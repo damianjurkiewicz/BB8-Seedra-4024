@@ -1973,7 +1973,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="PLC\PLC.tmc" TmcHash="{435252C9-CBFA-FA0C-DFC6-7DA5E24867CA}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="PLC\PLC.tmc" TmcHash="{78BBB1BE-7406-D98F-83AE-6EF0FFFD0D05}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -1991,38 +1991,15 @@ External Setpoint Generation:
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>SafetyGlobalVariableList.ERR_FB</Name>
-							<Comment><![CDATA[TWinSafe Group]]></Comment>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>SafetyGlobalVariableList.ERR_COM</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>SafetyGlobalVariableList.ERR_OTHER</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>SafetyGlobalVariableList.IN_RUN</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
 							<Name>SafetyGlobalVariableList.eStopButton</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>SafetyGlobalVariableList.AX5805_Error_Ch1</Name>
-							<Comment><![CDATA[AX580x]]></Comment>
+							<Name>GVL_Safety.FBError</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>SafetyGlobalVariableList.AX5805_Error_Ch2</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>SafetyGlobalVariableList.SAFETY_Permission</Name>
-							<Comment><![CDATA[ FALSE = cannot operate]]></Comment>
+							<Name>GVL_Safety.ComError</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -2050,33 +2027,16 @@ External Setpoint Generation:
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>SafetyGlobalVariableList.ERR_ACK</Name>
+							<Name>GVL_Safety.ErrorAck</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>SafetyGlobalVariableList.AX5805_ErrACK</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>SafetyGlobalVariableList.RestartFBs_TSG</Name>
-							<Comment><![CDATA[ Restart FB in TwinSafe Gr]]></Comment>
+							<Name>GVL_Safety.RestartFBs</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>SafetyTask Inputs</Name>
-						<Var>
-							<Name>GVL_Safety.FBError</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.SafeError</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.ComError</Name>
-							<Type>BOOL</Type>
-						</Var>
 						<Var>
 							<Name>IO.DI1</Name>
 							<Comment><![CDATA[Terminal EL1008]]></Comment>
@@ -2123,6 +2083,32 @@ External Setpoint Generation:
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
+							<Name>SafetyGlobalVariableList.ERR_FB</Name>
+							<Comment><![CDATA[TWinSafe Group]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.ERR_COM</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.ERR_OTHER</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.IN_RUN</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.AX5805_Error_Ch1</Name>
+							<Comment><![CDATA[AX580x]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.AX5805_Error_Ch2</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
 							<Name>SafetyGlobalVariableList.AX5805_STO_State_Ch1</Name>
 							<Type>BOOL</Type>
 						</Var>
@@ -2130,19 +2116,37 @@ External Setpoint Generation:
 							<Name>SafetyGlobalVariableList.AX5805_STO_State_Ch2</Name>
 							<Type>BOOL</Type>
 						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.SAFETY_Permission</Name>
+							<Comment><![CDATA[ FALSE = cannot operate]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.SafeError</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.eStopButton</Name>
+							<Type>BOOL</Type>
+						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
 						<Var>
+							<Name>SafetyGlobalVariableList.ERR_ACK</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.AX5805_ErrACK</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.RestartFBs_TSG</Name>
+							<Comment><![CDATA[ Restart FB in TwinSafe Gr]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
 							<Name>GVL_Safety.RunStop</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.ErrorAck</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.RestartFBs</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -2215,6 +2219,9 @@ External Setpoint Generation:
 				</Image>
 				<Image Id="4" AddrType="10" ImageType="3">
 					<Name>Image-2</Name>
+				</Image>
+				<Image Id="5" AddrType="10" ImageType="3">
+					<Name>Image-3</Name>
 				</Image>
 				<Box Id="1" BoxType="9099">
 					<Name>Term 1 (EK1100)</Name>
@@ -5866,10 +5873,10 @@ Bit 8 - 15 : reserved]]></Comment>
 								<Entry Name="FSOE__FSoE Slave CMD" Index="#x6000" Sub="#x01">
 									<Type>USINT</Type>
 								</Entry>
-								<Entry Name="FSOE__InputChannel1" Index="#x6001" Sub="#x01">
+								<Entry Name="FSOE__InputChannel1" Index="#x6001" Sub="#x01" Flags="#x00008020">
 									<Type>BIT</Type>
 								</Entry>
-								<Entry Name="FSOE__InputChannel2" Index="#x6001" Sub="#x02">
+								<Entry Name="FSOE__InputChannel2" Index="#x6001" Sub="#x02" Flags="#x00008020">
 									<Type>BIT</Type>
 								</Entry>
 								<Entry Name="FSOE__InputChannel3" Index="#x6001" Sub="#x03">
@@ -6041,9 +6048,11 @@ Bit 8 - 15 : reserved]]></Comment>
 		</Io>
 	</Project>
 	<Mappings>
-		<MappingInfo Identifier="{00000000-2002-0850-0120-500841000403}" Id="#x02030030"/>
+		<MappingInfo Identifier="{00000000-2001-0850-0020-500841000403}" Id="#x02030030"/>
 		<MappingInfo Identifier="{00000000-0020-0304-1000-040320000403}" Id="#x02030010"/>
 		<MappingInfo Identifier="{00000000-0030-0304-1000-040332000403}" Id="#x02030040"/>
+		<MappingInfo Identifier="{08502002-0040-0304-0020-500840000403}" Id="#x02030050" Watchdog="04000000040000000400000004000000"/>
+		<MappingInfo Identifier="{05000010-2001-0850-1000-040300205008}" Id="#x02030060" Watchdog="14000000040000000400000004000000"/>
 		<MappingInfo Identifier="{03040040-0040-0304-4000-040340000403}" Id="#x02030020" Watchdog="04000000040000000400000004000000"/>
 		<OwnerA Name="TIID^Device 3 (EtherCAT)">
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 10 (EL2904)">
@@ -6113,12 +6122,27 @@ Bit 8 - 15 : reserved]]></Comment>
 		</OwnerA>
 		<OwnerA Name="TIPC^PLC^PLC Instance">
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 8 (EL6900)">
-				<Link VarA="SafetyTask Inputs^GVL_Safety.ComError" VarB="StandardInputs^TwinSafeGroup1.GVL_Safety.ComError_8"/>
-				<Link VarA="SafetyTask Inputs^GVL_Safety.FBError" VarB="StandardInputs^TwinSafeGroup1.GVL_Safety.FBError_6"/>
+				<Link VarA="PlcTask Inputs^GVL_Safety.ComError" VarB="StandardInputs^TwinSafeGroup1.GVL_Safety.ComError_8"/>
+				<Link VarA="PlcTask Inputs^GVL_Safety.FBError" VarB="StandardInputs^TwinSafeGroup1.GVL_Safety.FBError_6"/>
+				<Link VarA="PlcTask Outputs^GVL_Safety.ErrorAck" VarB="StandardOutputs^TwinSafeGroup1.GVL_Safety.ErrorAck_1"/>
+				<Link VarA="PlcTask Outputs^GVL_Safety.RestartFBs" VarB="StandardOutputs^TwinSafeGroup1.GVL_Safety.RestartFBs_5"/>
 				<Link VarA="SafetyTask Inputs^GVL_Safety.SafeError" VarB="StandardInputs^TwinSafeGroup1.GVL_Safety.SafeError_7"/>
-				<Link VarA="SafetyTask Outputs^GVL_Safety.ErrorAck" VarB="StandardOutputs^TwinSafeGroup1.GVL_Safety.ErrorAck_1"/>
-				<Link VarA="SafetyTask Outputs^GVL_Safety.RestartFBs" VarB="StandardOutputs^TwinSafeGroup1.GVL_Safety.RestartFBs_5"/>
 				<Link VarA="SafetyTask Outputs^GVL_Safety.RunStop" VarB="StandardOutputs^TwinSafeGroup1.GVL_Safety.RunStop_4"/>
+			</OwnerB>
+			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 9 (EL1904)">
+				<Link VarA="SafetyTask Inputs^GVL_Safety.eStopButton" VarB="Module 1 (FSOES)^TxPDO^FSOE^InputChannel1"/>
+			</OwnerB>
+			<OwnerB Name="TINC^NC-Task 1 SAF^Axes^Axis 1">
+				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.AxisZ.BasicAxis._Axis.NcToPlc" VarB="Outputs^ToPlc"/>
+				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.AxisZ.BasicAxis._Axis.PlcToNc" VarB="Inputs^FromPlc"/>
+			</OwnerB>
+			<OwnerB Name="TINC^NC-Task 1 SAF^Axes^Axis 2">
+				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.AxisY.BasicAxis._Axis.NcToPlc" VarB="Outputs^ToPlc"/>
+				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.AxisY.BasicAxis._Axis.PlcToNc" VarB="Inputs^FromPlc"/>
+			</OwnerB>
+			<OwnerB Name="TINC^NC-Task 1 SAF^Axes^Axis 3">
+				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.NcToPlc" VarB="Outputs^ToPlc"/>
+				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.PlcToNc" VarB="Inputs^FromPlc"/>
 			</OwnerB>
 		</OwnerA>
 	</Mappings>

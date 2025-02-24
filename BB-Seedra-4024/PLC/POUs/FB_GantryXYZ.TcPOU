@@ -485,21 +485,21 @@ CASE Step OF
 			
 		10: //If necessary reset group
 		
-			SafetyGlobalVariableList.ERR_ACK := (SafetyGlobalVariableList.ERR_COM OR SafetyGlobalVariableList.ERR_FB OR SafetyGlobalVariableList.ERR_OTHER OR (NOT SafetyGlobalVariableList.IN_RUN)); 
+			GVL_Safety.ErrorAck := (GVL_Safety.ComError OR GVL_Safety.FBError); 
 		
-			IF SafetyGlobalVariableList.ERR_ACK OR SafetyTimer.Q THEN 
+			IF GVL_Safety.ErrorAck OR SafetyTimer.Q THEN 
 				Step := Step + 10;
 			END_IF
 
 		20: //Wait for the signal propagation
 			IF SafetyTimer.Q THEN
-				SafetyGlobalVariableList.ERR_ACK := FALSE;
+				GVL_Safety.ErrorAck := FALSE;
 				Step := Step + 10;
 			END_IF
 		
 		30: //Check FB errors
-			IF SafetyGlobalVariableList.ERR_FB OR (NOT SafetyGlobalVariableList.SAFETY_Permission) THEN
-				SafetyGlobalVariableList.RestartFBs_TSG := TRUE;
+			IF GVL_Safety.FBError OR (NOT GVL_Safety.SafetyPermission) THEN
+				GVL_Safety.RestartFBs := TRUE;
 			END_IF
 			
 			Step := Step + 10;
@@ -507,35 +507,16 @@ CASE Step OF
 		40: //Wait for the signal propagation
 		
 			IF SafetyTimer.Q THEN
-				SafetyGlobalVariableList.RestartFBs_TSG := FALSE;
+				GVL_Safety.RestartFBs := FALSE;
 				Step := Step + 10;
 			END_IF	
 			
 		50: //If necessary reset the AX5805
-			SafetyGlobalVariableList.AX5805_ErrACK := SafetyGlobalVariableList.AX5805_Error_Ch1 OR SafetyGlobalVariableList.AX5805_Error_Ch2;	
-		
-			IF SafetyGlobalVariableList.AX5805_ErrACK OR SafetyTimer.Q THEN
-				Step := Step + 10;
-			END_IF	
+			;
 			
 		60: //Wait for the signal propagation
 
-			IF SafetyTimer.Q THEN
-				
-				SafetyGlobalVariableList.AX5805_ErrACK	:= FALSE;
-			
-				IF SafetyGlobalVariableList.SAFETY_Permission AND 
-					NOT (SafetyGlobalVariableList.ERR_COM OR SafetyGlobalVariableList.ERR_FB OR SafetyGlobalVariableList.ERR_OTHER OR SafetyGlobalVariableList.AX5805_Error_Ch1 OR SafetyGlobalVariableList.AX5805_Error_Ch2) 
-				
-					THEN
-						Step := 0;
-						ResetSafety := TRUE;
-					ELSE
-						Step := 0;
-						ResetSafety := FALSE;
-				END_IF
-			
-			END_IF
+			;
 		
 		ELSE
 		
@@ -791,7 +772,9 @@ END_CASE
     <LineIds Name="FB_GantryXYZ.ResetSafety">
       <LineId Id="11" Count="5" />
       <LineId Id="76" Count="0" />
-      <LineId Id="17" Count="58" />
+      <LineId Id="17" Count="29" />
+      <LineId Id="51" Count="3" />
+      <LineId Id="70" Count="5" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
