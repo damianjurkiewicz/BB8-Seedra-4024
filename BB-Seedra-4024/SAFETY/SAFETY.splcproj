@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Crc="74649803" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{dd089ae2-d925-4402-87c9-527057084de0}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>TwinCAT3SafePlcProject</RootNamespace>
+    <AssemblyName>TwinCAT3SafePlcProject</AssemblyName>
+    <FileUpgradeFlags />
+    <UpgradeBackupLocation />
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <TargetSystem>EL6900</TargetSystem>
+    <ProgrammingLanguage>Graphical Editor</ProgrammingLanguage>
+    <Worker>Damian Jurkiewicz</Worker>
+    <IntProjName>SAFETY</IntProjName>
+    <IsNewCreated>false</IsNewCreated>
+    <SPlcProjVersion>1.8.0.0</SPlcProjVersion>
+    <NextSdsId>11</NextSdsId>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>false</DebugSymbols>
+    <OutputPath>bin\Release\</OutputPath>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="TwinSafeGroup1\Alias Devices\GVL_Safety.RunStop.sds" />
+    <None Include="TwinSafeGroup1\Alias Devices\GVL_Safety.RestartFBs.sds" />
+    <None Include="TwinSafeGroup1\Alias Devices\GVL_Safety.FBError.sds" />
+    <None Include="TwinSafeGroup1\Alias Devices\GVL_Safety.SafeError.sds" />
+    <None Include="TwinSafeGroup1\Alias Devices\GVL_Safety.ComError.sds" />
+    <None Include="TwinSafeGroup1\Alias Devices\Term 10 %28EL2904%29 - Module 1 %28FSOES%29.sds" />
+    <None Include="TwinSafeGroup1\Alias Devices\Term 9 %28EL1904%29 - Module 1 %28FSOES%29.sds" />
+    <None Include="TwinSafeGroup1\TwinSafeGroup1.sal" />
+    <None Include="TwinSafeGroup1\TwinSafeGroup1.sal.diagram">
+      <DependentUpon>TwinSafeGroup1\TwinSafeGroup1.sal</DependentUpon>
+      <Visible>false</Visible>
+    </None>
+    <None Include="TargetSystemConfig.xml">
+      <Visible>false</Visible>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GVLs" />
+    <Folder Include="TwinSafeGroup1" />
+    <Folder Include="TwinSafeGroup1\Alias Devices" />
+    <Folder Include="User FBs" />
+    <None Include="TwinSafeGroup1\Alias Devices\GVL_Safety.ErrorAck.sds" />
+  </ItemGroup>
+</Project>

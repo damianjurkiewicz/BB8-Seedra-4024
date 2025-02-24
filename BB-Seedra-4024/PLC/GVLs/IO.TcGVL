@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <GVL Name="IO" Id="{28fb6f3d-0143-40a3-8031-ba6ef6dfc5ef}">
+    <Declaration><![CDATA[VAR_GLOBAL
+
+//Terminal EL1008
+	DI1			AT%I*		:	BOOL;
+	DI2			AT%I*		:	BOOL;
+	DI3			AT%I*		:	BOOL;
+	DI4			AT%I*		:	BOOL;
+	DI5			AT%I*		:	BOOL;
+	DI6			AT%I*		:	BOOL;
+	DI7			AT%I*		:	BOOL;
+	DI8			AT%I*		:	BOOL;
+
+	ProximitySensorX			AT%I*		:	BOOL;
+	ProximitySensorY			AT%I*		:	BOOL;
+	ProximitySensorZ			AT%I*		:	BOOL;
+
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

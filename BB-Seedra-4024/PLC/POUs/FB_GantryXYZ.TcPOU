@@ -1,0 +1,811 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_GantryXYZ" Id="{474e1990-f731-0ed9-052c-42626742a38f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule 
+VAR
+    // Sub module definitions here
+
+    // List of sub modules
+    ipSubModules_Init : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
+
+    // Component definitions here
+    AxisX       		: FB_Component_BasicAxis 		:= (Name := 'AxisX');
+    AxisY    			: FB_Component_BasicAxis 		:= (Name := 'AxisY');
+	AxisZ				: FB_Component_BasicAxis		:= (Name := 'AxisZ');
+    GantryCylinder		: FB_GantryXYCylinder			:= (Name := 'Cylinder');
+    //Alarms for this module
+    GantryAlarms : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
+
+	//IO
+	LimitSwitchX :BOOL;
+	LimitSwitchY :BOOL;
+	LimitSwitchZ :BOOL;
+
+	HomeComplete :BOOL;
+	
+	//resets
+
+
+END_VAR
+
+VAR CONSTANT
+    GANTRY_ALARM_COUNT : INT := 5;
+END_VAR
+
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="MyMethods" Id="{d166ca9d-f57a-4d88-ac90-142e5eb5d488}" />
+    <Folder Name="States" Id="{8df42c9b-c051-49f1-9767-900503632339}" />
+    <Method Name="Aborting" Id="{5476dfef-6652-4e6b-8928-3724a50553de}" FolderPath="States\">
+      <Declaration><![CDATA[
+METHOD PROTECTED Aborting
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+END_VAR
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE SequenceState OF
+    0:
+        NoStateTasksToComplete := FALSE;
+        SequenceState          := SequenceState + 10;
+    10:
+		AxisX.Disable();
+		SequenceState := SequenceState + 10;
+	20:
+
+		StateTasksComplete := TRUE;
+END_CASE
+
+SUPER^.Aborting();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
+      <Declaration><![CDATA[METHOD PROTECTED Clearing
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+END_VAR
+
+VAR_INST
+	SoEResetAxis1 : FB_SoEReset;
+	ResetAxis1 :	MC_Reset;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE SequenceState OF
+    0:
+        NoStateTasksToComplete := FALSE;
+        SequenceState          := SequenceState + 10;
+    10:
+		//Reset any alarms that get latched
+//		GantryAlarms[E_Gantry.AlarmMessage].Clear(0,0);		
+//		GantryAlarms[E_Gantry.InfoMessage].Clear(0,0);
+//		GantryAlarms[E_Gantry.InitReferenceEvent].Clear(0,0);
+//		GantryAlarms[E_Gantry.StartTimeout].Clear(0,0);
+//		GantryAlarms[E_Gantry.WarnMessage].Clear(0,0);
+//		AxisX.Reset();
+//		AxisY.Reset();
+//		AxisZ.Reset();
+
+
+
+//		AxisX.Reset();
+
+		SoEResetAxis1(Axis := AxisX.Axis);
+		SoEResetAxis1.Execute := TRUE;	
+		
+		ResetAxis1(Axis:=AxisX.Axis);
+		ResetAxis1.Execute := TRUE;
+		
+		
+		SequenceState := SequenceState + 10;
+	20:
+	
+		SequenceState := SequenceState + 10;
+30: 
+
+		IF NOT ResetSafety() THEN
+			ResetSafety();
+		ELSE
+			SequenceState := SequenceState + 10;	
+		END_IF	
+    40:
+
+        // Enable here
+		// AxisX.Enable();
+		// AxisY.Enable();
+		// AxisZ.Enable();
+
+        // Check enabled here
+		// IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+			// SequenceState := SequenceState + 10;
+		// END_IF
+		
+		SequenceState := SequenceState + 10;
+		
+    50:
+        StateTasksComplete := TRUE;
+		
+END_CASE
+
+SUPER^.Clearing();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CreateEvents" Id="{40e5a283-7f33-033f-0879-cc11ecabc43d}">
+      <Declaration><![CDATA[METHOD PROTECTED CreateEvents
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Add your event creation here
+F_CreateAllEventsInClass(Alarms     := GantryAlarms,
+                         ClassSize  := SIZEOF(TC_EVENTS.Gantry),
+                         pInitEvent := ADR(TC_EVENTS.Gantry.InitReferenceEvent),
+                         Prefix     := _Name);
+
+// Super call to base
+SUPER^.CreateEvents();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CuttingBoxFiveSides" Id="{391386b3-3ac4-4fc7-a2a1-1d79f5676796}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD CuttingBoxFiveSides : BOOL
+
+VAR_INST
+	Step : INT ;	
+END_VAR
+
+
+
+(*
+	F			H
+	|			|
+D---+-----------+---C
+	|			|
+	|			| 
+B---+-----------+---A
+	|			|
+	E			G
+*)]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[	CASE Step OF
+		
+		0:  
+
+//Print Info
+			
+			Trace('Start Cutting Box Five Sides');
+
+
+			AxisX.MoveVelocity(500,0);
+			
+			
+			Step := Step + 10;	
+
+		10:	//Set Speed
+
+//			AxisX.Velocity := 10; 
+//			AxisY.Velocity := 10;
+//			AxisZ.Velocity := 5;
+			
+			Step := Step + 160;
+
+//		20:	//Positioning Motion to A
+   			
+//			AxisX.MoveAbsolute(0,0);
+//			AxisY.MoveAbsolute(250,0);		
+			
+//			Step := Step + 10; 
+		
+//		30: //Set Cutting Height
+			
+//			AxisZ.MoveAbsolute(-30,0);
+			
+//			Step := Step + 10;
+
+//		40: //Cutting Motion from A to B
+			
+//			AxisX.MoveAbsolute(500,0);		
+			
+//			Step := Step + 10;
+		
+//		50: //Return from Cutting Height 
+			
+//			AxisZ.MoveAbsolute(50,0);
+
+//			Step := Step + 10;
+		
+//		60: //Positioning Motion from B to C
+			
+//			AxisX.MoveAbsolute(0,0);
+//			AxisY.MoveAbsolute(50,0);
+	
+//			Step := Step + 10;
+
+//		70: //Set Cutting Height
+		
+//			AxisZ.MoveAbsolute(0,0);
+
+//			Step := Step + 10;
+
+//		80: //Cutting Motion from C to D
+			
+//			AxisX.MoveAbsolute(500,0);
+//			AxisY.MoveAbsolute(50,0);
+
+//			Step := Step + 10;
+
+//		90: //Return from Cutting Height 
+			
+//			AxisZ.MoveAbsolute(50,0);
+			
+//			Step := Step + 10;
+
+//		100: //Positioning Motion from D to E
+			
+//			AxisX.MoveAbsolute(450,0);
+//			AxisY.MoveAbsolute(300,0);
+
+//			Step := Step + 10;
+		
+//		110: //Set Cutting Height 	
+			
+//			AxisZ.MoveAbsolute(0,0);
+	
+//			Step := Step + 10;
+
+//		120: //Cutting Motion from E to F
+
+//			AxisX.MoveAbsolute(450,0);
+//			AxisY.MoveAbsolute(0,0);
+			
+//			Step := Step + 10;
+
+//		130: //Return from Cutting Height 
+
+//			AxisZ.MoveAbsolute(50,0);
+			
+//			Step := Step + 10;
+
+//		140: //Positioning Motion from F to G
+
+//			AxisX.MoveAbsolute(50,0);
+//			AxisY.MoveAbsolute(300,0);
+
+//			Step := Step + 10;
+
+//		150: //Cutting Motion from G to H
+  
+//			AxisX.MoveAbsolute(50,0);
+//			AxisY.MoveAbsolute(0,0);
+
+//			Step := Step + 10;
+
+//		160: //Return from Cutting Height 
+	
+//			AxisZ.MoveAbsolute(50,0);
+
+//			Step := Step + 10;
+
+		170: 
+
+//Return to ZERO
+////			AxisX.MoveAbsolute(0,0);
+//			AxisY.MoveAbsolute(0,0);
+			CuttingBoxFiveSides := TRUE;
+			Step := 0;
+			Trace('Box Five Sides is Cut');
+		
+			
+
+		
+
+			
+	END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic" Id="{0cfbfa67-40d6-05d6-0515-ef1c50353a78}">
+      <Declaration><![CDATA[METHOD CyclicLogic
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT _InitComplete THEN
+    _InitComplete := Initialize();
+    RETURN;
+END_IF
+
+SUPER^.CyclicLogic();
+
+//Set the current alarm severity for this module
+_CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentSeverity := _CurrentAlarmSeverity);
+
+//Simulate Alarm Messaging
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Execute" Id="{895d1ef9-5e85-47dd-a8bf-b32885837641}" FolderPath="States\">
+      <Declaration><![CDATA[METHOD PROTECTED Execute
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+
+	//=================================PRODUCTION MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Production:
+		CASE SequenceState OF
+			0:
+				NoStateTasksToComplete := FALSE;
+				
+				IF NOT CuttingBoxFiveSides() THEN
+					CuttingBoxFiveSides();	
+				ELSE
+					SequenceState := SequenceState + 10;
+				END_IF		
+				
+			10:		
+				StateTasksComplete := TRUE;
+				StateComplete();
+			END_CASE
+
+	//=================================MAINTENANCE & MANUAL MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+		;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="HMIPermissions" Id="{a7a517c4-9176-4ef6-9045-d889c05c8a21}">
+      <Declaration><![CDATA[METHOD PROTECTED HMIPermissions
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//General Mode Based Monitoring and handling of HMI control
+CASE _CurrentMode OF
+   
+ E_PMLUnitMode.ePMLUnitMode_Production:
+        CASE _CurrentState OF
+            E_PMLState.ePMLState_Stopped:
+				AllowHMIControl(ThisModuleOnly := FALSE);
+            E_PMLState.ePMLState_Idle:
+				AllowHMIControl(ThisModuleOnly := FALSE);
+            E_PMLState.ePMLState_Suspended:
+         		AllowHMIControl(ThisModuleOnly := FALSE);
+            E_PMLState.ePMLState_Execute:
+            	AllowHMIControl(ThisModuleOnly := FALSE); 
+            E_PMLState.ePMLState_Aborted:
+                AllowHMIControl(ThisModuleOnly := FALSE); 
+            E_PMLState.ePMLState_Held:
+                AllowHMIControl(ThisModuleOnly := FALSE); 
+            E_PMLState.ePMLState_Complete:
+          		AllowHMIControl(ThisModuleOnly := FALSE); 
+        END_CASE
+		
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+        AllowHMIControl(ThisModuleOnly := FALSE); 
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:
+        AllowHMIControl(ThisModuleOnly := FALSE); 
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Homing" Id="{7cf726af-0fa2-4719-9f55-f55ebcdc06af}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD Homing : BOOL
+
+VAR_INST
+	Step : INT ;	
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE Step OF
+		
+		0: 
+			Trace('Enable');
+			AxisX.Enable();
+		   //AxisX.MoveVelocity(5,0);
+			Step := Step + 10; 
+		10:
+//			Trace('Move Relative');
+//			IF IO.DI4 = FALSE THEN
+//				AxisX.Home();
+//				Step := Step + 10;
+//			END_IF
+			
+//			IF AxisX.Busy = FALSE THEN
+//				Step := Step + 10;
+//			END_IF
+			
+			Step := Step + 10;
+
+	
+		20:	
+			
+
+			Homing := TRUE;
+			Step := 0;	
+
+	END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Initialize" Id="{ba85f303-ffbe-03ad-229b-3741bd93e6e2}">
+      <Declaration><![CDATA[//! @summary Basic module initialization logic
+METHOD PROTECTED Initialize : BOOL;
+VAR
+    i                        : UDINT;
+    varInfo                  : __SYSTEM.VAR_INFO;
+    AllSubUnitsInitialized   : BOOL := TRUE;
+    AllComponentsInitialized : BOOL := TRUE;
+END_VAR
+
+//! @description This method is called by <c>CyclicLogic()</c> as required]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Initialize := FALSE;
+CASE DescendantSequenceState OF
+    0:
+		RegisterComponent(AxisX);
+		RegisterComponent(AxisY);	
+		RegisterComponent(AxisZ);	
+		RegisterComponent(GantryCylinder);
+		
+        _LogModeChanges         := FALSE;
+        _LogStateChanges        := FALSE;
+        DescendantSequenceState := DescendantSequenceState + 10;
+    10:
+        DescendantSequenceState := DescendantSequenceState + 10;
+    20:
+        //Copy Mode names
+        FOR i := 1 TO 3 DO
+            ModeNames[i] := F_UnitModeToString(UDINT_TO_DINT(i));
+        END_FOR
+
+        DescendantSequenceState := DescendantSequenceState + 10;
+    30:
+        //Call the Super
+        IF SUPER^.Initialize() THEN
+            DescendantSequenceState := DescendantSequenceState + 10;
+        END_IF
+    40:
+        Initialize := TRUE;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ResetSafety" Id="{6bac4035-16f4-4bf2-95a7-9f0b204a82b7}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD ResetSafety : BOOL
+VAR_INST
+	Step : INT ;	
+	SafetyTimer :TON;
+	SafetyTimerTrigger :R_TRIG;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SafetyTimer(IN:= Step > 0 AND NOT SafetyTimer.Q, PT:= T#500MS);
+
+CASE Step OF
+		
+		0:  // Reset group or waits
+			Trace('Timer Initialize');
+			Step := Step + 10;
+			
+		10: //If necessary reset group
+		
+			SafetyGlobalVariableList.ERR_ACK := (SafetyGlobalVariableList.ERR_COM OR SafetyGlobalVariableList.ERR_FB OR SafetyGlobalVariableList.ERR_OTHER OR (NOT SafetyGlobalVariableList.IN_RUN)); 
+		
+			IF SafetyGlobalVariableList.ERR_ACK OR SafetyTimer.Q THEN 
+				Step := Step + 10;
+			END_IF
+
+		20: //Wait for the signal propagation
+			IF SafetyTimer.Q THEN
+				SafetyGlobalVariableList.ERR_ACK := FALSE;
+				Step := Step + 10;
+			END_IF
+		
+		30: //Check FB errors
+			IF SafetyGlobalVariableList.ERR_FB OR (NOT SafetyGlobalVariableList.SAFETY_Permission) THEN
+				SafetyGlobalVariableList.RestartFBs_TSG := TRUE;
+			END_IF
+			
+			Step := Step + 10;
+			
+		40: //Wait for the signal propagation
+		
+			IF SafetyTimer.Q THEN
+				SafetyGlobalVariableList.RestartFBs_TSG := FALSE;
+				Step := Step + 10;
+			END_IF	
+			
+		50: //If necessary reset the AX5805
+			SafetyGlobalVariableList.AX5805_ErrACK := SafetyGlobalVariableList.AX5805_Error_Ch1 OR SafetyGlobalVariableList.AX5805_Error_Ch2;	
+		
+			IF SafetyGlobalVariableList.AX5805_ErrACK OR SafetyTimer.Q THEN
+				Step := Step + 10;
+			END_IF	
+			
+		60: //Wait for the signal propagation
+
+			IF SafetyTimer.Q THEN
+				
+				SafetyGlobalVariableList.AX5805_ErrACK	:= FALSE;
+			
+				IF SafetyGlobalVariableList.SAFETY_Permission AND 
+					NOT (SafetyGlobalVariableList.ERR_COM OR SafetyGlobalVariableList.ERR_FB OR SafetyGlobalVariableList.ERR_OTHER OR SafetyGlobalVariableList.AX5805_Error_Ch1 OR SafetyGlobalVariableList.AX5805_Error_Ch2) 
+				
+					THEN
+						Step := 0;
+						ResetSafety := TRUE;
+					ELSE
+						Step := 0;
+						ResetSafety := FALSE;
+				END_IF
+			
+			END_IF
+		
+		ELSE
+		
+		Step := 0;	
+
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Resetting" Id="{e7a01217-de28-430f-aeef-f83d9f1b6f0d}" FolderPath="States\">
+      <Declaration><![CDATA[METHOD PROTECTED Resetting
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+END_VAR
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+
+	//=================================PRODUCTION MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Production:
+		CASE SequenceState OF
+			0:
+				NoStateTasksToComplete := TRUE;
+				
+				IF NOT Homing() THEN
+					Homing();
+				ELSE
+					SequenceState := SequenceState + 10;	
+				END_IF		
+				
+			10:		
+				StateTasksComplete := TRUE;
+				SUPER^.Resetting();
+		END_CASE
+
+	//=================================MAINTENANCE & MANUAL MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+		;
+END_CASE
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_GantryXYZ">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Aborting">
+      <LineId Id="30" Count="4" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="56" Count="1" />
+      <LineId Id="61" Count="1" />
+      <LineId Id="79" Count="1" />
+      <LineId Id="29" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Clearing">
+      <LineId Id="28" Count="5" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="83" Count="3" />
+      <LineId Id="75" Count="2" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="128" Count="0" />
+      <LineId Id="127" Count="0" />
+      <LineId Id="126" Count="0" />
+      <LineId Id="124" Count="0" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="125" Count="0" />
+      <LineId Id="129" Count="0" />
+      <LineId Id="132" Count="0" />
+      <LineId Id="130" Count="1" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="62" Count="0" />
+      <LineId Id="142" Count="5" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="80" Count="1" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="40" Count="4" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="47" Count="1" />
+      <LineId Id="27" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CreateEvents">
+      <LineId Id="3" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingBoxFiveSides">
+      <LineId Id="96" Count="2" />
+      <LineId Id="307" Count="0" />
+      <LineId Id="306" Count="0" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="156" Count="0" />
+      <LineId Id="143" Count="0" />
+      <LineId Id="334" Count="0" />
+      <LineId Id="332" Count="0" />
+      <LineId Id="335" Count="1" />
+      <LineId Id="148" Count="1" />
+      <LineId Id="118" Count="0" />
+      <LineId Id="100" Count="2" />
+      <LineId Id="152" Count="0" />
+      <LineId Id="146" Count="1" />
+      <LineId Id="117" Count="0" />
+      <LineId Id="103" Count="1" />
+      <LineId Id="157" Count="0" />
+      <LineId Id="105" Count="2" />
+      <LineId Id="144" Count="0" />
+      <LineId Id="150" Count="0" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="158" Count="0" />
+      <LineId Id="153" Count="0" />
+      <LineId Id="155" Count="0" />
+      <LineId Id="154" Count="0" />
+      <LineId Id="108" Count="0" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="159" Count="0" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="160" Count="0" />
+      <LineId Id="124" Count="0" />
+      <LineId Id="161" Count="0" />
+      <LineId Id="125" Count="1" />
+      <LineId Id="138" Count="1" />
+      <LineId Id="162" Count="1" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="164" Count="0" />
+      <LineId Id="141" Count="0" />
+      <LineId Id="190" Count="1" />
+      <LineId Id="181" Count="0" />
+      <LineId Id="180" Count="0" />
+      <LineId Id="182" Count="0" />
+      <LineId Id="184" Count="1" />
+      <LineId Id="183" Count="0" />
+      <LineId Id="187" Count="0" />
+      <LineId Id="186" Count="0" />
+      <LineId Id="188" Count="1" />
+      <LineId Id="192" Count="0" />
+      <LineId Id="201" Count="1" />
+      <LineId Id="194" Count="0" />
+      <LineId Id="197" Count="1" />
+      <LineId Id="193" Count="0" />
+      <LineId Id="200" Count="0" />
+      <LineId Id="203" Count="0" />
+      <LineId Id="205" Count="0" />
+      <LineId Id="204" Count="0" />
+      <LineId Id="199" Count="0" />
+      <LineId Id="206" Count="1" />
+      <LineId Id="210" Count="0" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="142" Count="0" />
+      <LineId Id="211" Count="1" />
+      <LineId Id="218" Count="0" />
+      <LineId Id="214" Count="0" />
+      <LineId Id="217" Count="0" />
+      <LineId Id="220" Count="0" />
+      <LineId Id="219" Count="0" />
+      <LineId Id="222" Count="1" />
+      <LineId Id="216" Count="0" />
+      <LineId Id="280" Count="1" />
+      <LineId Id="225" Count="0" />
+      <LineId Id="224" Count="0" />
+      <LineId Id="227" Count="0" />
+      <LineId Id="226" Count="0" />
+      <LineId Id="228" Count="1" />
+      <LineId Id="231" Count="0" />
+      <LineId Id="230" Count="0" />
+      <LineId Id="233" Count="0" />
+      <LineId Id="232" Count="0" />
+      <LineId Id="235" Count="0" />
+      <LineId Id="237" Count="0" />
+      <LineId Id="236" Count="0" />
+      <LineId Id="239" Count="0" />
+      <LineId Id="238" Count="0" />
+      <LineId Id="241" Count="0" />
+      <LineId Id="240" Count="0" />
+      <LineId Id="242" Count="0" />
+      <LineId Id="244" Count="0" />
+      <LineId Id="243" Count="0" />
+      <LineId Id="245" Count="0" />
+      <LineId Id="234" Count="0" />
+      <LineId Id="247" Count="1" />
+      <LineId Id="250" Count="0" />
+      <LineId Id="249" Count="0" />
+      <LineId Id="252" Count="0" />
+      <LineId Id="251" Count="0" />
+      <LineId Id="305" Count="0" />
+      <LineId Id="304" Count="0" />
+      <LineId Id="253" Count="0" />
+      <LineId Id="255" Count="0" />
+      <LineId Id="300" Count="0" />
+      <LineId Id="313" Count="0" />
+      <LineId Id="309" Count="1" />
+      <LineId Id="256" Count="0" />
+      <LineId Id="312" Count="0" />
+      <LineId Id="264" Count="0" />
+      <LineId Id="258" Count="1" />
+      <LineId Id="19" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CyclicLogic">
+      <LineId Id="3" Count="5" />
+      <LineId Id="12" Count="4" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Execute">
+      <LineId Id="24" Count="8" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="36" Count="3" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="42" Count="3" />
+      <LineId Id="23" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.HMIPermissions">
+      <LineId Id="6" Count="24" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Homing">
+      <LineId Id="67" Count="3" />
+      <LineId Id="118" Count="0" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="72" Count="1" />
+      <LineId Id="104" Count="2" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="95" Count="2" />
+      <LineId Id="107" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="108" Count="0" />
+      <LineId Id="75" Count="2" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="78" Count="2" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Initialize">
+      <LineId Id="3" Count="4" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="8" Count="5" />
+      <LineId Id="41" Count="5" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="51" Count="7" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ResetSafety">
+      <LineId Id="11" Count="5" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="17" Count="58" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Resetting">
+      <LineId Id="82" Count="5" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="94" Count="9" />
+      <LineId Id="27" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

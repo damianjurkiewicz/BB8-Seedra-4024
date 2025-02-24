@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <DUT Name="ST_CylinderX_Status" Id="{9c3c3cc3-d2ef-0651-271a-ba4da8a7cca9}">
+    <Declaration><![CDATA[TYPE ST_CylinderX_Status :
+    STRUCT
+        Extended   : BOOL;
+        Retracted  : BOOL;
+        Extending  : BOOL;
+        Retracting : BOOL;
+    END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

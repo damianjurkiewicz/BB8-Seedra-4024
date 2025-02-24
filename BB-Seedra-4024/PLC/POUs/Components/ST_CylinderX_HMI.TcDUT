@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <DUT Name="ST_CylinderX_HMI" Id="{2fee6b41-7f7e-0486-1195-7e17846559f5}">
+    <Declaration><![CDATA[TYPE ST_CylinderX_HMI :
+    STRUCT
+        Config  : ST_Cylinder_Config;
+        Command : ST_CylinderX_Command;
+        Status  : ST_CylinderX_Status;
+    END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

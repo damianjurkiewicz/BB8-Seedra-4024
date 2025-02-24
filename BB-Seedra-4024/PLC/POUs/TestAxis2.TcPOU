@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="TestAxis2" Id="{c4d1aeed-ad07-48ee-832a-cb3f45f1be38}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK TestAxis2 EXTENDS FB_ComponentBase
+VAR
+	AxisSPT : FB_BasicAxis;
+	State 	: INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="CyclicLogic" Id="{add4678a-922e-4e32-840c-f1dbbb6cbc7b}">
+      <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
+VAR	
+
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.CyclicLogic();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Initialize" Id="{373c7236-707d-4500-91b5-e3c3f285aa21}">
+      <Declaration><![CDATA[METHOD PROTECTED Initialize : BOOL;
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.Initialize();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="MoveAxis" Id="{60e94f90-6698-4c2d-a40d-761d438c97f6}">
+      <Declaration><![CDATA[METHOD MoveAxis
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[      AxisSPT.CyclicLogic();
+
+IF SafetyGlobalVariableList.SAFETY_Permission = TRUE THEN
+
+	CASE State OF
+		
+	00:
+		IF AxisSPT.Enable() THEN
+			State := State + 10;
+		END_IF
+	10:
+		IF AxisSPT.Enabled THEN
+			AxisSPT.MoveVelocity( -5, TRUE);	
+		
+			IF IO.DI4 = TRUE THEN
+				AxisSPT.Home();
+				State := State + 10;
+			END_IF
+		END_IF
+
+	
+	20:
+		AxisSPT.Velocity := 10;
+		IF AxisSPT.MoveAbsolute(5000, FALSE) THEN
+			State := State + 10;
+		END_IF
+
+	30:
+		IF NOT AxisSPT.Busy THEN
+			State := State + 10;
+		END_IF
+
+	40:
+		AxisSPT.Trace('****Done****'); 
+
+	50:
+		//
+
+	END_CASE
+
+END_IF	]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="TestAxis2">
+      <LineId Id="167" Count="0" />
+    </LineIds>
+    <LineIds Name="TestAxis2.CyclicLogic">
+      <LineId Id="130" Count="0" />
+    </LineIds>
+    <LineIds Name="TestAxis2.Initialize">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="TestAxis2.MoveAxis">
+      <LineId Id="18" Count="1" />
+      <LineId Id="7" Count="3" />
+      <LineId Id="20" Count="6" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="57" Count="1" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="36" Count="10" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="16" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
