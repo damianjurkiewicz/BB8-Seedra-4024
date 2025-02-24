@@ -86,7 +86,7 @@ SUPER^.CyclicLogic();
 
 //NOT SafetyGlobalVariableList.eStopButton -> We Decouple physical button to Activate
   
-IF SafetyGlobalVariableList.eStopHMI OR NOT SafetyGlobalVariableList.eStopButton AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
+IF GVL_Safety.eStopHMI OR NOT SafetyGlobalVariableList.eStopButton AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
 	THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
 	RaiseAlarmWithStrings(MachineAlarms[E_Seedra.EmergencyStop],'','');
 //	ELSIF NOT SafetyGlobalVariableList.eStop THEN
@@ -136,7 +136,7 @@ METHOD PROTECTED HMICommunication
 //! @description This method is called cyclically by <c>CyclicLogic()</c>]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-IF SafetyGlobalVariableList.eStopHMI THEN
+IF GVL_Safety.eStopHMI THEN
 	PackMLBaseModule_HMI.Status.Error := TRUE;
 	THIS^._Error := TRUE;
 END_IF
