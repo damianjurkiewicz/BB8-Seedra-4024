@@ -1,13 +1,52 @@
-<?xml version="1.0" encoding="utf-8"?>
-<TcPlcObject Version="1.1.0.1">
-  <POU Name="MAIN" Id="{0e2fcadd-8368-472d-bab0-17f223d2dbf4}">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="MAIN" Id="{0464503f-a0ee-0a19-098a-507ac5cd340b}" SpecialFunc="None">
     <Declaration><![CDATA[PROGRAM MAIN
-VAR
-END_VAR
-]]>
-    </Declaration>
+
+	VAR
+		Seedra          : FB_Machine := (Name := 'SeedraMAIN');
+		InitComplete    : BOOL;
+	END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[]]></ST>
+      <ST><![CDATA[CyclicLogic();]]></ST>
     </Implementation>
+    <Method Name="CyclicLogic" Id="{85924404-3ac7-07ce-3884-239a0c5cad48}">
+      <Declaration><![CDATA[METHOD CyclicLogic
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT InitComplete THEN
+    InitComplete := Initialize();
+    RETURN;
+END_IF
+
+//Machine support HMI & Production Monitor
+
+
+//Machine Cyclic Logic
+Seedra.CyclicLogic();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Initialize" Id="{be8521cc-b0d4-05ce-0dc0-3bdba453ebf5}">
+      <Declaration><![CDATA[METHOD Initialize : BOOL
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//Top level machine initialization should happen here, in the main initialization method. Each subsequent "layer" of modules will be named within their respective "parent" intialize method
+_AppInfo.KeepOutputsOnBP := TRUE;
+Initialize := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="MAIN">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="MAIN.CyclicLogic">
+      <LineId Id="3" Count="8" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="MAIN.Initialize">
+      <LineId Id="3" Count="1" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>

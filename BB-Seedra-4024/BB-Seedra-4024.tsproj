@@ -1525,6 +1525,9 @@ External Setpoint Generation:
 					<Name>VISU_TASK</Name>
 				</Task>
 			</Tasks>
+			<TypeSystem>
+				<AdditionalTmcFile Name="PLC" File="..\..\..\Users\damia\Desktop\PLC.tmc"/>
+			</TypeSystem>
 		</System>
 		<Motion>
 			<NC>
@@ -1970,9 +1973,96 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="PLC\PLC.tmc" TmcHash="{189246D5-2820-EC1E-07B3-62FEE0A625FC}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="PLC\PLC.tmc" TmcHash="{435252C9-CBFA-FA0C-DFC6-7DA5E24867CA}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
+					<Vars VarGrpType="1">
+						<Name>PlcTask Inputs</Name>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.AxisY.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.AxisZ.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.ERR_FB</Name>
+							<Comment><![CDATA[TWinSafe Group]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.ERR_COM</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.ERR_OTHER</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.IN_RUN</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.eStopButton</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.AX5805_Error_Ch1</Name>
+							<Comment><![CDATA[AX580x]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.AX5805_Error_Ch2</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.SAFETY_Permission</Name>
+							<Comment><![CDATA[ FALSE = cannot operate]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+					</Vars>
+					<Vars VarGrpType="2" AreaNo="1">
+						<Name>PlcTask Outputs</Name>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.AxisY.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.AxisZ.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.GantryCylinder.Output</Name>
+							<Comment><![CDATA[Output]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.RUN_STOP</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.ERR_ACK</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.AX5805_ErrACK</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.RestartFBs_TSG</Name>
+							<Comment><![CDATA[ Restart FB in TwinSafe Gr]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+					</Vars>
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>SafetyTask Inputs</Name>
 						<Var>
@@ -1985,6 +2075,59 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>GVL_Safety.ComError</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI1</Name>
+							<Comment><![CDATA[Terminal EL1008]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI2</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI3</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI4</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI5</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI6</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI7</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI8</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorX</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorY</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorZ</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.AX5805_STO_State_Ch1</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>SafetyGlobalVariableList.AX5805_STO_State_Ch2</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -2022,10 +2165,20 @@ External Setpoint Generation:
 							<Priority>21</Priority>
 							<CycleTime>10000000</CycleTime>
 						</Context>
+						<Context>
+							<Id>2</Id>
+							<Name>VISU_TASK</Name>
+							<ManualConfig>
+								<OTCID>#x02010070</OTCID>
+							</ManualConfig>
+							<Priority>30</Priority>
+							<CycleTime>200000000</CycleTime>
+						</Context>
 					</Contexts>
 					<TaskPouOids>
 						<TaskPouOid Prio="20" OTCID="#x08502001"/>
 						<TaskPouOid Prio="21" OTCID="#x08502002"/>
+						<TaskPouOid Prio="30" OTCID="#x08502003"/>
 					</TaskPouOids>
 				</Instance>
 			</Project>
