@@ -86,7 +86,7 @@ SUPER^.CyclicLogic();
 
 //NOT SafetyGlobalVariableList.eStopButton -> We Decouple physical button to Activate
   
-IF GVL_Safety.eStopHMI OR NOT SafetyGlobalVariableList.eStopButton AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
+IF GVL_Safety.eStopHMI OR NOT GVL_Safety.eStopButton AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
 	THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
 	RaiseAlarmWithStrings(MachineAlarms[E_Seedra.EmergencyStop],'','');
 //	ELSIF NOT SafetyGlobalVariableList.eStop THEN
@@ -204,8 +204,8 @@ CASE DescendantSequenceState OF
         DescendantSequenceState := DescendantSequenceState + 10;
     30:
         // Initialize Safety
-		IF NOT SafetyGlobalVariableList.RUN_STOP THEN
-			SafetyGlobalVariableList.RUN_STOP := TRUE;	
+		IF NOT GVL_Safety.RunStop THEN
+			GVL_Safety.RunStop := TRUE;	
 		END_IF
         DescendantSequenceState := DescendantSequenceState + 10;
     40:

@@ -12,7 +12,9 @@ FBError AT%I* :BOOL;
 SafeError AT%I* :BOOL;
 ComError AT%I* :BOOL;
 
-SafetyPermission :BOOL;
+SafetyPermission AT %I* :BOOL;
+SafetyPermissionQ AT %Q* :BOOL;
+SafetyPermissionI AT %I* :BOOL;
 
 eStopButton					AT %I* :BOOL;
 eStopHMI					:BOOL;

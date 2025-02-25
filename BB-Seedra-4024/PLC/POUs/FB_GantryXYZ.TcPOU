@@ -475,7 +475,8 @@ VAR_INST
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[SafetyTimer(IN:= Step > 0 AND NOT SafetyTimer.Q, PT:= T#500MS);
+        <ST><![CDATA[//auto resetting timer, a start condition is an end condition
+SafetyTimer(IN:= Step > 0 AND NOT SafetyTimer.Q, PT:= T#500MS);
 
 CASE Step OF
 		
@@ -511,12 +512,24 @@ CASE Step OF
 				Step := Step + 10;
 			END_IF	
 			
-		50: //If necessary reset the AX5805
-			;
+		50: //Wait for the signal propagation
 			
-		60: //Wait for the signal propagation
-
-			;
+			
+		IF SafetyTimer.Q THEN
+				
+			
+				IF GVL_Safety.SafetyPermission AND 
+					NOT (GVL_Safety.ComError OR GVL_Safety.FBError OR GVL_Safety.SafeError) 
+				
+					THEN
+						Step := 0;
+						ResetSafety := TRUE;
+					ELSE
+						Step := 0;
+						ResetSafety := FALSE;
+				END_IF
+			
+			END_IF
 		
 		ELSE
 		
@@ -770,11 +783,14 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ResetSafety">
+      <LineId Id="104" Count="0" />
       <LineId Id="11" Count="5" />
       <LineId Id="76" Count="0" />
-      <LineId Id="17" Count="29" />
-      <LineId Id="51" Count="3" />
-      <LineId Id="70" Count="5" />
+      <LineId Id="17" Count="28" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="83" Count="3" />
+      <LineId Id="88" Count="15" />
+      <LineId Id="74" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
