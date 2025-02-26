@@ -435,7 +435,7 @@
           <TcLink>
             <TcPrjPath>..\BB-Seedra-4024\BB-Seedra-4024.tsproj</TcPrjPath>
             <IoItemPathName>TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 5 (EL7221-9014)</IoItemPathName>
-            <NcItemPathName AxisType="1">TINC^NC-Task 1 SAF^Axes^Axis 1</NcItemPathName>
+            <NcItemPathName AxisType="1">TINC^NC-Task 1 SAF^Axes^Axis Z</NcItemPathName>
           </TcLink>
           <SelectedModifyOptPDOsMode>0</SelectedModifyOptPDOsMode>
           <Block Id="0">
@@ -957,7 +957,7 @@
               </Parameter>
               <Parameter>
                 <PropertyName>FeedConstant</PropertyName>
-                <Value>60</Value>
+                <Value>3.9</Value>
               </Parameter>
               <Parameter>
                 <PropertyName>GearRatioMotorSide</PropertyName>
@@ -2547,6 +2547,6 @@ Bit 8 - 15 : reserved</Comment>
       <AmsNetId>0.0.0.0.4.1</AmsNetId>
       <AmsPort>1005</AmsPort>
     </AmsAddress>
-    <LinkedAxis>TINC^NC-Task 1 SAF^Axes^Axis 1</LinkedAxis>
+    <LinkedAxis>TINC^NC-Task 1 SAF^Axes^Axis Z</LinkedAxis>
   </EtherCAT>
 </TreeItem>
