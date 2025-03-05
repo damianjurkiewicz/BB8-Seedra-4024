@@ -24,7 +24,7 @@ VAR
 	HomeComplete :BOOL;
 	
 	//resets
-
+ 	_GantryStep : INT;
 
 END_VAR
 
@@ -32,6 +32,8 @@ VAR CONSTANT
     GANTRY_ALARM_COUNT : INT := 5;
 END_VAR
 
+
+  // Prywatna zmienna do przechowywania wartości Step
 
 ]]></Declaration>
     <Implementation>
@@ -57,6 +59,7 @@ END_VAR
 		AxisX.Disable();
 		AxisZ.Disable();
 		AxisY.Disable();
+		THIS^.GantryStep := 0;
 		SequenceState := SequenceState + 10;
 	20:
 
@@ -160,31 +163,31 @@ B---+-----------+---A
 *)]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-CASE Step OF
+CASE _GantryStep OF
 	0:
 		CuttingBoxFiveSides := FALSE;
 		Trace('Start Cutting Box Five Sides');
 
 		IF AxisZ.Enable() THEN
 			Trace('Enable');
-			Step := Step + 10;
+			_GantryStep := _GantryStep + 10;
 		END_IF
 
 	10:
 		IF AxisZ.Enabled THEN
 			Trace('ENABLED');
-			Step := Step + 10;
+			_GantryStep := _GantryStep + 10;
 		END_IF
 
 	20:
 		IF AxisZ.MoveVelocity(-2, FALSE) THEN
 			Trace('Moving');
-			Step := 30;
+			_GantryStep := 30;
 		END_IF
 
 	30:
 		CuttingBoxFiveSides := TRUE;
-		Step := 0;
+		_GantryStep := 0;
 		Trace('Box Five Sides is Cut');
 END_CASE
 ]]></ST>
@@ -236,6 +239,26 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Property Name="GantryStep" Id="{b85ccf6c-14f7-4091-9161-3a64d81c6f71}">
+      <Declaration><![CDATA[PROPERTY PUBLIC GantryStep : INT]]></Declaration>
+      <Get Name="Get" Id="{c9fc6e3e-e251-4188-a708-1d897bfbe015}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GantryStep := _GantryStep;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{51c79bd9-40f7-4370-9e3f-edffa2a24928}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF GantryStep < 0 THEN
+	_GantryStep := 0;  // Blokada wartości ujemnych
+	ELSE
+	_GantryStep := GantryStep;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="HMIPermissions" Id="{a7a517c4-9176-4ef6-9045-d889c05c8a21}">
       <Declaration><![CDATA[METHOD PROTECTED HMIPermissions
 
@@ -276,19 +299,21 @@ VAR_INST
 	Step : INT ;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE Step OF
+        <ST><![CDATA[
+
+CASE _GantryStep OF
 		
 	0:
 		Homing := FALSE;
 		IF AxisZ.Enable() THEN
 			Trace('Enable');
-			Step := Step + 10;
+			_GantryStep := _GantryStep + 10;
 		END_IF
 		
 	10:
 		IF AxisZ.Enabled THEN
 			Trace('ENABLED');
-			Step := Step + 10;
+			_GantryStep := _GantryStep + 10;
 		END_IF
 
 	20:
@@ -297,17 +322,17 @@ END_VAR]]></Declaration>
 				IF NOT AxisZ.Busy THEN
 				AxisZ.Home();
 				Trace('Jestem już na krancowce');
-				Step := 80;
+				_GantryStep := 80;
 				END_IF
 			END_IF
 		ELSE		
-			Step := Step + 10;
+			_GantryStep := _GantryStep + 10;
 		END_IF
 		
 	30:
 		IF AxisZ.MoveVelocity(5, FALSE) THEN
 			Trace('Szybki ruch, szukam krancowki');
-            Step := Step + 10;
+            _GantryStep := _GantryStep + 10;
         END_IF
 		
 	
@@ -317,7 +342,7 @@ END_VAR]]></Declaration>
 		IF AxisZ.Stop() THEN
 			IF NOT AxisZ.Busy THEN
 				Trace('Znalazłem krańcówkę');
-				Step := Step + 10;
+				_GantryStep := _GantryStep + 10;
 			END_IF
 		END_IF
 
@@ -326,27 +351,27 @@ END_VAR]]></Declaration>
 	50:
 		IF AxisZ.MoveRelative(-5,FALSE) THEN
 			Trace('Odsunięcie od krańcówki, po szybkim');
-			Step := Step + 10;
+			_GantryStep := _GantryStep + 10;
 		END_IF
 		
 	60: 
 		IF AxisZ.MoveVelocity(1,FALSE) THEN
 			Trace('Spokojny powrot dla precyzji');		
-			Step := Step + 10;
+			_GantryStep := _GantryStep + 10;
 		END_IF	
 		
 	70:
 		IF IO.ProximitySensorZ THEN
 			IF AxisZ.Stop() THEN
 				Trace('Zatrzymuje sie');
-				Step := Step + 10; // Przechodzimy do czekania na zatrzymanie
+				_GantryStep := _GantryStep + 10; // Przechodzimy do czekania na zatrzymanie
 			END_IF
 		END_IF
 
 	80:
 		IF NOT AxisZ.Busy THEN
 			IF AxisZ.Home() THEN
-				Step := Step + 10;
+				_GantryStep := _GantryStep + 10;
 				Trace('Precyzyjny Home wykonany');
 			END_IF
 		END_IF
@@ -355,21 +380,21 @@ END_VAR]]></Declaration>
 	90:	
 		IF AxisZ.MoveRelative(-2.0, FALSE) THEN
 			Trace('Odsunięcie od krańcówki o 2mm');
-			Step := Step + 10;
+			_GantryStep := _GantryStep + 10;
 		END_IF
 	
 	100:
 		IF NOT AxisZ.Busy THEN
 			IF AxisZ.Home() THEN
 				Trace('Ustawienie nowego zera po odsunięciu');
-				Step := Step + 10;
+				_GantryStep := _GantryStep + 10;
 			END_IF
 		END_IF
 	
 	110:
 		Homing := TRUE;
 		Trace('Homing zakończony pomyślnie');
-		Step := 0;
+		_GantryStep := 0;
 			
 	END_CASE
 	
@@ -429,27 +454,27 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[//auto resetting timer, a start condition is an end condition
-SafetyTimer(IN:= Step > 0 AND NOT SafetyTimer.Q, PT:= T#500MS);
+SafetyTimer(IN:= _GantryStep > 0 AND NOT SafetyTimer.Q, PT:= T#500MS);
 
-CASE Step OF
+CASE _GantryStep OF
 		
 		0:  // Reset group or waits
 			ResetSafety:= FALSE;
 			Trace('Timer Initialize');
-			Step := Step + 10;
+			_GantryStep := _GantryStep + 10;
 			
 		10: //If necessary reset group
 		
 			GVL_Safety.ErrorAck := (GVL_Safety.ComError OR GVL_Safety.FBError); 
 		
 			IF GVL_Safety.ErrorAck OR SafetyTimer.Q THEN 
-				Step := Step + 10;
+				_GantryStep := _GantryStep + 10;
 			END_IF
 
 		20: //Wait for the signal propagation
 			IF SafetyTimer.Q THEN
 				GVL_Safety.ErrorAck := FALSE;
-				Step := Step + 10;
+				_GantryStep := _GantryStep + 10;
 			END_IF
 		
 		30: //Check FB errors
@@ -457,13 +482,13 @@ CASE Step OF
 				GVL_Safety.RestartFBs := TRUE;
 			END_IF
 			
-			Step := Step + 10;
+			_GantryStep := _GantryStep + 10;
 			
 		40: //Wait for the signal propagation
 		
 			IF SafetyTimer.Q THEN
 				GVL_Safety.RestartFBs := FALSE;
-				Step := Step + 10;
+				_GantryStep := _GantryStep + 10;
 			END_IF	
 			
 		50: //Wait for the signal propagation
@@ -476,10 +501,10 @@ CASE Step OF
 					NOT (GVL_Safety.ComError OR GVL_Safety.FBError OR GVL_Safety.SafeError) 
 				
 					THEN
-						Step := 0;
+						_GantryStep := 0;
 						ResetSafety := TRUE;
 					ELSE
-						Step := 0;
+						_GantryStep := 0;
 						ResetSafety := FALSE;
 				END_IF
 			
@@ -487,7 +512,7 @@ CASE Step OF
 		
 		ELSE
 		
-		Step := 0;	
+		_GantryStep := 0;	
 
 END_CASE
 
@@ -535,6 +560,7 @@ END_CASE
       <LineId Id="30" Count="4" />
       <LineId Id="44" Count="0" />
       <LineId Id="88" Count="1" />
+      <LineId Id="97" Count="0" />
       <LineId Id="56" Count="1" />
       <LineId Id="61" Count="1" />
       <LineId Id="79" Count="1" />
@@ -571,9 +597,7 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingBoxFiveSides">
-      <LineId Id="379" Count="2" />
-      <LineId Id="423" Count="0" />
-      <LineId Id="382" Count="23" />
+      <LineId Id="441" Count="27" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CyclicLogic">
@@ -590,83 +614,19 @@ END_CASE
       <LineId Id="42" Count="3" />
       <LineId Id="23" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.GantryStep.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.GantryStep.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.HMIPermissions">
       <LineId Id="6" Count="24" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Homing">
-      <LineId Id="151" Count="1" />
-      <LineId Id="171" Count="0" />
-      <LineId Id="363" Count="0" />
-      <LineId Id="172" Count="1" />
-      <LineId Id="205" Count="0" />
-      <LineId Id="174" Count="0" />
-      <LineId Id="179" Count="1" />
-      <LineId Id="176" Count="0" />
-      <LineId Id="206" Count="0" />
-      <LineId Id="177" Count="0" />
-      <LineId Id="161" Count="0" />
-      <LineId Id="178" Count="0" />
-      <LineId Id="207" Count="0" />
-      <LineId Id="211" Count="0" />
-      <LineId Id="223" Count="0" />
-      <LineId Id="317" Count="0" />
-      <LineId Id="341" Count="0" />
-      <LineId Id="277" Count="0" />
-      <LineId Id="227" Count="0" />
-      <LineId Id="318" Count="0" />
-      <LineId Id="226" Count="0" />
-      <LineId Id="230" Count="1" />
-      <LineId Id="224" Count="0" />
-      <LineId Id="221" Count="0" />
-      <LineId Id="214" Count="0" />
-      <LineId Id="237" Count="0" />
-      <LineId Id="278" Count="0" />
-      <LineId Id="238" Count="0" />
-      <LineId Id="229" Count="0" />
-      <LineId Id="232" Count="1" />
-      <LineId Id="244" Count="0" />
-      <LineId Id="260" Count="0" />
-      <LineId Id="250" Count="0" />
-      <LineId Id="261" Count="0" />
-      <LineId Id="286" Count="2" />
-      <LineId Id="285" Count="0" />
-      <LineId Id="259" Count="0" />
-      <LineId Id="254" Count="0" />
-      <LineId Id="251" Count="0" />
-      <LineId Id="245" Count="1" />
-      <LineId Id="256" Count="0" />
-      <LineId Id="280" Count="0" />
-      <LineId Id="362" Count="0" />
-      <LineId Id="247" Count="0" />
-      <LineId Id="262" Count="0" />
-      <LineId Id="282" Count="0" />
-      <LineId Id="284" Count="0" />
-      <LineId Id="283" Count="0" />
-      <LineId Id="264" Count="2" />
-      <LineId Id="327" Count="2" />
-      <LineId Id="342" Count="0" />
-      <LineId Id="330" Count="6" />
-      <LineId Id="338" Count="2" />
-      <LineId Id="306" Count="0" />
-      <LineId Id="299" Count="0" />
-      <LineId Id="249" Count="0" />
-      <LineId Id="243" Count="0" />
-      <LineId Id="352" Count="2" />
-      <LineId Id="217" Count="0" />
-      <LineId Id="219" Count="0" />
-      <LineId Id="346" Count="0" />
-      <LineId Id="355" Count="4" />
-      <LineId Id="348" Count="0" />
-      <LineId Id="347" Count="0" />
-      <LineId Id="239" Count="0" />
-      <LineId Id="220" Count="0" />
-      <LineId Id="360" Count="0" />
-      <LineId Id="181" Count="0" />
-      <LineId Id="170" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="311" Count="0" />
-      <LineId Id="345" Count="0" />
+      <LineId Id="382" Count="99" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
@@ -679,18 +639,7 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ResetSafety">
-      <LineId Id="104" Count="0" />
-      <LineId Id="11" Count="4" />
-      <LineId Id="119" Count="0" />
-      <LineId Id="16" Count="0" />
-      <LineId Id="76" Count="0" />
-      <LineId Id="17" Count="28" />
-      <LineId Id="71" Count="0" />
-      <LineId Id="83" Count="3" />
-      <LineId Id="88" Count="15" />
-      <LineId Id="74" Count="1" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="112" Count="0" />
+      <LineId Id="189" Count="62" />
       <LineId Id="111" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
