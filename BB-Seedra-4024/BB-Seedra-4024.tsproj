@@ -1692,12 +1692,12 @@ External Setpoint Generation:
 				<Axis Id="2" CreateSymbols="true" AxisType="1">
 					<Name>Axis Y</Name>
 					<AxisPara>
-						<Dynamic Acceleration="8053.7925" Deceleration="8053.7925" Jerk="24161.3775"/>
-						<Velo RefSearch="53.69195" RefSync="53.69195" SlowManual="268.45975" FastManual="1610.7585" Fast="5369.195" Maximum="5369.195"/>
+						<Dynamic Acceleration="630.8805" Deceleration="630.8805" Jerk="1892.6415"/>
+						<Velo RefSearch="4.20587" RefSync="4.20587" SlowManual="21.02935" FastManual="126.1761" Fast="420.587" Maximum="420.587"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="60" ScaleFactorDenominator="1048576" MaxCount="#xffffffff"/>
+						<EncPara ScaleFactorNumerator="4.7" ScaleFactorDenominator="1048576" Inverse="true" MaxCount="#xffffffff"/>
 						<Vars VarGrpType="1">
 							<Name>Inputs</Name>
 							<Var>
@@ -1755,8 +1755,8 @@ External Setpoint Generation:
 						</Vars>
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
-						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="5906.1145" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+						<DrvPara Inverse="true" MaxCount="#xffffffff" DriveControlDWord="#x00020100">
+							<Analog VeloReferenz="462.6457" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -1833,12 +1833,12 @@ External Setpoint Generation:
 				<Axis Id="3" CreateSymbols="true" AxisType="1">
 					<Name>Axis X</Name>
 					<AxisPara>
-						<Dynamic Acceleration="8053.7925" Deceleration="8053.7925" Jerk="24161.3775"/>
-						<Velo RefSearch="53.69195" RefSync="53.69195" SlowManual="268.45975" FastManual="1610.7585" Fast="5369.195" Maximum="5369.195"/>
+						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14"/>
+						<Velo RefSearch="5.3692" RefSync="5.3692" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="60" ScaleFactorDenominator="1048576" MaxCount="#xffffffff"/>
+						<EncPara ScaleFactorNumerator="6" ScaleFactorDenominator="1048576" Inverse="true" MaxCount="#xffffffff"/>
 						<Vars VarGrpType="1">
 							<Name>Inputs</Name>
 							<Var>
@@ -1896,8 +1896,8 @@ External Setpoint Generation:
 						</Vars>
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
-						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="5906.1145" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+						<DrvPara Inverse="true" MaxCount="#xffffffff" DriveControlDWord="#x00020100">
+							<Analog VeloReferenz="590.612" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -1975,7 +1975,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="PLC\PLC.tmc" TmcHash="{97AD3629-7853-429C-2B19-8DED9F8BFA76}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" TmcPath="PLC\PLC.tmc" TmcHash="{65A5F6B4-4BB2-714A-7028-F7C048668186}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -1998,6 +1998,14 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>GVL_Safety.eStopButton</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorX</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorY</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
@@ -2086,14 +2094,6 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>IO.DI8</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.ProximitySensorX</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.ProximitySensorY</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -4368,7 +4368,7 @@ Bit 8 - 15 : reserved]]></Comment>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>60</Value>
+													<Value>4.7</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
@@ -4403,7 +4403,32 @@ Bit 8 - 15 : reserved]]></Comment>
 													<Value>563.07812</Value>
 												</Parameter>
 											</Load>
-											<Controller/>
+											<Controller>
+												<Filter Id="0">
+													<Name>ControllerFilter</Name>
+													<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
+													<Parameter>
+														<PropertyName>Filter_Type</PropertyName>
+														<Value>1</Value>
+													</Parameter>
+													<Parameter>
+														<PropertyName>Filter_LowPassFrequency</PropertyName>
+														<Value>320</Value>
+													</Parameter>
+													<Parameter>
+														<PropertyName>Filter_LowPassDamping</PropertyName>
+														<Value>0</Value>
+													</Parameter>
+													<Parameter>
+														<PropertyName>Filter_HighPassFrequency</PropertyName>
+														<Value>0</Value>
+													</Parameter>
+													<Parameter>
+														<PropertyName>Filter_HighPassDamping</PropertyName>
+														<Value>0</Value>
+													</Parameter>
+												</Filter>
+											</Controller>
 										</Block>
 										<WatchLog ChnId="0" UpdateIntervalInMs="500">
 											<WatchLogItem>
@@ -5431,7 +5456,7 @@ Bit 8 - 15 : reserved]]></Comment>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>60</Value>
+													<Value>6</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
@@ -5459,14 +5484,39 @@ Bit 8 - 15 : reserved]]></Comment>
 												</Parameter>
 												<Parameter>
 													<PropertyName>MaxApplicationTorqueForce</PropertyName>
-													<Value>1.6</Value>
+													<Value>0.8</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>MaxApplicationSpeed</PropertyName>
-													<Value>1256.63706143592</Value>
+													<Value>563.07812</Value>
 												</Parameter>
 											</Load>
-											<Controller/>
+											<Controller>
+												<Filter Id="0">
+													<Name>ControllerFilter</Name>
+													<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
+													<Parameter>
+														<PropertyName>Filter_Type</PropertyName>
+														<Value>1</Value>
+													</Parameter>
+													<Parameter>
+														<PropertyName>Filter_LowPassFrequency</PropertyName>
+														<Value>320</Value>
+													</Parameter>
+													<Parameter>
+														<PropertyName>Filter_LowPassDamping</PropertyName>
+														<Value>0</Value>
+													</Parameter>
+													<Parameter>
+														<PropertyName>Filter_HighPassFrequency</PropertyName>
+														<Value>0</Value>
+													</Parameter>
+													<Parameter>
+														<PropertyName>Filter_HighPassDamping</PropertyName>
+														<Value>0</Value>
+													</Parameter>
+												</Filter>
+											</Controller>
 										</Block>
 										<WatchLog ChnId="0" UpdateIntervalInMs="500">
 											<WatchLogItem>
@@ -6076,9 +6126,9 @@ Bit 8 - 15 : reserved]]></Comment>
 		</OwnerA>
 		<OwnerA Name="TIPC^PLC^PLC Instance">
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 2 (EL1008)">
+				<Link VarA="PlcTask Inputs^IO.ProximitySensorX" VarB="Channel 4^Input"/>
+				<Link VarA="PlcTask Inputs^IO.ProximitySensorY" VarB="Channel 5^Input"/>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorZ" VarB="Channel 6^Input"/>
-				<Link VarA="SafetyTask Inputs^IO.ProximitySensorX" VarB="Channel 4^Input"/>
-				<Link VarA="SafetyTask Inputs^IO.ProximitySensorY" VarB="Channel 5^Input"/>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 8 (EL6900)">
 				<Link VarA="PlcTask Inputs^GVL_Safety.ComError" VarB="StandardInputs^TwinSafeGroup1.GVL_Safety.ComError_8"/>

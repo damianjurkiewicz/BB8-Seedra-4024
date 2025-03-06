@@ -787,7 +787,7 @@
               </Parameter>
               <Parameter>
                 <PropertyName>FeedConstant</PropertyName>
-                <Value>60</Value>
+                <Value>4.7</Value>
               </Parameter>
               <Parameter>
                 <PropertyName>GearRatioMotorSide</PropertyName>
@@ -822,7 +822,32 @@
                 <Value>563.07812</Value>
               </Parameter>
             </Load>
-            <Controller />
+            <Controller>
+              <Filter Id="0">
+                <Name>ControllerFilter</Name>
+                <ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
+                <Parameter>
+                  <PropertyName>Filter_Type</PropertyName>
+                  <Value>1</Value>
+                </Parameter>
+                <Parameter>
+                  <PropertyName>Filter_LowPassFrequency</PropertyName>
+                  <Value>320</Value>
+                </Parameter>
+                <Parameter>
+                  <PropertyName>Filter_LowPassDamping</PropertyName>
+                  <Value>0</Value>
+                </Parameter>
+                <Parameter>
+                  <PropertyName>Filter_HighPassFrequency</PropertyName>
+                  <Value>0</Value>
+                </Parameter>
+                <Parameter>
+                  <PropertyName>Filter_HighPassDamping</PropertyName>
+                  <Value>0</Value>
+                </Parameter>
+              </Filter>
+            </Controller>
           </Block>
           <WatchLog ChnId="0" UpdateIntervalInMs="500">
             <WatchLogItem>

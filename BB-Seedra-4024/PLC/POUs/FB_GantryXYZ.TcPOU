@@ -295,9 +295,7 @@ END_CASE]]></ST>
     <Method Name="Homing" Id="{7cf726af-0fa2-4719-9f55-f55ebcdc06af}" FolderPath="MyMethods\">
       <Declaration><![CDATA[METHOD Homing : BOOL
 
-VAR_INST
-	Step : INT ;
-END_VAR]]></Declaration>
+]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 
@@ -305,22 +303,22 @@ CASE _GantryStep OF
 		
 	0:
 		Homing := FALSE;
-		IF AxisZ.Enable() THEN
+		IF AxisY.Enable() THEN
 			Trace('Enable');
 			_GantryStep := _GantryStep + 10;
 		END_IF
 		
 	10:
-		IF AxisZ.Enabled THEN
+		IF AxisY.Enabled THEN
 			Trace('ENABLED');
 			_GantryStep := _GantryStep + 10;
 		END_IF
 
 	20:
-		IF IO.ProximitySensorZ THEN
-			IF AxisZ.Stop() THEN
-				IF NOT AxisZ.Busy THEN
-				AxisZ.Home();
+		IF IO.ProximitySensorY THEN
+			IF AxisY.Stop() THEN
+				IF NOT AxisY.Busy THEN
+				AxisY.Home();
 				Trace('Jestem już na krancowce');
 				_GantryStep := 80;
 				END_IF
@@ -330,17 +328,17 @@ CASE _GantryStep OF
 		END_IF
 		
 	30:
-		IF AxisZ.MoveVelocity(5, FALSE) THEN
+		IF AxisY.MoveVelocity(5, FALSE) THEN
 			Trace('Szybki ruch, szukam krancowki');
             _GantryStep := _GantryStep + 10;
         END_IF
 		
 	
 	40: 
-		IF IO.ProximitySensorZ THEN
+		IF IO.ProximitySensorY THEN
 			
-		IF AxisZ.Stop() THEN
-			IF NOT AxisZ.Busy THEN
+		IF AxisY.Stop() THEN
+			IF NOT AxisY.Busy THEN
 				Trace('Znalazłem krańcówkę');
 				_GantryStep := _GantryStep + 10;
 			END_IF
@@ -349,28 +347,28 @@ CASE _GantryStep OF
 		END_IF
 
 	50:
-		IF AxisZ.MoveRelative(-5,FALSE) THEN
+		IF AxisY.MoveRelative(-5,FALSE) THEN
 			Trace('Odsunięcie od krańcówki, po szybkim');
 			_GantryStep := _GantryStep + 10;
 		END_IF
 		
 	60: 
-		IF AxisZ.MoveVelocity(1,FALSE) THEN
+		IF AxisY.MoveVelocity(1,FALSE) THEN
 			Trace('Spokojny powrot dla precyzji');		
 			_GantryStep := _GantryStep + 10;
 		END_IF	
 		
 	70:
-		IF IO.ProximitySensorZ THEN
-			IF AxisZ.Stop() THEN
+		IF IO.ProximitySensorY THEN
+			IF AxisY.Stop() THEN
 				Trace('Zatrzymuje sie');
 				_GantryStep := _GantryStep + 10; // Przechodzimy do czekania na zatrzymanie
 			END_IF
 		END_IF
 
 	80:
-		IF NOT AxisZ.Busy THEN
-			IF AxisZ.Home() THEN
+		IF NOT AxisY.Busy THEN
+			IF AxisY.Home() THEN
 				_GantryStep := _GantryStep + 10;
 				Trace('Precyzyjny Home wykonany');
 			END_IF
@@ -378,14 +376,14 @@ CASE _GantryStep OF
 
 
 	90:	
-		IF AxisZ.MoveRelative(-2.0, FALSE) THEN
+		IF AxisY.MoveRelative(-2.0, FALSE) THEN
 			Trace('Odsunięcie od krańcówki o 2mm');
 			_GantryStep := _GantryStep + 10;
 		END_IF
 	
 	100:
-		IF NOT AxisZ.Busy THEN
-			IF AxisZ.Home() THEN
+		IF NOT AxisY.Busy THEN
+			IF AxisY.Home() THEN
 				Trace('Ustawienie nowego zera po odsunięciu');
 				_GantryStep := _GantryStep + 10;
 			END_IF
@@ -626,7 +624,7 @@ END_CASE
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Homing">
-      <LineId Id="382" Count="99" />
+      <LineId Id="584" Count="99" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
