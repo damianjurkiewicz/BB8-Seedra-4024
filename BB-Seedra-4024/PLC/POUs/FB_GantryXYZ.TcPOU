@@ -26,6 +26,9 @@ VAR
 	//resets
 	_HomingStepX : INT;
  	_HomingStepY : INT;
+	_HomingStepZ : INT;
+	
+	_CuttingStep : INT;
 
 END_VAR
 
@@ -58,9 +61,13 @@ END_VAR
         SequenceState          := SequenceState + 10;
     10:
 		AxisX.Disable();
-		AxisZ.Disable();
 		AxisY.Disable();
+		AxisZ.Disable();
+
+		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
+		THIS^.HomingStepZ := 0;
+		THIS^.CuttingStep := 0;
 		SequenceState := SequenceState + 10;
 	20:
 
@@ -146,9 +153,7 @@ SUPER^.CreateEvents();]]></ST>
     <Method Name="Cutting" Id="{391386b3-3ac4-4fc7-a2a1-1d79f5676796}" FolderPath="MyMethods\">
       <Declaration><![CDATA[METHOD Cutting : BOOL
 
-VAR_INST
-	Step : INT ;	
-END_VAR
+
 
 
 
@@ -163,36 +168,77 @@ B---+-----------+---A
 	E			G
 *)]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE _HomingStepY OF
-	0:
-		Cutting := FALSE;
-		Trace('Start Cutting Box Five Sides');
+        <ST><![CDATA[CASE _CuttingStep OF 
+0:
+        Cutting := FALSE;
+        Trace('Start Cutting Box Five Sides');
 
-		IF AxisZ.Enable() THEN
-			Trace('Enable');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
+        AxisZ.Enable();
+        AxisY.Enable();
+        AxisX.Enable();
+        
+        _CuttingStep := 10;
 
-	10:
-		IF AxisZ.Enabled THEN
-			Trace('ENABLED');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
+    10:
+        IF AxisZ.Enabled AND AxisY.Enabled AND AxisX.Enabled THEN
+            Trace('ENABLED and Router ON');
+            _CuttingStep := 20;
+        END_IF
+        
+    20:
+     
+            AxisZ.Velocity := 20;
+            AxisY.Velocity := 100;
+            AxisX.Velocity := 20;
+            
+          //AxisZ.MoveRelative(20, FALSE);
+            AxisY.MoveRelative(200, FALSE);
+          //AxisX.MoveRelative(20, FALSE);
+            
+            Trace('Starting Axes Movement');
+            _CuttingStep := 30;
 
-	20:
-		IF AxisZ.MoveVelocity(-2, FALSE) THEN
-			Trace('Moving');
-			_HomingStepY := 30;
-		END_IF
+    
+    30:
+        IF NOT AxisZ.Busy AND NOT AxisY.Busy AND NOT AxisX.Busy THEN
+            Trace('Axes Movement Completed');
+            _CuttingStep := 40;
+        END_IF
+    
+    40:
+      
+        Trace('Router OFF');
+        _CuttingStep := 50;
 
-	30:
-		Cutting := TRUE;
-		_HomingStepY := 0;
-		Trace('Box Five Sides is Cut');
-END_CASE
-]]></ST>
+    50:
+      
+            Cutting := TRUE;
+            Trace('Box Five Sides is Cut');
+            _CuttingStep := 0;
+      
+END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Property Name="CuttingStep" Id="{3898497e-74b5-487e-9d83-61675b4ff850}">
+      <Declaration><![CDATA[PROPERTY PUBLIC CuttingStep : INT]]></Declaration>
+      <Get Name="Get" Id="{85c69036-89e0-4658-95e9-e32bfe715076}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CuttingStep := _CuttingStep;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{4ef01eb3-301e-4c44-97b5-e8a2a52b5b95}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF CuttingStep < 0 THEN
+	_CuttingStep := 0;  // Blokada wartości ujemnych
+	ELSE
+	_CuttingStep := CuttingStep;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="CyclicLogic" Id="{0cfbfa67-40d6-05d6-0515-ef1c50353a78}">
       <Declaration><![CDATA[METHOD CyclicLogic
 VAR_INPUT
@@ -308,6 +354,26 @@ END_IF]]></ST>
 	_HomingStepY := 0;  // Blokada wartości ujemnych
 	ELSE
 	_HomingStepY := HomingStepY;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="HomingStepZ" Id="{0b9a390e-db9e-4739-bffa-5ca069d437ef}">
+      <Declaration><![CDATA[PROPERTY PUBLIC HomingStepZ : INT]]></Declaration>
+      <Get Name="Get" Id="{403aef28-5a6c-4ea4-b639-a6922b7be29b}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HomingStepZ := _HomingStepZ;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{5b912885-4f7d-414a-b1af-1074244e821d}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF HomingStepZ < 0 THEN
+	_HomingStepZ := 0;  // Blokada wartości ujemnych
+	ELSE
+	_HomingStepZ := HomingStepX;
 END_IF]]></ST>
         </Implementation>
       </Set>
@@ -428,12 +494,14 @@ END_IF]]></ST>
 	0:
 		HomingY := FALSE;
 		IF AxisY.Enable() THEN
+			
 			Trace('Enable');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
 		
 	10:
 		IF AxisY.Enabled THEN
+			AxisY.Deceleration := 12000;
 			Trace('ENABLED');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
@@ -452,7 +520,7 @@ END_IF]]></ST>
 		END_IF
 		
 	30:
-		IF AxisY.MoveVelocity(-10, FALSE) THEN
+		IF AxisY.MoveVelocity(-50, FALSE) THEN
 			Trace('Szybki ruch, szukam krancowki');
             _HomingStepY := _HomingStepY + 10;
         END_IF
@@ -471,13 +539,13 @@ END_IF]]></ST>
 		END_IF
 
 	50:
-		IF AxisY.MoveRelative(5,FALSE) THEN
+		IF AxisY.MoveRelative(30,FALSE) THEN
 			Trace('Odsunięcie od krańcówki, po szybkim');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
 		
 	60: 
-		IF AxisY.MoveVelocity(-5,FALSE) THEN
+		IF AxisY.MoveVelocity(-10,FALSE) THEN
 			Trace('Spokojny powrot dla precyzji');		
 			_HomingStepY := _HomingStepY + 10;
 		END_IF	
@@ -517,6 +585,112 @@ END_IF]]></ST>
 		HomingY := TRUE;
 		Trace('Homing zakończony pomyślnie');
 		_HomingStepY := 0;
+			
+	END_CASE
+	
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="HomingZ" Id="{59c5c153-dee1-4d97-aac8-e655f142ebf1}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD HomingZ : BOOL
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _HomingStepZ OF
+		
+	0:
+		HomingZ := FALSE;
+		IF AxisZ.Enable() THEN
+			Trace('Enable');
+			_HomingStepZ := _HomingStepZ + 10;
+		END_IF
+		
+	10:
+		IF AxisZ.Enabled THEN
+			Trace('ENABLED');
+			_HomingStepZ := _HomingStepZ + 10;
+		END_IF
+
+	20:
+		IF IO.ProximitySensorZ THEN
+			IF AxisZ.Stop() THEN
+				IF NOT AxisZ.Busy THEN
+				AxisZ.Home();
+				Trace('Jestem już na krancowce');
+				_HomingStepZ := 80;
+				END_IF
+			END_IF
+		ELSE		
+			_HomingStepZ := _HomingStepZ + 10;
+		END_IF
+		
+	30:
+		IF AxisZ.MoveVelocity(-10, FALSE) THEN
+			Trace('Szybki ruch, szukam krancowki');
+            _HomingStepZ := _HomingStepZ + 10;
+        END_IF
+		
+	
+	40: 
+		IF IO.ProximitySensorZ THEN
+			
+		IF AxisZ.Stop() THEN
+			IF NOT AxisZ.Busy THEN
+				Trace('Znalazłem krańcówkę');
+				_HomingStepZ := _HomingStepZ + 10;
+			END_IF
+		END_IF
+
+		END_IF
+
+	50:
+		IF AxisZ.MoveRelative(5,FALSE) THEN
+			Trace('Odsunięcie od krańcówki, po szybkim');
+			_HomingStepZ := _HomingStepZ + 10;
+		END_IF
+		
+	60: 
+		IF AxisZ.MoveVelocity(-5,FALSE) THEN
+			Trace('Spokojny powrot dla precyzji');		
+			_HomingStepZ := _HomingStepZ + 10;
+		END_IF	
+		
+	70:
+		IF IO.ProximitySensorZ THEN
+			IF AxisZ.Stop() THEN
+				Trace('Zatrzymuje sie');
+				_HomingStepZ := _HomingStepZ + 10; // Przechodzimy do czekania na zatrzymanie
+			END_IF
+		END_IF
+
+	80:
+		IF NOT AxisZ.Busy THEN
+			IF AxisZ.Home() THEN
+				_HomingStepZ := _HomingStepZ + 10;
+				Trace('Precyzyjny Home wykonany');
+			END_IF
+		END_IF
+
+
+	90:	
+		IF AxisZ.MoveRelative(2.0, FALSE) THEN
+			Trace('Odsunięcie od krańcówki o 2mm');
+			_HomingStepZ := _HomingStepZ + 10;
+		END_IF
+	
+	100:
+		IF NOT AxisZ.Busy THEN
+			IF AxisZ.Home() THEN
+				Trace('Ustawienie nowego zera po odsunięciu');
+				_HomingStepZ := _HomingStepZ + 10;
+			END_IF
+		END_IF
+	
+	110:
+		HomingZ := TRUE;
+		Trace('Homing zakończony pomyślnie');
+		_HomingStepZ := 0;
 			
 	END_CASE
 	
@@ -668,8 +842,12 @@ END_VAR
 				IF  HomingX() THEN
 					SequenceState := SequenceState + 10;	
 				END_IF		
-	
-			30:		
+				
+			30:	
+				IF  HomingZ() THEN
+					SequenceState := SequenceState + 10;	
+				END_IF		
+			40:		
 				StateTasksComplete := TRUE;
 				SUPER^.Resetting();
 		END_CASE
@@ -686,7 +864,13 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Aborting">
-      <LineId Id="105" Count="14" />
+      <LineId Id="105" Count="5" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="124" Count="0" />
+      <LineId Id="112" Count="1" />
+      <LineId Id="121" Count="1" />
+      <LineId Id="114" Count="5" />
       <LineId Id="29" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
@@ -720,8 +904,18 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Cutting">
-      <LineId Id="503" Count="26" />
+      <LineId Id="591" Count="0" />
+      <LineId Id="639" Count="0" />
+      <LineId Id="592" Count="10" />
+      <LineId Id="604" Count="34" />
       <LineId Id="19" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingStep.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingStep.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CyclicLogic">
       <LineId Id="3" Count="5" />
@@ -755,12 +949,27 @@ END_CASE
       <LineId Id="5" Count="3" />
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.HomingStepZ.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.HomingStepZ.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingX">
       <LineId Id="788" Count="97" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingY">
-      <LineId Id="688" Count="97" />
+      <LineId Id="688" Count="4" />
+      <LineId Id="786" Count="0" />
+      <LineId Id="693" Count="5" />
+      <LineId Id="787" Count="0" />
+      <LineId Id="699" Count="86" />
+      <LineId Id="314" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.HomingZ">
+      <LineId Id="888" Count="97" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
@@ -786,6 +995,7 @@ END_CASE
       <LineId Id="125" Count="1" />
       <LineId Id="129" Count="1" />
       <LineId Id="128" Count="0" />
+      <LineId Id="131" Count="3" />
       <LineId Id="127" Count="0" />
       <LineId Id="94" Count="9" />
       <LineId Id="27" Count="0" />
