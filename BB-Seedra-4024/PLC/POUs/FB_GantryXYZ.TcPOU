@@ -328,7 +328,7 @@ CASE _GantryStep OF
 		END_IF
 		
 	30:
-		IF AxisY.MoveVelocity(5, FALSE) THEN
+		IF AxisY.MoveVelocity(-10, FALSE) THEN
 			Trace('Szybki ruch, szukam krancowki');
             _GantryStep := _GantryStep + 10;
         END_IF
@@ -347,13 +347,13 @@ CASE _GantryStep OF
 		END_IF
 
 	50:
-		IF AxisY.MoveRelative(-5,FALSE) THEN
+		IF AxisY.MoveRelative(5,FALSE) THEN
 			Trace('Odsunięcie od krańcówki, po szybkim');
 			_GantryStep := _GantryStep + 10;
 		END_IF
 		
 	60: 
-		IF AxisY.MoveVelocity(1,FALSE) THEN
+		IF AxisY.MoveVelocity(-5,FALSE) THEN
 			Trace('Spokojny powrot dla precyzji');		
 			_GantryStep := _GantryStep + 10;
 		END_IF	
@@ -376,7 +376,7 @@ CASE _GantryStep OF
 
 
 	90:	
-		IF AxisY.MoveRelative(-2.0, FALSE) THEN
+		IF AxisY.MoveRelative(2.0, FALSE) THEN
 			Trace('Odsunięcie od krańcówki o 2mm');
 			_GantryStep := _GantryStep + 10;
 		END_IF
