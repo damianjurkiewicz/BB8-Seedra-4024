@@ -153,10 +153,6 @@ SUPER^.CreateEvents();]]></ST>
     <Method Name="Cutting" Id="{391386b3-3ac4-4fc7-a2a1-1d79f5676796}" FolderPath="MyMethods\">
       <Declaration><![CDATA[METHOD Cutting : BOOL
 
-
-
-
-
 (*
 	F			H
 	|			|
@@ -168,60 +164,145 @@ B---+-----------+---A
 	E			G
 *)]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE _CuttingStep OF 
-0:
-        Cutting := FALSE;
-        Trace('Start Cutting Box Five Sides');
+        <ST><![CDATA[	CASE _CuttingStep OF
+		
+		0:  
 
-        AxisZ.Enable();
-        AxisY.Enable();
-        AxisX.Enable();
-        
-        _CuttingStep := 10;
+			Trace('Start Cutting Box Five Sides');
 
-    10:
-        IF AxisZ.Enabled AND AxisY.Enabled AND AxisX.Enabled THEN
-			AxisY.Acceleration := 7500;
-			AxisY.Deceleration := 7500;
-            Trace('ENABLED and Router ON');
-            _CuttingStep := 20;
-        END_IF
-        
-    20:
-     
-            AxisZ.Velocity := 75;
-            AxisY.Velocity := 50;
-            AxisX.Velocity := 100;
-            
-          	AxisZ.MoveRelative(50, FALSE);
-            AxisY.MoveRelative(200, FALSE);
-          	AxisX.MoveRelative(100, FALSE);
-            
-            Trace('Starting Axes Movement');
-            _CuttingStep := 30;
-
-    
-    30:
-        IF NOT AxisZ.Busy AND NOT AxisY.Busy AND NOT AxisX.Busy THEN
-            Trace('Axes Movement Completed');
-			AxisZ.Velocity := 150;
-            AxisY.Velocity := 100;
-            AxisX.Velocity := 200;
-            _CuttingStep := 40;
-        END_IF
-    
-    40:
-      	IF  AxisY.MoveAbsolute(0, FALSE) AND AxisZ.MoveAbsolute(0, FALSE) AND AxisX.MoveAbsolute(0,FALSE) THEN
-        Trace('Router OFF');
-        _CuttingStep := 50;
+			
+		IF AxisZ.Enable() THEN
+			Trace('Enable');
+			_CuttingStep := _CuttingStep + 10;
 		END_IF
-    50:
-      
-            Cutting := TRUE;
-            Trace('Box Five Sides is Cut');
-            _CuttingStep := 0;
-      
-END_CASE]]></ST>
+			
+			
+			
+
+		10:	//Set Speed
+
+			AxisX.Velocity := 10; 
+			AxisY.Velocity := 10;
+			AxisZ.Velocity := 5;
+			IF AxisZ.Enabled THEN
+				Trace('ENABLED');
+				_CuttingStep := _CuttingStep + 10;
+			END_IF
+			
+
+		20:	//Positioning Motion to A
+   			
+		
+		
+			AxisX.MoveAbsolute(0,0);
+			AxisY.MoveAbsolute(250,0);		
+			
+			_CuttingStep := _CuttingStep + 10; 
+		
+		30: //Set Cutting Height
+			
+			AxisZ.MoveAbsolute(-30,0);
+			
+			_CuttingStep := _CuttingStep + 10;
+
+		40: //Cutting Motion from A to B
+			
+			AxisX.MoveAbsolute(500,0);		
+			
+			_CuttingStep := _CuttingStep + 10;
+		
+		50: //Return from Cutting Height 
+			
+			AxisZ.MoveAbsolute(50,0);
+
+			_CuttingStep := _CuttingStep + 10;
+		
+		60: //Positioning Motion from B to C
+			
+			AxisX.MoveAbsolute(0,0);
+			AxisY.MoveAbsolute(50,0);
+	
+			_CuttingStep := _CuttingStep + 10;
+
+		70: //Set Cutting Height
+		
+			AxisZ.MoveAbsolute(0,0);
+
+			_CuttingStep := _CuttingStep + 10;
+
+		80: //Cutting Motion from C to D
+			
+			AxisX.MoveAbsolute(500,0);
+			AxisY.MoveAbsolute(50,0);
+
+			_CuttingStep := _CuttingStep + 10;
+
+		90: //Return from Cutting Height 
+			
+			AxisZ.MoveAbsolute(50,0);
+			
+			_CuttingStep := _CuttingStep + 10;
+
+		100: //Positioning Motion from D to E
+			
+			AxisX.MoveAbsolute(450,0);
+			AxisY.MoveAbsolute(300,0);
+
+			_CuttingStep := _CuttingStep + 10;
+		
+		110: //Set Cutting Height 	
+			
+			AxisZ.MoveAbsolute(0,0);
+	
+			_CuttingStep := _CuttingStep + 10;
+
+		120: //Cutting Motion from E to F
+
+			AxisX.MoveAbsolute(450,0);
+			AxisY.MoveAbsolute(0,0);
+			
+			_CuttingStep := _CuttingStep + 10;
+
+		130: //Return from Cutting Height 
+
+			AxisZ.MoveAbsolute(50,0);
+			
+			_CuttingStep := _CuttingStep + 10;
+
+		140: //Positioning Motion from F to G
+
+			AxisX.MoveAbsolute(50,0);
+			AxisY.MoveAbsolute(300,0);
+
+			_CuttingStep := _CuttingStep + 10;
+
+		150: //Cutting Motion from G to H
+  
+			AxisX.MoveAbsolute(50,0);
+			AxisY.MoveAbsolute(0,0);
+
+			_CuttingStep := _CuttingStep + 10;
+
+		160: //Return from Cutting Height 
+	
+			AxisZ.MoveAbsolute(50,0);
+
+			_CuttingStep := _CuttingStep + 10;
+
+		170: 
+
+			AxisZ.MoveAbsolute(0,0);
+			AxisX.MoveAbsolute(0,0);
+			AxisY.MoveAbsolute(0,0);
+			Cutting := TRUE;
+			Trace('Box Five Sides is Cut');
+		
+			
+
+		
+
+			
+	END_CASE]]></ST>
       </Implementation>
     </Method>
     <Property Name="CuttingStep" Id="{3898497e-74b5-487e-9d83-61675b4ff850}">
@@ -484,7 +565,7 @@ END_IF]]></ST>
 	110:
 		HomingX := TRUE;
 		Trace('Homing zakończony pomyślnie X');
-		_HomingStepX := 0;
+		
 			
 	END_CASE
 	
@@ -593,7 +674,7 @@ END_IF]]></ST>
 	110:
 		HomingY := TRUE;
 		Trace('Homing zakończony pomyślnie Y');
-		_HomingStepY := 0;
+		
 			
 	END_CASE
 	
@@ -702,7 +783,7 @@ END_IF]]></ST>
 	110:
 		HomingZ := TRUE;
 		Trace('Homing zakończony pomyślnie Z');
-		_HomingStepZ := 0;
+		
 			
 	END_CASE
 	
@@ -832,6 +913,11 @@ END_CASE
 VAR
 	i				: UDINT;
 	SubModulesReady : BOOL := TRUE;
+	
+	flagX :BOOL;
+	flagY :BOOL;
+	flagZ :BOOL;
+	
 END_VAR
 
 ]]></Declaration>
@@ -846,19 +932,27 @@ END_VAR
 				SequenceState := SequenceState + 10;	
 		
 			10:	
-				IF  HomingY()  THEN
-					SequenceState := SequenceState + 10;	
-				END_IF		
+				IF HomingY() THEN
+					flagY := TRUE;
+				END_IF
 				
-			20:	
-				IF  HomingX()  THEN
-					SequenceState := SequenceState + 10;	
-				END_IF		
+				IF HomingZ() THEN
+					flagZ := TRUE;
+				END_IF
 				
-			30:	
-				IF  HomingZ()  THEN
-					SequenceState := SequenceState + 10;	
-				END_IF			
+				IF HomingX() THEN
+					flagX := TRUE;
+				END_IF
+					
+				
+			
+			IF flagX AND flagY AND flagZ THEN
+				Trace('All Axes Homing completed');
+				THIS^.HomingStepX := 0;
+				THIS^.HomingStepY := 0;
+				THIS^.HomingStepZ := 0;
+				SequenceState := 40;
+			END_IF			
 					
 			40:		
 				StateTasksComplete := TRUE;
@@ -917,14 +1011,10 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Cutting">
-      <LineId Id="591" Count="0" />
-      <LineId Id="639" Count="0" />
-      <LineId Id="592" Count="10" />
-      <LineId Id="655" Count="1" />
-      <LineId Id="604" Count="20" />
-      <LineId Id="658" Count="1" />
-      <LineId Id="657" Count="0" />
-      <LineId Id="625" Count="13" />
+      <LineId Id="676" Count="3" />
+      <LineId Id="682" Count="0" />
+      <LineId Id="685" Count="125" />
+      <LineId Id="812" Count="6" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingStep.Get">
@@ -1007,14 +1097,19 @@ END_CASE
       <LineId Id="115" Count="0" />
       <LineId Id="122" Count="0" />
       <LineId Id="148" Count="0" />
-      <LineId Id="145" Count="0" />
-      <LineId Id="114" Count="0" />
+      <LineId Id="187" Count="1" />
+      <LineId Id="194" Count="0" />
+      <LineId Id="176" Count="0" />
+      <LineId Id="195" Count="2" />
+      <LineId Id="180" Count="0" />
+      <LineId Id="198" Count="1" />
+      <LineId Id="181" Count="0" />
+      <LineId Id="179" Count="0" />
       <LineId Id="149" Count="0" />
-      <LineId Id="151" Count="2" />
-      <LineId Id="150" Count="0" />
-      <LineId Id="154" Count="0" />
-      <LineId Id="156" Count="2" />
-      <LineId Id="155" Count="0" />
+      <LineId Id="184" Count="1" />
+      <LineId Id="211" Count="2" />
+      <LineId Id="186" Count="0" />
+      <LineId Id="183" Count="0" />
       <LineId Id="125" Count="0" />
       <LineId Id="94" Count="9" />
       <LineId Id="27" Count="0" />
