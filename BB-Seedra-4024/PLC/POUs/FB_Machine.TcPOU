@@ -111,12 +111,17 @@ END_IF
 			0:
 				NoStateTasksToComplete := FALSE;
 
-				//Advance Gantry to Resetting (Homing)
+				//Advance Gantry start
 				GantryXYZ.ChangeState(E_PMLCommand.ePMLCommand_Start);
 				
 				SequenceState := SequenceState + 10;
+			
+			10: 
+				IF GantryXYZ.CurrentState = E_PMLState.ePMLState_Complete THEN
+					SequenceState := SequenceState + 10;
+				END_IF	
 					
-			10:
+			20:
 				StateTasksComplete := TRUE;
 				StateComplete();
 				
@@ -349,7 +354,9 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Execute">
-      <LineId Id="24" Count="22" />
+      <LineId Id="24" Count="11" />
+      <LineId Id="49" Count="4" />
+      <LineId Id="36" Count="10" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.HMICommunication">

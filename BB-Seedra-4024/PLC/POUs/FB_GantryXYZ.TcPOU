@@ -181,19 +181,21 @@ B---+-----------+---A
 
     10:
         IF AxisZ.Enabled AND AxisY.Enabled AND AxisX.Enabled THEN
+			AxisY.Acceleration := 7500;
+			AxisY.Deceleration := 7500;
             Trace('ENABLED and Router ON');
             _CuttingStep := 20;
         END_IF
         
     20:
      
-            AxisZ.Velocity := 20;
-            AxisY.Velocity := 100;
-            AxisX.Velocity := 20;
+            AxisZ.Velocity := 75;
+            AxisY.Velocity := 50;
+            AxisX.Velocity := 100;
             
-          //AxisZ.MoveRelative(20, FALSE);
+          	AxisZ.MoveRelative(50, FALSE);
             AxisY.MoveRelative(200, FALSE);
-          //AxisX.MoveRelative(20, FALSE);
+          	AxisX.MoveRelative(100, FALSE);
             
             Trace('Starting Axes Movement');
             _CuttingStep := 30;
@@ -202,14 +204,17 @@ B---+-----------+---A
     30:
         IF NOT AxisZ.Busy AND NOT AxisY.Busy AND NOT AxisX.Busy THEN
             Trace('Axes Movement Completed');
+			AxisZ.Velocity := 150;
+            AxisY.Velocity := 100;
+            AxisX.Velocity := 200;
             _CuttingStep := 40;
         END_IF
     
     40:
-      
+      	IF  AxisY.MoveAbsolute(0, FALSE) AND AxisZ.MoveAbsolute(0, FALSE) AND AxisX.MoveAbsolute(0,FALSE) THEN
         Trace('Router OFF');
         _CuttingStep := 50;
-
+		END_IF
     50:
       
             Cutting := TRUE;
@@ -272,8 +277,8 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 				
 				IF Cutting() THEN
 					SequenceState := SequenceState + 10;
-				END_IF		
-				
+				END_IF	
+								
 			10:		
 				StateTasksComplete := TRUE;
 				StateComplete();
@@ -501,7 +506,8 @@ END_IF]]></ST>
 		
 	10:
 		IF AxisY.Enabled THEN
-			AxisY.Deceleration := 12000;
+			AxisY.Acceleration := 100;
+			AxisY.Deceleration := 15000;
 			Trace('ENABLED');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
@@ -539,7 +545,7 @@ END_IF]]></ST>
 		END_IF
 
 	50:
-		IF AxisY.MoveRelative(30,FALSE) THEN
+		IF AxisY.MoveRelative(20,FALSE) THEN
 			Trace('Odsunięcie od krańcówki, po szybkim');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
@@ -834,19 +840,20 @@ END_VAR
 				SequenceState := SequenceState + 10;	
 		
 			10:	
-				IF  HomingY() THEN
+				IF  HomingY()  THEN
 					SequenceState := SequenceState + 10;	
 				END_IF		
 				
-			20:
-				IF  HomingX() THEN
+			20:	
+				IF  HomingX()  THEN
 					SequenceState := SequenceState + 10;	
 				END_IF		
 				
 			30:	
-				IF  HomingZ() THEN
+				IF  HomingZ()  THEN
 					SequenceState := SequenceState + 10;	
-				END_IF		
+				END_IF			
+					
 			40:		
 				StateTasksComplete := TRUE;
 				SUPER^.Resetting();
@@ -907,7 +914,11 @@ END_CASE
       <LineId Id="591" Count="0" />
       <LineId Id="639" Count="0" />
       <LineId Id="592" Count="10" />
-      <LineId Id="604" Count="34" />
+      <LineId Id="655" Count="1" />
+      <LineId Id="604" Count="20" />
+      <LineId Id="658" Count="1" />
+      <LineId Id="657" Count="0" />
+      <LineId Id="625" Count="13" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingStep.Get">
@@ -925,7 +936,9 @@ END_CASE
     <LineIds Name="FB_GantryXYZ.Execute">
       <LineId Id="24" Count="8" />
       <LineId Id="49" Count="0" />
-      <LineId Id="36" Count="3" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="38" Count="1" />
       <LineId Id="52" Count="0" />
       <LineId Id="40" Count="0" />
       <LineId Id="42" Count="3" />
@@ -964,6 +977,7 @@ END_CASE
       <LineId Id="688" Count="4" />
       <LineId Id="786" Count="0" />
       <LineId Id="693" Count="5" />
+      <LineId Id="790" Count="0" />
       <LineId Id="787" Count="0" />
       <LineId Id="699" Count="86" />
       <LineId Id="314" Count="0" />
@@ -990,13 +1004,17 @@ END_CASE
       <LineId Id="89" Count="0" />
       <LineId Id="91" Count="0" />
       <LineId Id="115" Count="0" />
-      <LineId Id="122" Count="2" />
+      <LineId Id="122" Count="0" />
+      <LineId Id="148" Count="0" />
+      <LineId Id="145" Count="0" />
       <LineId Id="114" Count="0" />
-      <LineId Id="125" Count="1" />
-      <LineId Id="129" Count="1" />
-      <LineId Id="128" Count="0" />
-      <LineId Id="131" Count="3" />
-      <LineId Id="127" Count="0" />
+      <LineId Id="149" Count="0" />
+      <LineId Id="151" Count="2" />
+      <LineId Id="150" Count="0" />
+      <LineId Id="154" Count="0" />
+      <LineId Id="156" Count="2" />
+      <LineId Id="155" Count="0" />
+      <LineId Id="125" Count="0" />
       <LineId Id="94" Count="9" />
       <LineId Id="27" Count="0" />
     </LineIds>
