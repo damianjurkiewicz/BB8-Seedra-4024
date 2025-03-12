@@ -500,7 +500,7 @@ END_IF]]></ST>
 		HomingY := FALSE;
 		IF AxisY.Enable() THEN
 			
-			Trace('Enable');
+			Trace('Enable Axis Y');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
 		
@@ -756,27 +756,27 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[//auto resetting timer, a start condition is an end condition
-SafetyTimer(IN:= _HomingStepY > 0 AND NOT SafetyTimer.Q, PT:= T#500MS);
+SafetyTimer(IN:= Step > 0 AND NOT SafetyTimer.Q, PT:= T#500MS);
 
-CASE _HomingStepY OF
+CASE Step OF
 		
 		0:  // Reset group or waits
 			ResetSafety:= FALSE;
 			Trace('Timer Initialize');
-			_HomingStepY := _HomingStepY + 10;
+			Step := Step + 10;
 			
 		10: //If necessary reset group
 		
 			GVL_Safety.ErrorAck := (GVL_Safety.ComError OR GVL_Safety.FBError); 
 		
 			IF GVL_Safety.ErrorAck OR SafetyTimer.Q THEN 
-				_HomingStepY := _HomingStepY + 10;
+				Step := Step + 10;
 			END_IF
 
 		20: //Wait for the signal propagation
 			IF SafetyTimer.Q THEN
 				GVL_Safety.ErrorAck := FALSE;
-				_HomingStepY := _HomingStepY + 10;
+				Step := Step + 10;
 			END_IF
 		
 		30: //Check FB errors
@@ -784,13 +784,13 @@ CASE _HomingStepY OF
 				GVL_Safety.RestartFBs := TRUE;
 			END_IF
 			
-			_HomingStepY := _HomingStepY + 10;
+			Step := Step + 10;
 			
 		40: //Wait for the signal propagation
 		
 			IF SafetyTimer.Q THEN
 				GVL_Safety.RestartFBs := FALSE;
-				_HomingStepY := _HomingStepY + 10;
+				Step := Step + 10;
 			END_IF	
 			
 		50: //Wait for the signal propagation
@@ -803,10 +803,10 @@ CASE _HomingStepY OF
 					NOT (GVL_Safety.ComError OR GVL_Safety.FBError OR GVL_Safety.SafeError) 
 				
 					THEN
-						_HomingStepY := 0;
+						Step := 0;
 						ResetSafety := TRUE;
 					ELSE
-						_HomingStepY := 0;
+						Step := 0;
 						ResetSafety := FALSE;
 				END_IF
 			
@@ -814,7 +814,7 @@ CASE _HomingStepY OF
 		
 		ELSE
 		
-		_HomingStepY := 0;	
+		Step := 0;	
 
 END_CASE
 
@@ -996,7 +996,7 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ResetSafety">
-      <LineId Id="189" Count="62" />
+      <LineId Id="258" Count="62" />
       <LineId Id="111" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
