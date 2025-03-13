@@ -64,6 +64,7 @@ END_VAR
 		AxisY.Disable();
 		AxisZ.Disable();
 
+		IO.DO3 := FALSE;
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
 		THIS^.HomingStepZ := 0;
@@ -153,17 +154,17 @@ SUPER^.CreateEvents();]]></ST>
     <Method Name="Cutting" Id="{391386b3-3ac4-4fc7-a2a1-1d79f5676796}" FolderPath="MyMethods\">
       <Declaration><![CDATA[METHOD Cutting : BOOL
 (*
-	B			D
+	E			G
 	|			|
-F---+-----------+---E
+D---+-----------+---C
 	|			|
 	|			| 
-H---+-----------+---G
+B---+-----------+---A
 	|			|
-	A			C
+	F			H
 *)
 VAR
-	CuttingHeightZ  : REAL := 20;  
+	CuttingHeightZ  : REAL := 16;  
 	Point0x 		: REAL := 0;
 	Point0y 		: REAL := 0;
 	Point0z 		: REAL := 0;
@@ -184,7 +185,11 @@ VAR
 	PointHx 		: REAL := 250;
 	PointHy 		: REAL := 0;
 	
+
 	
+END_VAR
+VAR_INST
+		Timer			:TON;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -207,9 +212,12 @@ END_VAR
 			AxisZ.Deceleration := 8000;
 			AxisX.Velocity := 50; 
 			AxisY.Velocity := 50;
-			AxisZ.Velocity := 50;
+			AxisZ.Velocity := 10;
+			
+			IF IO.DO3 := TRUE THEN
 			Trace('Speed Set');
 			_CuttingStep := 20;
+			END_IF
 		END_IF
 
 	20:	// Positioning Motion to A
@@ -232,8 +240,14 @@ END_VAR
 	50: // Verify Cutting Height
 		IF AxisZ.InPosition THEN
 			Trace('Cutting Height Set');
+			Timer(IN := TRUE, PT := T#2000MS);
+			IF Timer.Q THEN
 			_CuttingStep := 60;
+			Timer(IN := FALSE); // Reset timera, aby działał ponownie
+			END_IF
 		END_IF
+
+
 
 	60: // Cutting Motion from A to B
 		AxisX.MoveAbsolute(PointBx,0);
@@ -388,6 +402,7 @@ END_VAR
 
 	330: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
+			IO.DO3 := FALSE;
 			Trace('Z Point 0 Reached');
 			_CuttingStep := 340;
 		END_IF
@@ -836,7 +851,7 @@ END_IF]]></ST>
 		END_IF
 
 	50:
-		IF AxisZ.MoveRelative(30,FALSE) THEN
+		IF AxisZ.MoveRelative(5,FALSE) THEN
 			Trace('Odsunięcie od krańcówki, po szybkim Z');
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF
@@ -1012,12 +1027,15 @@ VAR
 	i				: UDINT;
 	SubModulesReady : BOOL := TRUE;
 	
-	flagX :BOOL;
-	flagY :BOOL;
-	flagZ :BOOL;
+
 	
 END_VAR
 
+VAR_INST
+	flagX :BOOL;
+	flagY :BOOL;
+	flagZ :BOOL;
+END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE _CurrentMode OF
@@ -1029,14 +1047,18 @@ END_VAR
 				NoStateTasksToComplete := FALSE;
 				SequenceState := SequenceState + 10;	
 		
-			10:	
+			10: 
+				IF HomingZ() THEN
+					SequenceState := SequenceState + 10;
+					flagZ := TRUE;
+				END_IF	
+				
+			20:	
 				IF HomingY() THEN
 					flagY := TRUE;
 				END_IF
 				
-				IF HomingZ() THEN
-					flagZ := TRUE;
-				END_IF
+
 				
 				IF HomingX() THEN
 					flagX := TRUE;
@@ -1046,6 +1068,9 @@ END_VAR
 			
 			IF flagX AND flagY AND flagZ THEN
 				Trace('All Axes Homing completed');
+				flagX :=0; 
+				flagY :=0; 
+				flagZ :=0;
 				THIS^.CuttingStep := 0;
 				THIS^.HomingStepX := 0;
 				THIS^.HomingStepY := 0;
@@ -1073,6 +1098,7 @@ END_CASE
       <LineId Id="105" Count="5" />
       <LineId Id="123" Count="0" />
       <LineId Id="111" Count="0" />
+      <LineId Id="132" Count="0" />
       <LineId Id="124" Count="0" />
       <LineId Id="112" Count="1" />
       <LineId Id="121" Count="1" />
@@ -1110,7 +1136,19 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Cutting">
-      <LineId Id="1487" Count="211" />
+      <LineId Id="1487" Count="19" />
+      <LineId Id="1699" Count="0" />
+      <LineId Id="1701" Count="0" />
+      <LineId Id="1507" Count="1" />
+      <LineId Id="1702" Count="0" />
+      <LineId Id="1509" Count="18" />
+      <LineId Id="1762" Count="3" />
+      <LineId Id="1781" Count="2" />
+      <LineId Id="1775" Count="1" />
+      <LineId Id="1712" Count="0" />
+      <LineId Id="1532" Count="154" />
+      <LineId Id="1700" Count="0" />
+      <LineId Id="1687" Count="11" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingStep.Get">
@@ -1191,18 +1229,24 @@ END_CASE
       <LineId Id="89" Count="0" />
       <LineId Id="91" Count="0" />
       <LineId Id="115" Count="0" />
+      <LineId Id="226" Count="0" />
+      <LineId Id="229" Count="0" />
+      <LineId Id="231" Count="0" />
+      <LineId Id="230" Count="0" />
+      <LineId Id="228" Count="0" />
+      <LineId Id="227" Count="0" />
       <LineId Id="122" Count="0" />
       <LineId Id="148" Count="0" />
       <LineId Id="187" Count="1" />
       <LineId Id="194" Count="0" />
-      <LineId Id="176" Count="0" />
-      <LineId Id="195" Count="2" />
+      <LineId Id="196" Count="1" />
       <LineId Id="180" Count="0" />
       <LineId Id="198" Count="1" />
       <LineId Id="181" Count="0" />
       <LineId Id="179" Count="0" />
       <LineId Id="149" Count="0" />
       <LineId Id="184" Count="1" />
+      <LineId Id="237" Count="2" />
       <LineId Id="225" Count="0" />
       <LineId Id="211" Count="2" />
       <LineId Id="186" Count="0" />
