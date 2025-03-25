@@ -240,6 +240,7 @@ END_VAR
 	50: // Verify Cutting Height
 		IF AxisZ.InPosition THEN
 			Trace('Cutting Height Set');
+			IO.CoolingEnable := TRUE;
 			Timer(IN := TRUE, PT := T#2000MS);
 			IF Timer.Q THEN
 			_CuttingStep := 60;
@@ -263,6 +264,7 @@ END_VAR
 
 	80: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
+		IO.CoolingEnable := FALSE;
 		Trace('Returning from Cutting Height');
 		_CuttingStep := 90;
 
@@ -291,7 +293,11 @@ END_VAR
 
 	130: // Verify Z position reached
 		IF AxisZ.InPosition THEN
+			Timer(IN := TRUE, PT := T#2000MS);
+			IF Timer.Q THEN
 			_CuttingStep := 140;
+			Timer(IN := FALSE); // Reset timera, aby działał ponownie
+			END_IF
 		END_IF
 
 	140: // Cutting Motion from C to D
@@ -335,7 +341,11 @@ END_VAR
 
 	210: // Verify Z position reached
 		IF AxisZ.InPosition THEN
+			Timer(IN := TRUE, PT := T#2000MS);
+			IF Timer.Q THEN
 			_CuttingStep := 220;
+			Timer(IN := FALSE); // Reset timera, aby działał ponownie
+			END_IF
 		END_IF
 
 	220: // Cutting Motion from E to F
@@ -380,7 +390,11 @@ END_VAR
 	290: // Verify Z Cutting Height
 		IF AxisZ.InPosition THEN
 			Trace('Cutting Height Reached');
+			Timer(IN := TRUE, PT := T#2000MS);
+			IF Timer.Q THEN
 			_CuttingStep := 300;
+			Timer(IN := FALSE); // Reset timera, aby działał ponownie
+			END_IF
 		END_IF	
 
 	300: // Cutting Motion from G to H
@@ -1136,19 +1150,11 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Cutting">
-      <LineId Id="1487" Count="19" />
-      <LineId Id="1699" Count="0" />
-      <LineId Id="1701" Count="0" />
-      <LineId Id="1507" Count="1" />
-      <LineId Id="1702" Count="0" />
-      <LineId Id="1509" Count="18" />
-      <LineId Id="1762" Count="3" />
-      <LineId Id="1781" Count="2" />
-      <LineId Id="1775" Count="1" />
-      <LineId Id="1712" Count="0" />
-      <LineId Id="1532" Count="154" />
-      <LineId Id="1700" Count="0" />
-      <LineId Id="1687" Count="11" />
+      <LineId Id="1846" Count="46" />
+      <LineId Id="2119" Count="0" />
+      <LineId Id="1893" Count="22" />
+      <LineId Id="2120" Count="0" />
+      <LineId Id="1916" Count="163" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingStep.Get">
