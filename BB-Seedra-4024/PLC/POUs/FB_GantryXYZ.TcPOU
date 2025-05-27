@@ -482,9 +482,10 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 		CASE SequenceState OF
 			0:
 				NoStateTasksToComplete := FALSE;
-				
+				GVL_HMI.MenuToDisplay := 1;
 				IF Cutting() THEN
 					SequenceState := SequenceState + 10;
+					GVL_HMI.MenuToDisplay := 0;
 				END_IF	
 								
 			10:		
@@ -1172,6 +1173,7 @@ END_CASE
     <LineIds Name="FB_GantryXYZ.Execute">
       <LineId Id="24" Count="8" />
       <LineId Id="49" Count="0" />
+      <LineId Id="58" Count="0" />
       <LineId Id="56" Count="0" />
       <LineId Id="54" Count="0" />
       <LineId Id="38" Count="1" />
