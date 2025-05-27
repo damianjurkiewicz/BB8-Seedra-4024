@@ -65,6 +65,7 @@ END_VAR
 		AxisZ.Disable();
 
 		IO.DO3 := FALSE;
+		GVL_HMI.MenuToDisplay := 0;
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
 		THIS^.HomingStepZ := 0;
@@ -1115,6 +1116,7 @@ END_CASE
       <LineId Id="111" Count="0" />
       <LineId Id="132" Count="0" />
       <LineId Id="124" Count="0" />
+      <LineId Id="140" Count="0" />
       <LineId Id="112" Count="1" />
       <LineId Id="121" Count="1" />
       <LineId Id="114" Count="5" />
