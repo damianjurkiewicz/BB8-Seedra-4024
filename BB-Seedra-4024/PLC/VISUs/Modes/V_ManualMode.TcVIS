@@ -823,7 +823,7 @@
                     </o>
                     <o>
                       <v n="Id">2597686782L</v>
-                      <v n="Value">false</v>
+                      <v n="Value">true</v>
                     </o>
                     <o>
                       <v n="Id">3092690914L</v>
@@ -841,15 +841,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_114"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="STSnippetInputAction[]">
-                  <v>OnMouseClick</v>
-                  <a cet="STSnippetInputAction">
-                    <o>
-                      <v n="STSnippet">"HMI.Command.State := E_PMLCommand.ePMLCommand_Clear;
-"</v>
-                    </o>
-                  </a>
-                </d>
+                <d n="VisualElementInputActions" t="Hashtable" />
                 <v n="VisualElementIdentification">{ce2492d7-38cf-4dc8-ab44-66b34f735034}</v>
                 <v n="VisualElementOwningObjectGuid">{5eb24302-7c74-4cb0-913c-af4cad05dac4}</v>
                 <a n="LMGuids" et="Guid" />
@@ -2564,7 +2556,7 @@
             </o>
             <v n="DialogDut">{312dd4ca-4db9-490e-90a0-430895af3834}</v>
           </o>
-          <v n="LastUsedIdForIdentifier">140</v>
+          <v n="LastUsedIdForIdentifier">142</v>
           <o n="TextDocument" t="TextDocument">
             <a n="TextLines" cet="TextLine">
               <o>

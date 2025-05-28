@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_GantryXYZ" Id="{474e1990-f731-0ed9-052c-42626742a38f}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule 
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule
 VAR
     // Sub module definitions here
 
@@ -9,41 +9,38 @@ VAR
     ipSubModules_Init : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
 
     // Component definitions here
-    AxisX       		: FB_Component_BasicAxis 		:= (Name := 'AxisX');
-    AxisY    			: FB_Component_BasicAxis 		:= (Name := 'AxisY');
-	AxisZ				: FB_Component_BasicAxis		:= (Name := 'AxisZ');
-    GantryCylinder		: FB_GantryXYCylinder			:= (Name := 'Cylinder');
-    //Alarms for this module
+    AxisX : FB_Component_BasicAxis := (Name := 'AxisX');
+    AxisY : FB_Component_BasicAxis := (Name := 'AxisY');
+    AxisZ : FB_Component_BasicAxis := (Name := 'AxisZ');
+    GantryCylinder : FB_GantryXYCylinder := (Name := 'Cylinder');
+
+    // Alarms for this module
     GantryAlarms : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
 
-	//IO
-	LimitSwitchX :BOOL;
-	LimitSwitchY :BOOL;
-	LimitSwitchZ :BOOL;
+    // IO
+    LimitSwitchX : BOOL;
+    LimitSwitchY : BOOL;
+    LimitSwitchZ : BOOL;
 
-	HomeComplete :BOOL;
-	
-	//resets
-	_HomingStepX : INT;
- 	_HomingStepY : INT;
-	_HomingStepZ : INT;
-	
-	_CuttingStep : INT;
+    HomeComplete : BOOL;
+
+    // Properties
+    _HomingStepX : INT;
+    _HomingStepY : INT;
+    _HomingStepZ : INT;
+    _CuttingStep : INT;
+    _CuttingHeightZ : REAL;
 
 END_VAR
 
 VAR CONSTANT
     GANTRY_ALARM_COUNT : INT := 5;
-END_VAR
-
-
-  // Prywatna zmienna do przechowywania wartości Step
-
-]]></Declaration>
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
     <Folder Name="MyMethods" Id="{d166ca9d-f57a-4d88-ac90-142e5eb5d488}" />
+    <Folder Name="Properties" Id="{b05cc7e1-dc37-4910-986a-f085b4a0163d}" />
     <Folder Name="States" Id="{8df42c9b-c051-49f1-9767-900503632339}" />
     <Method Name="Aborting" Id="{5476dfef-6652-4e6b-8928-3724a50553de}" FolderPath="States\">
       <Declaration><![CDATA[
@@ -164,8 +161,7 @@ B---+-----------+---A
 	|			|
 	F			H
 *)
-VAR
-	CuttingHeightZ  : REAL := 16;  
+VAR  
 	Point0x 		: REAL := 0;
 	Point0y 		: REAL := 0;
 	Point0z 		: REAL := 0;
@@ -234,7 +230,7 @@ END_VAR
 		END_IF
 
 	40: // Set Cutting Height
-		AxisZ.MoveAbsolute(CuttingHeightZ,0);
+		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
 		Trace('Setting Cutting Height');
 		_CuttingStep := 50;
 
@@ -254,6 +250,7 @@ END_VAR
 	60: // Cutting Motion from A to B
 		AxisX.MoveAbsolute(PointBx,0);
 		AxisY.MoveAbsolute(PointBy,0);
+
 		Trace('Cutting from A to B');
 		_CuttingStep := 70;
 
@@ -288,7 +285,7 @@ END_VAR
 		END_IF
 
 	120: // Set Cutting Height
-		AxisZ.MoveAbsolute(CuttingHeightZ,0);
+		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
 		Trace('Setting Cutting Height for C to D');
 		_CuttingStep := 130;
 
@@ -336,7 +333,7 @@ END_VAR
 		END_IF
 
 	200: // Set Cutting Height 	
-		AxisZ.MoveAbsolute(CuttingHeightZ,0);
+		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
 		Trace('Setting Cutting Height for E to F');
 		_CuttingStep := 210;
 
@@ -384,7 +381,7 @@ END_VAR
 		END_IF
 		
 	280: // Set Cutting Height 	
-		AxisZ.MoveAbsolute(CuttingHeightZ,0);
+		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
 		Trace('Setting Cutting Height for G to H');
 		_CuttingStep := 290;
 			
@@ -433,7 +430,27 @@ END_VAR
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="CuttingStep" Id="{3898497e-74b5-487e-9d83-61675b4ff850}">
+    <Property Name="CuttingHeightZ" Id="{4c86fbb5-f7fe-4ab0-abb5-4601fd04a1c4}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CuttingHeightZ : REAL]]></Declaration>
+      <Get Name="Get" Id="{a83b65c4-5ea3-488c-967b-3ee17e2e67f9}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CuttingHeightZ := _CuttingHeightZ;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{3fde4dcd-fcc8-4a85-8a9a-5adb0df55581}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF CuttingHeightZ > 15 THEN
+	_CuttingHeightZ := 15;  // It can't go higher, you will kill yourself
+	ELSE
+	_CuttingHeightZ := CuttingHeightZ;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CuttingStep" Id="{3898497e-74b5-487e-9d83-61675b4ff850}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC CuttingStep : INT]]></Declaration>
       <Get Name="Get" Id="{85c69036-89e0-4658-95e9-e32bfe715076}">
         <Declaration><![CDATA[
@@ -533,7 +550,7 @@ CASE _CurrentMode OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="HomingStepX" Id="{bb0ed88a-091c-4bab-9e01-a967ca1fc9bb}">
+    <Property Name="HomingStepX" Id="{bb0ed88a-091c-4bab-9e01-a967ca1fc9bb}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC HomingStepX : INT]]></Declaration>
       <Get Name="Get" Id="{190b2c1a-84a4-4b9a-b82b-d034c6e97b13}">
         <Declaration><![CDATA[
@@ -553,7 +570,7 @@ END_IF]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="HomingStepY" Id="{b85ccf6c-14f7-4091-9161-3a64d81c6f71}">
+    <Property Name="HomingStepY" Id="{b85ccf6c-14f7-4091-9161-3a64d81c6f71}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC HomingStepY : INT]]></Declaration>
       <Get Name="Get" Id="{c9fc6e3e-e251-4188-a708-1d897bfbe015}">
         <Declaration><![CDATA[
@@ -573,7 +590,7 @@ END_IF]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="HomingStepZ" Id="{0b9a390e-db9e-4739-bffa-5ca069d437ef}">
+    <Property Name="HomingStepZ" Id="{0b9a390e-db9e-4739-bffa-5ca069d437ef}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC HomingStepZ : INT]]></Declaration>
       <Get Name="Get" Id="{403aef28-5a6c-4ea4-b639-a6922b7be29b}">
         <Declaration><![CDATA[
@@ -1153,12 +1170,17 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Cutting">
-      <LineId Id="1846" Count="46" />
-      <LineId Id="2119" Count="0" />
-      <LineId Id="1893" Count="22" />
-      <LineId Id="2120" Count="0" />
-      <LineId Id="1916" Count="163" />
+      <LineId Id="2199" Count="59" />
+      <LineId Id="2435" Count="0" />
+      <LineId Id="2259" Count="175" />
       <LineId Id="19" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingStep.Get">
       <LineId Id="2" Count="0" />
