@@ -13,6 +13,8 @@ VAR
     AxisY : FB_Component_BasicAxis := (Name := 'AxisY');
     AxisZ : FB_Component_BasicAxis := (Name := 'AxisZ');
     GantryCylinder : FB_GantryXYCylinder := (Name := 'Cylinder');
+	
+
 
     // Alarms for this module
     GantryAlarms : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;

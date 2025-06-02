@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"16"</v>
+          <v n="UniqueIdGenerator">"18"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -1501,6 +1501,93 @@
                             <n n="DescriptionTextID" />
                             <v n="DescriptionUseParent">false</v>
                           </o>
+                          <o>
+                            <v n="Flags">2L</v>
+                            <v n="BasicTypeNodeValue">"MAIN.Seedra.GantryXYZ.AxisX.AxisBase_HMI"</v>
+                            <v n="BasicTypeNodeAcceptsExpression">true</v>
+                            <n n="BasicTypeNodeFastAccess" />
+                            <a n="BasicTypeNodeEnumValues" et="String" />
+                            <n n="EnumValueDisplayTextIds" />
+                            <n n="EnumValueVisibilityAttributeValues" />
+                            <n n="EnumValueLibraryId" />
+                            <n n="DynamicEnumMemberVisibilityCheckerTypeGuid" />
+                            <l n="TypeNodeChildren" t="ArrayList" />
+                            <o n="TypeNodeType" t="TypeNodeType">
+                              <v n="TypeClass" t="TypeClass">Reference</v>
+                              <v n="QualifiedName">"ST_AxisBase_HMI"</v>
+                              <v n="Name">"ST_AxisBase_HMI"</v>
+                            </o>
+                            <v n="TypeNodeName">"HMIAxeX"</v>
+                            <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
+                              <v n="AttrFlags">0UL</v>
+                              <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
+                              <v n="ConvDone">true</v>
+                            </o>
+                            <v n="TypeNodeId" t="Int16">256</v>
+                            <v n="TypeNodeIdLong">260913865L</v>
+                            <n n="LibraryId" />
+                            <n n="DisplayTextId" />
+                            <n n="DescriptionTextID" />
+                            <v n="DescriptionUseParent">false</v>
+                          </o>
+                          <o>
+                            <v n="Flags">2L</v>
+                            <v n="BasicTypeNodeValue">"MAIN.Seedra.GantryXYZ.AxisY.AxisBase_HMI"</v>
+                            <v n="BasicTypeNodeAcceptsExpression">true</v>
+                            <n n="BasicTypeNodeFastAccess" />
+                            <a n="BasicTypeNodeEnumValues" et="String" />
+                            <n n="EnumValueDisplayTextIds" />
+                            <n n="EnumValueVisibilityAttributeValues" />
+                            <n n="EnumValueLibraryId" />
+                            <n n="DynamicEnumMemberVisibilityCheckerTypeGuid" />
+                            <l n="TypeNodeChildren" t="ArrayList" />
+                            <o n="TypeNodeType" t="TypeNodeType">
+                              <v n="TypeClass" t="TypeClass">Reference</v>
+                              <v n="QualifiedName">"ST_AxisBase_HMI"</v>
+                              <v n="Name">"ST_AxisBase_HMI"</v>
+                            </o>
+                            <v n="TypeNodeName">"HMIAxeY"</v>
+                            <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
+                              <v n="AttrFlags">0UL</v>
+                              <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
+                              <v n="ConvDone">true</v>
+                            </o>
+                            <v n="TypeNodeId" t="Int16">257</v>
+                            <v n="TypeNodeIdLong">2022312543L</v>
+                            <n n="LibraryId" />
+                            <n n="DisplayTextId" />
+                            <n n="DescriptionTextID" />
+                            <v n="DescriptionUseParent">false</v>
+                          </o>
+                          <o>
+                            <v n="Flags">2L</v>
+                            <v n="BasicTypeNodeValue">"MAIN.Seedra.GantryXYZ.AxisZ.AxisBase_HMI"</v>
+                            <v n="BasicTypeNodeAcceptsExpression">true</v>
+                            <n n="BasicTypeNodeFastAccess" />
+                            <a n="BasicTypeNodeEnumValues" et="String" />
+                            <n n="EnumValueDisplayTextIds" />
+                            <n n="EnumValueVisibilityAttributeValues" />
+                            <n n="EnumValueLibraryId" />
+                            <n n="DynamicEnumMemberVisibilityCheckerTypeGuid" />
+                            <l n="TypeNodeChildren" t="ArrayList" />
+                            <o n="TypeNodeType" t="TypeNodeType">
+                              <v n="TypeClass" t="TypeClass">Reference</v>
+                              <v n="QualifiedName">"ST_AxisBase_HMI"</v>
+                              <v n="Name">"ST_AxisBase_HMI"</v>
+                            </o>
+                            <v n="TypeNodeName">"HMIAxeZ"</v>
+                            <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
+                              <v n="AttrFlags">0UL</v>
+                              <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
+                              <v n="ConvDone">true</v>
+                            </o>
+                            <v n="TypeNodeId" t="Int16">258</v>
+                            <v n="TypeNodeIdLong">3783482341L</v>
+                            <n n="LibraryId" />
+                            <n n="DisplayTextId" />
+                            <n n="DescriptionTextID" />
+                            <v n="DescriptionUseParent">false</v>
+                          </o>
                         </l>
                         <o n="TypeNodeType" t="TypeNodeType">
                           <v n="TypeClass" t="TypeClass">Userdef</v>
@@ -1600,12 +1687,24 @@
                       <v n="Value">"MAIN.Seedra.PackMLBaseModule_HMI"</v>
                     </o>
                     <o>
+                      <v n="Id">3637978940L</v>
+                      <v n="Value">"MAIN.Seedra.PackMLBaseModule_HMI"</v>
+                    </o>
+                    <o>
                       <v n="Id">1581471122L</v>
                       <v n="Value">"MAIN.Seedra.PackMLBaseModule_HMI"</v>
                     </o>
                     <o>
-                      <v n="Id">3637978940L</v>
-                      <v n="Value">"MAIN.Seedra.PackMLBaseModule_HMI"</v>
+                      <v n="Id">260913865L</v>
+                      <v n="Value">"MAIN.Seedra.GantryXYZ.AxisX.AxisBase_HMI"</v>
+                    </o>
+                    <o>
+                      <v n="Id">2022312543L</v>
+                      <v n="Value">"MAIN.Seedra.GantryXYZ.AxisY.AxisBase_HMI"</v>
+                    </o>
+                    <o>
+                      <v n="Id">3783482341L</v>
+                      <v n="Value">"MAIN.Seedra.GantryXYZ.AxisZ.AxisBase_HMI"</v>
                     </o>
                   </l>
                 </o>
@@ -1737,12 +1836,12 @@
                       <v n="Value">""</v>
                     </o>
                     <o>
-                      <v n="Id">823443203L</v>
-                      <v n="Value">"537"</v>
-                    </o>
-                    <o>
                       <v n="Id">2597686782L</v>
                       <v n="Value">true</v>
+                    </o>
+                    <o>
+                      <v n="Id">823443203L</v>
+                      <v n="Value">"537"</v>
                     </o>
                   </l>
                 </o>
@@ -1906,9 +2005,14 @@
                 <v n="Text">"VAR_IN_OUT"</v>
               </o>
               <o>
-                <v n="Id">16L</v>
+                <v n="Id">18L</v>
                 <n n="Tag" />
                 <v n="Text">"	HMI : ST_PackMLBaseModule_HMI;"</v>
+              </o>
+              <o>
+                <v n="Id">17L</v>
+                <n n="Tag" />
+                <v n="Text">"	HMIAxeX : ST_AxisBase_HMI;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>
