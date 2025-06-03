@@ -493,24 +493,10 @@
                 <n n="VisualElementFrameInformation" />
                 <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
                   <v>OnMouseClick</v>
-                  <a et="IInputAction">
-                    <o t="STSnippetInputAction">
+                  <a cet="STSnippetInputAction">
+                    <o>
                       <v n="STSnippet">"HMI.Command.Mode := E_PMLUnitMode.ePMLUnitMode_Production;
 "</v>
-                    </o>
-                    <o t="FrameSelectionChangeInputAction">
-                      <o n="Selection" t="SelectedFrameInfo">
-                        <v n="SelectedFrame">{a7531131-c677-4502-b249-73ae09698d33}</v>
-                        <v n="Selection">0</v>
-                      </o>
-                      <o n="GlobSel" t="GlobalFrameSelection">
-                        <v n="IndExpr">""</v>
-                        <n n="AssignDir" />
-                        <v n="AssignDir33">""</v>
-                        <v n="AssignExpr">""</v>
-                        <v n="AssignType" t="AssignType">Directly</v>
-                      </o>
-                      <v n="SelType" t="FrameSelectionConfigurationType">Locally</v>
                     </o>
                   </a>
                 </d>
@@ -683,24 +669,10 @@
                 <n n="VisualElementFrameInformation" />
                 <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
                   <v>OnMouseClick</v>
-                  <a et="IInputAction">
-                    <o t="STSnippetInputAction">
+                  <a cet="STSnippetInputAction">
+                    <o>
                       <v n="STSnippet">"HMI.Command.Mode := E_PMLUnitMode.ePMLUnitMode_Maintenance;
 "</v>
-                    </o>
-                    <o t="FrameSelectionChangeInputAction">
-                      <o n="Selection" t="SelectedFrameInfo">
-                        <v n="SelectedFrame">{a7531131-c677-4502-b249-73ae09698d33}</v>
-                        <v n="Selection">2</v>
-                      </o>
-                      <o n="GlobSel" t="GlobalFrameSelection">
-                        <v n="IndExpr">""</v>
-                        <n n="AssignDir" />
-                        <v n="AssignDir33">""</v>
-                        <v n="AssignExpr">""</v>
-                        <v n="AssignType" t="AssignType">Directly</v>
-                      </o>
-                      <v n="SelType" t="FrameSelectionConfigurationType">Locally</v>
                     </o>
                   </a>
                 </d>
@@ -873,29 +845,15 @@
                 <n n="VisualElementFrameInformation" />
                 <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
                   <v>OnMouseClick</v>
-                  <a et="IInputAction">
-                    <o t="STSnippetInputAction">
+                  <a cet="STSnippetInputAction">
+                    <o>
                       <v n="STSnippet">"HMI.Command.Mode := E_PMLUnitMode.ePMLUnitMode_Manual;
-GVL_Safety.eStopHMI := TRUE;
+
 
 
 
 
 "</v>
-                    </o>
-                    <o t="FrameSelectionChangeInputAction">
-                      <o n="Selection" t="SelectedFrameInfo">
-                        <v n="SelectedFrame">{a7531131-c677-4502-b249-73ae09698d33}</v>
-                        <v n="Selection">1</v>
-                      </o>
-                      <o n="GlobSel" t="GlobalFrameSelection">
-                        <v n="IndExpr">""</v>
-                        <n n="AssignDir" />
-                        <v n="AssignDir33">""</v>
-                        <v n="AssignExpr">""</v>
-                        <v n="AssignType" t="AssignType">Directly</v>
-                      </o>
-                      <v n="SelType" t="FrameSelectionConfigurationType">Locally</v>
                     </o>
                   </a>
                 </d>
@@ -1685,7 +1643,7 @@ GVL_Safety.eStopHMI := TRUE;
                     </o>
                     <o>
                       <v n="Id">2597686782L</v>
-                      <v n="Value">true</v>
+                      <v n="Value">false</v>
                     </o>
                     <o>
                       <v n="Id">2501871159L</v>
@@ -1710,6 +1668,14 @@ GVL_Safety.eStopHMI := TRUE;
                     <o>
                       <v n="Id">3783482341L</v>
                       <v n="Value">"MAIN.Seedra.GantryXYZ.AxisZ.AxisBase_HMI"</v>
+                    </o>
+                    <o>
+                      <v n="Id">1311860368L</v>
+                      <v n="Value">"GVL_HMI.ModeMenuToDisplay"</v>
+                    </o>
+                    <o>
+                      <v n="Id">1013868361L</v>
+                      <v n="Value">true</v>
                     </o>
                   </l>
                 </o>
@@ -2058,7 +2024,6 @@ GVL_Safety.eStopHMI := TRUE;
       </Data>
       <TypeList>
         <Type n="ArrayList">System.Collections.ArrayList</Type>
-        <Type n="AssignType">{36313871-641b-466f-a38c-d0f629c5ffdd}</Type>
         <Type n="BackgroundSettings">{1038f12c-dd4b-4f96-87a3-a350fe8f3552}</Type>
         <Type n="BasicTypeNode">{f7e1e748-ea0f-4fcb-b563-94837ee17e8d}</Type>
         <Type n="Boolean">System.Boolean</Type>
@@ -2068,23 +2033,18 @@ GVL_Safety.eStopHMI := TRUE;
         <Type n="Double">System.Double</Type>
         <Type n="DynamicArrayNode">{6c16f79c-dd98-4c29-b3ba-7042e3055542}</Type>
         <Type n="FontDescription">{896a5e54-96c3-433b-96d2-4f1442fef591}</Type>
-        <Type n="FrameSelectionChangeInputAction">{4df7df60-c933-4318-97d1-72bcd264f510}</Type>
-        <Type n="FrameSelectionConfigurationType">{db81f68b-f091-4287-9583-0d25d85b481a}</Type>
         <Type n="GeneratedLanguageModelEntriesData">{703465dc-4679-4ff2-bcc3-c57d0a204da3}</Type>
         <Type n="GenericFbDescription">{40d6dd8d-dfd0-493a-8e29-c9a35e1e6539}</Type>
         <Type n="GenericVisualElem">{f86c2928-8614-4cca-824b-e819ac4d58c4}</Type>
-        <Type n="GlobalFrameSelection">{f8c6f6c5-051b-44d6-ba67-8d147ee35427}</Type>
         <Type n="Guid">System.Guid</Type>
         <Type n="Hashtable">System.Collections.Hashtable</Type>
         <Type n="HotkeyConfiguration">{6b108d46-58af-4e41-a3f4-174d8f160cc4}</Type>
-        <Type n="IInputAction">{69265815-ba9d-4bec-bfcb-427fb9172844}</Type>
         <Type n="IInputAction[]">_3S.CoDeSys.VisualElem.IInputAction[], VisualElem, Version=3.5.13.0, Culture=neutral, PublicKeyToken=null</Type>
         <Type n="Int16">System.Int16</Type>
         <Type n="Int32">System.Int32</Type>
         <Type n="Int64">System.Int64</Type>
         <Type n="NamedStyleColor">{fa491db2-51ff-4bc1-9cd0-ce8c94ff6216}</Type>
         <Type n="NamedStyleFont">{9e842eb2-1463-4af2-b605-4fbb17044f94}</Type>
-        <Type n="SelectedFrameInfo">{5aaff85c-800d-4b11-a6ba-9c95533622a4}</Type>
         <Type n="String">System.String</Type>
         <Type n="StructuredTypeNode">{503c5b2e-e80e-4ee7-ae00-c5b93a62b1aa}</Type>
         <Type n="STSnippetInputAction">{6302d3fe-6ea5-4c42-819a-a9734a133b3d}</Type>

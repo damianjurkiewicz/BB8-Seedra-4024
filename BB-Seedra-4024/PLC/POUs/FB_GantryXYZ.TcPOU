@@ -83,13 +83,9 @@ END_CASE
 	//=================================MAINTENANCE & MANUAL MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
 			
-		AxisX.Disable();
-		AxisY.Disable();
-		AxisZ.Disable();	
-	    GVL_HMI.MenuToDisplay := 3;
-		IF NOT AxisX.Enable() AND NOT AxisY.Enable() AND NOT AxisZ.Enable() THEN
+
 		SUPER^.Aborting();
-		END_IF
+
 END_CASE
 
 ]]></ST>
@@ -519,7 +515,7 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 		CASE SequenceState OF
 			0:
 				NoStateTasksToComplete := FALSE;
-				GVL_HMI.MenuToDisplay := 1;
+				//GVL_HMI.MenuToDisplay := 1;
 				IF Cutting() THEN
 					SequenceState := SequenceState + 10;
 					GVL_HMI.MenuToDisplay := 0;
@@ -1145,7 +1141,7 @@ END_VAR
 		IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 		SUPER^.Resetting();
 		END_IF
-		
+		SUPER^.Resetting();
 		
 	
 	END_CASE
@@ -1172,7 +1168,9 @@ END_VAR
       <LineId Id="114" Count="3" />
       <LineId Id="154" Count="0" />
       <LineId Id="118" Count="0" />
-      <LineId Id="181" Count="9" />
+      <LineId Id="181" Count="3" />
+      <LineId Id="187" Count="0" />
+      <LineId Id="190" Count="0" />
       <LineId Id="153" Count="0" />
       <LineId Id="152" Count="0" />
       <LineId Id="119" Count="0" />
