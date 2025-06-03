@@ -876,6 +876,11 @@
                   <a et="IInputAction">
                     <o t="STSnippetInputAction">
                       <v n="STSnippet">"HMI.Command.Mode := E_PMLUnitMode.ePMLUnitMode_Manual;
+GVL_Safety.eStopHMI := TRUE;
+
+
+
+
 "</v>
                     </o>
                     <o t="FrameSelectionChangeInputAction">

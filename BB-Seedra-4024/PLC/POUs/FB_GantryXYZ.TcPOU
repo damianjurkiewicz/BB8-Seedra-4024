@@ -54,7 +54,11 @@ END_VAR
 
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE SequenceState OF
+        <ST><![CDATA[CASE _CurrentMode OF
+
+	//=================================PRODUCTION MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Production:
+CASE SequenceState OF
     0:
         NoStateTasksToComplete := FALSE;
         SequenceState          := SequenceState + 10;
@@ -73,9 +77,22 @@ END_VAR
 	20:
 
 		StateTasksComplete := TRUE;
+		SUPER^.Aborting();
 END_CASE
 
-SUPER^.Aborting();]]></ST>
+	//=================================MAINTENANCE & MANUAL MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+			
+		AxisX.Disable();
+		AxisY.Disable();
+		AxisZ.Disable();	
+	    GVL_HMI.MenuToDisplay := 3;
+		IF NOT AxisX.Enable() AND NOT AxisY.Enable() AND NOT AxisZ.Enable() THEN
+		SUPER^.Aborting();
+		END_IF
+END_CASE
+
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
@@ -1120,8 +1137,20 @@ END_VAR
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
-		;
-END_CASE
+			
+		AxisX.Enable();
+		AxisY.Enable();
+		AxisZ.Enable();	
+	
+		IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
+		SUPER^.Resetting();
+		END_IF
+		
+		
+	
+	END_CASE
+		
+
 
 ]]></ST>
       </Implementation>
@@ -1130,6 +1159,8 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Aborting">
+      <LineId Id="149" Count="2" />
+      <LineId Id="148" Count="0" />
       <LineId Id="105" Count="5" />
       <LineId Id="123" Count="0" />
       <LineId Id="111" Count="0" />
@@ -1138,7 +1169,13 @@ END_CASE
       <LineId Id="140" Count="0" />
       <LineId Id="112" Count="1" />
       <LineId Id="121" Count="1" />
-      <LineId Id="114" Count="5" />
+      <LineId Id="114" Count="3" />
+      <LineId Id="154" Count="0" />
+      <LineId Id="118" Count="0" />
+      <LineId Id="181" Count="9" />
+      <LineId Id="153" Count="0" />
+      <LineId Id="152" Count="0" />
+      <LineId Id="119" Count="0" />
       <LineId Id="29" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
@@ -1286,7 +1323,19 @@ END_CASE
       <LineId Id="186" Count="0" />
       <LineId Id="183" Count="0" />
       <LineId Id="125" Count="0" />
-      <LineId Id="94" Count="9" />
+      <LineId Id="94" Count="5" />
+      <LineId Id="337" Count="0" />
+      <LineId Id="335" Count="0" />
+      <LineId Id="341" Count="0" />
+      <LineId Id="343" Count="1" />
+      <LineId Id="342" Count="0" />
+      <LineId Id="345" Count="0" />
+      <LineId Id="340" Count="0" />
+      <LineId Id="346" Count="0" />
+      <LineId Id="339" Count="0" />
+      <LineId Id="338" Count="0" />
+      <LineId Id="256" Count="1" />
+      <LineId Id="101" Count="2" />
       <LineId Id="27" Count="0" />
     </LineIds>
   </POU>

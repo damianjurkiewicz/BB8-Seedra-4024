@@ -95,6 +95,8 @@ IF GVL_Safety.eStopHMI OR NOT GVL_Safety.eStopButton AND NOT MachineAlarms[E_See
 END_IF
 
 
+
+
 ]]></ST>
       </Implementation>
     </Method>
@@ -255,7 +257,7 @@ END_VAR
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
-		;
+		SUPER^.Resetting();
 END_CASE
 ]]></ST>
       </Implementation>
@@ -349,6 +351,8 @@ END_IF]]></ST>
       <LineId Id="22" Count="1" />
       <LineId Id="29" Count="0" />
       <LineId Id="13" Count="0" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="43" Count="0" />
       <LineId Id="26" Count="0" />
       <LineId Id="14" Count="0" />
       <LineId Id="2" Count="0" />
