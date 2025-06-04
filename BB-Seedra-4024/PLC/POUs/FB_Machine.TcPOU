@@ -163,7 +163,7 @@ CASE _CurrentMode OF
    
  E_PMLUnitMode.ePMLUnitMode_Production:
  		
- 		GVL_HMI.ModeMenuToDisplay := 0;
+ 		GVL_HMI.MenuToDisplay := 0;
  	
         CASE _CurrentState OF
 			
@@ -187,11 +187,11 @@ CASE _CurrentMode OF
         END_CASE
 		
 	E_PMLUnitMode.ePMLUnitMode_Maintenance:
-		GVL_HMI.ModeMenuToDisplay := 2;
+		GVL_HMI.MenuToDisplay := 2;
         AllowHMIControl(ThisModuleOnly := FALSE); 
 		
     E_PMLUnitMode.ePMLUnitMode_Manual:
-		GVL_HMI.ModeMenuToDisplay := 1;
+		GVL_HMI.MenuToDisplay := 1;
         AllowHMIControl(ThisModuleOnly := FALSE); 
 
 END_CASE]]></ST>
