@@ -6,6 +6,7 @@
 	VAR
 		Seedra          : FB_Machine := (Name := 'SeedraMAIN');
 		InitComplete    : BOOL;
+		RebootSystem	: NT_Reboot;
 	END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[CyclicLogic();]]></ST>
