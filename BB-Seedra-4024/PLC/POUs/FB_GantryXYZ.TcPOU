@@ -530,31 +530,8 @@ END_VAR
 		Trace('Start Cutting Box Five Sides');
 		IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 			Trace('Axes Enabled');
-			_CuttingStep := 5;
+			_CuttingStep := 10;
 		END_IF
-		
-	5: 		Point0x := 0;		
-			Point0y := 0;	
-			Point0z := 0;	
-			PointAx := GVL_HMI.PanelFrontWidht + GVL_HMI.PanelHeight;	
-			PointAy := GVL_HMI.PanelFrontLength + 2*GVL_HMI.PanelHeight - 2*GVL_HMI.RailHeightCorrection + GVL_HMI.ToolOverpass; 
-			PointBx := GVL_HMI.PanelFrontWidht + GVL_HMI.PanelHeight;
-			PointBy := 0 - GVL_HMI.ToolOverpass;
-			PointCx := GVL_HMI.PanelHeight;
-			PointCy := GVL_HMI.PanelFrontLength + 2*GVL_HMI.PanelHeight - 2*GVL_HMI.RailHeightCorrection + GVL_HMI.ToolOverpass; 
-			PointDx := GVL_HMI.PanelHeight;	
-			PointDy := 0 - GVL_HMI.ToolOverpass;
-			PointEx := 2*GVL_HMI.PanelHeight + GVL_HMI.PanelFrontWidht + GVL_HMI.ToolOverpass;
-			PointEy := GVL_HMI.PanelHeight - GVL_HMI.ToolOverpass;
-			PointFx := 0 - GVL_HMI.ToolOverpass;		
-			PointFy := GVL_HMI.PanelHeight - GVL_HMI.RailHeightCorrection;		
-			PointGx := 2*GVL_HMI.PanelHeight + GVL_HMI.PanelFrontWidht + GVL_HMI.ToolOverpass;		
-			PointGy := GVL_HMI.PanelHeight + GVL_HMI.PanelFrontLength - GVL_HMI.RailHeightCorrection;		
-			PointHx := 0 - GVL_HMI.ToolOverpass;		
-			PointHy := GVL_HMI.PanelHeight + GVL_HMI.PanelFrontLength - GVL_HMI.RailHeightCorrection;
-	IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
-		_CuttingStep := 10;
-	END_IF
 
 	10:	// Set Speed
 		IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
@@ -806,25 +783,25 @@ B---+-----------+---A
 	F			H
 *)
 VAR  
-	Point0x 		: REAL;
-	Point0y 		: REAL;
-	Point0z 		: REAL;
-	PointAx 		: REAL;
-	PointAy 		: REAL;
-	PointBx 		: REAL;
-    PointBy 		: REAL;
-	PointCx 		: REAL;
-	PointCy 		: REAL;
-	PointDx 		: REAL;
-	PointDy 		: REAL;
-	PointEx 		: REAL;
-	PointEy 		: REAL;
-	PointFx 		: REAL;
-	PointFy 		: REAL;
-	PointGx 		: REAL;
-	PointGy 		: REAL;
-	PointHx 		: REAL;
-	PointHy 		: REAL;
+	Point0x 		: REAL := 0;
+	Point0y 		: REAL := 0;
+	Point0z 		: REAL := 0;
+	PointAx 		: REAL := 300;
+	PointAy 		: REAL := 50;
+	PointBx 		: REAL := 0;
+    PointBy 		: REAL := 50;
+	PointCx 		: REAL := 300;
+	PointCy 		: REAL := 350;
+	PointDx 		: REAL := 0;
+	PointDy 		: REAL := 350;
+	PointEx 		: REAL := 50;
+	PointEy 		: REAL := 400;
+	PointFx 		: REAL := 50;
+	PointFy 		: REAL := 0;
+	PointGx 		: REAL := 250;
+	PointGy 		: REAL := 400;
+	PointHx 		: REAL := 250;
+	PointHy 		: REAL := 0;
 END_VAR
 
 VAR_INST
@@ -832,10 +809,7 @@ VAR_INST
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-
-
-CASE _CuttingStep OF
+        <ST><![CDATA[CASE _CuttingStep OF
 
 	0: // Initial step, enable axes
 		Trace('Start Cutting Box Five Sides');
@@ -852,37 +826,14 @@ CASE _CuttingStep OF
 			AxisX.Deceleration := 8000;
 			AxisY.Deceleration := 8000;
 			AxisZ.Deceleration := 8000;
-			AxisX.Velocity := 10; 
-			AxisY.Velocity := 10;
+			AxisX.Velocity := 50; 
+			AxisY.Velocity := 50;
 			AxisZ.Velocity := 10;
 			
-			Point0x := 0;		
-			Point0y := 0;	
-			Point0z := 0;	
-			PointAx := GVL_HMI.PanelFrontWidht + GVL_HMI.PanelHeight;	
-			PointAy := GVL_HMI.PanelFrontLength + 2*GVL_HMI.PanelHeight - 2*GVL_HMI.RailHeightCorrection + GVL_HMI.ToolOverpass; 
-			PointBx := GVL_HMI.PanelFrontWidht + GVL_HMI.PanelHeight;
-			PointBy := 0 - GVL_HMI.ToolOverpass;
-			PointCx := GVL_HMI.PanelHeight;
-			PointCy := GVL_HMI.PanelFrontLength + 2*GVL_HMI.PanelHeight - 2*GVL_HMI.RailHeightCorrection + GVL_HMI.ToolOverpass; 
-			PointDx := GVL_HMI.PanelHeight;	
-			PointDy := 0 - GVL_HMI.ToolOverpass;
-			PointEx := 2*GVL_HMI.PanelHeight + GVL_HMI.PanelFrontWidht + GVL_HMI.ToolOverpass;
-			PointEy := GVL_HMI.PanelHeight - GVL_HMI.ToolOverpass;
-			PointFx := 0 - GVL_HMI.ToolOverpass;		
-			PointFy := GVL_HMI.PanelHeight - GVL_HMI.RailHeightCorrection;		
-			PointGx := 2*GVL_HMI.PanelHeight + GVL_HMI.PanelFrontWidht + GVL_HMI.ToolOverpass;		
-			PointGy := GVL_HMI.PanelHeight + GVL_HMI.PanelFrontLength - GVL_HMI.RailHeightCorrection;		
-			PointHx := 0 - GVL_HMI.ToolOverpass;		
-			PointHy := GVL_HMI.PanelHeight + GVL_HMI.PanelFrontLength - GVL_HMI.RailHeightCorrection;
-			
-			
-			
-			
-			//IF IO.DO3 = TRUE THEN
+			IF IO.DO3 := TRUE THEN
 			Trace('Speed Set');
 			_CuttingStep := 20;
-			//END_IF
+			END_IF
 		END_IF
 
 	20:	// Positioning Motion to A
@@ -1087,6 +1038,7 @@ CASE _CuttingStep OF
 			_CuttingStep := 340;
 		END_IF
 
+
 	340: // Final positioning 
 		AxisX.MoveAbsolute(Point0x,0);
 		AxisY.MoveAbsolute(Point0y,0);
@@ -1099,7 +1051,7 @@ CASE _CuttingStep OF
 		IF NOT AxisZ.Busy AND NOT AxisX.Busy AND NOT AxisY.Busy THEN
 			CutBorgoWings := TRUE;
 			END_IF	
-		
+
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -1899,32 +1851,11 @@ END_VAR
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CutBorgoFlaps">
-      <LineId Id="2508" Count="7" />
-      <LineId Id="2829" Count="0" />
-      <LineId Id="2831" Count="17" />
-      <LineId Id="2830" Count="0" />
-      <LineId Id="2849" Count="2" />
-      <LineId Id="2516" Count="220" />
-      <LineId Id="2781" Count="11" />
-      <LineId Id="2743" Count="1" />
+      <LineId Id="3131" Count="242" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CutBorgoWings">
-      <LineId Id="2515" Count="2" />
-      <LineId Id="2199" Count="19" />
-      <LineId Id="2518" Count="0" />
-      <LineId Id="2523" Count="17" />
-      <LineId Id="2519" Count="3" />
-      <LineId Id="2219" Count="39" />
-      <LineId Id="2435" Count="0" />
-      <LineId Id="2259" Count="171" />
-      <LineId Id="2473" Count="0" />
-      <LineId Id="2432" Count="1" />
-      <LineId Id="2474" Count="0" />
-      <LineId Id="2434" Count="0" />
-      <LineId Id="2477" Count="1" />
-      <LineId Id="2476" Count="0" />
-      <LineId Id="2475" Count="0" />
+      <LineId Id="3362" Count="242" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Get">
