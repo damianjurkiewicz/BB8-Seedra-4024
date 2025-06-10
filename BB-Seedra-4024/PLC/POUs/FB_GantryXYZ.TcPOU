@@ -13,7 +13,7 @@ VAR
     AxisY : FB_Component_BasicAxis := (Name := 'AxisY');
     AxisZ : FB_Component_BasicAxis := (Name := 'AxisZ');
     GantryCylinder : FB_GantryXYCylinder := (Name := 'Cylinder');
-	
+
 
 
     // Alarms for this module
@@ -24,22 +24,28 @@ VAR
     LimitSwitchY : BOOL;
     LimitSwitchZ : BOOL;
 
-    HomeComplete : BOOL;
+
 
     // Properties
     _HomingStepX : INT;
     _HomingStepY : INT;
     _HomingStepZ : INT;
     _CuttingStep : INT;
-    _CuttingHeightZ : REAL;
 
+
+END_VAR
+
+VAR PERSISTENT
+    _CuttingHeightZ : REAL;
+	_ToolOverpass : REAL;
 END_VAR
 
 VAR CONSTANT
     GANTRY_ALARM_COUNT : INT := 5;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[]]></ST>
+      <ST><![CDATA[
+]]></ST>
     </Implementation>
     <Folder Name="MyMethods" Id="{d166ca9d-f57a-4d88-ac90-142e5eb5d488}" />
     <Folder Name="Properties" Id="{b05cc7e1-dc37-4910-986a-f085b4a0163d}" />
@@ -82,11 +88,34 @@ END_CASE
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
-			
 
+	CASE SequenceState OF
+    
+	0:
+        NoStateTasksToComplete := FALSE;
+        SequenceState          := SequenceState + 10;
+    
+	10:
+		AxisX.Disable();
+		AxisY.Disable();
+		AxisZ.Disable();
+
+		IO.DO3 := FALSE;
+		GVL_HMI.ShowProductionPopup := 0;
+		THIS^.HomingStepX := 0;
+		THIS^.HomingStepY := 0;
+		THIS^.HomingStepZ := 0;
+		THIS^.CuttingStep := 0;
+		SequenceState := SequenceState + 10;
+	
+	20:
+
+		StateTasksComplete := TRUE;
 		SUPER^.Aborting();
+	END_CASE
+	
 
-END_CASE
+	END_CASE
 
 ]]></ST>
       </Implementation>
@@ -830,20 +859,20 @@ END_VAR
 			Point0y := 0;	
 			Point0z := 0;	
 			PointAx := GVL_HMI.PanelFrontWidht + GVL_HMI.PanelHeight;	
-			PointAy := GVL_HMI.PanelFrontLength + 2*GVL_HMI.PanelHeight - 2*GVL_HMI.RailHeightCorrection + GVL_HMI.ToolOverpass; 
+			PointAy := GVL_HMI.PanelFrontLength + 2*GVL_HMI.PanelHeight - 2*GVL_HMI.RailHeightCorrection + _ToolOverpass;; 
 			PointBx := GVL_HMI.PanelFrontWidht + GVL_HMI.PanelHeight;
-			PointBy := 0 - GVL_HMI.ToolOverpass;
+			PointBy := 0 - _ToolOverpass;
 			PointCx := GVL_HMI.PanelHeight;
-			PointCy := GVL_HMI.PanelFrontLength + 2*GVL_HMI.PanelHeight - 2*GVL_HMI.RailHeightCorrection + GVL_HMI.ToolOverpass; 
+			PointCy := GVL_HMI.PanelFrontLength + 2*GVL_HMI.PanelHeight - 2*GVL_HMI.RailHeightCorrection + _ToolOverpass;; 
 			PointDx := GVL_HMI.PanelHeight;	
-			PointDy := 0 - GVL_HMI.ToolOverpass;
-			PointEx := 2*GVL_HMI.PanelHeight + GVL_HMI.PanelFrontWidht + GVL_HMI.ToolOverpass;
-			PointEy := GVL_HMI.PanelHeight - GVL_HMI.ToolOverpass;
-			PointFx := 0 - GVL_HMI.ToolOverpass;		
+			PointDy := 0 - _ToolOverpass;;
+			PointEx := 2*GVL_HMI.PanelHeight + GVL_HMI.PanelFrontWidht + _ToolOverpass;;
+			PointEy := GVL_HMI.PanelHeight - _ToolOverpass;;
+			PointFx := 0 - _ToolOverpass;;		
 			PointFy := GVL_HMI.PanelHeight - GVL_HMI.RailHeightCorrection;		
-			PointGx := 2*GVL_HMI.PanelHeight + GVL_HMI.PanelFrontWidht + GVL_HMI.ToolOverpass;		
+			PointGx := 2*GVL_HMI.PanelHeight + GVL_HMI.PanelFrontWidht + _ToolOverpass;;		
 			PointGy := GVL_HMI.PanelHeight + GVL_HMI.PanelFrontLength - GVL_HMI.RailHeightCorrection;		
-			PointHx := 0 - GVL_HMI.ToolOverpass;		
+			PointHx := 0 - _ToolOverpass;;		
 			PointHy := GVL_HMI.PanelHeight + GVL_HMI.PanelFrontLength - GVL_HMI.RailHeightCorrection;
 	
 		IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
@@ -1135,6 +1164,16 @@ END_VAR]]></Declaration>
     RETURN;
 END_IF
 
+//aaa(
+//	Axis := AxisY.Axis , 
+//	Execute := TRUE , 
+//	ParameterNumber := MC_AxisParameter.AxisMinSoftPosLimit , 
+//	Value := -66, 
+//	 );
+	 
+	 
+
+
 SUPER^.CyclicLogic();
 
 //Set the current alarm severity for this module
@@ -1376,6 +1415,10 @@ END_IF]]></ST>
 	
 	100:
 		IF NOT AxisX.Busy THEN
+			
+		AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, 0);	 
+		AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+		
 			IF AxisX.Home() THEN
 				Trace('Ustawienie nowego zera po odsunięciu X');
 				_HomingStepX := _HomingStepX + 10;
@@ -1485,6 +1528,10 @@ END_IF]]></ST>
 	
 	100:
 		IF NOT AxisY.Busy THEN
+			
+		AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, 0);	 
+		AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
 			IF AxisY.Home() THEN
 				Trace('Ustawienie nowego zera po odsunięciu Y');
 				_HomingStepY := _HomingStepY + 10;
@@ -1594,6 +1641,10 @@ END_IF]]></ST>
 	
 	100:
 		IF NOT AxisZ.Busy THEN
+			
+			AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, 0);	 
+			AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 60);
+		
 			IF AxisZ.Home() THEN
 				Trace('Ustawienie nowego zera po odsunięciu Z');
 				_HomingStepZ := _HomingStepZ + 10;
@@ -1810,8 +1861,29 @@ END_VAR
 ]]></ST>
       </Implementation>
     </Method>
+    <Property Name="ToolOverpass" Id="{812d4990-d277-4bfc-8e06-a4ff70191e9b}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC ToolOverpass : REAL]]></Declaration>
+      <Get Name="Get" Id="{b0c9f572-3145-4e3a-b91c-cd20c9ba4da8}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ToolOverpass := _ToolOverpass;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{826fd5bf-1fa9-4f64-9665-346b4d89d6bf}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF ToolOverpass > 15 THEN
+	_ToolOverpass := 15;  
+	ELSE
+	_ToolOverpass := ToolOverpass;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <LineIds Name="FB_GantryXYZ">
-      <LineId Id="2" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="45" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Aborting">
       <LineId Id="149" Count="2" />
@@ -1827,9 +1899,17 @@ END_VAR
       <LineId Id="114" Count="3" />
       <LineId Id="154" Count="0" />
       <LineId Id="118" Count="0" />
-      <LineId Id="181" Count="3" />
-      <LineId Id="187" Count="0" />
+      <LineId Id="181" Count="2" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="200" Count="1" />
+      <LineId Id="222" Count="0" />
+      <LineId Id="202" Count="2" />
+      <LineId Id="221" Count="0" />
+      <LineId Id="205" Count="11" />
+      <LineId Id="220" Count="0" />
+      <LineId Id="217" Count="2" />
       <LineId Id="190" Count="0" />
+      <LineId Id="199" Count="0" />
       <LineId Id="153" Count="0" />
       <LineId Id="152" Count="0" />
       <LineId Id="119" Count="0" />
@@ -1914,7 +1994,11 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CyclicLogic">
-      <LineId Id="3" Count="5" />
+      <LineId Id="3" Count="3" />
+      <LineId Id="20" Count="5" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="26" Count="2" />
+      <LineId Id="7" Count="1" />
       <LineId Id="12" Count="4" />
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -1962,15 +2046,25 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingX">
-      <LineId Id="888" Count="100" />
+      <LineId Id="888" Count="86" />
+      <LineId Id="991" Count="1" />
+      <LineId Id="994" Count="0" />
+      <LineId Id="993" Count="0" />
+      <LineId Id="975" Count="13" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingY">
-      <LineId Id="793" Count="100" />
+      <LineId Id="793" Count="86" />
+      <LineId Id="896" Count="3" />
+      <LineId Id="880" Count="13" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingZ">
-      <LineId Id="988" Count="100" />
+      <LineId Id="988" Count="86" />
+      <LineId Id="1091" Count="1" />
+      <LineId Id="1094" Count="0" />
+      <LineId Id="1093" Count="0" />
+      <LineId Id="1075" Count="13" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
@@ -2028,6 +2122,13 @@ END_VAR
       <LineId Id="256" Count="1" />
       <LineId Id="101" Count="2" />
       <LineId Id="27" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ToolOverpass.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ToolOverpass.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
