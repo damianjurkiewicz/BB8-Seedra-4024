@@ -79,7 +79,7 @@ CASE SequenceState OF
 
 		IO.SpindleEnable := FALSE;
 
-		GVL_HMI.ShowProductionPopup := 0;
+
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
 		THIS^.HomingStepZ := 0;
@@ -106,7 +106,6 @@ END_CASE
 		AxisZ.Disable();
 
 		IO.SpindleEnable := FALSE;
-		GVL_HMI.ShowProductionPopup := 0;
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
 		THIS^.HomingStepZ := 0;
@@ -206,7 +205,6 @@ END_VAR
 			NoStateTasksToComplete := FALSE;
 			SequenceState          := SequenceState + 10;
 		10:
-			GVL_HMI.ShowProductionPopup := 0;
 			SequenceState := SequenceState + 10;
 		20:
 			StateTasksComplete := TRUE;
@@ -1219,7 +1217,6 @@ END_IF]]></ST>
 		CASE SequenceState OF
 			0:
 				NoStateTasksToComplete := FALSE;
-				GVL_HMI.ShowProductionPopup := 1;
 				SequenceState := SequenceState + 10;
 			10:
 					
@@ -1357,6 +1354,8 @@ END_IF]]></ST>
 		
 	0:
 		HomingX := FALSE;
+		
+		
 		IF AxisX.Enable() THEN
 			
 			Trace('Enable Axis X');
@@ -1440,9 +1439,6 @@ END_IF]]></ST>
 	
 	100:
 		IF NOT AxisX.Busy THEN
-			
-		AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, 0);	 
-		AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
 		
 			IF AxisX.Home() THEN
 				Trace('Ustawienie nowego zera po odsunięciu X');
@@ -1470,6 +1466,7 @@ END_IF]]></ST>
 		
 	0:
 		HomingY := FALSE;
+			
 		IF AxisY.Enable() THEN
 			
 			Trace('Enable Axis Y');
@@ -1553,9 +1550,6 @@ END_IF]]></ST>
 	
 	100:
 		IF NOT AxisY.Busy THEN
-			
-		AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, 0);	 
-		AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
 		
 			IF AxisY.Home() THEN
 				Trace('Ustawienie nowego zera po odsunięciu Y');
@@ -1582,7 +1576,8 @@ END_IF]]></ST>
         <ST><![CDATA[CASE _HomingStepZ OF
 		
 	0:
-		HomingZ := FALSE;
+		HomingZ := FALSE;	
+		
 		IF AxisZ.Enable() THEN
 			
 			Trace('Enable Axis Z');
@@ -1665,10 +1660,7 @@ END_IF]]></ST>
 		END_IF
 	
 	100:
-		IF NOT AxisZ.Busy THEN
-			
-			AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, 0);	 
-			AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 60);
+		IF NOT AxisZ.Busy THEN		
 		
 			IF AxisZ.Home() THEN
 				Trace('Ustawienie nowego zera po odsunięciu Z');
@@ -1908,7 +1900,21 @@ END_VAR
 		CASE SequenceState OF
 			0:
 				NoStateTasksToComplete := FALSE;
-				SequenceState := SequenceState + 10;	
+				SequenceState := SequenceState + 5;
+
+
+			5:
+
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -10);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+		
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -10);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -10);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 60);	
+				
+				SequenceState := SequenceState + 5;
 		
 			10: 
 				IF HomingZ() THEN
@@ -1947,16 +1953,46 @@ END_VAR
 		END_CASE
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
-	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
-			
-		AxisX.Enable();
-		AxisY.Enable();
-		AxisZ.Enable();	
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:
+
+	;
 	
-		IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
-		SUPER^.Resetting();
-		END_IF
-		SUPER^.Resetting();
+ 	E_PMLUnitMode.ePMLUnitMode_Manual:
+			
+	CASE SequenceState OF
+			0:
+				NoStateTasksToComplete := FALSE;
+				SequenceState := SequenceState + 10;	
+		
+			10: 
+				AxisX.Enable();
+				AxisY.Enable();
+				AxisZ.Enable();	
+				
+				IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+					SequenceState := SequenceState + 10;
+				END_IF
+				
+			20:	
+
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+		
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
+			
+				SequenceState := SequenceState + 10;
+			30:
+	
+				SequenceState := SequenceState + 10;
+					
+			40:		
+				StateTasksComplete := TRUE;
+				SUPER^.Resetting();
+		END_CASE
 		
 	
 	END_CASE
@@ -2011,7 +2047,8 @@ END_IF]]></ST>
       <LineId Id="222" Count="0" />
       <LineId Id="202" Count="2" />
       <LineId Id="221" Count="0" />
-      <LineId Id="205" Count="11" />
+      <LineId Id="205" Count="4" />
+      <LineId Id="211" Count="5" />
       <LineId Id="220" Count="0" />
       <LineId Id="217" Count="2" />
       <LineId Id="190" Count="0" />
@@ -2051,7 +2088,6 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Completing">
       <LineId Id="11" Count="8" />
-      <LineId Id="25" Count="0" />
       <LineId Id="30" Count="1" />
       <LineId Id="33" Count="9" />
       <LineId Id="10" Count="0" />
@@ -2116,7 +2152,7 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
-      <LineId Id="24" Count="7" />
+      <LineId Id="24" Count="6" />
       <LineId Id="102" Count="0" />
       <LineId Id="60" Count="0" />
       <LineId Id="79" Count="0" />
@@ -2159,23 +2195,26 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingX">
-      <LineId Id="888" Count="86" />
-      <LineId Id="991" Count="1" />
-      <LineId Id="994" Count="0" />
+      <LineId Id="888" Count="3" />
+      <LineId Id="995" Count="0" />
+      <LineId Id="997" Count="0" />
+      <LineId Id="892" Count="82" />
       <LineId Id="993" Count="0" />
       <LineId Id="975" Count="13" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingY">
-      <LineId Id="793" Count="86" />
-      <LineId Id="896" Count="3" />
+      <LineId Id="793" Count="3" />
+      <LineId Id="901" Count="0" />
+      <LineId Id="797" Count="82" />
+      <LineId Id="899" Count="0" />
       <LineId Id="880" Count="13" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingZ">
-      <LineId Id="988" Count="86" />
-      <LineId Id="1091" Count="1" />
-      <LineId Id="1094" Count="0" />
+      <LineId Id="988" Count="3" />
+      <LineId Id="1097" Count="0" />
+      <LineId Id="992" Count="82" />
       <LineId Id="1093" Count="0" />
       <LineId Id="1075" Count="13" />
       <LineId Id="314" Count="0" />
@@ -2225,6 +2264,11 @@ END_IF]]></ST>
       <LineId Id="82" Count="5" />
       <LineId Id="89" Count="0" />
       <LineId Id="91" Count="0" />
+      <LineId Id="434" Count="1" />
+      <LineId Id="433" Count="0" />
+      <LineId Id="437" Count="7" />
+      <LineId Id="436" Count="0" />
+      <LineId Id="445" Count="1" />
       <LineId Id="115" Count="0" />
       <LineId Id="226" Count="0" />
       <LineId Id="229" Count="0" />
@@ -2251,15 +2295,23 @@ END_IF]]></ST>
       <LineId Id="125" Count="0" />
       <LineId Id="94" Count="5" />
       <LineId Id="337" Count="0" />
+      <LineId Id="365" Count="2" />
+      <LineId Id="364" Count="0" />
       <LineId Id="335" Count="0" />
-      <LineId Id="341" Count="0" />
-      <LineId Id="343" Count="1" />
-      <LineId Id="342" Count="0" />
-      <LineId Id="345" Count="0" />
-      <LineId Id="340" Count="0" />
-      <LineId Id="346" Count="0" />
-      <LineId Id="339" Count="0" />
-      <LineId Id="338" Count="0" />
+      <LineId Id="377" Count="5" />
+      <LineId Id="416" Count="1" />
+      <LineId Id="386" Count="0" />
+      <LineId Id="418" Count="3" />
+      <LineId Id="387" Count="1" />
+      <LineId Id="422" Count="0" />
+      <LineId Id="425" Count="6" />
+      <LineId Id="397" Count="0" />
+      <LineId Id="423" Count="1" />
+      <LineId Id="398" Count="0" />
+      <LineId Id="411" Count="0" />
+      <LineId Id="432" Count="0" />
+      <LineId Id="412" Count="3" />
+      <LineId Id="374" Count="1" />
       <LineId Id="256" Count="1" />
       <LineId Id="101" Count="2" />
       <LineId Id="27" Count="0" />

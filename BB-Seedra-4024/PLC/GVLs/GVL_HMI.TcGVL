@@ -3,20 +3,12 @@
   <GVL Name="GVL_HMI" Id="{3f4f1fbc-c983-49da-9610-9708250e48c1}">
     <Declaration><![CDATA[{attribute 'qualified_only'}
 VAR_GLOBAL
-				//0 - will keep MainMenu open, 1- InfoMenu overlay during the production
+		//0 - will keep MainMenu open, 1- InfoMenu overlay during the production
 		ProgramToCut : INT;
-//0 - Production Mode, 1 - Manual Mode, 2 - Maintenance Mode
-		
+		//0 - Production Mode, 1 - Manual Mode, 2 - Maintenance Mode
 		MenuToDisplay :INT;
-	//0 - Cut Borgo Flaps, 1 - Cut Borgo Wings, 2 - Cut Arona	
-		ShowProductionPopup :INT;
-		
-
-
-	
-	
-
-		
+		//0 - Cut Borgo Flaps, 1 - Cut Borgo Wings, 2 - Cut Arona	
+		ShowProductionPopup :INT;		
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

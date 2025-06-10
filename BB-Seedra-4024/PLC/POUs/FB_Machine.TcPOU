@@ -174,18 +174,23 @@ CASE _CurrentMode OF
             E_PMLState.ePMLState_Stopped:
 				AllowHMIControl(ThisModuleOnly := FALSE);
             E_PMLState.ePMLState_Idle:
+				GVL_HMI.MenuToDisplay := 0;
 				AllowHMIControl(ThisModuleOnly := FALSE);
             E_PMLState.ePMLState_Suspended:
          		AllowHMIControl(ThisModuleOnly := FALSE);
             E_PMLState.ePMLState_Execute:
-				GVL_HMI.MenuToDisplay := 1;
+				GVL_HMI.ShowProductionPopup := 1;
             	AllowHMIControl(ThisModuleOnly := FALSE); 
+			  E_PMLState.ePMLState_Aborting:
+				GVL_HMI.ShowProductionPopup := 0;
+				AllowHMIControl(ThisModuleOnly := FALSE); 
             E_PMLState.ePMLState_Aborted:
 				GVL_HMI.MenuToDisplay := 0;
                 AllowHMIControl(ThisModuleOnly := FALSE); 
             E_PMLState.ePMLState_Held:
                 AllowHMIControl(ThisModuleOnly := FALSE); 
             E_PMLState.ePMLState_Complete:
+				GVL_HMI.ShowProductionPopup := 0;
           		AllowHMIControl(ThisModuleOnly := FALSE); 
 				
         END_CASE
@@ -410,11 +415,17 @@ END_IF]]></ST>
       <LineId Id="37" Count="0" />
       <LineId Id="7" Count="0" />
       <LineId Id="9" Count="1" />
+      <LineId Id="50" Count="0" />
       <LineId Id="12" Count="3" />
-      <LineId Id="40" Count="0" />
-      <LineId Id="16" Count="1" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="54" Count="1" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="17" Count="0" />
       <LineId Id="39" Count="0" />
-      <LineId Id="18" Count="4" />
+      <LineId Id="18" Count="3" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="22" Count="0" />
       <LineId Id="38" Count="0" />
       <LineId Id="23" Count="0" />
       <LineId Id="34" Count="0" />
