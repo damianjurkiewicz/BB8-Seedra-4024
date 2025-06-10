@@ -11,6 +11,9 @@ VAR
 
 	//Alarms for this module
 	MachineAlarms : ARRAY[1..MACHINE_ALARM_COUNT] OF FB_TcAlarm;
+	
+
+	
 
 END_VAR
 
@@ -22,6 +25,7 @@ END_VAR
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Folder Name="Properties" Id="{396a6016-c13c-4364-b739-7894bb49f371}" />
     <Folder Name="States" Id="{70644f5e-d79a-440d-8d18-4948c059f975}" />
     <Method Name="Clearing" Id="{309e3014-c1be-40c6-8306-4211d554a87f}" FolderPath="States\">
       <Declaration><![CDATA[

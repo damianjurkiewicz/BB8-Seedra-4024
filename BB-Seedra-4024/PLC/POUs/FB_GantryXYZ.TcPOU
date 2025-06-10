@@ -15,33 +15,37 @@ VAR
     GantryCylinder : FB_GantryXYCylinder := (Name := 'Cylinder');
 
 
-
     // Alarms for this module
     GantryAlarms : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
 
     // IO
-    LimitSwitchX : BOOL;
-    LimitSwitchY : BOOL;
-    LimitSwitchZ : BOOL;
-
-
+    LimitSwitchX : 			BOOL;
+    LimitSwitchY : 			BOOL;
+    LimitSwitchZ : 			BOOL;
 
     // Properties
-    _HomingStepX : INT;
-    _HomingStepY : INT;
-    _HomingStepZ : INT;
-    _CuttingStep : INT;
-
-
+    _HomingStepX :			INT;
+    _HomingStepY :			INT;
+    _HomingStepZ :			INT;
+    _CuttingStep :			INT;
+	
+	_PanelFrontWidht : 		REAL;
+	_PanelFrontLength : 	REAL;
+	_PanelHeight : 			REAL;
+	
 END_VAR
 
 VAR PERSISTENT
-    _CuttingHeightZ : REAL;
-	_ToolOverpass : REAL;
+
+    _CuttingHeightZ : 		REAL;
+	_ToolOverpass : 		REAL;
+	_RailHeightCorrection: 	REAL;
+	_DimensionCorrection : 	REAL;
+	
 END_VAR
 
 VAR CONSTANT
-    GANTRY_ALARM_COUNT : INT := 5;
+    GANTRY_ALARM_COUNT : 	INT := 5;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[
@@ -73,7 +77,8 @@ CASE SequenceState OF
 		AxisY.Disable();
 		AxisZ.Disable();
 
-		IO.DO3 := FALSE;
+		IO.SpindleEnable := FALSE;
+
 		GVL_HMI.ShowProductionPopup := 0;
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
@@ -100,7 +105,7 @@ END_CASE
 		AxisY.Disable();
 		AxisZ.Disable();
 
-		IO.DO3 := FALSE;
+		IO.SpindleEnable := FALSE;
 		GVL_HMI.ShowProductionPopup := 0;
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
@@ -292,9 +297,9 @@ END_VAR
 			AxisY.Velocity := 50;
 			AxisZ.Velocity := 10;
 			
-			IO.DO3 := TRUE;
+			IO.SpindleEnable := TRUE;
 			
-			IF IO.DO3 = TRUE THEN
+			IF IO.SpindleEnable = TRUE THEN
 			Trace('Speed Set');
 			_CuttingStep := 20;
 			END_IF
@@ -497,7 +502,7 @@ END_VAR
 
 	330: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
-			IO.DO3 := FALSE;
+			IO.SpindleEnable := FALSE;
 			Trace('Z Point 0 Reached');
 			_CuttingStep := 340;
 		END_IF
@@ -579,9 +584,9 @@ END_VAR
 			AxisY.Velocity := 50;
 			AxisZ.Velocity := 10;
 			
-			IO.DO3 := TRUE;
+			IO.SpindleEnable := TRUE;
 			
-			IF IO.DO3 = TRUE THEN
+			IF IO.SpindleEnable = TRUE THEN
 			Trace('Speed Set');
 			_CuttingStep := 20;
 			END_IF
@@ -784,7 +789,7 @@ END_VAR
 
 	330: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
-			IO.DO3 := FALSE;
+			IO.SpindleEnable := FALSE;
 			Trace('Z Point 0 Reached');
 			_CuttingStep := 340;
 		END_IF
@@ -858,22 +863,22 @@ END_VAR
 	5: 		Point0x := 0;		
 			Point0y := 0;	
 			Point0z := 0;	
-			PointAx := GVL_HMI.PanelFrontWidht + GVL_HMI.PanelHeight;	
-			PointAy := GVL_HMI.PanelFrontLength + 2*GVL_HMI.PanelHeight - 2*GVL_HMI.RailHeightCorrection + _ToolOverpass;; 
-			PointBx := GVL_HMI.PanelFrontWidht + GVL_HMI.PanelHeight;
+			PointAx := PanelFrontWidht + PanelHeight;	
+			PointAy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;; 
+			PointBx := PanelFrontWidht + PanelHeight;
 			PointBy := 0 - _ToolOverpass;
-			PointCx := GVL_HMI.PanelHeight;
-			PointCy := GVL_HMI.PanelFrontLength + 2*GVL_HMI.PanelHeight - 2*GVL_HMI.RailHeightCorrection + _ToolOverpass;; 
-			PointDx := GVL_HMI.PanelHeight;	
+			PointCx := PanelHeight;
+			PointCy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;; 
+			PointDx := PanelHeight;	
 			PointDy := 0 - _ToolOverpass;;
-			PointEx := 2*GVL_HMI.PanelHeight + GVL_HMI.PanelFrontWidht + _ToolOverpass;;
-			PointEy := GVL_HMI.PanelHeight - _ToolOverpass;;
+			PointEx := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;;
+			PointEy := PanelHeight - _ToolOverpass;;
 			PointFx := 0 - _ToolOverpass;;		
-			PointFy := GVL_HMI.PanelHeight - GVL_HMI.RailHeightCorrection;		
-			PointGx := 2*GVL_HMI.PanelHeight + GVL_HMI.PanelFrontWidht + _ToolOverpass;;		
-			PointGy := GVL_HMI.PanelHeight + GVL_HMI.PanelFrontLength - GVL_HMI.RailHeightCorrection;		
+			PointFy := PanelHeight - _RailHeightCorrection;		
+			PointGx := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;;		
+			PointGy := PanelHeight + PanelFrontLength - _RailHeightCorrection;		
 			PointHx := 0 - _ToolOverpass;;		
-			PointHy := GVL_HMI.PanelHeight + GVL_HMI.PanelFrontLength - GVL_HMI.RailHeightCorrection;
+			PointHy := PanelHeight + PanelFrontLength - _RailHeightCorrection;
 	
 		IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
 			_CuttingStep := 10;
@@ -891,9 +896,9 @@ END_VAR
 			AxisY.Velocity := 50;
 			AxisZ.Velocity := 10;
 			
-			IO.DO3 := TRUE;
+			IO.SpindleEnable := TRUE;
 			
-			IF IO.DO3 = TRUE THEN
+			IF IO.SpindleEnable = TRUE THEN
 			// Trace('Speed Set');
 			_CuttingStep := 20;
 			END_IF
@@ -1092,7 +1097,7 @@ END_VAR
 
 	330: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
-			IO.DO3 := FALSE;
+			IO.SpindleEnable := FALSE;
 			// Trace('Z Point 0 Reached');
 			_CuttingStep := 340;
 		END_IF
@@ -1183,6 +1188,26 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 ]]></ST>
       </Implementation>
     </Method>
+    <Property Name="DimensionCorrection" Id="{95467893-833e-4a85-85a7-4d3d7fbe1cbc}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC DimensionCorrection : REAL]]></Declaration>
+      <Get Name="Get" Id="{6597f0bb-ab93-4c8b-9f04-26dad4e00b3c}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DimensionCorrection := _DimensionCorrection;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{3a142071-aa1f-47a4-b310-22c10182eea7}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF DimensionCorrection > 4 THEN
+	_DimensionCorrection := 4;  // It can't go higher, you will kill yourself
+	ELSE
+	_DimensionCorrection := DimensionCorrection;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="Execute" Id="{895d1ef9-5e85-47dd-a8bf-b32885837641}" FolderPath="States\">
       <Declaration><![CDATA[METHOD PROTECTED Execute
 ]]></Declaration>
@@ -1704,6 +1729,86 @@ CASE DescendantSequenceState OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Property Name="PanelFrontLength" Id="{d37d1986-191c-4359-b366-a37c4466a7c4}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontLength : REAL]]></Declaration>
+      <Get Name="Get" Id="{719609b4-0075-4953-8df2-a544ce507b40}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[PanelFrontLength := _PanelFrontLength;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{d74bf0f0-654e-45df-b754-63029e5c2a12}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF PanelFrontLength > 15 THEN
+	_PanelFrontLength := 15;  // It can't go higher, you will kill yourself
+	ELSE
+	_PanelFrontLength := PanelFrontLength;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="PanelFrontWidht" Id="{f3e0dbc8-c3fa-460e-86ce-eb87111125e9}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontWidht : REAL]]></Declaration>
+      <Get Name="Get" Id="{337b7ccf-7529-41b1-81a1-e9c0f98de875}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[PanelFrontWidht := _PanelFrontWidht;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{6f7f0fd9-fb5c-4077-ab43-02d47a14a15f}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF PanelFrontWidht > 15 THEN
+	_PanelFrontWidht := 15;  // It can't go higher, you will kill yourself
+	ELSE
+	_PanelFrontWidht := PanelFrontWidht;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="PanelHeight" Id="{0920acc0-257a-43b2-a196-f22fc89e42ed}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC PanelHeight : REAL]]></Declaration>
+      <Get Name="Get" Id="{20b3fa55-de19-44e2-ad7b-52463e1bf19b}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[PanelHeight := _PanelHeight;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{91d58d60-235c-48ff-9b62-1155794955c4}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF PanelHeight > 15 THEN
+	_PanelHeight := 15;  // It can't go higher, you will kill yourself
+	ELSE
+	_PanelHeight := PanelHeight;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RailHeightCorrection" Id="{465e1c57-83b8-4b2a-a3fe-16819241fd4f}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC RailHeightCorrection : REAL]]></Declaration>
+      <Get Name="Get" Id="{8547e8a4-2368-4b1c-bac1-a9f1330a50a7}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RailHeightCorrection := _RailHeightCorrection;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{77d9b924-4d53-4d00-8d3d-e32bf531a5d3}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF RailHeightCorrection > 15 THEN
+	_RailHeightCorrection := 15;  // It can't go higher, you will kill yourself
+	ELSE
+	_RailHeightCorrection := RailHeightCorrection;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="ResetSafety" Id="{6bac4035-16f4-4bf2-95a7-9f0b204a82b7}" FolderPath="MyMethods\">
       <Declaration><![CDATA[METHOD ResetSafety : BOOL
 VAR_INST
@@ -1894,6 +1999,7 @@ END_IF]]></ST>
       <LineId Id="132" Count="0" />
       <LineId Id="124" Count="0" />
       <LineId Id="140" Count="0" />
+      <LineId Id="230" Count="0" />
       <LineId Id="112" Count="1" />
       <LineId Id="121" Count="1" />
       <LineId Id="114" Count="3" />
@@ -2002,6 +2108,13 @@ END_IF]]></ST>
       <LineId Id="12" Count="4" />
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.DimensionCorrection.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.DimensionCorrection.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
       <LineId Id="24" Count="7" />
       <LineId Id="102" Count="0" />
@@ -2074,6 +2187,34 @@ END_IF]]></ST>
       <LineId Id="41" Count="5" />
       <LineId Id="48" Count="0" />
       <LineId Id="51" Count="7" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelFrontLength.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelFrontLength.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelFrontWidht.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelFrontWidht.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelHeight.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelHeight.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RailHeightCorrection.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RailHeightCorrection.Set">
+      <LineId Id="5" Count="3" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ResetSafety">

@@ -1984,7 +1984,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{57FCE1FD-5331-68ED-E4C1-68A84E3F0EA4}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{E5119543-363E-28D2-930F-A95DB6348C3E}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2037,6 +2037,10 @@ External Setpoint Generation:
 					<Vars VarGrpType="2" AreaNo="1">
 						<Name>PlcTask Outputs</Name>
 						<Var>
+							<Name>IO.SpindleEnable</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
 							<Name>GVL_Safety.RunStop</Name>
 							<Type>BOOL</Type>
 						</Var>
@@ -2046,10 +2050,6 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>GVL_Safety.RestartFBs</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DO3</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
@@ -6148,7 +6148,7 @@ Bit 8 - 15 : reserved]]></Comment>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 4 (EL2008)">
 				<Link VarA="PlcTask Outputs^IO.CoolingEnable" VarB="Channel 4^Output"/>
-				<Link VarA="PlcTask Outputs^IO.DO3" VarB="Channel 3^Output"/>
+				<Link VarA="PlcTask Outputs^IO.SpindleEnable" VarB="Channel 3^Output"/>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 8 (EL6900)">
 				<Link VarA="PlcTask Inputs^GVL_Safety.ComError" VarB="StandardInputs^TwinSafeGroup1.GVL_Safety.ComError_8"/>

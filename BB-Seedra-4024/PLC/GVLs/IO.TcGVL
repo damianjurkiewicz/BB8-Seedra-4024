@@ -13,8 +13,8 @@
 	DI7			AT%I*		:	BOOL;
 	DI8			AT%I*		:	BOOL;
 	
-	DO3 		AT%Q*		:	BOOL;
-	CoolingEnable			AT%Q*		:	BOOL; 
+	SpindleEnable 				AT%Q*		:	BOOL;
+	CoolingEnable				AT%Q*		:	BOOL; 
 	
 	ProximitySensorX			AT%I*		:	BOOL;
 	ProximitySensorY			AT%I*		:	BOOL;
