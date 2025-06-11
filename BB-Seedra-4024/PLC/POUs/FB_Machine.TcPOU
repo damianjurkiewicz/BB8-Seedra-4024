@@ -345,26 +345,6 @@ ELSIF _CurrentState = E_PMLState.ePMLState_Stopped OR _CurrentState = E_PMLState
 END_IF]]></ST>
       </Implementation>
     </Method>
-    <Property Name="zProgramToCut" Id="{aaf13c4a-43ca-4327-b478-1799bad3718d}" FolderPath="Properties\">
-      <Declaration><![CDATA[PROPERTY PUBLIC zProgramToCut : INT]]></Declaration>
-      <Get Name="Get" Id="{5e2e0f78-8a15-431c-83cf-7bbcc0ac7bcc}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[zProgramToCut := _zProgramToCut;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{c0ec5c2b-5a92-481d-83f8-340969783d88}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[ IF zProgramToCut > 15 THEN
-	_zProgramToCut := 15;  // It can't go higher, you will kill yourself
-	ELSE
-	_zProgramToCut := zProgramToCut;
-END_IF]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <LineIds Name="FB_Machine">
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -492,13 +472,6 @@ END_IF]]></ST>
       <LineId Id="55" Count="0" />
       <LineId Id="23" Count="24" />
       <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_Machine.zProgramToCut.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_Machine.zProgramToCut.Set">
-      <LineId Id="5" Count="3" />
-      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

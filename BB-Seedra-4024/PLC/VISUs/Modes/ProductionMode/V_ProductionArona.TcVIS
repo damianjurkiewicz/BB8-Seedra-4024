@@ -183,7 +183,7 @@
                       <v n="Id">494569607L</v>
                       <l n="Value" t="ArrayList" cet="NamedStyleColor">
                         <o>
-                          <v n="Color">-1644826</v>
+                          <v n="Color">-1</v>
                           <v n="CanonicalName">"Element-DatePicker-MainArea-CurrentDay-BackColor"</v>
                         </o>
                       </l>
@@ -199,19 +199,16 @@
                     </o>
                     <o>
                       <v n="Id">135947015L</v>
-                      <l n="Value" t="ArrayList" cet="NamedStyleColor">
-                        <o>
-                          <v n="Color">-65536</v>
-                          <v n="CanonicalName">"BasicElement-Alarm-Frame-Color"</v>
-                        </o>
+                      <l n="Value" t="ArrayList" cet="UInt32">
+                        <v>4286644096</v>
                       </l>
                     </o>
                     <o>
                       <v n="Id">493260384L</v>
                       <l n="Value" t="ArrayList" cet="NamedStyleColor">
                         <o>
-                          <v n="Color">-12337</v>
-                          <v n="CanonicalName">"BasicElement-Alarm-Fill-Color"</v>
+                          <v n="Color">-2830136</v>
+                          <v n="CanonicalName">"Lightgray"</v>
                         </o>
                       </l>
                     </o>
@@ -249,7 +246,7 @@
                     </o>
                     <o>
                       <v n="Id">1999528970L</v>
-                      <v n="Value">"&lt;toggle/tap variable&gt;"</v>
+                      <v n="Value">"HMI.Status.State = E_PMLState.ePMLState_Idle"</v>
                     </o>
                     <o>
                       <v n="Id">3719097617L</v>
@@ -299,7 +296,7 @@
                     </o>
                     <o>
                       <v n="Id">2678395525L</v>
-                      <v n="Value" t="Int16">0</v>
+                      <v n="Value" t="Int16">5</v>
                     </o>
                     <o>
                       <v n="Id">564465120L</v>
@@ -311,7 +308,7 @@
                     </o>
                     <o>
                       <v n="Id">2827249010L</v>
-                      <v n="Value">"PS_HOLLOW"</v>
+                      <v n="Value">"PS_SOLID"</v>
                     </o>
                     <o>
                       <v n="Id">2597686782L</v>
@@ -504,8 +501,8 @@
                     <o>
                       <v n="InputBoxVariable">""</v>
                       <v n="InputType">"VisuDialogs.Numpad"</v>
-                      <v n="InputBoxMin">""</v>
-                      <v n="InputBoxMax">""</v>
+                      <v n="InputBoxMin">"20"</v>
+                      <v n="InputBoxMax">"1160"</v>
                       <v n="InputBoxDialogTitle">""</v>
                       <v n="Password">false</v>
                       <v n="UseTextOutputVariable">true</v>
@@ -813,8 +810,8 @@
                     <o>
                       <v n="InputBoxVariable">""</v>
                       <v n="InputType">"VisuDialogs.Numpad"</v>
-                      <v n="InputBoxMin">""</v>
-                      <v n="InputBoxMax">""</v>
+                      <v n="InputBoxMin">"40"</v>
+                      <v n="InputBoxMax">"400"</v>
                       <v n="InputBoxDialogTitle">""</v>
                       <v n="Password">false</v>
                       <v n="UseTextOutputVariable">true</v>

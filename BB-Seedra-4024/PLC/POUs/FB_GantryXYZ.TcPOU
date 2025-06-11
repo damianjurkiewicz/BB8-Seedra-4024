@@ -812,14 +812,14 @@ END_CASE]]></ST>
     <Method Name="CutBorgoWings" Id="{a743c5ed-8d5e-4e9d-9846-919578920253}" FolderPath="MyMethods\">
       <Declaration><![CDATA[METHOD CutBorgoWings : BOOL
 (*
-	D		B
+	F		    H
 	|			|
 D---+-----------+---C
 	|			|
 	|			| 
 B---+-----------+---A
 	|			|
-	C			A
+	E			G
 *)
 VAR  
 
@@ -890,8 +890,8 @@ END_VAR
 			AxisX.Deceleration := 8000;
 			AxisY.Deceleration := 8000;
 			AxisZ.Deceleration := 8000;
-			AxisX.Velocity := 50; 
-			AxisY.Velocity := 50;
+			AxisX.Velocity := 10; 
+			AxisY.Velocity := 10;
 			AxisZ.Velocity := 10;
 			
 			IO.SpindleEnable := TRUE;
