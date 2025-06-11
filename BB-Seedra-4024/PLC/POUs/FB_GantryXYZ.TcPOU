@@ -827,7 +827,7 @@ END_VAR
 
 VAR_INST
 	Timer			:TON;
-	Point0x 		: REAL := 0;
+	Point0x 		: REAL;
 	Point0y 		: REAL;
 	Point0z 		: REAL;
 	PointAx 		: REAL;
@@ -862,20 +862,20 @@ END_VAR
 			Point0y := 0;	
 			Point0z := 0;	
 			PointAx := PanelFrontWidht + PanelHeight;	
-			PointAy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;; 
+			PointAy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
 			PointBx := PanelFrontWidht + PanelHeight;
 			PointBy := 0 - _ToolOverpass;
 			PointCx := PanelHeight;
-			PointCy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;; 
+			PointCy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
 			PointDx := PanelHeight;	
-			PointDy := 0 - _ToolOverpass;;
-			PointEx := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;;
-			PointEy := PanelHeight - _ToolOverpass;;
-			PointFx := 0 - _ToolOverpass;;		
+			PointDy := 0 - _ToolOverpass;
+			PointEx := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;
+			PointEy := PanelHeight - _ToolOverpass;
+			PointFx := 0 - _ToolOverpass;		
 			PointFy := PanelHeight - _RailHeightCorrection;		
-			PointGx := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;;		
+			PointGx := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;		
 			PointGy := PanelHeight + PanelFrontLength - _RailHeightCorrection;		
-			PointHx := 0 - _ToolOverpass;;		
+			PointHx := 0 - _ToolOverpass;		
 			PointHy := PanelHeight + PanelFrontLength - _RailHeightCorrection;
 	
 		IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
@@ -883,7 +883,7 @@ END_VAR
 		END_IF
 
 	10:	// Set Speed
-		IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+		IF  AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
 			AxisX.Acceleration := 500;
 			AxisY.Acceleration := 500;
 			AxisZ.Acceleration := 500;
@@ -920,37 +920,42 @@ END_VAR
 		_CuttingStep := 50;
 
 	50: // Verify Cutting Height
-		IF AxisZ.InPosition THEN
+		IF AxisZ.InPosition AND NOT AxisZ.Busy THEN
 			// Trace('Cutting Height Set');
 			IO.CoolingEnable := TRUE;
-			Timer(IN := TRUE, PT := T#2000MS);
-			IF Timer.Q THEN
+			_CuttingStep := 55;
+		END_IF
+		
+	55: 
+		Timer(IN := TRUE, PT := T#10000MS);
+		IF Timer.Q THEN
 			_CuttingStep := 60;
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie
-			END_IF
-		END_IF
+		END_IF	
 
 	60: // Cutting Motion from A to B
 		AxisX.MoveAbsolute(PointBx,0);
 		AxisY.MoveAbsolute(PointBy,0);
-		// Trace('Cutting from A to B');
+		Trace('60Cutting from A to B');
+		IF NOT AxisX.Busy AND NOT AxisY.Busy THEN 
 		_CuttingStep := 70;
+		END_IF
 
 	70: // Verify position B reached
-		IF AxisX.InPosition THEN
-			// Trace('Position B Reached');
+		IF AxisX.InPosition AND AxisY.InPosition AND NOT AxisX.Busy AND NOT AxisY.Busy THEN
+			Trace('70Position B Reached');
 			_CuttingStep := 80;
 		END_IF
 
 	80: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
 		IO.CoolingEnable := FALSE;
-		// Trace('Returning from Cutting Height');
+		Trace('80Returning from Cutting Height');
 		_CuttingStep := 90;
 
 	90: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
-			// Trace('Z Returned');
+			Trace('90Z Returned');
 			_CuttingStep := 100;
 		END_IF
 
@@ -2118,7 +2123,14 @@ END_IF]]></ST>
       <LineId Id="3922" Count="0" />
       <LineId Id="3670" Count="14" />
       <LineId Id="3923" Count="1" />
-      <LineId Id="3685" Count="217" />
+      <LineId Id="3685" Count="26" />
+      <LineId Id="3716" Count="1" />
+      <LineId Id="3962" Count="1" />
+      <LineId Id="3965" Count="3" />
+      <LineId Id="3964" Count="0" />
+      <LineId Id="3718" Count="5" />
+      <LineId Id="3969" Count="1" />
+      <LineId Id="3724" Count="178" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Get">
