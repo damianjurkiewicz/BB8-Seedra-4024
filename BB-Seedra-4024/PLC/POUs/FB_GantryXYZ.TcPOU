@@ -890,8 +890,8 @@ END_VAR
 			AxisX.Deceleration := 8000;
 			AxisY.Deceleration := 8000;
 			AxisZ.Deceleration := 8000;
-			AxisX.Velocity := 10; 
-			AxisY.Velocity := 10;
+			AxisX.Velocity := 20; 
+			AxisY.Velocity := 20;
 			AxisZ.Velocity := 10;
 			
 			IO.SpindleEnable := TRUE;
@@ -1733,8 +1733,8 @@ END_CASE]]></ST>
       <Set Name="Set" Id="{d74bf0f0-654e-45df-b754-63029e5c2a12}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF PanelFrontLength > 15 THEN
-	_PanelFrontLength := 15;  // It can't go higher, you will kill yourself
+          <ST><![CDATA[ IF PanelFrontLength > 2360  THEN
+	_PanelFrontLength := 2360;  // It can't go higher, you will kill yourself
 	ELSE
 	_PanelFrontLength := PanelFrontLength;
 END_IF]]></ST>
@@ -1753,8 +1753,8 @@ END_IF]]></ST>
       <Set Name="Set" Id="{6f7f0fd9-fb5c-4077-ab43-02d47a14a15f}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF PanelFrontWidht > 15 THEN
-	_PanelFrontWidht := 15;  // It can't go higher, you will kill yourself
+          <ST><![CDATA[ IF PanelFrontWidht > 1160 THEN
+	_PanelFrontWidht := 1160;  // It can't go higher, you will kill yourself
 	ELSE
 	_PanelFrontWidht := PanelFrontWidht;
 END_IF]]></ST>
@@ -1773,8 +1773,8 @@ END_IF]]></ST>
       <Set Name="Set" Id="{91d58d60-235c-48ff-9b62-1155794955c4}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF PanelHeight > 15 THEN
-	_PanelHeight := 15;  // It can't go higher, you will kill yourself
+          <ST><![CDATA[ IF PanelHeight > 400 THEN
+	_PanelHeight := 400;  // It can't go higher, you will kill yourself
 	ELSE
 	_PanelHeight := PanelHeight;
 END_IF]]></ST>
