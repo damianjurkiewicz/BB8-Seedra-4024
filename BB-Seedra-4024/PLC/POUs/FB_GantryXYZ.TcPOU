@@ -1134,8 +1134,8 @@ END_CASE
       <Set Name="Set" Id="{3fde4dcd-fcc8-4a85-8a9a-5adb0df55581}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF CuttingHeightZ > 15 THEN
-	_CuttingHeightZ := 15;  // It can't go higher, you will kill yourself
+          <ST><![CDATA[ IF CuttingHeightZ > 100 THEN
+	_CuttingHeightZ := 100;  // It can't go higher, you will kill yourself
 	ELSE
 	_CuttingHeightZ := CuttingHeightZ;
 END_IF]]></ST>
@@ -1910,14 +1910,14 @@ END_VAR
 
 			5:
 
-				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -10);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
 				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
 		
-				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -10);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
 				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
 		
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -10);	 
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 60);	
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);	
 				
 				SequenceState := SequenceState + 5;
 		
