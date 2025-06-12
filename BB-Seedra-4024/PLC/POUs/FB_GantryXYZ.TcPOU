@@ -920,14 +920,14 @@ END_VAR
 		_CuttingStep := 50;
 
 	50: // Verify Cutting Height
-		IF AxisZ.InPosition AND NOT AxisZ.Busy THEN
+		IF AxisZ.InPosition THEN
 			// Trace('Cutting Height Set');
 			IO.CoolingEnable := TRUE;
 			_CuttingStep := 55;
 		END_IF
 		
 	55: 
-		Timer(IN := TRUE, PT := T#10000MS);
+		Timer(IN := TRUE, PT := T#5000MS);
 		IF Timer.Q THEN
 			_CuttingStep := 60;
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie
@@ -937,12 +937,12 @@ END_VAR
 		AxisX.MoveAbsolute(PointBx,0);
 		AxisY.MoveAbsolute(PointBy,0);
 		Trace('60Cutting from A to B');
-		IF NOT AxisX.Busy AND NOT AxisY.Busy THEN 
+		//IF NOT AxisX.Busy AND NOT AxisY.Busy THEN 
 		_CuttingStep := 70;
-		END_IF
+		//END_IF
 
 	70: // Verify position B reached
-		IF AxisX.InPosition AND AxisY.InPosition AND NOT AxisX.Busy AND NOT AxisY.Busy THEN
+		IF AxisX.InPosition AND AxisY.InPosition THEN
 			Trace('70Position B Reached');
 			_CuttingStep := 80;
 		END_IF
@@ -1363,7 +1363,7 @@ END_IF]]></ST>
 		
 		IF AxisX.Enable() THEN
 			
-			Trace('Enable Axis X');
+			//Trace('Enable Axis X');
 			_HomingStepX := _HomingStepX + 10;
 		END_IF
 		
@@ -1371,7 +1371,7 @@ END_IF]]></ST>
 		IF AxisX.Enabled THEN
 			AxisX.Acceleration := 100;
 			AxisX.Deceleration := 15000;
-			Trace('Enabled Axis X');
+			//Trace('Enabled Axis X');
 			_HomingStepX := _HomingStepX + 10;
 		END_IF
 
@@ -1380,7 +1380,7 @@ END_IF]]></ST>
 			IF AxisX.Stop() THEN
 				IF NOT AxisX.Busy THEN
 				AxisX.Home();
-				Trace('Start na krańcówce X');
+				////Trace('Start na krańcówce X');
 				_HomingStepX := 80;
 				END_IF
 			END_IF
@@ -1390,7 +1390,7 @@ END_IF]]></ST>
 		
 	30:
 		IF AxisX.MoveVelocity(-50, FALSE) THEN
-			Trace('Szybki ruch, szukam krancowki X');
+			////Trace('Szybki ruch, szukam krancowki X');
             _HomingStepX := _HomingStepX + 10;
         END_IF
 		
@@ -1400,7 +1400,7 @@ END_IF]]></ST>
 			
 		IF AxisX.Stop() THEN
 			IF NOT AxisX.Busy THEN
-				Trace('Spotkałem krańcówkę X');
+				//Trace('Spotkałem krańcówkę X');
 				_HomingStepX := _HomingStepX + 10;
 			END_IF
 		END_IF
@@ -1409,20 +1409,20 @@ END_IF]]></ST>
 
 	50:
 		IF AxisX.MoveRelative(30,FALSE) THEN
-			Trace('Odsunięcie od krańcówki, po szybkim X');
+			//Trace('Odsunięcie od krańcówki, po szybkim X');
 			_HomingStepX := _HomingStepX + 10;
 		END_IF
 		
 	60: 
 		IF AxisX.MoveVelocity(-10,FALSE) THEN
-			Trace('Spokojny powrot X');		
+			//Trace('Spokojny powrot X');		
 			_HomingStepX := _HomingStepX + 10;
 		END_IF	
 		
 	70:
 		IF IO.ProximitySensorX THEN
 			IF AxisX.Stop() THEN
-				Trace('Stop do precyzyjnego X');
+				//Trace('Stop do precyzyjnego X');
 				_HomingStepX := _HomingStepX + 10; // Przechodzimy do czekania na zatrzymanie
 			END_IF
 		END_IF
@@ -1431,14 +1431,14 @@ END_IF]]></ST>
 		IF NOT AxisX.Busy THEN
 			IF AxisX.Home() THEN
 				_HomingStepX := _HomingStepX + 10;
-				Trace('Precyzyjny Home wykonany X');
+				//Trace('Precyzyjny Home wykonany X');
 			END_IF
 		END_IF
 
 
 	90:	
 		IF AxisX.MoveRelative(2.0, FALSE) THEN
-			Trace('Odsunięcie od krańcówki o 2mm X');
+			//Trace('Odsunięcie od krańcówki o 2mm X');
 			_HomingStepX := _HomingStepX + 10;
 		END_IF
 	
@@ -1446,14 +1446,14 @@ END_IF]]></ST>
 		IF NOT AxisX.Busy THEN
 		
 			IF AxisX.Home() THEN
-				Trace('Ustawienie nowego zera po odsunięciu X');
+				//Trace('Ustawienie nowego zera po odsunięciu X');
 				_HomingStepX := _HomingStepX + 10;
 			END_IF
 		END_IF
 	
 	110:
 		HomingX := TRUE;
-		Trace('Homing zakończony pomyślnie X');
+		//Trace('Homing zakończony pomyślnie X');
 		
 			
 	END_CASE
@@ -1474,7 +1474,7 @@ END_IF]]></ST>
 			
 		IF AxisY.Enable() THEN
 			
-			Trace('Enable Axis Y');
+			//Trace('Enable Axis Y');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
 		
@@ -1482,7 +1482,7 @@ END_IF]]></ST>
 		IF AxisY.Enabled THEN
 			AxisY.Acceleration := 100;
 			AxisY.Deceleration := 15000;
-			Trace('Enabled Axis Y');
+			//Trace('Enabled Axis Y');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
 
@@ -1491,7 +1491,7 @@ END_IF]]></ST>
 			IF AxisY.Stop() THEN
 				IF NOT AxisY.Busy THEN
 				AxisY.Home();
-				Trace('Start na krańcówce Y');
+				//Trace('Start na krańcówce Y');
 				_HomingStepY := 80;
 				END_IF
 			END_IF
@@ -1501,7 +1501,7 @@ END_IF]]></ST>
 		
 	30:
 		IF AxisY.MoveVelocity(-50, FALSE) THEN
-			Trace('Szybki ruch, szukam krancowki Y');
+			//Trace('Szybki ruch, szukam krancowki Y');
             _HomingStepY := _HomingStepY + 10;
         END_IF
 		
@@ -1511,7 +1511,7 @@ END_IF]]></ST>
 			
 		IF AxisY.Stop() THEN
 			IF NOT AxisY.Busy THEN
-				Trace('Spotkałem krańcówkę Y');
+				//Trace('Spotkałem krańcówkę Y');
 				_HomingStepY := _HomingStepY + 10;
 			END_IF
 		END_IF
@@ -1520,20 +1520,20 @@ END_IF]]></ST>
 
 	50:
 		IF AxisY.MoveRelative(30,FALSE) THEN
-			Trace('Odsunięcie od krańcówki, po szybkim Y');
+			//Trace('Odsunięcie od krańcówki, po szybkim Y');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
 		
 	60: 
 		IF AxisY.MoveVelocity(-10,FALSE) THEN
-			Trace('Spokojny powrot Y');		
+			//Trace('Spokojny powrot Y');		
 			_HomingStepY := _HomingStepY + 10;
 		END_IF	
 		
 	70:
 		IF IO.ProximitySensorY THEN
 			IF AxisY.Stop() THEN
-				Trace('Stop do precyzyjnego Y');
+				//Trace('Stop do precyzyjnego Y');
 				_HomingStepY := _HomingStepY + 10; // Przechodzimy do czekania na zatrzymanie
 			END_IF
 		END_IF
@@ -1542,14 +1542,14 @@ END_IF]]></ST>
 		IF NOT AxisY.Busy THEN
 			IF AxisY.Home() THEN
 				_HomingStepY := _HomingStepY + 10;
-				Trace('Precyzyjny Home wykonany Y');
+				//Trace('Precyzyjny Home wykonany Y');
 			END_IF
 		END_IF
 
 
 	90:	
 		IF AxisY.MoveRelative(2.0, FALSE) THEN
-			Trace('Odsunięcie od krańcówki o 2mm Y');
+			//Trace('Odsunięcie od krańcówki o 2mm Y');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
 	
@@ -1557,14 +1557,14 @@ END_IF]]></ST>
 		IF NOT AxisY.Busy THEN
 		
 			IF AxisY.Home() THEN
-				Trace('Ustawienie nowego zera po odsunięciu Y');
+				//Trace('Ustawienie nowego zera po odsunięciu Y');
 				_HomingStepY := _HomingStepY + 10;
 			END_IF
 		END_IF
 	
 	110:
 		HomingY := TRUE;
-		Trace('Homing zakończony pomyślnie Y');
+		//Trace('Homing zakończony pomyślnie Y');
 		
 			
 	END_CASE
@@ -1585,7 +1585,7 @@ END_IF]]></ST>
 		
 		IF AxisZ.Enable() THEN
 			
-			Trace('Enable Axis Z');
+			//Trace('Enable Axis Z');
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF
 		
@@ -1593,7 +1593,7 @@ END_IF]]></ST>
 		IF AxisZ.Enabled THEN
 			AxisZ.Acceleration := 100;
 			AxisZ.Deceleration := 15000;
-			Trace('Enabled Axis Z');
+			//Trace('Enabled Axis Z');
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF
 
@@ -1602,7 +1602,7 @@ END_IF]]></ST>
 			IF AxisZ.Stop() THEN
 				IF NOT AxisZ.Busy THEN
 				AxisZ.Home();
-				Trace('Start na krańcówce Z');
+				//Trace('Start na krańcówce Z');
 				_HomingStepZ := 80;
 				END_IF
 			END_IF
@@ -1612,7 +1612,7 @@ END_IF]]></ST>
 		
 	30:
 		IF AxisZ.MoveVelocity(-50, FALSE) THEN
-			Trace('Szybki ruch, szukam krancowki Z');
+			//Trace('Szybki ruch, szukam krancowki Z');
             _HomingStepZ := _HomingStepZ + 10;
         END_IF
 		
@@ -1622,7 +1622,7 @@ END_IF]]></ST>
 			
 		IF AxisZ.Stop() THEN
 			IF NOT AxisZ.Busy THEN
-				Trace('Spotkałem krańcówkę Z');
+				//Trace('Spotkałem krańcówkę Z');
 				_HomingStepZ := _HomingStepZ + 10;
 			END_IF
 		END_IF
@@ -1631,20 +1631,20 @@ END_IF]]></ST>
 
 	50:
 		IF AxisZ.MoveRelative(5,FALSE) THEN
-			Trace('Odsunięcie od krańcówki, po szybkim Z');
+			//Trace('Odsunięcie od krańcówki, po szybkim Z');
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF
 		
 	60: 
 		IF AxisZ.MoveVelocity(-10,FALSE) THEN
-			Trace('Spokojny powrot Z');		
+			//Trace('Spokojny powrot Z');		
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF	
 		
 	70:
 		IF IO.ProximitySensorZ THEN
 			IF AxisZ.Stop() THEN
-				Trace('Stop do precyzyjnego Z');
+				//Trace('Stop do precyzyjnego Z');
 				_HomingStepZ := _HomingStepZ + 10; // Przechodzimy do czekania na zatrzymanie
 			END_IF
 		END_IF
@@ -1653,14 +1653,14 @@ END_IF]]></ST>
 		IF NOT AxisZ.Busy THEN
 			IF AxisZ.Home() THEN
 				_HomingStepZ := _HomingStepZ + 10;
-				Trace('Precyzyjny Home wykonany Z');
+				//Trace('Precyzyjny Home wykonany Z');
 			END_IF
 		END_IF
 
 
 	90:	
 		IF AxisZ.MoveRelative(2.0, FALSE) THEN
-			Trace('Odsunięcie od krańcówki o 2mm Z');
+			//Trace('Odsunięcie od krańcówki o 2mm Z');
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF
 	
@@ -1668,14 +1668,14 @@ END_IF]]></ST>
 		IF NOT AxisZ.Busy THEN		
 		
 			IF AxisZ.Home() THEN
-				Trace('Ustawienie nowego zera po odsunięciu Z');
+				//Trace('Ustawienie nowego zera po odsunięciu Z');
 				_HomingStepZ := _HomingStepZ + 10;
 			END_IF
 		END_IF
 	
 	110:
 		HomingZ := TRUE;
-		Trace('Homing zakończony pomyślnie Z');
+		//Trace('Homing zakończony pomyślnie Z');
 		
 			
 	END_CASE
@@ -1960,7 +1960,40 @@ END_VAR
 	//=================================MAINTENANCE & MANUAL MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Maintenance:
 
-	;
+	CASE SequenceState OF
+			0:
+				NoStateTasksToComplete := FALSE;
+				SequenceState := SequenceState + 10;	
+		
+			10: 
+				AxisX.Enable();
+				AxisY.Enable();
+				AxisZ.Enable();	
+				
+				IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+					SequenceState := SequenceState + 10;
+				END_IF
+				
+			20:	
+
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+		
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
+			
+				SequenceState := SequenceState + 10;
+			30:
+	
+				SequenceState := SequenceState + 10;
+					
+			40:		
+				StateTasksComplete := TRUE;
+				SUPER^.Resetting();
+		END_CASE
 	
  	E_PMLUnitMode.ePMLUnitMode_Manual:
 			
@@ -2307,7 +2340,9 @@ END_IF]]></ST>
       <LineId Id="125" Count="0" />
       <LineId Id="94" Count="5" />
       <LineId Id="337" Count="0" />
-      <LineId Id="365" Count="2" />
+      <LineId Id="365" Count="0" />
+      <LineId Id="461" Count="32" />
+      <LineId Id="366" Count="1" />
       <LineId Id="364" Count="0" />
       <LineId Id="335" Count="0" />
       <LineId Id="377" Count="5" />
