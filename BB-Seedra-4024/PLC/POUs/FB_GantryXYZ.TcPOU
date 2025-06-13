@@ -33,6 +33,9 @@ VAR
 	_PanelFrontLength : 	REAL;
 	_PanelHeight : 			REAL;
 	
+	_CurrentSpeed: 			REAL;
+	_CuttingStepProgress :	REAL;
+	
 END_VAR
 
 VAR PERSISTENT
@@ -41,7 +44,13 @@ VAR PERSISTENT
 	_ToolOverpass : 		REAL;
 	_RailHeightCorrection: 	REAL;
 	_DimensionCorrection : 	REAL;
-	
+	_CuttingSpeedX 			: REAL;
+	_RapidSpeedX 			: REAL;
+	_CuttingSpeedY 			: REAL;
+	_RapidSpeedY 			: REAL;
+	_CuttingSpeedZ 			: REAL;
+	_RapidSpeedZ 			: REAL;
+	_IdleTime 				:REAL;
 END_VAR
 
 VAR CONSTANT
@@ -878,21 +887,23 @@ END_VAR
 			PointHx := 0 - _ToolOverpass;		
 			PointHy := PanelHeight + PanelFrontLength - _RailHeightCorrection;
 	
-		IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
-			_CuttingStep := 10;
-		END_IF
-
-	10:	// Set Speed
-		IF  AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
 			AxisX.Acceleration := 500;
 			AxisY.Acceleration := 500;
 			AxisZ.Acceleration := 500;
 			AxisX.Deceleration := 8000;
 			AxisY.Deceleration := 8000;
 			AxisZ.Deceleration := 8000;
-			AxisX.Velocity := 20; 
-			AxisY.Velocity := 20;
-			AxisZ.Velocity := 10;
+			
+		IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
+			_CuttingStep := 10;
+		END_IF
+
+	10:	// Set Speed
+		IF  AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+
+			AxisX.Velocity := _RapidSpeedX; 
+			AxisY.Velocity := _RapidSpeedY;
+			AxisZ.Velocity := _RapidSpeedZ;
 			
 			IO.SpindleEnable := TRUE;
 			
@@ -901,6 +912,8 @@ END_VAR
 			_CuttingStep := 20;
 			END_IF
 		END_IF
+		
+		
 
 	20:	// Positioning Motion to A
 		AxisX.MoveAbsolute(PointAx,0);
@@ -916,6 +929,7 @@ END_VAR
 
 	40: // Set Cutting Height
 		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
+			AxisZ.Velocity := _CuttingSpeedZ;
 		// Trace('Setting Cutting Height');
 		_CuttingStep := 50;
 
@@ -927,7 +941,9 @@ END_VAR
 		END_IF
 		
 	55: 
-		Timer(IN := TRUE, PT := T#5000MS);
+		Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
+		AxisX.Velocity := _CuttingSpeedX;
+		AxisY.Velocity := _CuttingSpeedY;
 		IF Timer.Q THEN
 			_CuttingStep := 60;
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie
@@ -943,6 +959,7 @@ END_VAR
 
 	70: // Verify position B reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			AxisZ.Velocity := _RapidSpeedZ;
 			Trace('70Position B Reached');
 			_CuttingStep := 80;
 		END_IF
@@ -955,6 +972,8 @@ END_VAR
 
 	90: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
+			AxisX.Velocity := _RapidSpeedX;
+			AxisY.Velocity := _RapidSpeedY;
 			Trace('90Z Returned');
 			_CuttingStep := 100;
 		END_IF
@@ -968,6 +987,8 @@ END_VAR
 	110: // Verify position C reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
 			// Trace('Position C Reached');
+			AxisZ.Velocity := _CuttingSpeedZ;
+			IO.CoolingEnable := TRUE;
 			_CuttingStep := 120;
 		END_IF
 
@@ -975,14 +996,17 @@ END_VAR
 		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
 		// Trace('Setting Cutting Height for C to D');
 		_CuttingStep := 130;
-
+			
 	130: // Verify Z position reached
 		IF AxisZ.InPosition THEN
-			Timer(IN := TRUE, PT := T#2000MS);
-			IF Timer.Q THEN
-			_CuttingStep := 140;
+			Timer(IN := TRUE, PT := T#5000MS);
+			AxisX.Velocity := _CuttingSpeedX;
+			AxisY.Velocity := _CuttingSpeedY;
+		IF Timer.Q THEN
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie
-			END_IF
+			_CuttingStep := 140;			
+		END_IF
+
 		END_IF
 
 	140: // Cutting Motion from C to D
@@ -993,16 +1017,20 @@ END_VAR
 
 	150: // Verify position D reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			AxisZ.Velocity := _RapidSpeedZ;
 			_CuttingStep := 160;
 		END_IF
 
 	160: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
+		IO.CoolingEnable := FALSE;
 		// Trace('Returning from Cutting Height');
 		_CuttingStep := 170;
 
 	170: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
+			AxisX.Velocity := _RapidSpeedX;
+			AxisY.Velocity := _RapidSpeedY;
 			// Trace('Z Returned');
 			_CuttingStep := 180;
 		END_IF
@@ -1015,6 +1043,8 @@ END_VAR
 
 	190: // Verify position E reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			IO.CoolingEnable := TRUE;
+			AxisZ.Velocity := _RapidSpeedZ;
 			// Trace('Position E Reached');
 			_CuttingStep := 200;
 		END_IF
@@ -1026,6 +1056,8 @@ END_VAR
 
 	210: // Verify Z position reached
 		IF AxisZ.InPosition THEN
+			AxisX.Velocity := _CuttingSpeedX;
+			AxisY.Velocity := _CuttingSpeedY;
 			Timer(IN := TRUE, PT := T#2000MS);
 			IF Timer.Q THEN
 			_CuttingStep := 220;
@@ -1046,11 +1078,14 @@ END_VAR
 
 	240: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
+		IO.CoolingEnable := FALSE;
 		// Trace('Returning from Cutting Height');
 		_CuttingStep := 250;
 
 	250: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
+			AxisX.Velocity := _RapidSpeedX;
+			AxisY.Velocity := _RapidSpeedY;
 			// Trace('Z Returned');
 			_CuttingStep := 260;
 		END_IF
@@ -1063,6 +1098,7 @@ END_VAR
 
 	270: // Verify position G reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			IO.CoolingEnable := TRUE;
 			// Trace('Position G Reached');
 			_CuttingStep := 280;
 		END_IF
@@ -1074,6 +1110,8 @@ END_VAR
 			
 	290: // Verify Z Cutting Height
 		IF AxisZ.InPosition THEN
+			AxisX.Velocity := _CuttingSpeedX;
+			AxisY.Velocity := _CuttingSpeedY;
 			// Trace('Cutting Height Reached');
 			Timer(IN := TRUE, PT := T#2000MS);
 			IF Timer.Q THEN
@@ -1090,6 +1128,7 @@ END_VAR
 
 	310: // Verify position H reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			IO.CoolingEnable := FALSE;
 			_CuttingStep := 320;
 		END_IF
 			
@@ -1180,7 +1219,7 @@ END_IF
 //	 );
 	 
 	 
-
+_CurrentSpeed := SQRT( AxisX.SetVelocity*AxisX.SetVelocity + AxisY.SetVelocity*AxisY.SetVelocity + AxisZ.SetVelocity*AxisZ.SetVelocity );
 
 SUPER^.CyclicLogic();
 
@@ -1389,7 +1428,7 @@ END_IF]]></ST>
 		END_IF
 		
 	30:
-		IF AxisX.MoveVelocity(-50, FALSE) THEN
+		IF AxisX.MoveVelocity(-100, FALSE) THEN
 			////Trace('Szybki ruch, szukam krancowki X');
             _HomingStepX := _HomingStepX + 10;
         END_IF
@@ -1500,7 +1539,7 @@ END_IF]]></ST>
 		END_IF
 		
 	30:
-		IF AxisY.MoveVelocity(-50, FALSE) THEN
+		IF AxisY.MoveVelocity(-100, FALSE) THEN
 			//Trace('Szybki ruch, szukam krancowki Y');
             _HomingStepY := _HomingStepY + 10;
         END_IF
@@ -1611,7 +1650,7 @@ END_IF]]></ST>
 		END_IF
 		
 	30:
-		IF AxisZ.MoveVelocity(-50, FALSE) THEN
+		IF AxisZ.MoveVelocity(-100, FALSE) THEN
 			//Trace('Szybki ruch, szukam krancowki Z');
             _HomingStepZ := _HomingStepZ + 10;
         END_IF
@@ -2153,17 +2192,64 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CutBorgoWings">
       <LineId Id="3641" Count="28" />
+      <LineId Id="4016" Count="4" />
+      <LineId Id="4014" Count="1" />
       <LineId Id="3922" Count="0" />
-      <LineId Id="3670" Count="14" />
+      <LineId Id="3670" Count="4" />
+      <LineId Id="3680" Count="4" />
       <LineId Id="3923" Count="1" />
-      <LineId Id="3685" Count="26" />
+      <LineId Id="3685" Count="4" />
+      <LineId Id="4021" Count="1" />
+      <LineId Id="3690" Count="14" />
+      <LineId Id="4023" Count="0" />
+      <LineId Id="3705" Count="6" />
       <LineId Id="3716" Count="1" />
       <LineId Id="3962" Count="1" />
-      <LineId Id="3965" Count="3" />
+      <LineId Id="3965" Count="0" />
+      <LineId Id="4028" Count="0" />
+      <LineId Id="4030" Count="0" />
+      <LineId Id="4029" Count="0" />
+      <LineId Id="3967" Count="1" />
       <LineId Id="3964" Count="0" />
       <LineId Id="3718" Count="5" />
       <LineId Id="3969" Count="1" />
-      <LineId Id="3724" Count="178" />
+      <LineId Id="3724" Count="3" />
+      <LineId Id="4031" Count="0" />
+      <LineId Id="3728" Count="10" />
+      <LineId Id="4032" Count="1" />
+      <LineId Id="3739" Count="12" />
+      <LineId Id="4034" Count="0" />
+      <LineId Id="4008" Count="0" />
+      <LineId Id="3752" Count="6" />
+      <LineId Id="4024" Count="0" />
+      <LineId Id="3760" Count="2" />
+      <LineId Id="4036" Count="1" />
+      <LineId Id="3763" Count="0" />
+      <LineId Id="3765" Count="1" />
+      <LineId Id="4035" Count="0" />
+      <LineId Id="4027" Count="0" />
+      <LineId Id="3767" Count="9" />
+      <LineId Id="4038" Count="0" />
+      <LineId Id="3777" Count="4" />
+      <LineId Id="4009" Count="0" />
+      <LineId Id="3782" Count="4" />
+      <LineId Id="4039" Count="1" />
+      <LineId Id="3787" Count="11" />
+      <LineId Id="4010" Count="0" />
+      <LineId Id="4041" Count="0" />
+      <LineId Id="3799" Count="10" />
+      <LineId Id="4044" Count="1" />
+      <LineId Id="3810" Count="19" />
+      <LineId Id="4011" Count="0" />
+      <LineId Id="3830" Count="4" />
+      <LineId Id="4042" Count="1" />
+      <LineId Id="3835" Count="11" />
+      <LineId Id="4012" Count="0" />
+      <LineId Id="3847" Count="10" />
+      <LineId Id="4046" Count="1" />
+      <LineId Id="3858" Count="15" />
+      <LineId Id="4013" Count="0" />
+      <LineId Id="3874" Count="28" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Get">

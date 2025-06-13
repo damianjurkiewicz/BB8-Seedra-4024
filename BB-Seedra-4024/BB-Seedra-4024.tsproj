@@ -1984,7 +1984,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{5BA0DBD1-9A56-3B30-0142-7A4BC3736865}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{25B0BA5A-B6F2-D518-CE24-F3DBA4212D25}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2037,10 +2037,6 @@ External Setpoint Generation:
 					<Vars VarGrpType="2" AreaNo="1">
 						<Name>PlcTask Outputs</Name>
 						<Var>
-							<Name>IO.SpindleEnable</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
 							<Name>GVL_Safety.RunStop</Name>
 							<Type>BOOL</Type>
 						</Var>
@@ -2050,6 +2046,10 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>GVL_Safety.RestartFBs</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.SpindleEnable</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
