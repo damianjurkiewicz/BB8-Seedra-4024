@@ -31,10 +31,6 @@ VAR
 	_CuttingStepProgress :	REAL := 1.0;
 	_LastCuttingStep 	:	INT := 1;
 	
-	_PanelFrontWidht : 		REAL;
-	_PanelFrontLength : 	REAL;
-	_PanelHeight : 			REAL;
-	
 	_CurrentSpeed: 			LREAL;
 
 	
@@ -53,6 +49,10 @@ VAR PERSISTENT
 	_CuttingSpeedZ 			: REAL;
 	_RapidSpeedZ 			: REAL;
 	_IdleTime 				:REAL;
+
+	_PanelFrontWidht : 		REAL;
+	_PanelFrontLength : 	REAL;
+	_PanelHeight : 			REAL;
 END_VAR
 
 VAR CONSTANT
@@ -950,8 +950,8 @@ END_VAR
 		AxisX.Velocity := _CuttingSpeedX;
 		AxisY.Velocity := _CuttingSpeedY;
 		IF Timer.Q THEN
-			_CuttingStep := 60;
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie
+			_CuttingStep := 60;
 		END_IF	
 
 	60: // Cutting Motion from A to B
@@ -1065,8 +1065,8 @@ END_VAR
 			AxisY.Velocity := _CuttingSpeedY;
 			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
 			IF Timer.Q THEN
-			_CuttingStep := 220;
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie
+			_CuttingStep := 220;
 			END_IF
 		END_IF
 
@@ -1120,8 +1120,8 @@ END_VAR
 			// Trace('Cutting Height Reached');
 			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
 			IF Timer.Q THEN
+			Timer(IN := FALSE); // Reset timera, aby działał ponownie			
 			_CuttingStep := 300;
-			Timer(IN := FALSE); // Reset timera, aby działał ponownie
 			END_IF
 		END_IF	
 
@@ -1145,13 +1145,22 @@ END_VAR
 	330: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
 			IO.SpindleEnable := FALSE;
+			AxisY.Velocity := _RapidSpeedY;
+			AxisX.Velocity := _RapidSpeedX;
+			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1500.0));
+			IF Timer.Q THEN
+			Timer(IN := FALSE); // Reset timera, aby działał ponownie			
+			_CuttingStep := 300;
+			END_IF
 			// Trace('Z Point 0 Reached');
 			_CuttingStep := 340;
 		END_IF
+		
+		
 
 	340: // Final positioning 
-		AxisX.MoveAbsolute(Point0x,0);
-		AxisY.MoveAbsolute(Point0y,0);
+		AxisX.MoveRelative(100,0);
+		AxisY.MoveRelative(100,0);
 		IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
 			_CuttingStep := 350;
 			// Trace('Box Five Sides is Cut');
@@ -1267,7 +1276,17 @@ END_IF]]></ST>
 		CASE SequenceState OF
 			0:
 				NoStateTasksToComplete := FALSE;
-				SequenceState := SequenceState + 10;
+				SequenceState := SequenceState + 5;
+			5:
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -20);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1200);
+		
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -20);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -20);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);	
+				SequenceState := SequenceState + 5;
 			10:
 					
 				CASE GVL_HMI.ProgramToCut OF
@@ -1545,7 +1564,7 @@ END_IF]]></ST>
 		END_IF
 		
 	30:
-		IF AxisY.MoveVelocity(-100, FALSE) THEN
+		IF AxisY.MoveVelocity(-80, FALSE) THEN
 			//Trace('Szybki ruch, szukam krancowki Y');
             _HomingStepY := _HomingStepY + 10;
         END_IF
@@ -1783,8 +1802,8 @@ END_CASE]]></ST>
       <Set Name="Set" Id="{d74bf0f0-654e-45df-b754-63029e5c2a12}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF PanelFrontLength > 2360  THEN
-	_PanelFrontLength := 2360;  // It can't go higher, you will kill yourself
+          <ST><![CDATA[ IF PanelFrontLength = 0  THEN
+	_PanelFrontLength := 500;  // It can't go higher, you will kill yourself
 	ELSE
 	_PanelFrontLength := PanelFrontLength;
 END_IF]]></ST>
@@ -1803,8 +1822,8 @@ END_IF]]></ST>
       <Set Name="Set" Id="{6f7f0fd9-fb5c-4077-ab43-02d47a14a15f}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF PanelFrontWidht > 1160 THEN
-	_PanelFrontWidht := 1160;  // It can't go higher, you will kill yourself
+          <ST><![CDATA[ IF PanelFrontWidht = 0 THEN
+	_PanelFrontWidht := 400;  // It can't go higher, you will kill yourself
 	ELSE
 	_PanelFrontWidht := PanelFrontWidht;
 END_IF]]></ST>
@@ -1823,8 +1842,8 @@ END_IF]]></ST>
       <Set Name="Set" Id="{91d58d60-235c-48ff-9b62-1155794955c4}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF PanelHeight > 400 THEN
-	_PanelHeight := 400;  // It can't go higher, you will kill yourself
+          <ST><![CDATA[ IF PanelHeight = 0 THEN
+	_PanelHeight := 80;  // It can't go higher, you will kill yourself
 	ELSE
 	_PanelHeight := PanelHeight;
 END_IF]]></ST>
@@ -2221,7 +2240,8 @@ END_IF]]></ST>
       <LineId Id="4028" Count="0" />
       <LineId Id="4030" Count="0" />
       <LineId Id="4029" Count="0" />
-      <LineId Id="3967" Count="1" />
+      <LineId Id="3968" Count="0" />
+      <LineId Id="4093" Count="0" />
       <LineId Id="3964" Count="0" />
       <LineId Id="3718" Count="5" />
       <LineId Id="3969" Count="1" />
@@ -2251,7 +2271,10 @@ END_IF]]></ST>
       <LineId Id="4041" Count="0" />
       <LineId Id="3799" Count="10" />
       <LineId Id="4044" Count="1" />
-      <LineId Id="3810" Count="19" />
+      <LineId Id="3810" Count="1" />
+      <LineId Id="3813" Count="0" />
+      <LineId Id="4092" Count="0" />
+      <LineId Id="3814" Count="15" />
       <LineId Id="4011" Count="0" />
       <LineId Id="3830" Count="4" />
       <LineId Id="4042" Count="1" />
@@ -2259,9 +2282,17 @@ END_IF]]></ST>
       <LineId Id="4012" Count="0" />
       <LineId Id="3847" Count="10" />
       <LineId Id="4046" Count="1" />
-      <LineId Id="3858" Count="15" />
+      <LineId Id="3858" Count="3" />
+      <LineId Id="4091" Count="0" />
+      <LineId Id="3863" Count="10" />
       <LineId Id="4013" Count="0" />
-      <LineId Id="3874" Count="28" />
+      <LineId Id="3874" Count="10" />
+      <LineId Id="4087" Count="1" />
+      <LineId Id="4095" Count="3" />
+      <LineId Id="4094" Count="0" />
+      <LineId Id="3885" Count="2" />
+      <LineId Id="4089" Count="1" />
+      <LineId Id="3888" Count="14" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Get">
@@ -2299,6 +2330,10 @@ END_IF]]></ST>
       <LineId Id="24" Count="6" />
       <LineId Id="102" Count="0" />
       <LineId Id="60" Count="0" />
+      <LineId Id="106" Count="6" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="105" Count="0" />
       <LineId Id="79" Count="0" />
       <LineId Id="81" Count="5" />
       <LineId Id="88" Count="4" />
