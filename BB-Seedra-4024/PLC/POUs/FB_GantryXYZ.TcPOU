@@ -27,14 +27,16 @@ VAR
     _HomingStepX :			INT;
     _HomingStepY :			INT;
     _HomingStepZ :			INT;
-    _CuttingStep :			INT;
+    _CuttingStep :			INT := 0;
+	_CuttingStepProgress :	REAL := 1.0;
+	_LastCuttingStep 	:	INT := 1;
 	
 	_PanelFrontWidht : 		REAL;
 	_PanelFrontLength : 	REAL;
 	_PanelHeight : 			REAL;
 	
-	_CurrentSpeed: 			REAL;
-	_CuttingStepProgress :	REAL;
+	_CurrentSpeed: 			LREAL;
+
 	
 END_VAR
 
@@ -87,7 +89,7 @@ CASE SequenceState OF
 		AxisZ.Disable();
 
 		IO.SpindleEnable := FALSE;
-
+		IO.CoolingEnable := FALSE;
 
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
@@ -113,7 +115,8 @@ END_CASE
 		AxisX.Disable();
 		AxisY.Disable();
 		AxisZ.Disable();
-
+		
+		IO.CoolingEnable := FALSE;
 		IO.SpindleEnable := FALSE;
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
@@ -862,7 +865,9 @@ END_VAR
 
 	0: // Initial step, enable axes
 		// Trace('Start Cutting Box Five Sides');
+		_LastCuttingStep := 350;
 		IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
+			
 			// Trace('Axes Enabled');
 			_CuttingStep := 5;
 		END_IF
@@ -999,7 +1004,7 @@ END_VAR
 			
 	130: // Verify Z position reached
 		IF AxisZ.InPosition THEN
-			Timer(IN := TRUE, PT := T#5000MS);
+			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
 			AxisX.Velocity := _CuttingSpeedX;
 			AxisY.Velocity := _CuttingSpeedY;
 		IF Timer.Q THEN
@@ -1058,7 +1063,7 @@ END_VAR
 		IF AxisZ.InPosition THEN
 			AxisX.Velocity := _CuttingSpeedX;
 			AxisY.Velocity := _CuttingSpeedY;
-			Timer(IN := TRUE, PT := T#2000MS);
+			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
 			IF Timer.Q THEN
 			_CuttingStep := 220;
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie
@@ -1113,7 +1118,7 @@ END_VAR
 			AxisX.Velocity := _CuttingSpeedX;
 			AxisY.Velocity := _CuttingSpeedY;
 			// Trace('Cutting Height Reached');
-			Timer(IN := TRUE, PT := T#2000MS);
+			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
 			IF Timer.Q THEN
 			_CuttingStep := 300;
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie
@@ -1220,6 +1225,7 @@ END_IF
 	 
 	 
 _CurrentSpeed := SQRT( AxisX.SetVelocity*AxisX.SetVelocity + AxisY.SetVelocity*AxisY.SetVelocity + AxisZ.SetVelocity*AxisZ.SetVelocity );
+_CuttingStepProgress := _CuttingStep * 100 / (1.0 + _LastCuttingStep);
 
 SUPER^.CyclicLogic();
 
@@ -2124,7 +2130,9 @@ END_IF]]></ST>
       <LineId Id="222" Count="0" />
       <LineId Id="202" Count="2" />
       <LineId Id="221" Count="0" />
-      <LineId Id="205" Count="4" />
+      <LineId Id="205" Count="3" />
+      <LineId Id="238" Count="0" />
+      <LineId Id="209" Count="0" />
       <LineId Id="211" Count="5" />
       <LineId Id="220" Count="0" />
       <LineId Id="217" Count="2" />
@@ -2191,7 +2199,11 @@ END_IF]]></ST>
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CutBorgoWings">
-      <LineId Id="3641" Count="28" />
+      <LineId Id="3641" Count="3" />
+      <LineId Id="4086" Count="0" />
+      <LineId Id="3645" Count="0" />
+      <LineId Id="4085" Count="0" />
+      <LineId Id="3646" Count="23" />
       <LineId Id="4016" Count="4" />
       <LineId Id="4014" Count="1" />
       <LineId Id="3922" Count="0" />
@@ -2271,6 +2283,7 @@ END_IF]]></ST>
       <LineId Id="20" Count="5" />
       <LineId Id="19" Count="0" />
       <LineId Id="26" Count="2" />
+      <LineId Id="31" Count="0" />
       <LineId Id="7" Count="1" />
       <LineId Id="12" Count="4" />
       <LineId Id="2" Count="0" />
