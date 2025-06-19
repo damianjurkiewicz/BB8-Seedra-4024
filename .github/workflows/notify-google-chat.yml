@@ -3,7 +3,7 @@ name: Notify Google Chat on Push
 on:
   push:
     branches:
-      - main  # lub zmień na 'master' albo 'dev', jeśli inna gałąź
+      - main  # lub zmień na master/dev – zależnie od repo
 
 jobs:
   notify:
@@ -13,15 +13,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Extract last commit message
+      - name: Extract commit data
         run: |
           echo "LAST_COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
+          echo "LAST_COMMIT_URL=$(git log -1 --pretty=format:'https://github.com/${{ github.repository }}/commit/%H')" >> $GITHUB_ENV
+          echo "AUTHOR_NAME=$(git log -1 --pretty=format:'%an')" >> $GITHUB_ENV
+          echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
 
       - name: Send commit to Google Chat
         run: |
           curl -X POST \
-            -H 'Content-Type: application/json' \
-            -d "{\"text\": \"🧠 Commit: $LAST_COMMIT_MESSAGE\"}" \
-            \"$GOOGLE_CHAT_WEBHOOK\"
+            -H "Content-Type: application/json" \
+            -d "{
+              \"text\": \"🧠 *Commit pushed*\n👤 Author: $AUTHOR_NAME\n🌿 Branch: $BRANCH_NAME\n📝 Message: $LAST_COMMIT_MESSAGE\n🔗 [Zobacz commit]($LAST_COMMIT_URL)\"
+            }" \
+            "$GOOGLE_CHAT_WEBHOOK"
         env:
           GOOGLE_CHAT_WEBHOOK: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
