@@ -3,7 +3,8 @@ name: Notify Google Chat on Push
 on:
   push:
     branches:
-      - main  # lub zmień na master/dev – zależnie od repo
+      - main
+      - visubranch  # dodaj gałąź jeśli używasz innej
 
 jobs:
   notify:
@@ -13,20 +14,16 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Extract commit data
+      - name: Extract last commit message
         run: |
-          echo "LAST_COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
-          echo "LAST_COMMIT_URL=$(git log -1 --pretty=format:'https://github.com/${{ github.repository }}/commit/%H')" >> $GITHUB_ENV
-          echo "AUTHOR_NAME=$(git log -1 --pretty=format:'%an')" >> $GITHUB_ENV
-          echo "BRANCH_NAME=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+          COMMIT_MSG=$(git log -1 --pretty=%s)
+          echo "LAST_COMMIT_MESSAGE=${COMMIT_MSG:-Brak komentarza}" >> $GITHUB_ENV
 
       - name: Send commit to Google Chat
         run: |
           curl -X POST \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"text\": \"🧠 *Commit pushed*\n👤 Author: $AUTHOR_NAME\n🌿 Branch: $BRANCH_NAME\n📝 Message: $LAST_COMMIT_MESSAGE\n🔗 [Zobacz commit]($LAST_COMMIT_URL)\"
-            }" \
+            -H 'Content-Type: application/json' \
+	    -d "{\"text\": \"🧠 Testowa wiadomość z GitHuba\"}"
             "$GOOGLE_CHAT_WEBHOOK"
         env:
           GOOGLE_CHAT_WEBHOOK: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
