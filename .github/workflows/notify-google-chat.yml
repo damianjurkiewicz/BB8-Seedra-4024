@@ -1,0 +1,27 @@
+name: Notify Google Chat on Push
+
+on:
+  push:
+    branches:
+      - main  # lub zmień na 'master' albo 'dev', jeśli inna gałąź
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Extract last commit message
+        run: |
+          echo "LAST_COMMIT_MESSAGE=$(git log -1 --pretty=format:'%s')" >> $GITHUB_ENV
+
+      - name: Send commit to Google Chat
+        run: |
+          curl -X POST \
+            -H 'Content-Type: application/json' \
+            -d "{\"text\": \"🧠 Commit: $LAST_COMMIT_MESSAGE\"}" \
+            \"$GOOGLE_CHAT_WEBHOOK\"
+        env:
+          GOOGLE_CHAT_WEBHOOK: ${{ secrets.GOOGLE_CHAT_WEBHOOK }}
