@@ -405,6 +405,7 @@ END_VAR
 
 	0: // Initial step, enable axes
 		//Modification of nothing
+		//Second modification of nothign
 		// Trace('Start Cutting Box Five Sides');
 		_LastCuttingStep := 350;
 		IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
@@ -1756,6 +1757,7 @@ END_IF]]></ST>
     <LineIds Name="FB_GantryXYZ.CutBorgoWings">
       <LineId Id="3641" Count="2" />
       <LineId Id="4177" Count="0" />
+      <LineId Id="4215" Count="0" />
       <LineId Id="3644" Count="0" />
       <LineId Id="4086" Count="0" />
       <LineId Id="3645" Count="0" />
