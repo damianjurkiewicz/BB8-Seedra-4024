@@ -468,13 +468,13 @@ END_VAR
 
 	30: // Verify Position A
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			AxisZ.Velocity := _CuttingSpeedZ;
 			// Trace('Position A Reached');
 			_CuttingStep := 40; 
 		END_IF
 
 	40: // Set Cutting Height
 		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
-			AxisZ.Velocity := _CuttingSpeedZ;
 		// Trace('Setting Cutting Height');
 		_CuttingStep := 50;
 
@@ -589,7 +589,7 @@ END_VAR
 	190: // Verify position E reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
 			IO.CoolingEnable := TRUE;
-			AxisZ.Velocity := _RapidSpeedZ;
+			AxisZ.Velocity := _CuttingSpeedZ;
 			// Trace('Position E Reached');
 			_CuttingStep := 200;
 		END_IF
@@ -618,6 +618,7 @@ END_VAR
 
 	230: // Verify position F reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			AxisZ.Velocity := _RapidSpeedZ;
 			_CuttingStep := 240;
 		END_IF
 
@@ -643,6 +644,7 @@ END_VAR
 
 	270: // Verify position G reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			AxisZ.Velocity := _CuttingSpeedZ;
 			IO.CoolingEnable := TRUE;
 			// Trace('Position G Reached');
 			_CuttingStep := 280;
@@ -673,6 +675,7 @@ END_VAR
 
 	310: // Verify position H reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			AxisZ.Velocity := _RapidSpeedZ;
 			IO.CoolingEnable := FALSE;
 			_CuttingStep := 320;
 		END_IF
@@ -1763,9 +1766,9 @@ END_IF]]></ST>
       <LineId Id="3923" Count="1" />
       <LineId Id="3685" Count="4" />
       <LineId Id="4021" Count="1" />
-      <LineId Id="3690" Count="14" />
-      <LineId Id="4023" Count="0" />
-      <LineId Id="3705" Count="6" />
+      <LineId Id="3690" Count="8" />
+      <LineId Id="4136" Count="0" />
+      <LineId Id="3699" Count="12" />
       <LineId Id="3716" Count="1" />
       <LineId Id="3962" Count="1" />
       <LineId Id="3965" Count="0" />
@@ -1806,17 +1809,21 @@ END_IF]]></ST>
       <LineId Id="3810" Count="1" />
       <LineId Id="3813" Count="0" />
       <LineId Id="4092" Count="0" />
-      <LineId Id="3814" Count="15" />
+      <LineId Id="3814" Count="10" />
+      <LineId Id="4137" Count="0" />
+      <LineId Id="3825" Count="4" />
       <LineId Id="4011" Count="0" />
       <LineId Id="3830" Count="4" />
       <LineId Id="4042" Count="1" />
       <LineId Id="3835" Count="11" />
+      <LineId Id="4138" Count="0" />
       <LineId Id="4012" Count="0" />
       <LineId Id="3847" Count="10" />
       <LineId Id="4046" Count="1" />
       <LineId Id="3858" Count="3" />
       <LineId Id="4091" Count="0" />
       <LineId Id="3863" Count="10" />
+      <LineId Id="4139" Count="0" />
       <LineId Id="4013" Count="0" />
       <LineId Id="3874" Count="10" />
       <LineId Id="4087" Count="1" />
