@@ -1984,7 +1984,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{957DB62C-93B2-6F82-EDB5-E0DB27CBCF5C}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{4FD8D1EB-1D36-354B-16EA-78D94BEE23BE}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2126,6 +2126,14 @@ External Setpoint Generation:
 						<Name>SafetyTask Outputs</Name>
 						<Var>
 							<Name>GVL_Safety.SafetyPermissionQ</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.PistonValveCutY</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.PistonValceCutX</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -6080,6 +6088,7 @@ Bit 8 - 15 : reserved]]></Comment>
 		<MappingInfo Identifier="{00000000-2001-0850-0020-500841000403}" Id="#x02030030"/>
 		<MappingInfo Identifier="{00000000-0020-0304-1000-040320000403}" Id="#x02030010"/>
 		<MappingInfo Identifier="{00000000-0030-0304-1000-040332000403}" Id="#x02030050"/>
+		<MappingInfo Identifier="{08502002-0040-0304-0020-500840000403}" Id="#x02030060" Watchdog="04000000040000000400000004000000"/>
 		<MappingInfo Identifier="{05000010-2001-0850-1000-040300205008}" Id="#x02030040" Watchdog="14000000040000000400000004000000"/>
 		<MappingInfo Identifier="{03040040-0040-0304-4000-040340000403}" Id="#x02030020" Watchdog="04000000040000000400000004000000"/>
 		<OwnerA Name="TIID^Device 3 (EtherCAT)">
@@ -6153,10 +6162,14 @@ Bit 8 - 15 : reserved]]></Comment>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorX" VarB="Channel 4^Input"/>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorY" VarB="Channel 5^Input"/>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorZ" VarB="Channel 6^Input"/>
+				<Link VarA="SafetyTask Inputs^IO.PistonSensorCutX" VarB="Channel 8^Input"/>
+				<Link VarA="SafetyTask Inputs^IO.PistonSensorCutY" VarB="Channel 7^Input"/>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 4 (EL2008)">
 				<Link VarA="PlcTask Outputs^IO.CoolingEnable" VarB="Channel 4^Output"/>
 				<Link VarA="PlcTask Outputs^IO.SpindleEnable" VarB="Channel 3^Output"/>
+				<Link VarA="SafetyTask Outputs^IO.PistonValceCutX" VarB="Channel 6^Output"/>
+				<Link VarA="SafetyTask Outputs^IO.PistonValveCutY" VarB="Channel 5^Output"/>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 8 (EL6900)">
 				<Link VarA="PlcTask Inputs^GVL_Safety.ComError" VarB="StandardInputs^TwinSafeGroup1.GVL_Safety.ComError_8"/>
