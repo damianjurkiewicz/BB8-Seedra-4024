@@ -1984,7 +1984,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{4FD8D1EB-1D36-354B-16EA-78D94BEE23BE}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{CA70F8C1-688B-8204-92DB-2491F507332C}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2000,6 +2000,18 @@ External Setpoint Generation:
 						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.AxisZ.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorX</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorY</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorZ</Name>
+							<Type>BOOL</Type>
 						</Var>
 						<Var>
 							<Name>GVL_Safety.FBError</Name>
@@ -2019,18 +2031,6 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>GVL_Safety.eStopButton</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.ProximitySensorX</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.ProximitySensorY</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.ProximitySensorZ</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -2054,6 +2054,14 @@ External Setpoint Generation:
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
+							<Name>IO.SpindleEnable</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.CoolingEnable</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
 							<Name>GVL_Safety.RunStop</Name>
 							<Type>BOOL</Type>
 						</Var>
@@ -2065,21 +2073,9 @@ External Setpoint Generation:
 							<Name>GVL_Safety.RestartFBs</Name>
 							<Type>BOOL</Type>
 						</Var>
-						<Var>
-							<Name>IO.SpindleEnable</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.CoolingEnable</Name>
-							<Type>BOOL</Type>
-						</Var>
 					</Vars>
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>SafetyTask Inputs</Name>
-						<Var>
-							<Name>GVL_Safety.SafetyPermissionI</Name>
-							<Type>BOOL</Type>
-						</Var>
 						<Var>
 							<Name>IO.DI1</Name>
 							<Comment><![CDATA[Terminal EL1008]]></Comment>
@@ -2114,26 +2110,20 @@ External Setpoint Generation:
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>IO.PistonSensorCutY</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.PistonSensorCutX</Name>
+							<Name>GVL_Safety.SafetyPermissionI</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
 						<Var>
-							<Name>GVL_Safety.SafetyPermissionQ</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
 							<Name>IO.PistonValveCutY</Name>
+							<Comment><![CDATA[PistonSensorCutY 			AT%I*		:	BOOL;
+PistonSensorCutX			AT%I*		:	BOOL;]]></Comment>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>IO.PistonValceCutX</Name>
+							<Name>GVL_Safety.SafetyPermissionQ</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -2207,6 +2197,9 @@ External Setpoint Generation:
 				<Image Id="4" AddrType="10" ImageType="3">
 					<Name>Image-2</Name>
 				</Image>
+				<Image Id="5" AddrType="10" ImageType="3">
+					<Name>Image-3</Name>
+				</Image>
 				<Box Id="1" BoxType="9099">
 					<Name>Term 1 (EK1100)</Name>
 					<ImageId>1000</ImageId>
@@ -2265,6 +2258,7 @@ External Setpoint Generation:
 						<EtherCAT SlaveType="1" PdiType="#x0104" CycleMBoxPollingTime="0" VendorId="#x00000002" ProductCode="#x03f03052" RevisionNo="#x00120000" RepeatSupport="true" PortPhys="51" MaxSlotCount="256" MaxSlotGroupCount="1" SlotPdoIncrement="1" SlotIndexIncrement="16" Type="EL1008 8Ch. Dig. Input 24V, 3ms" Desc="EL1008" PortABoxInfo="#x01000002">
 							<SyncMan>001001000000010004000000000000000100001000010000</SyncMan>
 							<Fmmu>0000000000000000001000010100000002000000000000000000000000000000</Fmmu>
+							<SuTask>#x02010050</SuTask>
 							<Pdo Name="Channel 1" Index="#x1a00" Flags="#x0011" SyncMan="0">
 								<Entry Name="Input" Index="#x6000" Sub="#x01">
 									<Type>BIT</Type>
@@ -5813,6 +5807,7 @@ Bit 8 - 15 : reserved]]></Comment>
 							<Fmmu>0000000000000000001d00010100000002000000000000000000000000000000</Fmmu>
 							<Fmmu>00000000000000000d0800010100000003000000000000000000000000000000</Fmmu>
 							<BootStrapData>0010f400f410f400</BootStrapData>
+							<SuTask>#x02010060</SuTask>
 							<Pdo Name="ConnectionInputs" Index="#x1a00" Flags="#x2011" SyncMan="3">
 								<Entry Name="TwinSafeGroup1.Term 9 (EL1904) - Module 1 (FSOES)_2 TxPDO" Index="#x7000" Sub="#x01">
 									<Type GUID="{2438F91B-E188-4ED7-8594-54354F9ED6A4}" Namespace="Safety">FSOE_6</Type>
@@ -5906,6 +5901,7 @@ Bit 8 - 15 : reserved]]></Comment>
 							<Fmmu>0000000000000000001900010100000002000000000000000000000000000000</Fmmu>
 							<Fmmu>00000000000000000d0800010100000003000000000000000000000000000000</Fmmu>
 							<BootStrapData>0010f400f410f400</BootStrapData>
+							<SuTask>#x02010060</SuTask>
 							<Pdo Name="TxPDO" Index="#x1a00" Flags="#x0090" SyncMan="3">
 								<Entry Name="FSOE__FSoE Slave CMD" Index="#x6000" Sub="#x01">
 									<Type>USINT</Type>
@@ -5973,6 +5969,7 @@ Bit 8 - 15 : reserved]]></Comment>
 							<Fmmu>0000000000000000001900010100000002000000000000000000000000000000</Fmmu>
 							<Fmmu>00000000000000000d0800010100000003000000000000000000000000000000</Fmmu>
 							<BootStrapData>0018f400f418f400</BootStrapData>
+							<SuTask>#x02010060</SuTask>
 							<Pdo Name="TxPDO" Index="#x1a00" Flags="#x0090" SyncMan="3">
 								<Entry Name="FSOE__FSoE Slave CMD" Index="#x6000" Sub="#x01">
 									<Type>USINT</Type>
@@ -6062,6 +6059,7 @@ Bit 8 - 15 : reserved]]></Comment>
 						<EtherCAT SlaveType="1" PdiType="#x0104" CycleMBoxPollingTime="0" VendorId="#x00000002" ProductCode="#x0a3e3052" RevisionNo="#x00120000" RepeatSupport="true" PortPhys="51" MaxSlotCount="256" MaxSlotGroupCount="1" SlotPdoIncrement="1" SlotIndexIncrement="16" Type="EL2622 2Ch. Relay Output, NO (230V AC / 30V DC)" Desc="EL2622" PortABoxInfo="#x0100000a">
 							<SyncMan>000f01004400010003000000000000000000000f44090000</SyncMan>
 							<Fmmu>0000000000000000000f00020100000001000000000000000000000000000000</Fmmu>
+							<SuTask>#x02010050</SuTask>
 							<Pdo Name="Channel 1" Index="#x1600" InOut="1" Flags="#x0011" SyncMan="0">
 								<Entry Name="Output" Index="#x7000" Sub="#x01">
 									<Type>BIT</Type>
@@ -6086,11 +6084,12 @@ Bit 8 - 15 : reserved]]></Comment>
 	</Project>
 	<Mappings>
 		<MappingInfo Identifier="{00000000-2001-0850-0020-500841000403}" Id="#x02030030"/>
+		<MappingInfo Identifier="{00000000-2001-0850-0020-500852000403}" Id="#x02030050"/>
 		<MappingInfo Identifier="{00000000-0020-0304-1000-040320000403}" Id="#x02030010"/>
-		<MappingInfo Identifier="{00000000-0030-0304-1000-040332000403}" Id="#x02030050"/>
-		<MappingInfo Identifier="{08502002-0040-0304-0020-500840000403}" Id="#x02030060" Watchdog="04000000040000000400000004000000"/>
+		<MappingInfo Identifier="{00000000-0030-0304-1000-040333000403}" Id="#x02030060"/>
+		<MappingInfo Identifier="{08502002-0040-0304-0020-500840000403}" Id="#x02030070" Watchdog="04000000040000000400000004000000"/>
 		<MappingInfo Identifier="{05000010-2001-0850-1000-040300205008}" Id="#x02030040" Watchdog="14000000040000000400000004000000"/>
-		<MappingInfo Identifier="{03040040-0040-0304-4000-040340000403}" Id="#x02030020" Watchdog="04000000040000000400000004000000"/>
+		<MappingInfo Identifier="{03040050-0050-0304-5000-040350000403}" Id="#x02030020" Watchdog="04000000040000000400000004000000"/>
 		<OwnerA Name="TIID^Device 3 (EtherCAT)">
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 10 (EL2904)">
 				<Link VarA="Term 1 (EK1100)^Term 8 (EL6900)^ConnectionInputs^TwinSafeGroup1.Term 10 (EL2904) - Module 1 (FSOES)_3 TxPDO" VarB="Module 1 (FSOES)^RxPDO^FSOE"/>
@@ -6162,13 +6161,10 @@ Bit 8 - 15 : reserved]]></Comment>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorX" VarB="Channel 4^Input"/>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorY" VarB="Channel 5^Input"/>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorZ" VarB="Channel 6^Input"/>
-				<Link VarA="SafetyTask Inputs^IO.PistonSensorCutX" VarB="Channel 8^Input"/>
-				<Link VarA="SafetyTask Inputs^IO.PistonSensorCutY" VarB="Channel 7^Input"/>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 4 (EL2008)">
 				<Link VarA="PlcTask Outputs^IO.CoolingEnable" VarB="Channel 4^Output"/>
 				<Link VarA="PlcTask Outputs^IO.SpindleEnable" VarB="Channel 3^Output"/>
-				<Link VarA="SafetyTask Outputs^IO.PistonValceCutX" VarB="Channel 6^Output"/>
 				<Link VarA="SafetyTask Outputs^IO.PistonValveCutY" VarB="Channel 5^Output"/>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 8 (EL6900)">
