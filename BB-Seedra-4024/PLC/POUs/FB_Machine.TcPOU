@@ -11,6 +11,9 @@ VAR
 
 	//Alarms for this module
 	MachineAlarms : ARRAY[1..MACHINE_ALARM_COUNT] OF FB_TcAlarm;
+	
+	_zProgramToCut : INT;
+	
 
 END_VAR
 
@@ -22,6 +25,7 @@ END_VAR
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Folder Name="Properties" Id="{396a6016-c13c-4364-b739-7894bb49f371}" />
     <Folder Name="States" Id="{70644f5e-d79a-440d-8d18-4948c059f975}" />
     <Method Name="Clearing" Id="{309e3014-c1be-40c6-8306-4211d554a87f}" FolderPath="States\">
       <Declaration><![CDATA[
@@ -82,6 +86,7 @@ END_IF
 
 SUPER^.CyclicLogic();
 
+
 //Here the alarms will raise and clear on its own if the input changes
 
 //NOT SafetyGlobalVariableList.eStopButton -> We Decouple physical button to Activate
@@ -93,6 +98,8 @@ IF GVL_Safety.eStopHMI OR NOT GVL_Safety.eStopButton AND NOT MachineAlarms[E_See
 //	MachineAlarms[E_Seedra.EmergencyStop].Clear(0, 0);
 
 END_IF
+
+
 
 
 ]]></ST>
@@ -159,27 +166,43 @@ SUPER^.HMICommunication();]]></ST>
 CASE _CurrentMode OF
    
  E_PMLUnitMode.ePMLUnitMode_Production:
+ 		
+ 		GVL_HMI.MenuToDisplay := 0;
+ 	
         CASE _CurrentState OF
+			
             E_PMLState.ePMLState_Stopped:
 				AllowHMIControl(ThisModuleOnly := FALSE);
             E_PMLState.ePMLState_Idle:
+				GVL_HMI.MenuToDisplay := 0;
 				AllowHMIControl(ThisModuleOnly := FALSE);
             E_PMLState.ePMLState_Suspended:
          		AllowHMIControl(ThisModuleOnly := FALSE);
             E_PMLState.ePMLState_Execute:
+				GVL_HMI.ShowProductionPopup := 1;
             	AllowHMIControl(ThisModuleOnly := FALSE); 
+			  E_PMLState.ePMLState_Aborting:
+				GVL_HMI.ShowProductionPopup := 0;
+				AllowHMIControl(ThisModuleOnly := FALSE); 
             E_PMLState.ePMLState_Aborted:
+				GVL_HMI.MenuToDisplay := 0;
                 AllowHMIControl(ThisModuleOnly := FALSE); 
             E_PMLState.ePMLState_Held:
                 AllowHMIControl(ThisModuleOnly := FALSE); 
             E_PMLState.ePMLState_Complete:
+				GVL_HMI.ShowProductionPopup := 0;
           		AllowHMIControl(ThisModuleOnly := FALSE); 
+				
         END_CASE
 		
-    E_PMLUnitMode.ePMLUnitMode_Manual:
-        AllowHMIControl(ThisModuleOnly := FALSE); 
 	E_PMLUnitMode.ePMLUnitMode_Maintenance:
+		GVL_HMI.MenuToDisplay := 2;
         AllowHMIControl(ThisModuleOnly := FALSE); 
+		
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+		GVL_HMI.MenuToDisplay := 1;
+        AllowHMIControl(ThisModuleOnly := FALSE); 
+
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -224,6 +247,16 @@ CASE DescendantSequenceState OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Method Name="ModeChanged" Id="{5bfe65a8-d51c-4624-a0bd-49f22428c940}">
+      <Declaration><![CDATA[// Called one Cycle on State Change
+METHOD PROTECTED ModeChanged
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Trace('Mode was changed - ABORTING');
+ChangeState(E_PMLCommand.ePMLCommand_Abort);]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Resetting" Id="{e510dc83-237a-4a59-97e9-db4b9408b4b7}" FolderPath="States\">
       <Declaration><![CDATA[METHOD PROTECTED Resetting
 VAR
@@ -255,7 +288,7 @@ END_VAR
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
-		;
+		SUPER^.Resetting();
 END_CASE
 ]]></ST>
       </Implementation>
@@ -338,7 +371,8 @@ END_IF]]></ST>
     <LineIds Name="FB_Machine.CyclicLogic">
       <LineId Id="18" Count="0" />
       <LineId Id="3" Count="5" />
-      <LineId Id="25" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="47" Count="0" />
       <LineId Id="19" Count="0" />
       <LineId Id="39" Count="0" />
       <LineId Id="36" Count="0" />
@@ -349,6 +383,8 @@ END_IF]]></ST>
       <LineId Id="22" Count="1" />
       <LineId Id="29" Count="0" />
       <LineId Id="13" Count="0" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="43" Count="0" />
       <LineId Id="26" Count="0" />
       <LineId Id="14" Count="0" />
       <LineId Id="2" Count="0" />
@@ -372,13 +408,33 @@ END_IF]]></ST>
     <LineIds Name="FB_Machine.HMIPermissions">
       <LineId Id="3" Count="2" />
       <LineId Id="35" Count="0" />
-      <LineId Id="6" Count="1" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="6" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="7" Count="0" />
       <LineId Id="9" Count="1" />
-      <LineId Id="12" Count="11" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="12" Count="3" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="16" Count="0" />
+      <LineId Id="54" Count="1" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="18" Count="3" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="23" Count="0" />
       <LineId Id="34" Count="0" />
+      <LineId Id="44" Count="1" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="42" Count="0" />
       <LineId Id="33" Count="0" />
+      <LineId Id="41" Count="0" />
       <LineId Id="27" Count="0" />
-      <LineId Id="32" Count="0" />
       <LineId Id="29" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -394,6 +450,10 @@ END_IF]]></ST>
       <LineId Id="68" Count="0" />
       <LineId Id="57" Count="1" />
       <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.ModeChanged">
+      <LineId Id="6" Count="0" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Resetting">
       <LineId Id="28" Count="6" />

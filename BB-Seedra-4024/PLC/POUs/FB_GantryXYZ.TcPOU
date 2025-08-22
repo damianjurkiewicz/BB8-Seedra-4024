@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_GantryXYZ" Id="{474e1990-f731-0ed9-052c-42626742a38f}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule 
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule
 VAR
     // Sub module definitions here
 
@@ -9,41 +9,61 @@ VAR
     ipSubModules_Init : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
 
     // Component definitions here
-    AxisX       		: FB_Component_BasicAxis 		:= (Name := 'AxisX');
-    AxisY    			: FB_Component_BasicAxis 		:= (Name := 'AxisY');
-	AxisZ				: FB_Component_BasicAxis		:= (Name := 'AxisZ');
-    GantryCylinder		: FB_GantryXYCylinder			:= (Name := 'Cylinder');
-    //Alarms for this module
+    AxisX : FB_Component_BasicAxis := (Name := 'AxisX');
+    AxisY : FB_Component_BasicAxis := (Name := 'AxisY');
+    AxisZ : FB_Component_BasicAxis := (Name := 'AxisZ');
+    GantryCylinder : FB_GantryXYCylinder := (Name := 'Cylinder');
+
+
+    // Alarms for this module
     GantryAlarms : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
 
-	//IO
-	LimitSwitchX :BOOL;
-	LimitSwitchY :BOOL;
-	LimitSwitchZ :BOOL;
+    // IO
+    LimitSwitchX : 			BOOL;
+    LimitSwitchY : 			BOOL;
+    LimitSwitchZ : 			BOOL;
 
-	HomeComplete :BOOL;
+    // Properties
+    _HomingStepX :			INT;
+    _HomingStepY :			INT;
+    _HomingStepZ :			INT;
+    _CuttingStep :			INT := 0;
+	_CuttingStepProgress :	REAL := 1.0;
+	_LastCuttingStep 	:	INT := 1;
 	
-	//resets
-	_HomingStepX : INT;
- 	_HomingStepY : INT;
-	_HomingStepZ : INT;
-	
-	_CuttingStep : INT;
+	_CurrentSpeed: 			LREAL;
 
+	
+END_VAR
+
+VAR PERSISTENT
+
+    _CuttingHeightZ : 		REAL;
+	_ToolOverpass : 		REAL;
+	_RailHeightCorrection: 	REAL;
+	_DimensionCorrection : 	REAL;
+	_CuttingSpeedX 			: REAL;
+	_RapidSpeedX 			: REAL;
+	_CuttingSpeedY 			: REAL;
+	_RapidSpeedY 			: REAL;
+	_CuttingSpeedZ 			: REAL;
+	_RapidSpeedZ 			: REAL;
+	_IdleTime 				:REAL;
+
+	_PanelFrontWidht : 		REAL;
+	_PanelFrontLength : 	REAL;
+	_PanelHeight : 			REAL;
 END_VAR
 
 VAR CONSTANT
-    GANTRY_ALARM_COUNT : INT := 5;
-END_VAR
-
-
-  // Prywatna zmienna do przechowywania wartości Step
-
-]]></Declaration>
+    GANTRY_ALARM_COUNT : 	INT := 5;
+END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[]]></ST>
+      <ST><![CDATA[
+]]></ST>
     </Implementation>
     <Folder Name="MyMethods" Id="{d166ca9d-f57a-4d88-ac90-142e5eb5d488}" />
+    <Folder Name="Properties" Id="{b05cc7e1-dc37-4910-986a-f085b4a0163d}" />
     <Folder Name="States" Id="{8df42c9b-c051-49f1-9767-900503632339}" />
     <Method Name="Aborting" Id="{5476dfef-6652-4e6b-8928-3724a50553de}" FolderPath="States\">
       <Declaration><![CDATA[
@@ -55,7 +75,11 @@ END_VAR
 
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE SequenceState OF
+        <ST><![CDATA[CASE _CurrentMode OF
+
+	//=================================PRODUCTION MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Production:
+CASE SequenceState OF
     0:
         NoStateTasksToComplete := FALSE;
         SequenceState          := SequenceState + 10;
@@ -64,7 +88,9 @@ END_VAR
 		AxisY.Disable();
 		AxisZ.Disable();
 
-		IO.DO3 := FALSE;
+		IO.SpindleEnable := FALSE;
+		IO.CoolingEnable := FALSE;
+
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
 		THIS^.HomingStepZ := 0;
@@ -73,9 +99,41 @@ END_VAR
 	20:
 
 		StateTasksComplete := TRUE;
+		SUPER^.Aborting();
 END_CASE
 
-SUPER^.Aborting();]]></ST>
+	//=================================MAINTENANCE & MANUAL MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+
+	CASE SequenceState OF
+    
+	0:
+        NoStateTasksToComplete := FALSE;
+        SequenceState          := SequenceState + 10;
+    
+	10:
+		AxisX.Disable();
+		AxisY.Disable();
+		AxisZ.Disable();
+		
+		IO.CoolingEnable := FALSE;
+		IO.SpindleEnable := FALSE;
+		THIS^.HomingStepX := 0;
+		THIS^.HomingStepY := 0;
+		THIS^.HomingStepZ := 0;
+		THIS^.CuttingStep := 0;
+		SequenceState := SequenceState + 10;
+	
+	20:
+
+		StateTasksComplete := TRUE;
+		SUPER^.Aborting();
+	END_CASE
+	
+
+	END_CASE
+
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
@@ -101,6 +159,9 @@ END_VAR]]></Declaration>
 //		GantryAlarms[E_Gantry.InitReferenceEvent].Clear(0,0);
 //		GantryAlarms[E_Gantry.StartTimeout].Clear(0,0);
 //		GantryAlarms[E_Gantry.WarnMessage].Clear(0,0);
+		THIS^.HomingStepX := 0;
+		THIS^.HomingStepY := 0;
+		THIS^.HomingStepZ := 0;
 		AxisX.Reset();
 		AxisY.Reset();
 		AxisZ.Reset();
@@ -136,6 +197,41 @@ END_CASE
 SUPER^.Clearing();]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Completing" Id="{6c861ff6-52ea-4daf-b956-f189ed9d190d}" FolderPath="States\">
+      <Declaration><![CDATA[// This method contains code which will execute when this PackML module is in the Completing state
+METHOD PROTECTED Completing
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+END_VAR
+
+// This method is called as required by <c>StateControl()</c>
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+
+	//=================================PRODUCTION MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Production:
+		CASE SequenceState OF
+		0:
+			NoStateTasksToComplete := FALSE;
+			SequenceState          := SequenceState + 10;
+		10:
+			SequenceState := SequenceState + 10;
+		20:
+			StateTasksComplete := TRUE;
+			SUPER^.Completing();
+	END_CASE
+
+	//=================================MAINTENANCE & MANUAL MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+			
+
+		SUPER^.Completing();
+
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="CreateEvents" Id="{40e5a283-7f33-033f-0879-cc11ecabc43d}">
       <Declaration><![CDATA[METHOD PROTECTED CreateEvents
 VAR_INPUT
@@ -151,8 +247,8 @@ F_CreateAllEventsInClass(Alarms     := GantryAlarms,
 SUPER^.CreateEvents();]]></ST>
       </Implementation>
     </Method>
-    <Method Name="Cutting" Id="{391386b3-3ac4-4fc7-a2a1-1d79f5676796}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD Cutting : BOOL
+    <Method Name="CutArona" Id="{4a6c8d9d-4b5c-46da-8179-e7275fa91b7f}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD CutArona : BOOL
 (*
 	E			G
 	|			|
@@ -163,8 +259,7 @@ B---+-----------+---A
 	|			|
 	F			H
 *)
-VAR
-	CuttingHeightZ  : REAL := 16;  
+VAR  
 	Point0x 		: REAL := 0;
 	Point0y 		: REAL := 0;
 	Point0z 		: REAL := 0;
@@ -184,10 +279,8 @@ VAR
 	PointGy 		: REAL := 400;
 	PointHx 		: REAL := 250;
 	PointHy 		: REAL := 0;
-	
-
-	
 END_VAR
+
 VAR_INST
 		Timer			:TON;
 END_VAR
@@ -202,223 +295,456 @@ END_VAR
 			_CuttingStep := 10;
 		END_IF
 
-	10:	// Set Speed
-		IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+	
+	10:
+		IF NOT AxisZ.Busy AND NOT AxisX.Busy AND NOT AxisY.Busy THEN
+			CutArona := TRUE;
+			END_IF	
+
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CutBorgoFlaps" Id="{391386b3-3ac4-4fc7-a2a1-1d79f5676796}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD CutBorgoFlaps : BOOL
+(*
+	E			G
+	|			|
+D---+-----------+---C
+	|			|
+	|			| 
+B---+-----------+---A
+	|			|
+	F			H
+*)
+VAR  
+	Point0x 		: REAL := 0;
+	Point0y 		: REAL := 0;
+	Point0z 		: REAL := 0;
+	PointAx 		: REAL := 300;
+	PointAy 		: REAL := 50;
+	PointBx 		: REAL := 0;
+    PointBy 		: REAL := 50;
+	PointCx 		: REAL := 300;
+	PointCy 		: REAL := 350;
+	PointDx 		: REAL := 0;
+	PointDy 		: REAL := 350;
+	PointEx 		: REAL := 50;
+	PointEy 		: REAL := 400;
+	PointFx 		: REAL := 50;
+	PointFy 		: REAL := 0;
+	PointGx 		: REAL := 250;
+	PointGy 		: REAL := 400;
+	PointHx 		: REAL := 250;
+	PointHy 		: REAL := 0;
+END_VAR
+
+VAR_INST
+		Timer			:TON;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CuttingStep OF
+
+	0: // Initial step, enable axes
+		Trace('Start Cutting Box Five Sides');
+		IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
+			Trace('Axes Enabled');
+			_CuttingStep := 10;
+		END_IF
+
+	
+	10:
+		IF NOT AxisZ.Busy AND NOT AxisX.Busy AND NOT AxisY.Busy THEN
+			CutBorgoFlaps := TRUE;
+			END_IF	
+
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CutBorgoWings" Id="{a743c5ed-8d5e-4e9d-9846-919578920253}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD CutBorgoWings : BOOL
+(*
+	F		    H
+	|			|
+D---+-----------+---C
+	|			|
+	|			| 
+B---+-----------+---A
+	|			|
+	E			G
+*)
+VAR  
+
+END_VAR
+
+VAR_INST
+	Timer			:TON;
+	Point0x 		: REAL;
+	Point0y 		: REAL;
+	Point0z 		: REAL;
+	PointAx 		: REAL;
+	PointAy 		: REAL;
+	PointBx 		: REAL;
+    PointBy 		: REAL;
+	PointCx 		: REAL;
+	PointCy 		: REAL;
+	PointDx 		: REAL;
+	PointDy 		: REAL;
+	PointEx 		: REAL;
+	PointEy 		: REAL;
+	PointFx 		: REAL;
+	PointFy 		: REAL;
+	PointGx 		: REAL;
+	PointGy 		: REAL;
+	PointHx 		: REAL;
+	PointHy 		: REAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CuttingStep OF
+
+	0: // Initial step, enable axes
+		//Modification of nothing
+		//Second modification of nothign
+		//3
+		//4
+		//5
+		//6
+		// Trace('Start Cutting Box Five Sides');
+		_LastCuttingStep := 350;
+		IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
+			
+			// Trace('Axes Enabled');
+			_CuttingStep := 5;
+		END_IF
+		
+	5: 		Point0x := 0;		
+			Point0y := 0;	
+			Point0z := 0;	
+			PointAx := PanelFrontWidht + PanelHeight;	
+			PointAy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
+			PointBx := PanelFrontWidht + PanelHeight;
+			PointBy := 0 - _ToolOverpass;
+			PointCx := PanelHeight;
+			PointCy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
+			PointDx := PanelHeight;	
+			PointDy := 0 - _ToolOverpass;
+			PointEx := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;
+			PointEy := PanelHeight - _ToolOverpass;
+			PointFx := 0 - _ToolOverpass;		
+			PointFy := PanelHeight - _RailHeightCorrection;		
+			PointGx := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;		
+			PointGy := PanelHeight + PanelFrontLength - _RailHeightCorrection;		
+			PointHx := 0 - _ToolOverpass;		
+			PointHy := PanelHeight + PanelFrontLength - _RailHeightCorrection;
+	
 			AxisX.Acceleration := 500;
 			AxisY.Acceleration := 500;
 			AxisZ.Acceleration := 500;
 			AxisX.Deceleration := 8000;
 			AxisY.Deceleration := 8000;
 			AxisZ.Deceleration := 8000;
-			AxisX.Velocity := 50; 
-			AxisY.Velocity := 50;
-			AxisZ.Velocity := 10;
 			
-			IF IO.DO3 := TRUE THEN
-			Trace('Speed Set');
+		IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
+			_CuttingStep := 10;
+		END_IF
+
+	10:	// Set Speed
+		IF  AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+
+			AxisX.Velocity := _RapidSpeedX; 
+			AxisY.Velocity := _RapidSpeedY;
+			AxisZ.Velocity := _RapidSpeedZ;
+			
+			IO.SpindleEnable := TRUE;
+			
+			IF IO.SpindleEnable = TRUE THEN
+			// Trace('Speed Set');
 			_CuttingStep := 20;
 			END_IF
 		END_IF
+		
+		
 
 	20:	// Positioning Motion to A
 		AxisX.MoveAbsolute(PointAx,0);
 		AxisY.MoveAbsolute(PointAy,0);
-		Trace('Moving to position A');
+		// Trace('Moving to position A');
 		_CuttingStep := 30;
 
 	30: // Verify Position A
 		IF AxisX.InPosition AND AxisY.InPosition THEN
-			Trace('Position A Reached');
+			AxisZ.Velocity := _CuttingSpeedZ;
+			// Trace('Position A Reached');
 			_CuttingStep := 40; 
 		END_IF
 
 	40: // Set Cutting Height
-		AxisZ.MoveAbsolute(CuttingHeightZ,0);
-		Trace('Setting Cutting Height');
+		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
+		// Trace('Setting Cutting Height');
 		_CuttingStep := 50;
 
 	50: // Verify Cutting Height
 		IF AxisZ.InPosition THEN
-			Trace('Cutting Height Set');
-			Timer(IN := TRUE, PT := T#2000MS);
-			IF Timer.Q THEN
-			_CuttingStep := 60;
-			Timer(IN := FALSE); // Reset timera, aby działał ponownie
-			END_IF
+			// Trace('Cutting Height Set');
+			IO.CoolingEnable := TRUE;
+			_CuttingStep := 55;
 		END_IF
-
-
+		
+	55: 
+		Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
+		AxisX.Velocity := _CuttingSpeedX;
+		AxisY.Velocity := _CuttingSpeedY;
+		IF Timer.Q THEN
+			Timer(IN := FALSE); // Reset timera, aby działał ponownie
+			_CuttingStep := 60;
+		END_IF	
 
 	60: // Cutting Motion from A to B
 		AxisX.MoveAbsolute(PointBx,0);
 		AxisY.MoveAbsolute(PointBy,0);
-		Trace('Cutting from A to B');
+		Trace('60Cutting from A to B');
+		//IF NOT AxisX.Busy AND NOT AxisY.Busy THEN 
 		_CuttingStep := 70;
+		//END_IF
 
 	70: // Verify position B reached
-		IF AxisX.InPosition THEN
-			Trace('Position B Reached');
+		IF AxisX.InPosition AND AxisY.InPosition THEN
+			AxisZ.Velocity := _RapidSpeedZ;
+			Trace('70Position B Reached');
 			_CuttingStep := 80;
 		END_IF
 
 	80: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
-		Trace('Returning from Cutting Height');
+		IO.CoolingEnable := FALSE;
+		Trace('80Returning from Cutting Height');
 		_CuttingStep := 90;
 
 	90: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
-			Trace('Z Returned');
+			AxisX.Velocity := _RapidSpeedX;
+			AxisY.Velocity := _RapidSpeedY;
+			Trace('90Z Returned');
 			_CuttingStep := 100;
 		END_IF
 
 	100: // Positioning Motion from B to C
 		AxisX.MoveAbsolute(PointCx,0);
 		AxisY.MoveAbsolute(PointCy,0);
-		Trace('Positioning from B to C');
+		// Trace('Positioning from B to C');
 		_CuttingStep := 110;
 
 	110: // Verify position C reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
-			Trace('Position C Reached');
+			// Trace('Position C Reached');
+			AxisZ.Velocity := _CuttingSpeedZ;
+			IO.CoolingEnable := TRUE;
 			_CuttingStep := 120;
 		END_IF
 
 	120: // Set Cutting Height
-		AxisZ.MoveAbsolute(CuttingHeightZ,0);
-		Trace('Setting Cutting Height for C to D');
+		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
+		// Trace('Setting Cutting Height for C to D');
 		_CuttingStep := 130;
-
+			
 	130: // Verify Z position reached
 		IF AxisZ.InPosition THEN
-			_CuttingStep := 140;
+			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
+			AxisX.Velocity := _CuttingSpeedX;
+			AxisY.Velocity := _CuttingSpeedY;
+		IF Timer.Q THEN
+			Timer(IN := FALSE); // Reset timera, aby działał ponownie
+			_CuttingStep := 140;			
+		END_IF
+
 		END_IF
 
 	140: // Cutting Motion from C to D
 		AxisX.MoveAbsolute(PointDx,0);
 		AxisY.MoveAbsolute(PointDy,0);
-		Trace('Cutting C to D');
+		// Trace('Cutting C to D');
 		_CuttingStep := 150;
 
 	150: // Verify position D reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			AxisZ.Velocity := _RapidSpeedZ;
 			_CuttingStep := 160;
 		END_IF
 
 	160: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
-		Trace('Returning from Cutting Height');
+		IO.CoolingEnable := FALSE;
+		// Trace('Returning from Cutting Height');
 		_CuttingStep := 170;
 
 	170: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
-			Trace('Z Returned');
+			AxisX.Velocity := _RapidSpeedX;
+			AxisY.Velocity := _RapidSpeedY;
+			// Trace('Z Returned');
 			_CuttingStep := 180;
 		END_IF
 
 	180: // Positioning Motion from D to E
 		AxisX.MoveAbsolute(PointEx,0);
 		AxisY.MoveAbsolute(PointEy,0);
-		Trace('Positioning from D to E');
+		// Trace('Positioning from D to E');
 		_CuttingStep := 190;
 
 	190: // Verify position E reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
-			Trace('Position E Reached');
+			IO.CoolingEnable := TRUE;
+			AxisZ.Velocity := _CuttingSpeedZ;
+			// Trace('Position E Reached');
 			_CuttingStep := 200;
 		END_IF
 
 	200: // Set Cutting Height 	
-		AxisZ.MoveAbsolute(CuttingHeightZ,0);
-		Trace('Setting Cutting Height for E to F');
+		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
+		// Trace('Setting Cutting Height for E to F');
 		_CuttingStep := 210;
 
 	210: // Verify Z position reached
 		IF AxisZ.InPosition THEN
+			AxisX.Velocity := _CuttingSpeedX;
+			AxisY.Velocity := _CuttingSpeedY;
+			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
+			IF Timer.Q THEN
+			Timer(IN := FALSE); // Reset timera, aby działał ponownie
 			_CuttingStep := 220;
+			END_IF
 		END_IF
 
 	220: // Cutting Motion from E to F
 		AxisX.MoveAbsolute(PointFx,0);
 		AxisY.MoveAbsolute(PointFy,0);
-		Trace('Cutting from E to F');
+		// Trace('Cutting from E to F');
 		_CuttingStep := 230;
 
 	230: // Verify position F reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			AxisZ.Velocity := _RapidSpeedZ;
 			_CuttingStep := 240;
 		END_IF
 
 	240: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
-		Trace('Returning from Cutting Height');
+		IO.CoolingEnable := FALSE;
+		// Trace('Returning from Cutting Height');
 		_CuttingStep := 250;
 
 	250: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
-			Trace('Z Returned');
+			AxisX.Velocity := _RapidSpeedX;
+			AxisY.Velocity := _RapidSpeedY;
+			// Trace('Z Returned');
 			_CuttingStep := 260;
 		END_IF
 
 	260: // Positioning Motion from F to G
 		AxisX.MoveAbsolute(PointGx,0);
 		AxisY.MoveAbsolute(PointGy,0);
-		Trace('Positioning from F to G');
+		// Trace('Positioning from F to G');
 		_CuttingStep := 270;
 
 	270: // Verify position G reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
-			Trace('Position G Reached');
+			AxisZ.Velocity := _CuttingSpeedZ;
+			IO.CoolingEnable := TRUE;
+			// Trace('Position G Reached');
 			_CuttingStep := 280;
 		END_IF
 		
 	280: // Set Cutting Height 	
-		AxisZ.MoveAbsolute(CuttingHeightZ,0);
-		Trace('Setting Cutting Height for G to H');
+		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
+		// Trace('Setting Cutting Height for G to H');
 		_CuttingStep := 290;
 			
 	290: // Verify Z Cutting Height
 		IF AxisZ.InPosition THEN
-			Trace('Cutting Height Reached');
+			AxisX.Velocity := _CuttingSpeedX;
+			AxisY.Velocity := _CuttingSpeedY;
+			// Trace('Cutting Height Reached');
+			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
+			IF Timer.Q THEN
+			Timer(IN := FALSE); // Reset timera, aby działał ponownie			
 			_CuttingStep := 300;
+			END_IF
 		END_IF	
 
 	300: // Cutting Motion from G to H
 		AxisX.MoveAbsolute(PointHx,0);
 		AxisY.MoveAbsolute(PointHy,0);
-		Trace('Cutting from G to H');
+		// Trace('Cutting from G to H');
 		_CuttingStep := 310;
 
 	310: // Verify position H reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
+			AxisZ.Velocity := _RapidSpeedZ;
+			IO.CoolingEnable := FALSE;
 			_CuttingStep := 320;
 		END_IF
 			
-
 	320: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
-		Trace('Returning from Cutting Height');
+		// Trace('Returning from Cutting Height');
 		_CuttingStep := 330;
 
 	330: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
-			IO.DO3 := FALSE;
-			Trace('Z Point 0 Reached');
+			IO.SpindleEnable := FALSE;
+			AxisY.Velocity := _RapidSpeedY;
+			AxisX.Velocity := _RapidSpeedX;
+			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1500.0));
+			IF Timer.Q THEN
+			Timer(IN := FALSE); // Reset timera, aby działał ponownie			
+			_CuttingStep := 300;
+			END_IF
+			// Trace('Z Point 0 Reached');
 			_CuttingStep := 340;
 		END_IF
+		
+		
 
 	340: // Final positioning 
-		AxisX.MoveAbsolute(Point0x,0);
-		AxisY.MoveAbsolute(Point0y,0);
+		AxisX.MoveRelative(100,0);
+		AxisY.MoveRelative(100,0);
 		IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
-			Cutting := TRUE;
-			Trace('Box Five Sides is Cut');
+			_CuttingStep := 350;
+			// Trace('Box Five Sides is Cut');
 		END_IF
 
-END_CASE]]></ST>
+	350:
+		IF NOT AxisZ.Busy AND NOT AxisX.Busy AND NOT AxisY.Busy THEN
+			CutBorgoWings := TRUE;
+		END_IF	
+
+END_CASE
+]]></ST>
       </Implementation>
     </Method>
-    <Property Name="CuttingStep" Id="{3898497e-74b5-487e-9d83-61675b4ff850}">
+    <Property Name="CuttingHeightZ" Id="{4c86fbb5-f7fe-4ab0-abb5-4601fd04a1c4}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CuttingHeightZ : REAL]]></Declaration>
+      <Get Name="Get" Id="{a83b65c4-5ea3-488c-967b-3ee17e2e67f9}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CuttingHeightZ := _CuttingHeightZ;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{3fde4dcd-fcc8-4a85-8a9a-5adb0df55581}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF CuttingHeightZ > 100 THEN
+	_CuttingHeightZ := 100;  // It can't go higher, you will kill yourself
+	ELSE
+	_CuttingHeightZ := CuttingHeightZ;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CuttingStep" Id="{3898497e-74b5-487e-9d83-61675b4ff850}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC CuttingStep : INT]]></Declaration>
       <Get Name="Get" Id="{85c69036-89e0-4658-95e9-e32bfe715076}">
         <Declaration><![CDATA[
@@ -448,6 +774,17 @@ END_VAR]]></Declaration>
     RETURN;
 END_IF
 
+//aaa(
+//	Axis := AxisY.Axis , 
+//	Execute := TRUE , 
+//	ParameterNumber := MC_AxisParameter.AxisMinSoftPosLimit , 
+//	Value := -66, 
+//	 );
+	 
+	 
+_CurrentSpeed := SQRT( AxisX.SetVelocity*AxisX.SetVelocity + AxisY.SetVelocity*AxisY.SetVelocity + AxisZ.SetVelocity*AxisZ.SetVelocity );
+_CuttingStepProgress := _CuttingStep * 100 / (1.0 + _LastCuttingStep);
+
 SUPER^.CyclicLogic();
 
 //Set the current alarm severity for this module
@@ -457,6 +794,26 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 ]]></ST>
       </Implementation>
     </Method>
+    <Property Name="DimensionCorrection" Id="{95467893-833e-4a85-85a7-4d3d7fbe1cbc}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC DimensionCorrection : REAL]]></Declaration>
+      <Get Name="Get" Id="{6597f0bb-ab93-4c8b-9f04-26dad4e00b3c}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[DimensionCorrection := _DimensionCorrection;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{3a142071-aa1f-47a4-b310-22c10182eea7}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF DimensionCorrection > 4 THEN
+	_DimensionCorrection := 4;  // It can't go higher, you will kill yourself
+	ELSE
+	_DimensionCorrection := DimensionCorrection;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="Execute" Id="{895d1ef9-5e85-47dd-a8bf-b32885837641}" FolderPath="States\">
       <Declaration><![CDATA[METHOD PROTECTED Execute
 ]]></Declaration>
@@ -468,12 +825,41 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 		CASE SequenceState OF
 			0:
 				NoStateTasksToComplete := FALSE;
-				
-				IF Cutting() THEN
-					SequenceState := SequenceState + 10;
-				END_IF	
+				SequenceState := SequenceState + 5;
+			5:
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -20);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1200);
+		
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -20);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -20);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);	
+				SequenceState := SequenceState + 5;
+			10:
+					
+				CASE GVL_HMI.ProgramToCut OF
+					
+
+					0:
+					IF CutBorgoFlaps() THEN
+						SequenceState := SequenceState + 10;
+					END_IF
+					
+					1:
+					IF CutBorgoWings() THEN
+						SequenceState := SequenceState + 10;
+					END_IF
+					
+					2:
+					IF CutArona() THEN
+						SequenceState := SequenceState + 10;
+					END_IF
+					
+				END_CASE
+			
 								
-			10:		
+			20:		
 				StateTasksComplete := TRUE;
 				StateComplete();
 			END_CASE
@@ -517,7 +903,7 @@ CASE _CurrentMode OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="HomingStepX" Id="{bb0ed88a-091c-4bab-9e01-a967ca1fc9bb}">
+    <Property Name="HomingStepX" Id="{bb0ed88a-091c-4bab-9e01-a967ca1fc9bb}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC HomingStepX : INT]]></Declaration>
       <Get Name="Get" Id="{190b2c1a-84a4-4b9a-b82b-d034c6e97b13}">
         <Declaration><![CDATA[
@@ -537,7 +923,7 @@ END_IF]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="HomingStepY" Id="{b85ccf6c-14f7-4091-9161-3a64d81c6f71}">
+    <Property Name="HomingStepY" Id="{b85ccf6c-14f7-4091-9161-3a64d81c6f71}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC HomingStepY : INT]]></Declaration>
       <Get Name="Get" Id="{c9fc6e3e-e251-4188-a708-1d897bfbe015}">
         <Declaration><![CDATA[
@@ -557,7 +943,7 @@ END_IF]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="HomingStepZ" Id="{0b9a390e-db9e-4739-bffa-5ca069d437ef}">
+    <Property Name="HomingStepZ" Id="{0b9a390e-db9e-4739-bffa-5ca069d437ef}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC HomingStepZ : INT]]></Declaration>
       <Get Name="Get" Id="{403aef28-5a6c-4ea4-b639-a6922b7be29b}">
         <Declaration><![CDATA[
@@ -586,9 +972,11 @@ END_IF]]></ST>
 		
 	0:
 		HomingX := FALSE;
+		
+		
 		IF AxisX.Enable() THEN
 			
-			Trace('Enable Axis X');
+			//Trace('Enable Axis X');
 			_HomingStepX := _HomingStepX + 10;
 		END_IF
 		
@@ -596,7 +984,7 @@ END_IF]]></ST>
 		IF AxisX.Enabled THEN
 			AxisX.Acceleration := 100;
 			AxisX.Deceleration := 15000;
-			Trace('Enabled Axis X');
+			//Trace('Enabled Axis X');
 			_HomingStepX := _HomingStepX + 10;
 		END_IF
 
@@ -605,7 +993,7 @@ END_IF]]></ST>
 			IF AxisX.Stop() THEN
 				IF NOT AxisX.Busy THEN
 				AxisX.Home();
-				Trace('Start na krańcówce X');
+				////Trace('Start na krańcówce X');
 				_HomingStepX := 80;
 				END_IF
 			END_IF
@@ -614,8 +1002,8 @@ END_IF]]></ST>
 		END_IF
 		
 	30:
-		IF AxisX.MoveVelocity(-50, FALSE) THEN
-			Trace('Szybki ruch, szukam krancowki X');
+		IF AxisX.MoveVelocity(-100, FALSE) THEN
+			////Trace('Szybki ruch, szukam krancowki X');
             _HomingStepX := _HomingStepX + 10;
         END_IF
 		
@@ -625,7 +1013,7 @@ END_IF]]></ST>
 			
 		IF AxisX.Stop() THEN
 			IF NOT AxisX.Busy THEN
-				Trace('Spotkałem krańcówkę X');
+				//Trace('Spotkałem krańcówkę X');
 				_HomingStepX := _HomingStepX + 10;
 			END_IF
 		END_IF
@@ -634,20 +1022,20 @@ END_IF]]></ST>
 
 	50:
 		IF AxisX.MoveRelative(30,FALSE) THEN
-			Trace('Odsunięcie od krańcówki, po szybkim X');
+			//Trace('Odsunięcie od krańcówki, po szybkim X');
 			_HomingStepX := _HomingStepX + 10;
 		END_IF
 		
 	60: 
 		IF AxisX.MoveVelocity(-10,FALSE) THEN
-			Trace('Spokojny powrot X');		
+			//Trace('Spokojny powrot X');		
 			_HomingStepX := _HomingStepX + 10;
 		END_IF	
 		
 	70:
 		IF IO.ProximitySensorX THEN
 			IF AxisX.Stop() THEN
-				Trace('Stop do precyzyjnego X');
+				//Trace('Stop do precyzyjnego X');
 				_HomingStepX := _HomingStepX + 10; // Przechodzimy do czekania na zatrzymanie
 			END_IF
 		END_IF
@@ -656,28 +1044,29 @@ END_IF]]></ST>
 		IF NOT AxisX.Busy THEN
 			IF AxisX.Home() THEN
 				_HomingStepX := _HomingStepX + 10;
-				Trace('Precyzyjny Home wykonany X');
+				//Trace('Precyzyjny Home wykonany X');
 			END_IF
 		END_IF
 
 
 	90:	
 		IF AxisX.MoveRelative(2.0, FALSE) THEN
-			Trace('Odsunięcie od krańcówki o 2mm X');
+			//Trace('Odsunięcie od krańcówki o 2mm X');
 			_HomingStepX := _HomingStepX + 10;
 		END_IF
 	
 	100:
 		IF NOT AxisX.Busy THEN
+		
 			IF AxisX.Home() THEN
-				Trace('Ustawienie nowego zera po odsunięciu X');
+				//Trace('Ustawienie nowego zera po odsunięciu X');
 				_HomingStepX := _HomingStepX + 10;
 			END_IF
 		END_IF
 	
 	110:
 		HomingX := TRUE;
-		Trace('Homing zakończony pomyślnie X');
+		//Trace('Homing zakończony pomyślnie X');
 		
 			
 	END_CASE
@@ -695,9 +1084,10 @@ END_IF]]></ST>
 		
 	0:
 		HomingY := FALSE;
+			
 		IF AxisY.Enable() THEN
 			
-			Trace('Enable Axis Y');
+			//Trace('Enable Axis Y');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
 		
@@ -705,7 +1095,7 @@ END_IF]]></ST>
 		IF AxisY.Enabled THEN
 			AxisY.Acceleration := 100;
 			AxisY.Deceleration := 15000;
-			Trace('Enabled Axis Y');
+			//Trace('Enabled Axis Y');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
 
@@ -714,7 +1104,7 @@ END_IF]]></ST>
 			IF AxisY.Stop() THEN
 				IF NOT AxisY.Busy THEN
 				AxisY.Home();
-				Trace('Start na krańcówce Y');
+				//Trace('Start na krańcówce Y');
 				_HomingStepY := 80;
 				END_IF
 			END_IF
@@ -723,8 +1113,8 @@ END_IF]]></ST>
 		END_IF
 		
 	30:
-		IF AxisY.MoveVelocity(-50, FALSE) THEN
-			Trace('Szybki ruch, szukam krancowki Y');
+		IF AxisY.MoveVelocity(-80, FALSE) THEN
+			//Trace('Szybki ruch, szukam krancowki Y');
             _HomingStepY := _HomingStepY + 10;
         END_IF
 		
@@ -734,7 +1124,7 @@ END_IF]]></ST>
 			
 		IF AxisY.Stop() THEN
 			IF NOT AxisY.Busy THEN
-				Trace('Spotkałem krańcówkę Y');
+				//Trace('Spotkałem krańcówkę Y');
 				_HomingStepY := _HomingStepY + 10;
 			END_IF
 		END_IF
@@ -743,20 +1133,20 @@ END_IF]]></ST>
 
 	50:
 		IF AxisY.MoveRelative(30,FALSE) THEN
-			Trace('Odsunięcie od krańcówki, po szybkim Y');
+			//Trace('Odsunięcie od krańcówki, po szybkim Y');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
 		
 	60: 
 		IF AxisY.MoveVelocity(-10,FALSE) THEN
-			Trace('Spokojny powrot Y');		
+			//Trace('Spokojny powrot Y');		
 			_HomingStepY := _HomingStepY + 10;
 		END_IF	
 		
 	70:
 		IF IO.ProximitySensorY THEN
 			IF AxisY.Stop() THEN
-				Trace('Stop do precyzyjnego Y');
+				//Trace('Stop do precyzyjnego Y');
 				_HomingStepY := _HomingStepY + 10; // Przechodzimy do czekania na zatrzymanie
 			END_IF
 		END_IF
@@ -765,28 +1155,29 @@ END_IF]]></ST>
 		IF NOT AxisY.Busy THEN
 			IF AxisY.Home() THEN
 				_HomingStepY := _HomingStepY + 10;
-				Trace('Precyzyjny Home wykonany Y');
+				//Trace('Precyzyjny Home wykonany Y');
 			END_IF
 		END_IF
 
 
 	90:	
 		IF AxisY.MoveRelative(2.0, FALSE) THEN
-			Trace('Odsunięcie od krańcówki o 2mm Y');
+			//Trace('Odsunięcie od krańcówki o 2mm Y');
 			_HomingStepY := _HomingStepY + 10;
 		END_IF
 	
 	100:
 		IF NOT AxisY.Busy THEN
+		
 			IF AxisY.Home() THEN
-				Trace('Ustawienie nowego zera po odsunięciu Y');
+				//Trace('Ustawienie nowego zera po odsunięciu Y');
 				_HomingStepY := _HomingStepY + 10;
 			END_IF
 		END_IF
 	
 	110:
 		HomingY := TRUE;
-		Trace('Homing zakończony pomyślnie Y');
+		//Trace('Homing zakończony pomyślnie Y');
 		
 			
 	END_CASE
@@ -803,10 +1194,11 @@ END_IF]]></ST>
         <ST><![CDATA[CASE _HomingStepZ OF
 		
 	0:
-		HomingZ := FALSE;
+		HomingZ := FALSE;	
+		
 		IF AxisZ.Enable() THEN
 			
-			Trace('Enable Axis Z');
+			//Trace('Enable Axis Z');
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF
 		
@@ -814,7 +1206,7 @@ END_IF]]></ST>
 		IF AxisZ.Enabled THEN
 			AxisZ.Acceleration := 100;
 			AxisZ.Deceleration := 15000;
-			Trace('Enabled Axis Z');
+			//Trace('Enabled Axis Z');
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF
 
@@ -823,7 +1215,7 @@ END_IF]]></ST>
 			IF AxisZ.Stop() THEN
 				IF NOT AxisZ.Busy THEN
 				AxisZ.Home();
-				Trace('Start na krańcówce Z');
+				//Trace('Start na krańcówce Z');
 				_HomingStepZ := 80;
 				END_IF
 			END_IF
@@ -832,8 +1224,8 @@ END_IF]]></ST>
 		END_IF
 		
 	30:
-		IF AxisZ.MoveVelocity(-50, FALSE) THEN
-			Trace('Szybki ruch, szukam krancowki Z');
+		IF AxisZ.MoveVelocity(-100, FALSE) THEN
+			//Trace('Szybki ruch, szukam krancowki Z');
             _HomingStepZ := _HomingStepZ + 10;
         END_IF
 		
@@ -843,7 +1235,7 @@ END_IF]]></ST>
 			
 		IF AxisZ.Stop() THEN
 			IF NOT AxisZ.Busy THEN
-				Trace('Spotkałem krańcówkę Z');
+				//Trace('Spotkałem krańcówkę Z');
 				_HomingStepZ := _HomingStepZ + 10;
 			END_IF
 		END_IF
@@ -852,20 +1244,20 @@ END_IF]]></ST>
 
 	50:
 		IF AxisZ.MoveRelative(5,FALSE) THEN
-			Trace('Odsunięcie od krańcówki, po szybkim Z');
+			//Trace('Odsunięcie od krańcówki, po szybkim Z');
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF
 		
 	60: 
 		IF AxisZ.MoveVelocity(-10,FALSE) THEN
-			Trace('Spokojny powrot Z');		
+			//Trace('Spokojny powrot Z');		
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF	
 		
 	70:
 		IF IO.ProximitySensorZ THEN
 			IF AxisZ.Stop() THEN
-				Trace('Stop do precyzyjnego Z');
+				//Trace('Stop do precyzyjnego Z');
 				_HomingStepZ := _HomingStepZ + 10; // Przechodzimy do czekania na zatrzymanie
 			END_IF
 		END_IF
@@ -874,28 +1266,29 @@ END_IF]]></ST>
 		IF NOT AxisZ.Busy THEN
 			IF AxisZ.Home() THEN
 				_HomingStepZ := _HomingStepZ + 10;
-				Trace('Precyzyjny Home wykonany Z');
+				//Trace('Precyzyjny Home wykonany Z');
 			END_IF
 		END_IF
 
 
 	90:	
 		IF AxisZ.MoveRelative(2.0, FALSE) THEN
-			Trace('Odsunięcie od krańcówki o 2mm Z');
+			//Trace('Odsunięcie od krańcówki o 2mm Z');
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF
 	
 	100:
-		IF NOT AxisZ.Busy THEN
+		IF NOT AxisZ.Busy THEN		
+		
 			IF AxisZ.Home() THEN
-				Trace('Ustawienie nowego zera po odsunięciu Z');
+				//Trace('Ustawienie nowego zera po odsunięciu Z');
 				_HomingStepZ := _HomingStepZ + 10;
 			END_IF
 		END_IF
 	
 	110:
 		HomingZ := TRUE;
-		Trace('Homing zakończony pomyślnie Z');
+		//Trace('Homing zakończony pomyślnie Z');
 		
 			
 	END_CASE
@@ -946,6 +1339,86 @@ CASE DescendantSequenceState OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Property Name="PanelFrontLength" Id="{d37d1986-191c-4359-b366-a37c4466a7c4}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontLength : REAL]]></Declaration>
+      <Get Name="Get" Id="{719609b4-0075-4953-8df2-a544ce507b40}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[PanelFrontLength := _PanelFrontLength;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{d74bf0f0-654e-45df-b754-63029e5c2a12}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF PanelFrontLength = 0  THEN
+	_PanelFrontLength := 500;  // It can't go higher, you will kill yourself
+	ELSE
+	_PanelFrontLength := PanelFrontLength;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="PanelFrontWidht" Id="{f3e0dbc8-c3fa-460e-86ce-eb87111125e9}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontWidht : REAL]]></Declaration>
+      <Get Name="Get" Id="{337b7ccf-7529-41b1-81a1-e9c0f98de875}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[PanelFrontWidht := _PanelFrontWidht;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{6f7f0fd9-fb5c-4077-ab43-02d47a14a15f}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF PanelFrontWidht = 0 THEN
+	_PanelFrontWidht := 400;  // It can't go higher, you will kill yourself
+	ELSE
+	_PanelFrontWidht := PanelFrontWidht;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="PanelHeight" Id="{0920acc0-257a-43b2-a196-f22fc89e42ed}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC PanelHeight : REAL]]></Declaration>
+      <Get Name="Get" Id="{20b3fa55-de19-44e2-ad7b-52463e1bf19b}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[PanelHeight := _PanelHeight;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{91d58d60-235c-48ff-9b62-1155794955c4}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF PanelHeight = 0 THEN
+	_PanelHeight := 80;  // It can't go higher, you will kill yourself
+	ELSE
+	_PanelHeight := PanelHeight;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RailHeightCorrection" Id="{465e1c57-83b8-4b2a-a3fe-16819241fd4f}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC RailHeightCorrection : REAL]]></Declaration>
+      <Get Name="Get" Id="{8547e8a4-2368-4b1c-bac1-a9f1330a50a7}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RailHeightCorrection := _RailHeightCorrection;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{77d9b924-4d53-4d00-8d3d-e32bf531a5d3}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF RailHeightCorrection > 15 THEN
+	_RailHeightCorrection := 15;  // It can't go higher, you will kill yourself
+	ELSE
+	_RailHeightCorrection := RailHeightCorrection;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="ResetSafety" Id="{6bac4035-16f4-4bf2-95a7-9f0b204a82b7}" FolderPath="MyMethods\">
       <Declaration><![CDATA[METHOD ResetSafety : BOOL
 VAR_INST
@@ -1045,7 +1518,21 @@ END_VAR
 		CASE SequenceState OF
 			0:
 				NoStateTasksToComplete := FALSE;
-				SequenceState := SequenceState + 10;	
+				SequenceState := SequenceState + 5;
+
+
+			5:
+
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+		
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);	
+				
+				SequenceState := SequenceState + 5;
 		
 			10: 
 				IF HomingZ() THEN
@@ -1084,31 +1571,152 @@ END_VAR
 		END_CASE
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
-	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
-		;
-END_CASE
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:
+
+	CASE SequenceState OF
+			0:
+				NoStateTasksToComplete := FALSE;
+				SequenceState := SequenceState + 10;	
+		
+			10: 
+				AxisX.Enable();
+				AxisY.Enable();
+				AxisZ.Enable();	
+				
+				IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+					SequenceState := SequenceState + 10;
+				END_IF
+				
+			20:	
+
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+		
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
+			
+				SequenceState := SequenceState + 10;
+			30:
+	
+				SequenceState := SequenceState + 10;
+					
+			40:		
+				StateTasksComplete := TRUE;
+				SUPER^.Resetting();
+		END_CASE
+	
+ 	E_PMLUnitMode.ePMLUnitMode_Manual:
+			
+	CASE SequenceState OF
+			0:
+				NoStateTasksToComplete := FALSE;
+				SequenceState := SequenceState + 10;	
+		
+			10: 
+				AxisX.Enable();
+				AxisY.Enable();
+				AxisZ.Enable();	
+				
+				IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+					SequenceState := SequenceState + 10;
+				END_IF
+				
+			20:	
+
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+		
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
+			
+				SequenceState := SequenceState + 10;
+			30:
+	
+				SequenceState := SequenceState + 10;
+					
+			40:		
+				StateTasksComplete := TRUE;
+				SUPER^.Resetting();
+		END_CASE
+		
+	
+	END_CASE
+		
+
 
 ]]></ST>
       </Implementation>
     </Method>
+    <Property Name="ToolOverpass" Id="{812d4990-d277-4bfc-8e06-a4ff70191e9b}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY PUBLIC ToolOverpass : REAL]]></Declaration>
+      <Get Name="Get" Id="{b0c9f572-3145-4e3a-b91c-cd20c9ba4da8}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ToolOverpass := _ToolOverpass;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{826fd5bf-1fa9-4f64-9665-346b4d89d6bf}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ IF ToolOverpass > 15 THEN
+	_ToolOverpass := 15;  
+	ELSE
+	_ToolOverpass := ToolOverpass;
+END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <LineIds Name="FB_GantryXYZ">
-      <LineId Id="2" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="45" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Aborting">
+      <LineId Id="149" Count="2" />
+      <LineId Id="148" Count="0" />
       <LineId Id="105" Count="5" />
       <LineId Id="123" Count="0" />
       <LineId Id="111" Count="0" />
       <LineId Id="132" Count="0" />
       <LineId Id="124" Count="0" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="230" Count="0" />
       <LineId Id="112" Count="1" />
       <LineId Id="121" Count="1" />
-      <LineId Id="114" Count="5" />
+      <LineId Id="114" Count="3" />
+      <LineId Id="154" Count="0" />
+      <LineId Id="118" Count="0" />
+      <LineId Id="181" Count="2" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="200" Count="1" />
+      <LineId Id="222" Count="0" />
+      <LineId Id="202" Count="2" />
+      <LineId Id="221" Count="0" />
+      <LineId Id="205" Count="3" />
+      <LineId Id="238" Count="0" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="211" Count="5" />
+      <LineId Id="220" Count="0" />
+      <LineId Id="217" Count="2" />
+      <LineId Id="190" Count="0" />
+      <LineId Id="199" Count="0" />
+      <LineId Id="153" Count="0" />
+      <LineId Id="152" Count="0" />
+      <LineId Id="119" Count="0" />
       <LineId Id="29" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
       <LineId Id="28" Count="5" />
       <LineId Id="78" Count="0" />
       <LineId Id="83" Count="3" />
+      <LineId Id="156" Count="1" />
+      <LineId Id="155" Count="0" />
       <LineId Id="75" Count="2" />
       <LineId Id="130" Count="0" />
       <LineId Id="99" Count="0" />
@@ -1131,25 +1739,116 @@ END_CASE
       <LineId Id="47" Count="1" />
       <LineId Id="27" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.Completing">
+      <LineId Id="11" Count="8" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="33" Count="9" />
+      <LineId Id="10" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.CreateEvents">
       <LineId Id="3" Count="6" />
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.Cutting">
-      <LineId Id="1487" Count="19" />
-      <LineId Id="1699" Count="0" />
-      <LineId Id="1701" Count="0" />
-      <LineId Id="1507" Count="1" />
-      <LineId Id="1702" Count="0" />
-      <LineId Id="1509" Count="18" />
-      <LineId Id="1762" Count="3" />
-      <LineId Id="1781" Count="2" />
-      <LineId Id="1775" Count="1" />
-      <LineId Id="1712" Count="0" />
-      <LineId Id="1532" Count="154" />
-      <LineId Id="1700" Count="0" />
-      <LineId Id="1687" Count="11" />
+    <LineIds Name="FB_GantryXYZ.CutArona">
+      <LineId Id="2558" Count="14" />
       <LineId Id="19" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutBorgoFlaps">
+      <LineId Id="3131" Count="8" />
+      <LineId Id="3368" Count="5" />
+      <LineId Id="19" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutBorgoWings">
+      <LineId Id="3641" Count="2" />
+      <LineId Id="4177" Count="0" />
+      <LineId Id="4215" Count="4" />
+      <LineId Id="3644" Count="0" />
+      <LineId Id="4086" Count="0" />
+      <LineId Id="3645" Count="0" />
+      <LineId Id="4085" Count="0" />
+      <LineId Id="3646" Count="23" />
+      <LineId Id="4016" Count="4" />
+      <LineId Id="4014" Count="1" />
+      <LineId Id="3922" Count="0" />
+      <LineId Id="3670" Count="4" />
+      <LineId Id="3680" Count="4" />
+      <LineId Id="3923" Count="1" />
+      <LineId Id="3685" Count="4" />
+      <LineId Id="4021" Count="1" />
+      <LineId Id="3690" Count="8" />
+      <LineId Id="4136" Count="0" />
+      <LineId Id="3699" Count="12" />
+      <LineId Id="3716" Count="1" />
+      <LineId Id="3962" Count="1" />
+      <LineId Id="3965" Count="0" />
+      <LineId Id="4028" Count="0" />
+      <LineId Id="4030" Count="0" />
+      <LineId Id="4029" Count="0" />
+      <LineId Id="3968" Count="0" />
+      <LineId Id="4093" Count="0" />
+      <LineId Id="3964" Count="0" />
+      <LineId Id="3718" Count="5" />
+      <LineId Id="3969" Count="1" />
+      <LineId Id="3724" Count="3" />
+      <LineId Id="4031" Count="0" />
+      <LineId Id="3728" Count="10" />
+      <LineId Id="4032" Count="1" />
+      <LineId Id="3739" Count="12" />
+      <LineId Id="4034" Count="0" />
+      <LineId Id="4008" Count="0" />
+      <LineId Id="3752" Count="6" />
+      <LineId Id="4024" Count="0" />
+      <LineId Id="3760" Count="2" />
+      <LineId Id="4036" Count="1" />
+      <LineId Id="3763" Count="0" />
+      <LineId Id="3765" Count="1" />
+      <LineId Id="4035" Count="0" />
+      <LineId Id="4027" Count="0" />
+      <LineId Id="3767" Count="9" />
+      <LineId Id="4038" Count="0" />
+      <LineId Id="3777" Count="4" />
+      <LineId Id="4009" Count="0" />
+      <LineId Id="3782" Count="4" />
+      <LineId Id="4039" Count="1" />
+      <LineId Id="3787" Count="11" />
+      <LineId Id="4010" Count="0" />
+      <LineId Id="4041" Count="0" />
+      <LineId Id="3799" Count="10" />
+      <LineId Id="4044" Count="1" />
+      <LineId Id="3810" Count="1" />
+      <LineId Id="3813" Count="0" />
+      <LineId Id="4092" Count="0" />
+      <LineId Id="3814" Count="10" />
+      <LineId Id="4137" Count="0" />
+      <LineId Id="3825" Count="4" />
+      <LineId Id="4011" Count="0" />
+      <LineId Id="3830" Count="4" />
+      <LineId Id="4042" Count="1" />
+      <LineId Id="3835" Count="11" />
+      <LineId Id="4138" Count="0" />
+      <LineId Id="4012" Count="0" />
+      <LineId Id="3847" Count="10" />
+      <LineId Id="4046" Count="1" />
+      <LineId Id="3858" Count="3" />
+      <LineId Id="4091" Count="0" />
+      <LineId Id="3863" Count="10" />
+      <LineId Id="4139" Count="0" />
+      <LineId Id="4013" Count="0" />
+      <LineId Id="3874" Count="10" />
+      <LineId Id="4087" Count="1" />
+      <LineId Id="4095" Count="3" />
+      <LineId Id="4094" Count="0" />
+      <LineId Id="3885" Count="2" />
+      <LineId Id="4089" Count="1" />
+      <LineId Id="3888" Count="14" />
+      <LineId Id="19" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingStep.Get">
       <LineId Id="2" Count="0" />
@@ -1159,14 +1858,37 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CyclicLogic">
-      <LineId Id="3" Count="5" />
+      <LineId Id="3" Count="3" />
+      <LineId Id="20" Count="5" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="26" Count="2" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="7" Count="1" />
       <LineId Id="12" Count="4" />
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.DimensionCorrection.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.DimensionCorrection.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
-      <LineId Id="24" Count="8" />
-      <LineId Id="49" Count="0" />
-      <LineId Id="56" Count="0" />
+      <LineId Id="24" Count="6" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="106" Count="6" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="81" Count="5" />
+      <LineId Id="88" Count="4" />
+      <LineId Id="94" Count="4" />
+      <LineId Id="100" Count="1" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="66" Count="0" />
       <LineId Id="54" Count="0" />
       <LineId Id="38" Count="1" />
       <LineId Id="52" Count="0" />
@@ -1200,15 +1922,28 @@ END_CASE
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingX">
-      <LineId Id="888" Count="100" />
+      <LineId Id="888" Count="3" />
+      <LineId Id="995" Count="0" />
+      <LineId Id="997" Count="0" />
+      <LineId Id="892" Count="82" />
+      <LineId Id="993" Count="0" />
+      <LineId Id="975" Count="13" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingY">
-      <LineId Id="793" Count="100" />
+      <LineId Id="793" Count="3" />
+      <LineId Id="901" Count="0" />
+      <LineId Id="797" Count="82" />
+      <LineId Id="899" Count="0" />
+      <LineId Id="880" Count="13" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingZ">
-      <LineId Id="988" Count="100" />
+      <LineId Id="988" Count="3" />
+      <LineId Id="1097" Count="0" />
+      <LineId Id="992" Count="82" />
+      <LineId Id="1093" Count="0" />
+      <LineId Id="1075" Count="13" />
       <LineId Id="314" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
@@ -1220,6 +1955,34 @@ END_CASE
       <LineId Id="51" Count="7" />
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelFrontLength.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelFrontLength.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelFrontWidht.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelFrontWidht.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelHeight.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.PanelHeight.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RailHeightCorrection.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RailHeightCorrection.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.ResetSafety">
       <LineId Id="258" Count="62" />
       <LineId Id="111" Count="0" />
@@ -1228,6 +1991,11 @@ END_CASE
       <LineId Id="82" Count="5" />
       <LineId Id="89" Count="0" />
       <LineId Id="91" Count="0" />
+      <LineId Id="434" Count="1" />
+      <LineId Id="433" Count="0" />
+      <LineId Id="437" Count="7" />
+      <LineId Id="436" Count="0" />
+      <LineId Id="445" Count="1" />
       <LineId Id="115" Count="0" />
       <LineId Id="226" Count="0" />
       <LineId Id="229" Count="0" />
@@ -1252,8 +2020,37 @@ END_CASE
       <LineId Id="186" Count="0" />
       <LineId Id="183" Count="0" />
       <LineId Id="125" Count="0" />
-      <LineId Id="94" Count="9" />
+      <LineId Id="94" Count="5" />
+      <LineId Id="337" Count="0" />
+      <LineId Id="365" Count="0" />
+      <LineId Id="461" Count="32" />
+      <LineId Id="366" Count="1" />
+      <LineId Id="364" Count="0" />
+      <LineId Id="335" Count="0" />
+      <LineId Id="377" Count="5" />
+      <LineId Id="416" Count="1" />
+      <LineId Id="386" Count="0" />
+      <LineId Id="418" Count="3" />
+      <LineId Id="387" Count="1" />
+      <LineId Id="422" Count="0" />
+      <LineId Id="425" Count="6" />
+      <LineId Id="397" Count="0" />
+      <LineId Id="423" Count="1" />
+      <LineId Id="398" Count="0" />
+      <LineId Id="411" Count="0" />
+      <LineId Id="432" Count="0" />
+      <LineId Id="412" Count="3" />
+      <LineId Id="374" Count="1" />
+      <LineId Id="256" Count="1" />
+      <LineId Id="101" Count="2" />
       <LineId Id="27" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ToolOverpass.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ToolOverpass.Set">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
