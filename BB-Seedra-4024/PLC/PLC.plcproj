@@ -70,6 +70,12 @@
     <Compile Include="POUs\SAFETY.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Segments\ST_CutSegment.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Segments\ST_PointXY.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SafetyTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
@@ -120,6 +126,7 @@
     <Folder Include="DUTs" />
     <Folder Include="GVLs" />
     <Folder Include="POUs\Components" />
+    <Folder Include="POUs\Segments" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
     <Folder Include="VISUs\Modes" />
