@@ -19,6 +19,9 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DUTs\E_RecipeID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\MoveState_t.TcDUT">
       <SubType>Code</SubType>
     </Compile>

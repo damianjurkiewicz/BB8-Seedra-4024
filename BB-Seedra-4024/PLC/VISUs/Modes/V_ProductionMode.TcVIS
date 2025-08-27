@@ -1678,8 +1678,7 @@
                   <v>OnMouseClick</v>
                   <a cet="STSnippetInputAction">
                     <o>
-                      <v n="STSnippet">"GVL_HMI.ProgramToCut := 0;
-"</v>
+                      <v n="STSnippet">"_ProgramIdRequested := E_RecipeID.eBorgoFlaps"</v>
                     </o>
                   </a>
                 </d>
@@ -1853,8 +1852,7 @@
                   <v>OnMouseClick</v>
                   <a cet="STSnippetInputAction">
                     <o>
-                      <v n="STSnippet">"GVL_HMI.ProgramToCut := 1;
-"</v>
+                      <v n="STSnippet">"_ProgramIdRequested := E_RecipeID.eBorgoWings"</v>
                     </o>
                   </a>
                 </d>
@@ -2157,7 +2155,7 @@
                   <v>OnMouseClick</v>
                   <a cet="STSnippetInputAction">
                     <o>
-                      <v n="STSnippet">"GVL_HMI.ProgramToCut := 2;
+                      <v n="STSnippet">"_ProgramIdRequested := E_RecipeID.eArona
 "</v>
                     </o>
                   </a>

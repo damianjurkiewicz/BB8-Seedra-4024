@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <DUT Name="E_RecipeID" Id="{83f6e929-f490-4200-8a96-c165cec45b3f}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_RecipeId :
+(
+    eBorgoFlaps := 0,
+    eBorgoWings := 1,
+    eArona      := 2,
+    eUnknown    := 999
+) := eUnknown;
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

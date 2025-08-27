@@ -30,7 +30,7 @@ VAR
     _CuttingStep :			INT := 0;
 	_CuttingStepProgress :	REAL := 1.0;
 	_LastCuttingStep 	:	INT := 1;
-	
+	 _ProgramIdRequested :  E_RecipeID;
 	_CurrentSpeed: 			LREAL;
 	
 	//Segments
@@ -143,6 +143,66 @@ END_CASE
 	END_CASE
 
 ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="BuildSegments_Arona" Id="{e84aaa35-d3d2-459f-b6b9-b01f1c51048b}" FolderPath="MyMethods\Segments\">
+      <Declaration><![CDATA[METHOD BuildSegments_Arona : BOOL
+VAR_INST
+    Ax,Ay,Bx,Byy,Cx,Cy,Dx,Dy,Ex,Ey,Fx,Fy,Gx,Gy,Hx,Hy : REAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Ax := PanelFrontWidht + PanelHeight;    
+Ay := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
+Bx := PanelFrontWidht + PanelHeight;    Byy := 0 - _ToolOverpass;
+Cx := PanelHeight;                       Cy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
+Dx := PanelHeight;                       Dy := 0 - _ToolOverpass;
+Ex := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;  Ey := PanelHeight - _ToolOverpass;
+Fx := 0 - _ToolOverpass;                 Fy := PanelHeight - _RailHeightCorrection;
+Gx := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;  Gy := PanelHeight + PanelFrontLength - _RailHeightCorrection;
+Hx := 0 - _ToolOverpass;                 Hy := PanelHeight + PanelFrontLength - _RailHeightCorrection;
+
+// 2) Zbuduj listę odcinków „start→stop” (A→B, C→D, E→F, G→H):
+nSeg := 4;
+
+aSeg[1].Start.X := Ax; aSeg[1].Start.Y := Ay;  aSeg[1].Stop.X := Bx; aSeg[1].Stop.Y := Byy;
+aSeg[2].Start.X := Cx; aSeg[2].Start.Y := Cy;  aSeg[2].Stop.X := Dx; aSeg[2].Stop.Y := Dy;
+aSeg[3].Start.X := Ex; aSeg[3].Start.Y := Ey;  aSeg[3].Stop.X := Fx; aSeg[3].Stop.Y := Fy;
+aSeg[4].Start.X := Gx; aSeg[4].Start.Y := Gy;  aSeg[4].Stop.X := Hx; aSeg[4].Stop.Y := Hy;
+
+IF Ax > 0 THEN
+	BuildSegments_BorgoWings := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="BuildSegments_BorgoFlaps" Id="{30aff943-63a2-49df-9f71-8b8f78deda49}" FolderPath="MyMethods\Segments\">
+      <Declaration><![CDATA[METHOD BuildSegments_BorgoFlaps : BOOL
+VAR_INST
+    Ax,Ay,Bx,Byy,Cx,Cy,Dx,Dy,Ex,Ey,Fx,Fy,Gx,Gy,Hx,Hy : REAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Ax := PanelFrontWidht + PanelHeight;    
+Ay := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
+Bx := PanelFrontWidht + PanelHeight;    Byy := 0 - _ToolOverpass;
+Cx := PanelHeight;                       Cy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
+Dx := PanelHeight;                       Dy := 0 - _ToolOverpass;
+Ex := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;  Ey := PanelHeight - _ToolOverpass;
+Fx := 0 - _ToolOverpass;                 Fy := PanelHeight - _RailHeightCorrection;
+Gx := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;  Gy := PanelHeight + PanelFrontLength - _RailHeightCorrection;
+Hx := 0 - _ToolOverpass;                 Hy := PanelHeight + PanelFrontLength - _RailHeightCorrection;
+
+// 2) Zbuduj listę odcinków „start→stop” (A→B, C→D, E→F, G→H):
+nSeg := 4;
+
+aSeg[1].Start.X := Ax; aSeg[1].Start.Y := Ay;  aSeg[1].Stop.X := Bx; aSeg[1].Stop.Y := Byy;
+aSeg[2].Start.X := Cx; aSeg[2].Start.Y := Cy;  aSeg[2].Stop.X := Dx; aSeg[2].Stop.Y := Dy;
+aSeg[3].Start.X := Ex; aSeg[3].Start.Y := Ey;  aSeg[3].Stop.X := Fx; aSeg[3].Stop.Y := Fy;
+aSeg[4].Start.X := Gx; aSeg[4].Start.Y := Gy;  aSeg[4].Stop.X := Hx; aSeg[4].Stop.Y := Hy;
+
+IF Ax > 0 THEN
+	BuildSegments_BorgoWings := TRUE;
+END_IF]]></ST>
       </Implementation>
     </Method>
     <Method Name="BuildSegments_BorgoWings" Id="{0600b631-5666-4473-9115-8ec263b291bb}" FolderPath="MyMethods\Segments\">
@@ -284,68 +344,6 @@ F_CreateAllEventsInClass(Alarms     := GantryAlarms,
 
 // Super call to base
 SUPER^.CreateEvents();]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="CutArona" Id="{4a6c8d9d-4b5c-46da-8179-e7275fa91b7f}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD CutArona : BOOL
-(*
-	E			G
-	|			|
-D---+-----------+---C
-	|			|
-	|			| 
-B---+-----------+---A
-	|			|
-	F			H
-*)
-VAR  
-	Point0x 		: REAL := 0;
-	Point0y 		: REAL := 0;
-	Point0z 		: REAL := 0;
-	PointAx 		: REAL := 300;
-	PointAy 		: REAL := 50;
-	PointBx 		: REAL := 0;
-    PointBy 		: REAL := 50;
-	PointCx 		: REAL := 300;
-	PointCy 		: REAL := 350;
-	PointDx 		: REAL := 0;
-	PointDy 		: REAL := 350;
-	PointEx 		: REAL := 50;
-	PointEy 		: REAL := 400;
-	PointFx 		: REAL := 50;
-	PointFy 		: REAL := 0;
-	PointGx 		: REAL := 250;
-	PointGy 		: REAL := 400;
-	PointHx 		: REAL := 250;
-	PointHy 		: REAL := 0;
-END_VAR
-
-VAR_INST
-		Timer			:TON;
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE _CuttingStep OF
-    0: // Enable osi
-        _LastCuttingStep := 350;
-        _CuttingStep := 5;
-      
-
-    5: // Zbuduj odcinki dla tego programu
-        BuildSegments_BorgoWings();
-        _CuttingStep := 10;
-
-    10: // Jedź ogólnym wykonawcą
-        IF ExecuteSegments() THEN
-            // (opcjonalnie) mały odjazd końcowy
-            _CuttingStep := 20;
-        END_IF
-
-    20:
-        IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
-            CutArona := TRUE;
-        END_IF
-END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="CutBorgoFlaps" Id="{391386b3-3ac4-4fc7-a2a1-1d79f5676796}" FolderPath="MyMethods\">
@@ -768,6 +766,88 @@ END_CASE
 ]]></ST>
       </Implementation>
     </Method>
+    <Method Name="CutOrchestrator" Id="{4a6c8d9d-4b5c-46da-8179-e7275fa91b7f}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD CutOrchestrator : BOOL
+(*
+	E			G
+	|			|
+D---+-----------+---C
+	|			|
+	|			| 
+B---+-----------+---A
+	|			|
+	F			H
+*)
+VAR  
+	Point0x 		: REAL := 0;
+	Point0y 		: REAL := 0;
+	Point0z 		: REAL := 0;
+	PointAx 		: REAL := 300;
+	PointAy 		: REAL := 50;
+	PointBx 		: REAL := 0;
+    PointBy 		: REAL := 50;
+	PointCx 		: REAL := 300;
+	PointCy 		: REAL := 350;
+	PointDx 		: REAL := 0;
+	PointDy 		: REAL := 350;
+	PointEx 		: REAL := 50;
+	PointEy 		: REAL := 400;
+	PointFx 		: REAL := 50;
+	PointFy 		: REAL := 0;
+	PointGx 		: REAL := 250;
+	PointGy 		: REAL := 400;
+	PointHx 		: REAL := 250;
+	PointHy 		: REAL := 0;
+END_VAR
+
+VAR_INST
+		Timer			:TON;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CuttingStep OF
+    0: // Enable osi
+        _LastCuttingStep := 350;
+        _CuttingStep := 5;
+      
+
+    5: // Zbuduj odcinki dla tego programu
+				CASE _ProgramIdRequested OF
+					
+					E_RecipeID.eBorgoFlaps:
+					IF BuildSegments_BorgoFlaps() THEN
+						SequenceState := SequenceState + 10;
+					END_IF
+					
+					E_RecipeID.eBorgoWings:
+					IF BuildSegments_BorgoWings() THEN
+						SequenceState := SequenceState + 10;
+					END_IF
+					
+					E_RecipeID.eArona:
+					IF BuildSegments_Arona() THEN
+						SequenceState := SequenceState + 10;
+					END_IF
+					
+				END_CASE        
+
+
+
+        _CuttingStep := 10;
+
+    10: // Jedź ogólnym wykonawcą
+        IF ExecuteSegments() THEN
+            // (opcjonalnie) mały odjazd końcowy
+            _CuttingStep := 20;
+        END_IF
+
+    20:
+        IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
+            CutOrchestrator := TRUE;
+        END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="CuttingHeightZ" Id="{4c86fbb5-f7fe-4ab0-abb5-4601fd04a1c4}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC CuttingHeightZ : REAL]]></Declaration>
       <Get Name="Get" Id="{a83b65c4-5ea3-488c-967b-3ee17e2e67f9}">
@@ -882,25 +962,30 @@ END_IF]]></ST>
 				SequenceState := SequenceState + 5;
 			10:
 					
-				CASE GVL_HMI.ProgramToCut OF
+				IF CutOrchestrator() THEN
+					SequenceState := SequenceState + 10;
+				END_IF
+				
+			
+			
+//				CASE GVL_HMI.ProgramToCut OF
 					
-
-					0:
-					IF CutBorgoFlaps() THEN
-						SequenceState := SequenceState + 10;
-					END_IF
+//					0:
+//					IF CutBorgoFlaps() THEN
+//						SequenceState := SequenceState + 10;
+//					END_IF
 					
-					1:
-					IF CutBorgoWings() THEN
-						SequenceState := SequenceState + 10;
-					END_IF
+//					1:
+//					IF CutBorgoWings() THEN
+//						SequenceState := SequenceState + 10;
+//					END_IF
 					
-					2:
-					IF CutArona() THEN
-						SequenceState := SequenceState + 10;
-					END_IF
+//					2:
+//					IF CutOrchestrator() THEN
+//						SequenceState := SequenceState + 10;
+//					END_IF
 					
-				END_CASE
+//				END_CASE
 			
 								
 			20:		
@@ -1566,6 +1651,25 @@ END_IF]]></ST>
         </Implementation>
       </Set>
     </Property>
+    <Property Name="ProgramIdRequested" Id="{3b163a54-6fcd-4be2-bb98-ad529d342348}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY ProgramIdRequested : E_RecipeID]]></Declaration>
+      <Get Name="Get" Id="{21210547-61ea-4bd8-a78a-96552b4742ab}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ProgramIdRequested := _ProgramIdRequested;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{2bb8002c-0857-45bb-b53e-f611a5c233b9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ _ProgramIdRequested := ProgramIdRequested;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="RailHeightCorrection" Id="{465e1c57-83b8-4b2a-a3fe-16819241fd4f}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC RailHeightCorrection : REAL]]></Declaration>
       <Get Name="Get" Id="{8547e8a4-2368-4b1c-bac1-a9f1330a50a7}">
@@ -1878,6 +1982,20 @@ END_IF]]></ST>
       <LineId Id="119" Count="0" />
       <LineId Id="29" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.BuildSegments_Arona">
+      <LineId Id="8" Count="15" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="26" Count="1" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoFlaps">
+      <LineId Id="8" Count="15" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="26" Count="1" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoWings">
       <LineId Id="8" Count="15" />
       <LineId Id="5" Count="0" />
@@ -1922,12 +2040,6 @@ END_IF]]></ST>
     <LineIds Name="FB_GantryXYZ.CreateEvents">
       <LineId Id="3" Count="6" />
       <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutArona">
-      <LineId Id="2609" Count="2" />
-      <LineId Id="2613" Count="9" />
-      <LineId Id="2625" Count="6" />
-      <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CutBorgoFlaps">
       <LineId Id="3131" Count="8" />
@@ -2019,6 +2131,16 @@ END_IF]]></ST>
       <LineId Id="3888" Count="14" />
       <LineId Id="19" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutOrchestrator">
+      <LineId Id="2704" Count="6" />
+      <LineId Id="2727" Count="1" />
+      <LineId Id="2730" Count="14" />
+      <LineId Id="2711" Count="0" />
+      <LineId Id="2725" Count="1" />
+      <LineId Id="2724" Count="0" />
+      <LineId Id="2712" Count="11" />
+      <LineId Id="19" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -2059,7 +2181,10 @@ END_IF]]></ST>
       <LineId Id="113" Count="0" />
       <LineId Id="105" Count="0" />
       <LineId Id="79" Count="0" />
-      <LineId Id="81" Count="5" />
+      <LineId Id="119" Count="1" />
+      <LineId Id="115" Count="3" />
+      <LineId Id="81" Count="1" />
+      <LineId Id="84" Count="2" />
       <LineId Id="88" Count="4" />
       <LineId Id="94" Count="4" />
       <LineId Id="100" Count="1" />
@@ -2177,6 +2302,12 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.PanelHeight.Set">
       <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RailHeightCorrection.Get">
