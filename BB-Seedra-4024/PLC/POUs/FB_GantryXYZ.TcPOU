@@ -38,8 +38,12 @@ VAR
     nSeg      : INT;          // Ile odcinków
     iSeg      : INT;          // Indeks aktualnego odcinka
     subStep   : INT := 0;          // Podkroki wykonania jednego odcinka
-   
-
+    
+	//Segments Cut
+	aSegCut      : ARRAY[1..32] OF ST_CutSegment;
+    nSegCut      : INT;          // Ile odcinków
+    iSegCut      : INT;          // Indeks aktualnego odcinka
+	subStepCut   : INT := 0;     // Podkroki wykonania jednego odcinka
 	
 END_VAR
 
@@ -171,7 +175,7 @@ aSeg[3].Start.X := Ex; aSeg[3].Start.Y := Ey;  aSeg[3].Stop.X := Fx; aSeg[3].Sto
 aSeg[4].Start.X := Gx; aSeg[4].Start.Y := Gy;  aSeg[4].Stop.X := Hx; aSeg[4].Stop.Y := Hy;
 
 IF Ax > 0 THEN
-	BuildSegments_BorgoWings := TRUE;
+	BuildSegments_Arona := TRUE;
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -201,7 +205,7 @@ aSeg[3].Start.X := Ex; aSeg[3].Start.Y := Ey;  aSeg[3].Stop.X := Fx; aSeg[3].Sto
 aSeg[4].Start.X := Gx; aSeg[4].Start.Y := Gy;  aSeg[4].Stop.X := Hx; aSeg[4].Stop.Y := Hy;
 
 IF Ax > 0 THEN
-	BuildSegments_BorgoWings := TRUE;
+	BuildSegments_BorgoFlaps := TRUE;
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -209,10 +213,13 @@ END_IF]]></ST>
       <Declaration><![CDATA[METHOD BuildSegments_BorgoWings : BOOL
 VAR_INST
     Ax,Ay,Bx,Byy,Cx,Cy,Dx,Dy,Ex,Ey,Fx,Fy,Gx,Gy,Hx,Hy : REAL;
+	CutAx,CutAy,CutBx,CutByy,CutCx,CutCy,CutDx,CutDy,CutEx,CutEy,CutFx,CutFy,CutGx,CutGy,CutHx,CutHy : REAL;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[Ax := PanelFrontWidht + PanelHeight;    
+        <ST><![CDATA[
+//Points to Mill
+Ax := PanelFrontWidht + PanelHeight;    
 Ay := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
 Bx := PanelFrontWidht + PanelHeight;    Byy := 0 - _ToolOverpass;
 Cx := PanelHeight;                       Cy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
@@ -230,7 +237,21 @@ aSeg[2].Start.X := Cx; aSeg[2].Start.Y := Cy;  aSeg[2].Stop.X := Dx; aSeg[2].Sto
 aSeg[3].Start.X := Ex; aSeg[3].Start.Y := Ey;  aSeg[3].Stop.X := Fx; aSeg[3].Stop.Y := Fy;
 aSeg[4].Start.X := Gx; aSeg[4].Start.Y := Gy;  aSeg[4].Stop.X := Hx; aSeg[4].Stop.Y := Hy;
 
+//Points to Cut Y
+
+CutAx := 0;   								CutAy := PanelFrontLength + 2 * PanelHeight - 2 * RailHeightCorrection; 
+CutBx := 0; 								CutByy := 0;
+CutCx := PanelFrontWidht + 2 * PanelHeight; CutCy := PanelFrontLength + 2 * PanelHeight - 2 * RailHeightCorrection; 
+CutDx := PanelFrontWidht + 2 * PanelHeight; CutDy := 0 ;
+
+nSegCut := 2;
+
+aSegCut[1].Start.X := CutAx; aSegCut[1].Start.Y := CutAy;  aSegCut[1].Stop.X := CutBx; aSegCut[1].Stop.Y := CutByy;
+aSegCut[2].Start.X := CutCx; aSegCut[2].Start.Y := CutCy;  aSegCut[2].Stop.X := CutDx; aSegCut[2].Stop.Y := CutDy;
+
+
 IF Ax > 0 THEN
+	Trace('SegmentyZbuildowane?');
 	BuildSegments_BorgoWings := TRUE;
 END_IF]]></ST>
       </Implementation>
@@ -816,17 +837,18 @@ END_VAR
 					
 					E_RecipeID.eBorgoFlaps:
 					IF BuildSegments_BorgoFlaps() THEN
-						SequenceState := SequenceState + 10;
+						_CuttingStep := _CuttingStep + 10;
 					END_IF
 					
 					E_RecipeID.eBorgoWings:
+					Trace('Czy wybralem program BorgoWings??');
 					IF BuildSegments_BorgoWings() THEN
-						SequenceState := SequenceState + 10;
+						_CuttingStep := _CuttingStep + 10;
 					END_IF
 					
 					E_RecipeID.eArona:
 					IF BuildSegments_Arona() THEN
-						SequenceState := SequenceState + 10;
+						_CuttingStep := _CuttingStep + 10;
 					END_IF
 					
 				END_CASE        
@@ -836,12 +858,18 @@ END_VAR
         _CuttingStep := 10;
 
     10: // Jedź ogólnym wykonawcą
-        IF ExecuteSegments() THEN
+        //IF ExecuteSegmentsMill() THEN
             // (opcjonalnie) mały odjazd końcowy
             _CuttingStep := 20;
+        //END_IF
+		
+	20: 
+	 	IF ExecuteSegmentsCutY() THEN
+            // (opcjonalnie) mały odjazd końcowy
+            _CuttingStep := 30;
         END_IF
 
-    20:
+    30:
         IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
             CutOrchestrator := TRUE;
         END_IF
@@ -999,8 +1027,8 @@ END_IF]]></ST>
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Method Name="ExecuteSegments" Id="{3ee66abc-6845-49e5-b2ff-149134d7252b}" FolderPath="MyMethods\Segments\">
-      <Declaration><![CDATA[METHOD ExecuteSegments : BOOL
+    <Method Name="ExecuteSegmentsCutY" Id="{dc7ba1fd-c66f-4871-a334-3c135aa8a2cb}" FolderPath="MyMethods\Segments\">
+      <Declaration><![CDATA[METHOD ExecuteSegmentsCutY : BOOL
 VAR
     safeZ : REAL := 0.0; // Twój Point0z
 END_VAR
@@ -1009,19 +1037,134 @@ VAR_INST
 	tonDwell			:TON;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-CASE subStep OF
+        <ST><![CDATA[CASE subStepCut OF
 
 // -------- Inicjalizacja pierwszego segmentu --------
 0:
 IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
-			 Trace('CutAronaEnabled');
+			 Trace('SegmentExecutionY');
+			 
+			 
+    IF nSegCut <= 0 THEN
+        // Nie ma czego ciąć
+        IO.SpindleEnable := FALSE;
+        ExecuteSegmentsCutY := TRUE;
+        RETURN;
+    END_IF;
+
+    // Jednorazowe nastawy:
+    AxisX.Acceleration := 500;   AxisX.Deceleration := 8000;
+    AxisY.Acceleration := 500;   AxisY.Deceleration := 8000;
+    AxisZ.Acceleration := 500;   AxisZ.Deceleration := 8000;
+
+    AxisX.Velocity := _RapidSpeedX;
+    AxisY.Velocity := _RapidSpeedY;
+    AxisZ.Velocity := _RapidSpeedZ;
+
+    IO.SpindleEnable := FALSE;
+    IO.CoolingEnable := FALSE;
+
+    iSegCut := 1;
+	
+	IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
+		subStepCut := 10;
+	END_IF	 
+   
+END_IF
+
+10:
+    AxisX.MoveAbsolute(aSegCut[iSegCut].Start.X, 0);
+    AxisY.MoveAbsolute(aSegCut[iSegCut].Start.Y, 0);
+    subStepCut := 20;
+
+20: // czekamy na pozycję XY
+    IF AxisX.InPosition AND AxisY.InPosition THEN
+        subStepCut := 30;
+    END_IF
+
+// -------- Zanurzenie Z do wysokości cięcia --------
+30:
+    IO.PistonValceCutX := TRUE;
+    subStepCut := 40;
+
+40: 
+    IF IO.PistonValceCutX THEN
+	AxisX.Velocity := _CuttingSpeedX;
+	AxisY.Velocity := _CuttingSpeedY;
+	subStepCut := 50;
+    END_IF
+
+	
+		
+	
+50: // dwell
+
+	tonDwell(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
+
+    IF tonDwell.Q THEN
+        tonDwell(IN := FALSE);
+        subStepCut := 60;
+    END_IF
+	
+
+// -------- Cięcie XY do końca odcinka --------
+60:
+    AxisX.MoveAbsolute(aSegCut[iSegCut].Stop.X, 0);
+    AxisY.MoveAbsolute(aSegCut[iSegCut].Stop.Y, 0);
+    subStepCut := 70;
+
+70: // czekamy na koniec cięcia
+    IF AxisX.InPosition AND AxisY.InPosition THEN
+        subStepCut := 80;
+    END_IF
+
+// -------- Retrakt Z i przygotowanie następnego --------
+80:
+    IO.PistonValceCutX := FALSE;
+    subStepCut := 90;
+
+90:
+    IF AxisZ.InPosition THEN
+        AxisX.Velocity := _RapidSpeedX;
+        AxisY.Velocity := _RapidSpeedY;
+
+        iSegCut := iSegCut + 1;
+        IF iSegCut > nSegCut THEN
+            IO.SpindleEnable := FALSE;
+            subStepCut := 1000; // koniec
+        ELSE
+            subStepCut := 10;   // następny odcinek
+        END_IF
+    END_IF
+
+// -------- Zakończenie --------
+1000:
+    ExecuteSegmentsCutY := TRUE;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecuteSegmentsMill" Id="{3ee66abc-6845-49e5-b2ff-149134d7252b}" FolderPath="MyMethods\Segments\">
+      <Declaration><![CDATA[METHOD ExecuteSegmentsMill : BOOL
+VAR
+    safeZ : REAL := 0.0; // Twój Point0z
+END_VAR
+
+VAR_INST
+	tonDwell			:TON;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE subStep OF
+
+// -------- Inicjalizacja pierwszego segmentu --------
+0:
+IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
+			 Trace('MillSegmentsEexecution');
 			 
 			 
     IF nSeg <= 0 THEN
         // Nie ma czego ciąć
         IO.SpindleEnable := FALSE;
-        ExecuteSegments := TRUE;
+        ExecuteSegmentsMill := TRUE;
         RETURN;
     END_IF;
 
@@ -1118,7 +1261,7 @@ END_IF
 
 // -------- Zakończenie --------
 1000:
-    ExecuteSegments := TRUE;
+    ExecuteSegmentsMill := TRUE;
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -1997,10 +2140,24 @@ END_IF]]></ST>
       <LineId Id="26" Count="1" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoWings">
+      <LineId Id="45" Count="0" />
+      <LineId Id="44" Count="0" />
       <LineId Id="8" Count="15" />
       <LineId Id="5" Count="0" />
+      <LineId Id="46" Count="1" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="42" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="39" Count="1" />
+      <LineId Id="34" Count="0" />
       <LineId Id="25" Count="0" />
       <LineId Id="24" Count="0" />
+      <LineId Id="53" Count="0" />
       <LineId Id="26" Count="1" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
@@ -2134,11 +2291,17 @@ END_IF]]></ST>
     <LineIds Name="FB_GantryXYZ.CutOrchestrator">
       <LineId Id="2704" Count="6" />
       <LineId Id="2727" Count="1" />
-      <LineId Id="2730" Count="14" />
+      <LineId Id="2730" Count="5" />
+      <LineId Id="2823" Count="0" />
+      <LineId Id="2736" Count="8" />
       <LineId Id="2711" Count="0" />
       <LineId Id="2725" Count="1" />
       <LineId Id="2724" Count="0" />
-      <LineId Id="2712" Count="11" />
+      <LineId Id="2712" Count="6" />
+      <LineId Id="2781" Count="1" />
+      <LineId Id="2784" Count="2" />
+      <LineId Id="2783" Count="0" />
+      <LineId Id="2719" Count="4" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Get">
@@ -2197,31 +2360,12 @@ END_IF]]></ST>
       <LineId Id="42" Count="3" />
       <LineId Id="23" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.ExecuteSegments">
-      <LineId Id="8" Count="1" />
-      <LineId Id="111" Count="0" />
-      <LineId Id="10" Count="0" />
-      <LineId Id="112" Count="0" />
-      <LineId Id="114" Count="1" />
-      <LineId Id="117" Count="1" />
-      <LineId Id="130" Count="19" />
-      <LineId Id="159" Count="0" />
-      <LineId Id="157" Count="1" />
-      <LineId Id="120" Count="0" />
-      <LineId Id="116" Count="0" />
-      <LineId Id="113" Count="0" />
-      <LineId Id="150" Count="0" />
-      <LineId Id="185" Count="24" />
-      <LineId Id="258" Count="0" />
-      <LineId Id="210" Count="0" />
-      <LineId Id="261" Count="0" />
-      <LineId Id="260" Count="0" />
-      <LineId Id="211" Count="0" />
-      <LineId Id="268" Count="1" />
-      <LineId Id="267" Count="0" />
-      <LineId Id="212" Count="3" />
-      <LineId Id="253" Count="0" />
-      <LineId Id="216" Count="35" />
+    <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutY">
+      <LineId Id="284" Count="102" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ExecuteSegmentsMill">
+      <LineId Id="284" Count="108" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HMIPermissions">

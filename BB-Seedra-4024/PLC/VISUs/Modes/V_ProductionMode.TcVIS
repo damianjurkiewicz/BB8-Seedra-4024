@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"19"</v>
+          <v n="UniqueIdGenerator">"20"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -1128,7 +1128,7 @@
                     </o>
                     <o>
                       <v n="Id">1311860368L</v>
-                      <v n="Value">"GVL_HMI.ProgramToCut"</v>
+                      <v n="Value">"MAIN.Seedra.GantryXYZ._ProgramIdRequested"</v>
                     </o>
                     <o>
                       <v n="Id">1013868361L</v>
@@ -1589,7 +1589,7 @@
                     </o>
                     <o>
                       <v n="Id">1999528970L</v>
-                      <v n="Value">"GVL_HMI.ProgramToCut=0"</v>
+                      <v n="Value">"MAIN.Seedra.GantryXYZ._ProgramIdRequested = E_RecipeID.eBorgoFlaps"</v>
                     </o>
                     <o>
                       <v n="Id">3719097617L</v>
@@ -1678,7 +1678,7 @@
                   <v>OnMouseClick</v>
                   <a cet="STSnippetInputAction">
                     <o>
-                      <v n="STSnippet">"_ProgramIdRequested := E_RecipeID.eBorgoFlaps"</v>
+                      <v n="STSnippet">"MAIN.Seedra.GantryXYZ._ProgramIdRequested := E_RecipeID.eBorgoFlaps;"</v>
                     </o>
                   </a>
                 </d>
@@ -1763,7 +1763,7 @@
                     </o>
                     <o>
                       <v n="Id">1999528970L</v>
-                      <v n="Value">"GVL_HMI.ProgramToCut=1"</v>
+                      <v n="Value">"MAIN.Seedra.GantryXYZ._ProgramIdRequested = E_RecipeID.eBorgoWings"</v>
                     </o>
                     <o>
                       <v n="Id">3719097617L</v>
@@ -1852,7 +1852,7 @@
                   <v>OnMouseClick</v>
                   <a cet="STSnippetInputAction">
                     <o>
-                      <v n="STSnippet">"_ProgramIdRequested := E_RecipeID.eBorgoWings"</v>
+                      <v n="STSnippet">"MAIN.Seedra.GantryXYZ._ProgramIdRequested := E_RecipeID.eBorgoWings;"</v>
                     </o>
                   </a>
                 </d>
@@ -2066,7 +2066,7 @@
                     </o>
                     <o>
                       <v n="Id">1999528970L</v>
-                      <v n="Value">"GVL_HMI.ProgramToCut=2"</v>
+                      <v n="Value">"MAIN.Seedra.GantryXYZ._ProgramIdRequested = E_RecipeID.eArona"</v>
                     </o>
                     <o>
                       <v n="Id">3719097617L</v>
@@ -2155,7 +2155,7 @@
                   <v>OnMouseClick</v>
                   <a cet="STSnippetInputAction">
                     <o>
-                      <v n="STSnippet">"_ProgramIdRequested := E_RecipeID.eArona
+                      <v n="STSnippet">"MAIN.Seedra.GantryXYZ._ProgramIdRequested := E_RecipeID.eArona;
 "</v>
                     </o>
                   </a>
