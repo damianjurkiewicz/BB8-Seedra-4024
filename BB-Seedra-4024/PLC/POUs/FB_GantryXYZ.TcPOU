@@ -40,7 +40,7 @@ VAR
     subStep   : INT := 0;          // Podkroki wykonania jednego odcinka
     
 	//Segments Cut
-	aSegCut      : ARRAY[1..32] OF ST_CutSegment;
+	SegmentsToCutY      : ARRAY[1..32] OF ST_CutSegment;
     nSegCut      : INT;          // Ile odcinków
     iSegCut      : INT;          // Indeks aktualnego odcinka
 	subStepCut   : INT := 0;     // Podkroki wykonania jednego odcinka
@@ -212,48 +212,37 @@ END_IF]]></ST>
     <Method Name="BuildSegments_BorgoWings" Id="{0600b631-5666-4473-9115-8ec263b291bb}" FolderPath="MyMethods\Segments\">
       <Declaration><![CDATA[METHOD BuildSegments_BorgoWings : BOOL
 VAR_INST
-    Ax,Ay,Bx,Byy,Cx,Cy,Dx,Dy,Ex,Ey,Fx,Fy,Gx,Gy,Hx,Hy : REAL;
-	CutAx,CutAy,CutBx,CutByy,CutCx,CutCy,CutDx,CutDy,CutEx,CutEy,CutFx,CutFy,CutGx,CutGy,CutHx,CutHy : REAL;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-//Points to Mill
-Ax := PanelFrontWidht + PanelHeight;    
-Ay := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
-Bx := PanelFrontWidht + PanelHeight;    Byy := 0 - _ToolOverpass;
-Cx := PanelHeight;                       Cy := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;
-Dx := PanelHeight;                       Dy := 0 - _ToolOverpass;
-Ex := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;  Ey := PanelHeight - _ToolOverpass;
-Fx := 0 - _ToolOverpass;                 Fy := PanelHeight - _RailHeightCorrection;
-Gx := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;  Gy := PanelHeight + PanelFrontLength - _RailHeightCorrection;
-Hx := 0 - _ToolOverpass;                 Hy := PanelHeight + PanelFrontLength - _RailHeightCorrection;
-
-// 2) Zbuduj listę odcinków „start→stop” (A→B, C→D, E→F, G→H):
+        <ST><![CDATA[//  Start → Stop, Milling Segments
 nSeg := 4;
 
-aSeg[1].Start.X := Ax; aSeg[1].Start.Y := Ay;  aSeg[1].Stop.X := Bx; aSeg[1].Stop.Y := Byy;
-aSeg[2].Start.X := Cx; aSeg[2].Start.Y := Cy;  aSeg[2].Stop.X := Dx; aSeg[2].Stop.Y := Dy;
-aSeg[3].Start.X := Ex; aSeg[3].Start.Y := Ey;  aSeg[3].Stop.X := Fx; aSeg[3].Stop.Y := Fy;
-aSeg[4].Start.X := Gx; aSeg[4].Start.Y := Gy;  aSeg[4].Stop.X := Hx; aSeg[4].Stop.Y := Hy;
+aSeg[1].Start.X := PanelFrontWidht + PanelHeight;  ; aSeg[1].Start.Y := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass;;  
+aSeg[1].Stop.X := PanelFrontWidht + PanelHeight; aSeg[1].Stop.Y := 0 - _ToolOverpass;
+aSeg[2].Start.X := PanelHeight; aSeg[2].Start.Y := PanelFrontLength + 2*PanelHeight - 2*_RailHeightCorrection + _ToolOverpass; 
+aSeg[2].Stop.X :=  PanelHeight; ; aSeg[2].Stop.Y := 0 - _ToolOverpass;
+aSeg[3].Start.X := 2*PanelHeight + PanelFrontWidht + _ToolOverpass;; aSeg[3].Start.Y := PanelHeight - _ToolOverpass;; 
+aSeg[3].Stop.X := 0 - _ToolOverpass; aSeg[3].Stop.Y := PanelHeight - _RailHeightCorrection;
+aSeg[4].Start.X := 2*PanelHeight + PanelFrontWidht + _ToolOverpass; aSeg[4].Start.Y := PanelHeight + PanelFrontLength - _RailHeightCorrection;  
+aSeg[4].Stop.X := 0 - _ToolOverpass;   aSeg[4].Stop.Y := PanelHeight + PanelFrontLength - _RailHeightCorrection;
 
-//Points to Cut Y
-
-CutAx := 0;   CutAy := 500; 
-CutBx := 0;   CutByy := 0;
-CutCx := 500; CutCy := 500; 
-CutDx := 500; CutDy := 0 ;
-
+//  Start → Stop, CutY Segments
 nSegCut := 2;
 
-aSegCut[1].Start.X := CutAx; aSegCut[1].Start.Y := CutAy;  aSegCut[1].Stop.X := CutBx; aSegCut[1].Stop.Y := CutByy;
-aSegCut[2].Start.X := CutCx; aSegCut[2].Start.Y := CutCy;  aSegCut[2].Stop.X := CutDx; aSegCut[2].Stop.Y := CutDy;
+SegmentsToCutY[1].Start.X := 0; 
+SegmentsToCutY[1].Start.Y := 500;  
+SegmentsToCutY[1].Stop.X := 0; 
+SegmentsToCutY[1].Stop.Y := 0;
+SegmentsToCutY[2].Start.X := 500; 
+SegmentsToCutY[2].Start.Y := 500;  
+SegmentsToCutY[2].Stop.X := 500; 
+SegmentsToCutY[2].Stop.Y := 0;
 
 
-IF Ax > 0 THEN
-	Trace('SegmentyZbuildowane?');
-	BuildSegments_BorgoWings := TRUE;
-END_IF]]></ST>
+
+BuildSegments_BorgoWings := TRUE;
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
@@ -1070,8 +1059,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(aSegCut[iSegCut].Start.X, 0);
-    AxisY.MoveAbsolute(aSegCut[iSegCut].Start.Y, 0);
+    AxisX.MoveAbsolute(SegmentsToCutY[iSegCut].Start.X, 0);
+    AxisY.MoveAbsolute(SegmentsToCutY[iSegCut].Start.Y, 0);
     subStepCut := 20;
 
 20: // czekamy na pozycję XY
@@ -1111,8 +1100,8 @@ END_IF
 
 // -------- Cięcie XY do końca odcinka --------
 60:
-    AxisX.MoveAbsolute(aSegCut[iSegCut].Stop.X, 0);
-    AxisY.MoveAbsolute(aSegCut[iSegCut].Stop.Y, 0);
+    AxisX.MoveAbsolute(SegmentsToCutY[iSegCut].Stop.X, 0);
+    AxisY.MoveAbsolute(SegmentsToCutY[iSegCut].Stop.Y, 0);
     subStepCut := 70;
 
 70: // czekamy na koniec cięcia
@@ -2154,25 +2143,22 @@ END_IF]]></ST>
       <LineId Id="26" Count="1" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoWings">
-      <LineId Id="45" Count="0" />
-      <LineId Id="44" Count="0" />
-      <LineId Id="8" Count="15" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="46" Count="1" />
-      <LineId Id="50" Count="0" />
-      <LineId Id="49" Count="0" />
-      <LineId Id="51" Count="0" />
-      <LineId Id="48" Count="0" />
-      <LineId Id="42" Count="0" />
-      <LineId Id="52" Count="0" />
-      <LineId Id="43" Count="0" />
-      <LineId Id="35" Count="0" />
-      <LineId Id="39" Count="1" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="25" Count="0" />
-      <LineId Id="24" Count="0" />
-      <LineId Id="53" Count="0" />
-      <LineId Id="26" Count="1" />
+      <LineId Id="70" Count="3" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="95" Count="0" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="97" Count="0" />
+      <LineId Id="77" Count="1" />
+      <LineId Id="85" Count="2" />
+      <LineId Id="98" Count="2" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="101" Count="2" />
+      <LineId Id="89" Count="1" />
+      <LineId Id="92" Count="1" />
+      <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
       <LineId Id="28" Count="5" />
