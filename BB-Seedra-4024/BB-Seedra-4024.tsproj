@@ -1984,7 +1984,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{A5FC003F-DDB0-2EC7-675E-58BB5E9A4001}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{8842750E-8428-39FB-E143-588D5C748C7C}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2065,10 +2065,6 @@ External Setpoint Generation:
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>IO.PistonValceCutX</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
@@ -2134,6 +2130,10 @@ External Setpoint Generation:
 						<Name>SafetyTask Outputs</Name>
 						<Var>
 							<Name>GVL_Safety.SafetyPermissionQ</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.PistonValceCutX</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -6176,9 +6176,9 @@ Bit 8 - 15 : reserved]]></Comment>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 4 (EL2008)">
 				<Link VarA="PlcTask Outputs^IO.CoolingEnable" VarB="Channel 4^Output"/>
-				<Link VarA="PlcTask Outputs^IO.PistonValceCutX" VarB="Channel 6^Output"/>
 				<Link VarA="PlcTask Outputs^IO.PistonValveCutY" VarB="Channel 5^Output"/>
 				<Link VarA="PlcTask Outputs^IO.SpindleEnable" VarB="Channel 3^Output"/>
+				<Link VarA="SafetyTask Outputs^IO.PistonValceCutX" VarB="Channel 6^Output"/>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 8 (EL6900)">
 				<Link VarA="PlcTask Inputs^GVL_Safety.ComError" VarB="StandardInputs^TwinSafeGroup1.GVL_Safety.ComError_8"/>
