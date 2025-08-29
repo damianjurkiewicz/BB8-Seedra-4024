@@ -27,7 +27,7 @@ VAR
     _HomingStepX :			INT;
     _HomingStepY :			INT;
     _HomingStepZ :			INT;
-    _SequenceStep :			INT := 0;
+
 	_ProgramIdRequested :   E_RecipeID;
 	_CurrentSpeed: 			LREAL;
 	
@@ -42,6 +42,9 @@ VAR
     SegmentsToCutY       : INT;          // Ile odcinków
     iSegmentsToCutY      : INT;          // Indeks aktualnego odcinka
 
+	//Sequencers
+	OrchestratorStep :			INT := 0;
+	ExecutorStep :				INT := 0;
 	
 END_VAR
 
@@ -105,7 +108,8 @@ CASE SequenceState OF
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
 		THIS^.HomingStepZ := 0;
-		_SequenceStep := 0;
+		OrchestratorStep := 0;
+		ExecutorStep := 0;
 		SequenceState := SequenceState + 10;
 	20:
 
@@ -132,7 +136,7 @@ END_CASE
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
 		THIS^.HomingStepZ := 0;
-		_SequenceStep := 0;
+		OrchestratorStep := 0;
 		SequenceState := SequenceState + 10;
 	
 	20:
@@ -393,13 +397,13 @@ VAR_INST
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE _SequenceStep OF
+        <ST><![CDATA[CASE OrchestratorStep OF
 
 	0: // Initial step, enable axes
 		Trace('Start Cutting Box Five Sides');
 		IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 			Trace('Axes Enabled');
-			_SequenceStep := 10;
+			OrchestratorStep := 10;
 		END_IF
 
 	
@@ -451,7 +455,7 @@ VAR_INST
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE _SequenceStep OF
+        <ST><![CDATA[CASE OrchestratorStep OF
 
 	0: // Initial step, enable axes
 		//Modification of nothing
@@ -465,7 +469,7 @@ END_VAR
 		IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 			
 			// Trace('Axes Enabled');
-			_SequenceStep := 5;
+			OrchestratorStep := 5;
 		END_IF
 		
 	5: 		Point0x := 0;		
@@ -496,7 +500,7 @@ END_VAR
 			AxisZ.Deceleration := 8000;
 			
 		IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
-			_SequenceStep := 10;
+			OrchestratorStep := 10;
 		END_IF
 
 	10:	// Set Speed
@@ -510,7 +514,7 @@ END_VAR
 			
 			IF IO.SpindleEnable = TRUE THEN
 			// Trace('Speed Set');
-			_SequenceStep := 20;
+			OrchestratorStep := 20;
 			END_IF
 		END_IF
 		
@@ -520,25 +524,25 @@ END_VAR
 		AxisX.MoveAbsolute(PointAx,0);
 		AxisY.MoveAbsolute(PointAy,0);
 		// Trace('Moving to position A');
-		_SequenceStep := 30;
+		OrchestratorStep := 30;
 
 	30: // Verify Position A
 		IF AxisX.InPosition AND AxisY.InPosition THEN
 			AxisZ.Velocity := _CuttingSpeedZ;
 			// Trace('Position A Reached');
-			_SequenceStep := 40; 
+			OrchestratorStep := 40; 
 		END_IF
 
 	40: // Set Cutting Height
 		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
 		// Trace('Setting Cutting Height');
-		_SequenceStep := 50;
+		OrchestratorStep := 50;
 
 	50: // Verify Cutting Height
 		IF AxisZ.InPosition THEN
 			// Trace('Cutting Height Set');
 			IO.CoolingEnable := TRUE;
-			_SequenceStep := 55;
+			OrchestratorStep := 55;
 		END_IF
 		
 	55: 
@@ -547,7 +551,7 @@ END_VAR
 		AxisY.Velocity := _CuttingSpeedY;
 		IF Timer.Q THEN
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie
-			_SequenceStep := 60;
+			OrchestratorStep := 60;
 		END_IF	
 
 	60: // Cutting Motion from A to B
@@ -555,48 +559,48 @@ END_VAR
 		AxisY.MoveAbsolute(PointBy,0);
 		Trace('60Cutting from A to B');
 		//IF NOT AxisX.Busy AND NOT AxisY.Busy THEN 
-		_SequenceStep := 70;
+		OrchestratorStep := 70;
 		//END_IF
 
 	70: // Verify position B reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
 			AxisZ.Velocity := _RapidSpeedZ;
 			Trace('70Position B Reached');
-			_SequenceStep := 80;
+			OrchestratorStep := 80;
 		END_IF
 
 	80: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
 		IO.CoolingEnable := FALSE;
 		Trace('80Returning from Cutting Height');
-		_SequenceStep := 90;
+		OrchestratorStep := 90;
 
 	90: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
 			AxisX.Velocity := _RapidSpeedX;
 			AxisY.Velocity := _RapidSpeedY;
 			Trace('90Z Returned');
-			_SequenceStep := 100;
+			OrchestratorStep := 100;
 		END_IF
 
 	100: // Positioning Motion from B to C
 		AxisX.MoveAbsolute(PointCx,0);
 		AxisY.MoveAbsolute(PointCy,0);
 		// Trace('Positioning from B to C');
-		_SequenceStep := 110;
+		OrchestratorStep := 110;
 
 	110: // Verify position C reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
 			// Trace('Position C Reached');
 			AxisZ.Velocity := _CuttingSpeedZ;
 			IO.CoolingEnable := TRUE;
-			_SequenceStep := 120;
+			OrchestratorStep := 120;
 		END_IF
 
 	120: // Set Cutting Height
 		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
 		// Trace('Setting Cutting Height for C to D');
-		_SequenceStep := 130;
+		OrchestratorStep := 130;
 			
 	130: // Verify Z position reached
 		IF AxisZ.InPosition THEN
@@ -605,7 +609,7 @@ END_VAR
 			AxisY.Velocity := _CuttingSpeedY;
 		IF Timer.Q THEN
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie
-			_SequenceStep := 140;			
+			OrchestratorStep := 140;			
 		END_IF
 
 		END_IF
@@ -614,46 +618,46 @@ END_VAR
 		AxisX.MoveAbsolute(PointDx,0);
 		AxisY.MoveAbsolute(PointDy,0);
 		// Trace('Cutting C to D');
-		_SequenceStep := 150;
+		OrchestratorStep := 150;
 
 	150: // Verify position D reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
 			AxisZ.Velocity := _RapidSpeedZ;
-			_SequenceStep := 160;
+			OrchestratorStep := 160;
 		END_IF
 
 	160: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
 		IO.CoolingEnable := FALSE;
 		// Trace('Returning from Cutting Height');
-		_SequenceStep := 170;
+		OrchestratorStep := 170;
 
 	170: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
 			AxisX.Velocity := _RapidSpeedX;
 			AxisY.Velocity := _RapidSpeedY;
 			// Trace('Z Returned');
-			_SequenceStep := 180;
+			OrchestratorStep := 180;
 		END_IF
 
 	180: // Positioning Motion from D to E
 		AxisX.MoveAbsolute(PointEx,0);
 		AxisY.MoveAbsolute(PointEy,0);
 		// Trace('Positioning from D to E');
-		_SequenceStep := 190;
+		OrchestratorStep := 190;
 
 	190: // Verify position E reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
 			IO.CoolingEnable := TRUE;
 			AxisZ.Velocity := _CuttingSpeedZ;
 			// Trace('Position E Reached');
-			_SequenceStep := 200;
+			OrchestratorStep := 200;
 		END_IF
 
 	200: // Set Cutting Height 	
 		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
 		// Trace('Setting Cutting Height for E to F');
-		_SequenceStep := 210;
+		OrchestratorStep := 210;
 
 	210: // Verify Z position reached
 		IF AxisZ.InPosition THEN
@@ -662,7 +666,7 @@ END_VAR
 			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
 			IF Timer.Q THEN
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie
-			_SequenceStep := 220;
+			OrchestratorStep := 220;
 			END_IF
 		END_IF
 
@@ -670,46 +674,46 @@ END_VAR
 		AxisX.MoveAbsolute(PointFx,0);
 		AxisY.MoveAbsolute(PointFy,0);
 		// Trace('Cutting from E to F');
-		_SequenceStep := 230;
+		OrchestratorStep := 230;
 
 	230: // Verify position F reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
 			AxisZ.Velocity := _RapidSpeedZ;
-			_SequenceStep := 240;
+			OrchestratorStep := 240;
 		END_IF
 
 	240: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
 		IO.CoolingEnable := FALSE;
 		// Trace('Returning from Cutting Height');
-		_SequenceStep := 250;
+		OrchestratorStep := 250;
 
 	250: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
 			AxisX.Velocity := _RapidSpeedX;
 			AxisY.Velocity := _RapidSpeedY;
 			// Trace('Z Returned');
-			_SequenceStep := 260;
+			OrchestratorStep := 260;
 		END_IF
 
 	260: // Positioning Motion from F to G
 		AxisX.MoveAbsolute(PointGx,0);
 		AxisY.MoveAbsolute(PointGy,0);
 		// Trace('Positioning from F to G');
-		_SequenceStep := 270;
+		OrchestratorStep := 270;
 
 	270: // Verify position G reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
 			AxisZ.Velocity := _CuttingSpeedZ;
 			IO.CoolingEnable := TRUE;
 			// Trace('Position G Reached');
-			_SequenceStep := 280;
+			OrchestratorStep := 280;
 		END_IF
 		
 	280: // Set Cutting Height 	
 		AxisZ.MoveAbsolute(_CuttingHeightZ,0);
 		// Trace('Setting Cutting Height for G to H');
-		_SequenceStep := 290;
+		OrchestratorStep := 290;
 			
 	290: // Verify Z Cutting Height
 		IF AxisZ.InPosition THEN
@@ -719,7 +723,7 @@ END_VAR
 			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
 			IF Timer.Q THEN
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie			
-			_SequenceStep := 300;
+			OrchestratorStep := 300;
 			END_IF
 		END_IF	
 
@@ -727,19 +731,19 @@ END_VAR
 		AxisX.MoveAbsolute(PointHx,0);
 		AxisY.MoveAbsolute(PointHy,0);
 		// Trace('Cutting from G to H');
-		_SequenceStep := 310;
+		OrchestratorStep := 310;
 
 	310: // Verify position H reached
 		IF AxisX.InPosition AND AxisY.InPosition THEN
 			AxisZ.Velocity := _RapidSpeedZ;
 			IO.CoolingEnable := FALSE;
-			_SequenceStep := 320;
+			OrchestratorStep := 320;
 		END_IF
 			
 	320: // Return from Cutting Height 
 		AxisZ.MoveAbsolute(Point0z,0);
 		// Trace('Returning from Cutting Height');
-		_SequenceStep := 330;
+		OrchestratorStep := 330;
 
 	330: // Verify Z height retraction
 		IF AxisZ.InPosition THEN
@@ -749,10 +753,10 @@ END_VAR
 			Timer(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1500.0));
 			IF Timer.Q THEN
 			Timer(IN := FALSE); // Reset timera, aby działał ponownie			
-			_SequenceStep := 300;
+			OrchestratorStep := 300;
 			END_IF
 			// Trace('Z Point 0 Reached');
-			_SequenceStep := 340;
+			OrchestratorStep := 340;
 		END_IF
 		
 		
@@ -761,7 +765,7 @@ END_VAR
 		AxisX.MoveRelative(100,0);
 		AxisY.MoveRelative(100,0);
 		IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
-			_SequenceStep := 350;
+			OrchestratorStep := 350;
 			// Trace('Box Five Sides is Cut');
 		END_IF
 
@@ -772,95 +776,6 @@ END_VAR
 
 END_CASE
 ]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="CutOrchestrator" Id="{4a6c8d9d-4b5c-46da-8179-e7275fa91b7f}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD CutOrchestrator : BOOL
-(*
-	E			G
-	|			|
-D---+-----------+---C
-	|			|
-	|			| 
-B---+-----------+---A
-	|			|
-	F			H
-*)
-VAR  
-	Point0x 		: REAL := 0;
-	Point0y 		: REAL := 0;
-	Point0z 		: REAL := 0;
-	PointAx 		: REAL := 300;
-	PointAy 		: REAL := 50;
-	PointBx 		: REAL := 0;
-    PointBy 		: REAL := 50;
-	PointCx 		: REAL := 300;
-	PointCy 		: REAL := 350;
-	PointDx 		: REAL := 0;
-	PointDy 		: REAL := 350;
-	PointEx 		: REAL := 50;
-	PointEy 		: REAL := 400;
-	PointFx 		: REAL := 50;
-	PointFy 		: REAL := 0;
-	PointGx 		: REAL := 250;
-	PointGy 		: REAL := 400;
-	PointHx 		: REAL := 250;
-	PointHy 		: REAL := 0;
-END_VAR
-
-VAR_INST
-		Timer			:TON;
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE _SequenceStep OF
-    0: // Enable osi
-        
-        _SequenceStep := 5;
-      
-
-    5: // Zbuduj odcinki dla tego programu
-				CASE _ProgramIdRequested OF
-					
-					E_RecipeID.eBorgoFlaps:
-					IF BuildSegments_BorgoFlaps() THEN
-						_SequenceStep := _SequenceStep + 10;
-					END_IF
-					
-					E_RecipeID.eBorgoWings:
-					Trace('Czy wybralem program BorgoWings??');
-					IF BuildSegments_BorgoWings() THEN
-						_SequenceStep := _SequenceStep + 10;
-					END_IF
-					
-					E_RecipeID.eArona:
-					IF BuildSegments_Arona() THEN
-						_SequenceStep := _SequenceStep + 10;
-					END_IF
-					
-				END_CASE        
-
-
-
-        _SequenceStep := 10;
-
-    10: // Jedź ogólnym wykonawcą
-        //IF ExecuteSegmentsMill() THEN
-            // (opcjonalnie) mały odjazd końcowy
-            _SequenceStep := 20;
-        //END_IF
-		
-	20: 
-	 	IF ExecuteSegmentsCutY() THEN
-            // (opcjonalnie) mały odjazd końcowy
-            _SequenceStep := 30;
-        END_IF
-
-    30:
-        IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
-            CutOrchestrator := TRUE;
-        END_IF
-END_CASE]]></ST>
       </Implementation>
     </Method>
     <Property Name="CuttingHeightZ" Id="{4c86fbb5-f7fe-4ab0-abb5-4601fd04a1c4}" FolderPath="Properties\">
@@ -957,7 +872,7 @@ END_IF]]></ST>
 				SequenceState := SequenceState + 5;
 			10:
 					
-				IF CutOrchestrator() THEN
+				IF MachiningOrchestrator() THEN
 					SequenceState := SequenceState + 10;
 				END_IF
 				
@@ -996,16 +911,9 @@ END_CASE]]></ST>
     </Method>
     <Method Name="ExecuteSegmentsCutY" Id="{dc7ba1fd-c66f-4871-a334-3c135aa8a2cb}" FolderPath="MyMethods\Segments\">
       <Declaration><![CDATA[METHOD ExecuteSegmentsCutY : BOOL
-VAR
-    safeZ : REAL := 0.0; // Twój Point0z
-END_VAR
-
-VAR_INST
-	tonDwell			: TON;
-	subStepCut   	    : INT := 0;     // Podkroki wykonania jednego odcinka
-END_VAR]]></Declaration>
+]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE subStepCut OF
+        <ST><![CDATA[CASE ExecutorStep OF
 
 // -------- Inicjalizacja pierwszego segmentu --------
 0:
@@ -1032,7 +940,7 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 	
 	IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
 		iSegmentsToCutY := iSegmentsToCutY + 1;
-		subStepCut := 10;
+		ExecutorStep := 10;
 	END_IF	 
    
 END_IF
@@ -1040,69 +948,56 @@ END_IF
 10:
     AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.X, 0);
     AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.Y, 0);
-    subStepCut := 20;
+    ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
     IF AxisX.InPosition AND AxisY.InPosition THEN 
-        subStepCut := 30;
+        ExecutorStep := 30;
     END_IF
 
-// -------- Zanurzenie Z do wysokości cięcia --------
+
 30:
     IO.PistonValveCutY := TRUE;
-    tonDwell(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
-
-    IF tonDwell.Q THEN
-        tonDwell(IN := FALSE);
-        subStepCut := 40;
-    END_IF
+	IF SequenceTimer(1) THEN //in seconds
+		ExecutorStep := 40;
+	END_IF
 
 40: 
     IF IO.PistonSensorCutY THEN
 	AxisX.Velocity := _CuttingSpeedX;
 	AxisY.Velocity := _CuttingSpeedY;
-	subStepCut := 50;
+	ExecutorStep := 50;
     END_IF
-
-	
 		
 	
-50: // dwell
-
-	tonDwell(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
-
-    IF tonDwell.Q THEN
-        tonDwell(IN := FALSE);
-        subStepCut := 60;
-    END_IF
-	
+50:
+   
+   	IF SequenceTimer(_IdleTime) THEN
+		ExecutorStep := 60;
+	END_IF
 
 // -------- Cięcie XY do końca odcinka --------
 60:
     AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.X, 0);
     AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.Y, 0);
-    subStepCut := 70;
+    ExecutorStep := 70;
 
 70: // czekamy na koniec cięcia
     IF AxisX.InPosition AND AxisY.InPosition THEN
-        subStepCut := 80;
+        ExecutorStep := 80;
     END_IF
 
 // -------- Retrakt Z i przygotowanie następnego --------
 80:
     IO.PistonValveCutY := FALSE;
     
-	tonDwell(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
-
-    IF tonDwell.Q THEN
-        tonDwell(IN := FALSE);
-        subStepCut := 85;
-    END_IF
-	
+	IF SequenceTimer(1) THEN //in seconds
+		ExecutorStep := 85;
+	END_IF
 	
 85: IF NOT IO.PistonSensorCutY  THEN
 		 iSegmentsToCutY := iSegmentsToCutY + 1; 
-		 subStepCut := 90;
+		 ExecutorStep := 90;
 	END_IF	
 
 90:
@@ -1113,14 +1008,15 @@ END_IF
         
         IF iSegmentsToCutY > SegmentsToCutY THEN
             IO.SpindleEnable := FALSE;
-            subStepCut := 1000; // koniec
+            ExecutorStep := 1000; // koniec
         ELSE
-            subStepCut := 10;   // następny odcinek
+            ExecutorStep := 10;   // następny odcinek
         END_IF
     END_IF
 
 // -------- Zakończenie --------
 1000:
+	ExecutorStep := 0;
     ExecuteSegmentsCutY := TRUE;
 END_CASE]]></ST>
       </Implementation>
@@ -1133,10 +1029,9 @@ END_VAR
 
 VAR_INST
 	tonDwell			 : TON;
-	subStep   			 : INT := 0;          // Podkroki wykonania jednego odcinka
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE subStep OF
+        <ST><![CDATA[CASE ExecutorStep OF
 
 // -------- Inicjalizacja pierwszego segmentu --------
 0:
@@ -1166,7 +1061,7 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
     iSegmentsToGroove := 1;
 	
 	IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
-		subStep := 10;
+		ExecutorStep := 10;
 	END_IF	 
    
 END_IF
@@ -1174,18 +1069,18 @@ END_IF
 10:
     AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X, 0);
     AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y, 0);
-    subStep := 20;
+    ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
     IF AxisX.InPosition AND AxisY.InPosition THEN
         AxisZ.Velocity := _CuttingSpeedZ;
-        subStep := 30;
+        ExecutorStep := 30;
     END_IF
 
 // -------- Zanurzenie Z do wysokości cięcia --------
 30:
     AxisZ.MoveAbsolute(_CuttingHeightZ, 0);
-    subStep := 40;
+    ExecutorStep := 40;
 
 40: // czekamy na Z, włącz chłodzenie i poczekaj "idle"
     IF AxisZ.InPosition THEN
@@ -1194,7 +1089,7 @@ END_IF
         AxisY.Velocity := _CuttingSpeedY;
 
         
-        subStep := 50;
+        ExecutorStep := 50;
     END_IF
 
 	
@@ -1202,31 +1097,28 @@ END_IF
 	
 50: // dwell
 
-	tonDwell(IN := TRUE, PT := REAL_TO_TIME(_IdleTime * 1000.0));
-
-    IF tonDwell.Q THEN
-        tonDwell(IN := FALSE);
-        subStep := 60;
-    END_IF
+   	IF SequenceTimer(_IdleTime) THEN
+		ExecutorStep := 60;
+	END_IF
 	
 
 // -------- Cięcie XY do końca odcinka --------
 60:
     AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X, 0);
     AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y, 0);
-    subStep := 70;
+    ExecutorStep := 70;
 
 70: // czekamy na koniec cięcia
     IF AxisX.InPosition AND AxisY.InPosition THEN
         AxisZ.Velocity := _RapidSpeedZ;
         IO.CoolingEnable := FALSE;
-        subStep := 80;
+        ExecutorStep := 80;
     END_IF
 
 // -------- Retrakt Z i przygotowanie następnego --------
 80:
     AxisZ.MoveAbsolute(safeZ, 0);
-    subStep := 90;
+    ExecutorStep := 90;
 
 90:
     IF AxisZ.InPosition THEN
@@ -1236,14 +1128,15 @@ END_IF
         iSegmentsToGroove := iSegmentsToGroove + 1;
         IF iSegmentsToGroove > SegmentsToGroove THEN
             IO.SpindleEnable := FALSE;
-            subStep := 1000; // koniec
+            ExecutorStep := 1000; // koniec
         ELSE
-            subStep := 10;   // następny odcinek
+            ExecutorStep := 10;   // następny odcinek
         END_IF
     END_IF
 
 // -------- Zakończenie --------
 1000:
+	ExecutorStep := 0;
     ExecuteSegmentsMill := TRUE;
 END_CASE]]></ST>
       </Implementation>
@@ -1717,6 +1610,93 @@ CASE DescendantSequenceState OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Method Name="MachiningOrchestrator" Id="{4a6c8d9d-4b5c-46da-8179-e7275fa91b7f}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD MachiningOrchestrator : BOOL
+(*
+	E			G
+	|			|
+D---+-----------+---C
+	|			|
+	|			| 
+B---+-----------+---A
+	|			|
+	F			H
+*)
+VAR  
+	Point0x 		: REAL := 0;
+	Point0y 		: REAL := 0;
+	Point0z 		: REAL := 0;
+	PointAx 		: REAL := 300;
+	PointAy 		: REAL := 50;
+	PointBx 		: REAL := 0;
+    PointBy 		: REAL := 50;
+	PointCx 		: REAL := 300;
+	PointCy 		: REAL := 350;
+	PointDx 		: REAL := 0;
+	PointDy 		: REAL := 350;
+	PointEx 		: REAL := 50;
+	PointEy 		: REAL := 400;
+	PointFx 		: REAL := 50;
+	PointFy 		: REAL := 0;
+	PointGx 		: REAL := 250;
+	PointGy 		: REAL := 400;
+	PointHx 		: REAL := 250;
+	PointHy 		: REAL := 0;
+END_VAR
+
+VAR_INST
+		Timer			:TON;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE OrchestratorStep OF
+    0: // Enable osi
+        
+        OrchestratorStep := 5;
+      
+
+    5: // Zbuduj odcinki dla tego programu
+				CASE _ProgramIdRequested OF
+					
+					E_RecipeID.eBorgoFlaps:
+					IF BuildSegments_BorgoFlaps() THEN
+						OrchestratorStep := OrchestratorStep + 10;
+					END_IF
+					
+					E_RecipeID.eBorgoWings:
+					Trace('Czy wybralem program BorgoWings??');
+					IF BuildSegments_BorgoWings() THEN
+						OrchestratorStep := OrchestratorStep + 10;
+					END_IF
+					
+					E_RecipeID.eArona:
+					IF BuildSegments_Arona() THEN
+						OrchestratorStep := OrchestratorStep + 10;
+					END_IF
+					
+				END_CASE        
+
+
+
+        OrchestratorStep := 10;
+
+    10: // Jedź ogólnym wykonawcą
+        //IF ExecuteSegmentsMill() THEN
+            OrchestratorStep := 20;
+        //END_IF
+		
+	20: 
+	 	IF ExecuteSegmentsCutY() THEN
+            OrchestratorStep := 30;
+        END_IF
+
+    30:
+        IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
+            MachiningOrchestrator := TRUE;
+        END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="PanelFrontLength" Id="{d37d1986-191c-4359-b366-a37c4466a7c4}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontLength : REAL]]></Declaration>
       <Get Name="Get" Id="{719609b4-0075-4953-8df2-a544ce507b40}">
@@ -1955,7 +1935,8 @@ END_VAR
 				flagX :=0; 
 				flagY :=0; 
 				flagZ :=0;
-				_SequenceStep := 0;
+				OrchestratorStep := 0;
+				ExecutorStep := 0;
 				THIS^.HomingStepX := 0;
 				THIS^.HomingStepY := 0;
 				THIS^.HomingStepZ := 0;
@@ -2050,6 +2031,24 @@ END_VAR
 ]]></ST>
       </Implementation>
     </Method>
+    <Method Name="SequenceTimer" Id="{2e721ea1-cfa0-448e-b2fb-baa077a6b9b3}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD SequenceTimer : BOOL
+VAR_INPUT
+	WaitingTime :REAL;
+END_VAR
+
+VAR_INST
+	 Timer :TON;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[ Timer(IN := TRUE, PT := REAL_TO_TIME(WaitingTime * 1000.0));
+ IF Timer.Q THEN
+	Timer(IN := FALSE);
+	SequenceTimer := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="ToolOverpass" Id="{812d4990-d277-4bfc-8e06-a4ff70191e9b}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY PUBLIC ToolOverpass : REAL]]></Declaration>
       <Get Name="Get" Id="{b0c9f572-3145-4e3a-b91c-cd20c9ba4da8}">
@@ -2086,6 +2085,7 @@ END_IF]]></ST>
       <LineId Id="230" Count="0" />
       <LineId Id="112" Count="1" />
       <LineId Id="121" Count="1" />
+      <LineId Id="246" Count="0" />
       <LineId Id="114" Count="3" />
       <LineId Id="154" Count="0" />
       <LineId Id="118" Count="0" />
@@ -2268,22 +2268,6 @@ END_IF]]></ST>
       <LineId Id="3888" Count="14" />
       <LineId Id="19" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutOrchestrator">
-      <LineId Id="2704" Count="6" />
-      <LineId Id="2727" Count="1" />
-      <LineId Id="2730" Count="5" />
-      <LineId Id="2823" Count="0" />
-      <LineId Id="2736" Count="8" />
-      <LineId Id="2711" Count="0" />
-      <LineId Id="2725" Count="1" />
-      <LineId Id="2724" Count="0" />
-      <LineId Id="2712" Count="6" />
-      <LineId Id="2781" Count="1" />
-      <LineId Id="2784" Count="2" />
-      <LineId Id="2783" Count="0" />
-      <LineId Id="2719" Count="4" />
-      <LineId Id="19" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -2334,11 +2318,20 @@ END_IF]]></ST>
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutY">
-      <LineId Id="532" Count="116" />
+      <LineId Id="794" Count="54" />
+      <LineId Id="850" Count="0" />
+      <LineId Id="852" Count="5" />
+      <LineId Id="859" Count="40" />
+      <LineId Id="901" Count="0" />
+      <LineId Id="900" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsMill">
-      <LineId Id="284" Count="108" />
+      <LineId Id="627" Count="65" />
+      <LineId Id="737" Count="1" />
+      <LineId Id="698" Count="36" />
+      <LineId Id="736" Count="0" />
+      <LineId Id="735" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HMIPermissions">
@@ -2399,6 +2392,10 @@ END_IF]]></ST>
       <LineId Id="48" Count="0" />
       <LineId Id="51" Count="7" />
       <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.MachiningOrchestrator">
+      <LineId Id="2896" Count="44" />
+      <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.PanelFrontLength.Get">
       <LineId Id="2" Count="0" />
@@ -2467,6 +2464,7 @@ END_IF]]></ST>
       <LineId Id="184" Count="1" />
       <LineId Id="237" Count="2" />
       <LineId Id="225" Count="0" />
+      <LineId Id="508" Count="0" />
       <LineId Id="211" Count="2" />
       <LineId Id="186" Count="0" />
       <LineId Id="183" Count="0" />
@@ -2495,6 +2493,10 @@ END_IF]]></ST>
       <LineId Id="256" Count="1" />
       <LineId Id="101" Count="2" />
       <LineId Id="27" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.SequenceTimer">
+      <LineId Id="23" Count="3" />
+      <LineId Id="7" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ToolOverpass.Get">
       <LineId Id="2" Count="0" />
