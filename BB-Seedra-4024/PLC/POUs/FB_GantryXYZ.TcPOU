@@ -37,10 +37,15 @@ VAR
     iSegmentsToGroove    : INT;          // Indeks aktualnego odcinka
     
     
-	//Segments Cut
+	//Segments Cut Y
 	SegmentCutY      	 : ARRAY[1..32] OF ST_CutSegment;
     SegmentsToCutY       : INT;          // Ile odcinków
     iSegmentsToCutY      : INT;          // Indeks aktualnego odcinka
+	
+	//Segments Cut X
+	SegmentCutX      	 : ARRAY[1..32] OF ST_CutSegment;
+    SegmentsToCutX       : INT;          // Ile odcinków
+    iSegmentsToCutX      : INT;          // Indeks aktualnego odcinka
 
 	//Sequencers
 	OrchestratorStep :			INT := 0;
@@ -254,6 +259,17 @@ SegmentCutY[2].Start.X := 500;
 SegmentCutY[2].Start.Y := 500;  
 SegmentCutY[2].Stop.X  := 500; 
 SegmentCutY[2].Stop.Y  := 0;
+
+SegmentsToCutX := 2;
+
+SegmentCutX[1].Start.X := 500; 
+SegmentCutX[1].Start.Y := 500;  
+SegmentCutX[1].Stop.X  := 500; 
+SegmentCutX[1].Stop.Y  := 0;
+SegmentCutX[2].Start.X := 0; 
+SegmentCutX[2].Start.Y := 500;  
+SegmentCutX[2].Stop.X  := 0; 
+SegmentCutX[2].Stop.Y  := 0;
 
 
 
@@ -923,6 +939,119 @@ END_IF]]></ST>
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Method Name="ExecuteSegmentsCutX" Id="{94347c53-d843-4c0f-8fa0-b761cd0d80e2}" FolderPath="MyMethods\Segments\">
+      <Declaration><![CDATA[METHOD ExecuteSegmentsCutX : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE ExecutorStep OF
+
+// -------- Inicjalizacja pierwszego segmentu --------
+0:
+IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
+			 Trace('SegmentExecutionY');
+			 
+			 
+    IF SegmentsToCutX <= 0 THEN
+        // Nie ma czego ciąć
+        ExecuteSegmentsCutX := TRUE;
+        RETURN;
+    END_IF;
+
+    // Jednorazowe nastawy:
+    AxisX.Acceleration := 500;   AxisX.Deceleration := 8000;
+    AxisY.Acceleration := 500;   AxisY.Deceleration := 8000;
+    AxisZ.Acceleration := 500;   AxisZ.Deceleration := 8000;
+
+    AxisX.Velocity := _RapidSpeedX;
+    AxisY.Velocity := _RapidSpeedY;
+    AxisZ.Velocity := _RapidSpeedZ;
+
+	iSegmentsToCutY := 0;
+	
+	IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
+		iSegmentsToCutX := iSegmentsToCutX + 1;
+		ExecutorStep := 10;
+	END_IF	 
+   
+END_IF
+
+10:
+    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.X, 0);
+    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.Y, 0);
+    ExecutorStep := 20;
+
+20: // czekamy na pozycję XY
+    IF AxisX.InPosition AND AxisY.InPosition THEN 
+        ExecutorStep := 30;
+    END_IF
+
+
+30:
+    IO.PistonValveCutX := TRUE;
+	IF SequenceTimer(1) THEN //in seconds
+		ExecutorStep := 40;
+	END_IF
+
+40: 
+    IF IO.PistonSensorCutX THEN
+	AxisX.Velocity := _CuttingSpeedX;
+	AxisY.Velocity := _CuttingSpeedY;
+	ExecutorStep := 50;
+    END_IF
+		
+	
+50:
+   
+   	IF SequenceTimer(_IdleTime) THEN
+		ExecutorStep := 60;
+	END_IF
+
+// -------- Cięcie XY do końca odcinka --------
+60:
+    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.X, 0);
+    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.Y, 0);
+    ExecutorStep := 70;
+
+70: // czekamy na koniec cięcia
+    IF AxisX.InPosition AND AxisY.InPosition THEN
+        ExecutorStep := 80;
+    END_IF
+
+// -------- Retrakt Z i przygotowanie następnego --------
+80:
+    IO.PistonValveCutX := FALSE;
+    
+	IF SequenceTimer(1) THEN //in seconds
+		ExecutorStep := 85;
+	END_IF
+	
+85: IF NOT IO.PistonSensorCutX  THEN
+		 iSegmentsToCutX := iSegmentsToCutX + 1; 
+		 ExecutorStep := 90;
+	END_IF	
+
+90:
+    IF  AxisX.InPosition AND AxisY.InPosition THEN
+        AxisX.Velocity := _RapidSpeedX;
+        AxisY.Velocity := _RapidSpeedY;
+
+        
+        IF iSegmentsToCutX > SegmentsToCutX THEN
+            IO.SpindleEnable := FALSE;
+            ExecutorStep := 1000; // koniec
+        ELSE
+            ExecutorStep := 10;   // następny odcinek
+        END_IF
+    END_IF
+
+// -------- Zakończenie --------
+1000:
+	ExecutorStep := 0;
+	Trace('SegmentExecutionYFINISHED');
+    ExecuteSegmentsCutX := TRUE;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="ExecuteSegmentsCutY" Id="{dc7ba1fd-c66f-4871-a334-3c135aa8a2cb}" FolderPath="MyMethods\Segments\">
       <Declaration><![CDATA[METHOD ExecuteSegmentsCutY : BOOL
 ]]></Declaration>
@@ -1106,6 +1235,7 @@ END_IF
 	END_IF
 	
 60:
+
     AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X, 0);
     AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y, 0);
     ExecutorStep := 70;
@@ -1658,8 +1788,13 @@ END_VAR
 	 	IF ExecuteSegmentsCutY() THEN
             OrchestratorStep := 30;
         END_IF
+		
+	30: 
+	 	//IF ExecuteSegmentsCutX() THEN
+            OrchestratorStep := 40;
+        //END_IF	
 
-    30:
+    40:
         IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
             MachiningOrchestrator := TRUE;
         END_IF
@@ -2118,6 +2253,8 @@ END_IF]]></ST>
       <LineId Id="98" Count="2" />
       <LineId Id="88" Count="0" />
       <LineId Id="101" Count="2" />
+      <LineId Id="129" Count="9" />
+      <LineId Id="128" Count="0" />
       <LineId Id="89" Count="1" />
       <LineId Id="92" Count="1" />
       <LineId Id="27" Count="0" />
@@ -2299,6 +2436,15 @@ END_IF]]></ST>
       <LineId Id="42" Count="3" />
       <LineId Id="23" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutX">
+      <LineId Id="794" Count="54" />
+      <LineId Id="850" Count="0" />
+      <LineId Id="852" Count="5" />
+      <LineId Id="859" Count="40" />
+      <LineId Id="901" Count="1" />
+      <LineId Id="900" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutY">
       <LineId Id="794" Count="54" />
       <LineId Id="850" Count="0" />
@@ -2324,7 +2470,9 @@ END_IF]]></ST>
       <LineId Id="691" Count="0" />
       <LineId Id="737" Count="1" />
       <LineId Id="698" Count="1" />
-      <LineId Id="702" Count="3" />
+      <LineId Id="702" Count="0" />
+      <LineId Id="747" Count="0" />
+      <LineId Id="703" Count="2" />
       <LineId Id="745" Count="0" />
       <LineId Id="707" Count="5" />
       <LineId Id="714" Count="20" />
@@ -2392,7 +2540,11 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.MachiningOrchestrator">
-      <LineId Id="2896" Count="44" />
+      <LineId Id="2896" Count="39" />
+      <LineId Id="2945" Count="0" />
+      <LineId Id="2947" Count="2" />
+      <LineId Id="2946" Count="0" />
+      <LineId Id="2936" Count="4" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.PanelFrontLength.Get">
