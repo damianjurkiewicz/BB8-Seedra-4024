@@ -18,12 +18,9 @@ VAR
 
     // Alarms for this module
     GantryAlarms : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
-
-    // IO
-    LimitSwitchX : 			BOOL;
-    LimitSwitchY : 			BOOL;
-    LimitSwitchZ : 			BOOL;
-
+	
+	CoolingEnsable				AT%Q*		:	BOOL; 
+	
     // Properties
     _HomingStepX :			INT;
     _HomingStepY :			INT;
@@ -53,24 +50,22 @@ VAR
 	ExecutorStep :				INT := 0;
 	
 	GantryXYZ_HMI : ST_GantryXYZ_HMI;
-	
 END_VAR
 
 VAR PERSISTENT
     _CuttingHeightZ 		:REAL;
-    _ToolOverpass 			:REAL;
-    _RailHeightCorrection	:REAL;
-    _DimensionCorrection	:REAL;
-    _CuttingSpeedX 			:REAL;
-    _RapidSpeedX 			:REAL;
-    _CuttingSpeedY 			:REAL;
-    _RapidSpeedY 			:REAL;
-    _CuttingSpeedZ 			:REAL;
-    _RapidSpeedZ 			:REAL;
-    _IdleTime 				:REAL;
+	_CuttingSpeedX 			:REAL;
+	_CuttingSpeedY 			:REAL;
+	_CuttingSpeedZ 			:REAL;
     _PanelFrontWidht 		:REAL;
     _PanelFrontLength 		:REAL;
     _PanelHeight 			:REAL;
+    _RailHeightCorrection	:REAL;
+    _RapidSpeedX 			:REAL;
+    _RapidSpeedY 			:REAL;
+    _RapidSpeedZ 			:REAL;
+    _IdleTime 				:REAL;
+    _ToolOverpass 			:REAL;
 END_VAR
 
 VAR CONSTANT
@@ -83,7 +78,10 @@ END_VAR]]></Declaration>
     <Folder Name="MyMethods" Id="{d166ca9d-f57a-4d88-ac90-142e5eb5d488}">
       <Folder Name="Segments" Id="{b8033ee7-c5f7-43d2-a584-12e2969c60b8}" />
     </Folder>
-    <Folder Name="Properties" Id="{b05cc7e1-dc37-4910-986a-f085b4a0163d}" />
+    <Folder Name="Properties" Id="{b05cc7e1-dc37-4910-986a-f085b4a0163d}">
+      <Folder Name="Config" Id="{d432f26c-f18e-459c-b74b-59233683f472}" />
+      <Folder Name="Status" Id="{76f95e74-5bed-4ec3-be3e-2b7b97f61740}" />
+    </Folder>
     <Folder Name="States" Id="{8df42c9b-c051-49f1-9767-900503632339}" />
     <Method Name="Aborting" Id="{5476dfef-6652-4e6b-8928-3724a50553de}" FolderPath="States\">
       <Declaration><![CDATA[
@@ -389,7 +387,23 @@ F_CreateAllEventsInClass(Alarms     := GantryAlarms,
 SUPER^.CreateEvents();]]></ST>
       </Implementation>
     </Method>
-    <Property Name="CuttingHeightZ" Id="{4c86fbb5-f7fe-4ab0-abb5-4601fd04a1c4}" FolderPath="Properties\">
+    <Property Name="CurrentSpeed" Id="{357ae8db-7056-4092-8dce-8465b738ac10}" FolderPath="Properties\Status\">
+      <Declaration><![CDATA[PROPERTY CurrentSpeed : LREAL]]></Declaration>
+      <Get Name="Get" Id="{c2cd3b04-3efb-4ba6-9575-51c55bf7cfdf}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CurrentSpeed := _CurrentSpeed;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{0f2a4f6e-af6f-4874-84df-bad362e7f2ed}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CurrentSpeed := CurrentSpeed;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CuttingHeightZ" Id="{4c86fbb5-f7fe-4ab0-abb5-4601fd04a1c4}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY PUBLIC CuttingHeightZ : REAL]]></Declaration>
       <Get Name="Get" Id="{a83b65c4-5ea3-488c-967b-3ee17e2e67f9}">
         <Declaration><![CDATA[
@@ -402,6 +416,57 @@ SUPER^.CreateEvents();]]></ST>
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
           <ST><![CDATA[_CuttingHeightZ := CuttingHeightZ;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CuttingSpeedX" Id="{ab870480-cf07-40c0-bfcb-dd69cb432ee7}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CuttingSpeedX : REAL]]></Declaration>
+      <Get Name="Get" Id="{6314d467-3274-40d3-b79c-da2e9e92d14f}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CuttingSpeedX := _CuttingSpeedX;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{187fbc7b-15d7-49b2-9b45-3a42d4ac6f21}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CuttingSpeedX := CuttingSpeedX;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CuttingSpeedY" Id="{dbf5c766-18d1-470a-99da-17fb86de0bc4}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CuttingSpeedY : REAL]]></Declaration>
+      <Get Name="Get" Id="{857e501f-f2f5-4e77-9eae-4cbc8957979e}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CuttingSpeedY := _CuttingSpeedY;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{e1f697d5-7820-41ea-a263-d25f9b120395}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CuttingSpeedY := CuttingSpeedY;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CuttingSpeedZ" Id="{1df46c0c-e665-451c-ba3a-e7e742b71643}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CuttingSpeedZ : REAL]]></Declaration>
+      <Get Name="Get" Id="{bacd8e8f-7f73-4606-b74b-5e23e6d6dcf2}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CuttingSpeedZ := _CuttingSpeedZ;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{dea83ede-69cc-4213-8244-a1bc2a541f42}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CuttingSpeedZ := CuttingSpeedZ;
 ]]></ST>
         </Implementation>
       </Set>
@@ -436,26 +501,6 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 ]]></ST>
       </Implementation>
     </Method>
-    <Property Name="DimensionCorrection" Id="{95467893-833e-4a85-85a7-4d3d7fbe1cbc}" FolderPath="Properties\">
-      <Declaration><![CDATA[PROPERTY PUBLIC DimensionCorrection : REAL]]></Declaration>
-      <Get Name="Get" Id="{6597f0bb-ab93-4c8b-9f04-26dad4e00b3c}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[DimensionCorrection := _DimensionCorrection;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{3a142071-aa1f-47a4-b310-22c10182eea7}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[ IF DimensionCorrection > 4 THEN
-	_DimensionCorrection := 4;  // It can't go higher, you will kill yourself
-	ELSE
-	_DimensionCorrection := DimensionCorrection;
-END_IF]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <Method Name="Execute" Id="{895d1ef9-5e85-47dd-a8bf-b32885837641}" FolderPath="States\">
       <Declaration><![CDATA[METHOD PROTECTED Execute
 ]]></Declaration>
@@ -852,30 +897,29 @@ END_CASE]]></ST>
     </Method>
     <Method Name="HMICommunication" Id="{0dce72f4-da14-4dd2-b6a3-5db9db3404e0}">
       <Declaration><![CDATA[// Provides interlocks for HMI control and updates HMI status information for this module
+//Only in this place HMI input can overwrite internal data 
 METHOD PROTECTED HMICommunication
-
 // This method is called cyclically by CyclicLogic()]]></Declaration>
       <Implementation>
         <ST><![CDATA[SUPER^.HMICommunication();
 
 
+_CuttingHeightZ       := GantryXYZ_HMI.Config.CuttingHeightZ;		
+_CuttingSpeedX        := GantryXYZ_HMI.Config.CuttingSpeedX;		
+_CuttingSpeedY        := GantryXYZ_HMI.Config.CuttingSpeedY;		
+_CuttingSpeedZ        := GantryXYZ_HMI.Config.CuttingSpeedZ;		
+_PanelFrontWidht      := GantryXYZ_HMI.Config.PanelFrontWidht;		
+_PanelFrontLength     := GantryXYZ_HMI.Config.PanelFrontLength;		
+_PanelHeight          := GantryXYZ_HMI.Config.PanelHeight;	
+_RailHeightCorrection := GantryXYZ_HMI.Config.RailHeightCorrection;
+_RapidSpeedX          := GantryXYZ_HMI.Config.RapidSpeedX;			
+_RapidSpeedY          := GantryXYZ_HMI.Config.RapidSpeedY;	
+_RapidSpeedZ          := GantryXYZ_HMI.Config.RapidSpeedZ;	
+_IdleTime             := GantryXYZ_HMI.Config.IdleTime;			
+_ToolOverpass         := GantryXYZ_HMI.Config.ToolOverpass;			
 
-_CuttingHeightZ := GantryXYZ_HMI.Config.CuttingHeightZ;
 
-
-GantryXYZ_HMI.Config.DimensionCorrection := _DimensionCorrection;
-GantryXYZ_HMI.Config.PanelFrontLength := _PanelFrontLength;
-GantryXYZ_HMI.Config.PanelFrontWidht := _PanelFrontWidht;
-GantryXYZ_HMI.Config.PanelHeight := _PanelHeight;
-GantryXYZ_HMI.Config.ProgramIdRequested := _ProgramIdRequested;
-GantryXYZ_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
-GantryXYZ_HMI.Config.ToolOverpass := _ToolOverpass;
-
-
-//IF GantryXYZ_HMI.Config.CuttingHeightZ <> GantryXYZ_HMI.Command.SetCuttingHeightZ THEN
-//    _CuttingHeightZ := GantryXYZ_HMI.Command.SetCuttingHeightZ;
-//    GantryXYZ_HMI.Config.CuttingHeightZ := _CuttingHeightZ;
-//END_IF]]></ST>
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="HMIPermissions" Id="{a7a517c4-9176-4ef6-9045-d889c05c8a21}">
@@ -923,11 +967,8 @@ END_CASE]]></ST>
       <Set Name="Set" Id="{9c9687a4-cd61-4104-a02f-3fe4715cd2fa}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF HomingStepX < 0 THEN
-	_HomingStepX := 0;  // Blokada wartości ujemnych
-	ELSE
-	_HomingStepX := HomingStepX;
-END_IF]]></ST>
+          <ST><![CDATA[_HomingStepX := HomingStepX;
+]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -943,11 +984,8 @@ END_IF]]></ST>
       <Set Name="Set" Id="{51c79bd9-40f7-4370-9e3f-edffa2a24928}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF HomingStepY < 0 THEN
-	_HomingStepY := 0;  // Blokada wartości ujemnych
-	ELSE
-	_HomingStepY := HomingStepY;
-END_IF]]></ST>
+          <ST><![CDATA[_HomingStepY := HomingStepY;
+]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -963,11 +1001,8 @@ END_IF]]></ST>
       <Set Name="Set" Id="{5b912885-4f7d-414a-b1af-1074244e821d}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF HomingStepZ < 0 THEN
-	_HomingStepZ := 0;  // Blokada wartości ujemnych
-	ELSE
-	_HomingStepZ := HomingStepX;
-END_IF]]></ST>
+          <ST><![CDATA[_HomingStepZ := HomingStepX;
+]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -1305,6 +1340,23 @@ END_IF]]></ST>
 ]]></ST>
       </Implementation>
     </Method>
+    <Property Name="IdleTime" Id="{dfb103a6-b180-49ba-a124-4e96d3059088}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC IdleTime : REAL]]></Declaration>
+      <Get Name="Get" Id="{d6ada8f0-07b8-4d16-9743-4e216d422b6a}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IdleTime := _IdleTime;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{e8df0304-5562-4c08-bd77-ccab9fffa15b}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_IdleTime := IdleTime;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="Initialize" Id="{ba85f303-ffbe-03ad-229b-3741bd93e6e2}">
       <Declaration><![CDATA[//! @summary Basic module initialization logic
 METHOD PROTECTED Initialize : BOOL;
@@ -1409,7 +1461,7 @@ END_VAR
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="PanelFrontLength" Id="{d37d1986-191c-4359-b366-a37c4466a7c4}" FolderPath="Properties\">
+    <Property Name="PanelFrontLength" Id="{d37d1986-191c-4359-b366-a37c4466a7c4}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontLength : REAL]]></Declaration>
       <Get Name="Get" Id="{719609b4-0075-4953-8df2-a544ce507b40}">
         <Declaration><![CDATA[
@@ -1421,15 +1473,12 @@ END_CASE]]></ST>
       <Set Name="Set" Id="{d74bf0f0-654e-45df-b754-63029e5c2a12}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF PanelFrontLength = 0  THEN
-	_PanelFrontLength := 500;  // It can't go higher, you will kill yourself
-	ELSE
-	_PanelFrontLength := PanelFrontLength;
-END_IF]]></ST>
+          <ST><![CDATA[_PanelFrontLength := PanelFrontLength;
+]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="PanelFrontWidht" Id="{f3e0dbc8-c3fa-460e-86ce-eb87111125e9}" FolderPath="Properties\">
+    <Property Name="PanelFrontWidht" Id="{f3e0dbc8-c3fa-460e-86ce-eb87111125e9}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontWidht : REAL]]></Declaration>
       <Get Name="Get" Id="{337b7ccf-7529-41b1-81a1-e9c0f98de875}">
         <Declaration><![CDATA[
@@ -1441,15 +1490,12 @@ END_IF]]></ST>
       <Set Name="Set" Id="{6f7f0fd9-fb5c-4077-ab43-02d47a14a15f}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF PanelFrontWidht = 0 THEN
-	_PanelFrontWidht := 400;  // It can't go higher, you will kill yourself
-	ELSE
-	_PanelFrontWidht := PanelFrontWidht;
-END_IF]]></ST>
+          <ST><![CDATA[_PanelFrontWidht := PanelFrontWidht;
+]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="PanelHeight" Id="{0920acc0-257a-43b2-a196-f22fc89e42ed}" FolderPath="Properties\">
+    <Property Name="PanelHeight" Id="{0920acc0-257a-43b2-a196-f22fc89e42ed}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY PUBLIC PanelHeight : REAL]]></Declaration>
       <Get Name="Get" Id="{20b3fa55-de19-44e2-ad7b-52463e1bf19b}">
         <Declaration><![CDATA[
@@ -1461,34 +1507,29 @@ END_IF]]></ST>
       <Set Name="Set" Id="{91d58d60-235c-48ff-9b62-1155794955c4}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF PanelHeight = 0 THEN
-	_PanelHeight := 80;  // It can't go higher, you will kill yourself
-	ELSE
-	_PanelHeight := PanelHeight;
-END_IF]]></ST>
+          <ST><![CDATA[_PanelHeight := PanelHeight;
+]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="ProgramIdRequested" Id="{3b163a54-6fcd-4be2-bb98-ad529d342348}" FolderPath="Properties\">
+    <Property Name="ProgramIdRequested" Id="{3b163a54-6fcd-4be2-bb98-ad529d342348}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY ProgramIdRequested : E_RecipeID]]></Declaration>
       <Get Name="Get" Id="{21210547-61ea-4bd8-a78a-96552b4742ab}">
-        <Declaration><![CDATA[VAR
-END_VAR
+        <Declaration><![CDATA[
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[ProgramIdRequested := _ProgramIdRequested;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{2bb8002c-0857-45bb-b53e-f611a5c233b9}">
-        <Declaration><![CDATA[VAR
-END_VAR
+        <Declaration><![CDATA[
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ _ProgramIdRequested := ProgramIdRequested;]]></ST>
+          <ST><![CDATA[_ProgramIdRequested := ProgramIdRequested;]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="RailHeightCorrection" Id="{465e1c57-83b8-4b2a-a3fe-16819241fd4f}" FolderPath="Properties\">
+    <Property Name="RailHeightCorrection" Id="{465e1c57-83b8-4b2a-a3fe-16819241fd4f}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY PUBLIC RailHeightCorrection : REAL]]></Declaration>
       <Get Name="Get" Id="{8547e8a4-2368-4b1c-bac1-a9f1330a50a7}">
         <Declaration><![CDATA[
@@ -1505,6 +1546,57 @@ END_VAR
 	ELSE
 	_RailHeightCorrection := RailHeightCorrection;
 END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RapidSpeedX" Id="{8c9f4f21-3743-48de-8aa6-1e7f68956f80}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC RapidSpeedX : REAL]]></Declaration>
+      <Get Name="Get" Id="{80bdcbb9-4e80-4343-9582-3dba51122fa5}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RapidSpeedX := _RapidSpeedX;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{5ccad6ef-816c-4c49-afb6-3e5204fc4fb5}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_RapidSpeedX := RapidSpeedX;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RapidSpeedY" Id="{5dfea665-2261-44a4-b000-9743b481b2b9}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC RapidSpeedY : REAL]]></Declaration>
+      <Get Name="Get" Id="{59b145df-2cff-4ecc-847b-f8d110514f0e}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RapidSpeedY := _RapidSpeedY;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{4f8d9cc9-05ef-4eb8-8eb1-49992a2bb0d6}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_RapidSpeedY := RapidSpeedY;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RapidSpeedZ" Id="{cebf8cd2-acc1-4736-8c92-219e5578dd1a}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC RapidSpeedZ : REAL]]></Declaration>
+      <Get Name="Get" Id="{11b4159d-524a-4e2d-b881-810c4516a42c}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RapidSpeedZ := _RapidSpeedZ;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{e54cbdaf-56e9-49ed-85a4-52a0db9e7c8e}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_RapidSpeedZ := RapidSpeedZ;
+]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -1745,13 +1837,24 @@ END_VAR
     </Method>
     <Method Name="RestorePersistentData" Id="{9e1193e7-d277-4fd9-ac0c-81f097451afd}">
       <Declaration><![CDATA[METHOD RestorePersistentData : BOOL
-VAR_INPUT
-END_VAR
+//Only _Variables are PERSISTENT, This method is executed during the initialization
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
+GantryXYZ_HMI.Config.CuttingHeightZ       := _CuttingHeightZ;		
+GantryXYZ_HMI.Config.CuttingSpeedX        := _CuttingSpeedX;		
+GantryXYZ_HMI.Config.CuttingSpeedY        := _CuttingSpeedY;		
+GantryXYZ_HMI.Config.CuttingSpeedZ        := _CuttingSpeedZ;		
+GantryXYZ_HMI.Config.PanelFrontWidht      := _PanelFrontWidht;		
+GantryXYZ_HMI.Config.PanelFrontLength     := _PanelFrontLength;		
+GantryXYZ_HMI.Config.PanelHeight          := _PanelHeight;	
+GantryXYZ_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
+GantryXYZ_HMI.Config.RapidSpeedX          := _RapidSpeedX;			
+GantryXYZ_HMI.Config.RapidSpeedY          := _RapidSpeedY;	
+GantryXYZ_HMI.Config.RapidSpeedZ          := _RapidSpeedZ;	
+GantryXYZ_HMI.Config.IdleTime             := _IdleTime;			
+GantryXYZ_HMI.Config.ToolOverpass         := _ToolOverpass;	
 
-GantryXYZ_HMI.Config.CuttingHeightZ := _CuttingHeightZ;
 RestorePersistentData := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -1773,7 +1876,7 @@ END_VAR
 END_IF]]></ST>
       </Implementation>
     </Method>
-    <Property Name="ToolOverpass" Id="{812d4990-d277-4bfc-8e06-a4ff70191e9b}" FolderPath="Properties\">
+    <Property Name="ToolOverpass" Id="{812d4990-d277-4bfc-8e06-a4ff70191e9b}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY PUBLIC ToolOverpass : REAL]]></Declaration>
       <Get Name="Get" Id="{b0c9f572-3145-4e3a-b91c-cd20c9ba4da8}">
         <Declaration><![CDATA[
@@ -1785,11 +1888,8 @@ END_IF]]></ST>
       <Set Name="Set" Id="{826fd5bf-1fa9-4f64-9665-346b4d89d6bf}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ IF ToolOverpass > 15 THEN
-	_ToolOverpass := 15;  
-	ELSE
-	_ToolOverpass := ToolOverpass;
-END_IF]]></ST>
+          <ST><![CDATA[_ToolOverpass := ToolOverpass;
+]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -1917,10 +2017,37 @@ END_IF]]></ST>
       <LineId Id="3" Count="6" />
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.CurrentSpeed.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CurrentSpeed.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingSpeedX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingSpeedX.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingSpeedY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingSpeedY.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingSpeedZ.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CuttingSpeedZ.Set">
       <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -1932,13 +2059,6 @@ END_IF]]></ST>
       <LineId Id="31" Count="0" />
       <LineId Id="7" Count="1" />
       <LineId Id="12" Count="4" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.DimensionCorrection.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.DimensionCorrection.Set">
-      <LineId Id="5" Count="3" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
@@ -2014,14 +2134,10 @@ END_IF]]></ST>
       <LineId Id="6" Count="0" />
       <LineId Id="70" Count="0" />
       <LineId Id="65" Count="0" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="76" Count="0" />
-      <LineId Id="75" Count="0" />
-      <LineId Id="21" Count="6" />
+      <LineId Id="77" Count="11" />
+      <LineId Id="27" Count="0" />
       <LineId Id="38" Count="0" />
       <LineId Id="41" Count="0" />
-      <LineId Id="77" Count="2" />
       <LineId Id="37" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HMIPermissions">
@@ -2032,21 +2148,21 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingStepX.Set">
-      <LineId Id="5" Count="3" />
+      <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingStepY.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingStepY.Set">
-      <LineId Id="5" Count="3" />
+      <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingStepZ.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingStepZ.Set">
-      <LineId Id="5" Count="3" />
+      <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HomingX">
@@ -2074,6 +2190,13 @@ END_IF]]></ST>
       <LineId Id="1075" Count="13" />
       <LineId Id="314" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.IdleTime.Get">
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.IdleTime.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
       <LineId Id="3" Count="4" />
       <LineId Id="68" Count="0" />
@@ -2100,21 +2223,21 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.PanelFrontLength.Set">
-      <LineId Id="5" Count="3" />
+      <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.PanelFrontWidht.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.PanelFrontWidht.Set">
-      <LineId Id="5" Count="3" />
+      <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.PanelHeight.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.PanelHeight.Set">
-      <LineId Id="5" Count="3" />
+      <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Get">
@@ -2128,6 +2251,27 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RailHeightCorrection.Set">
       <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RapidSpeedX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RapidSpeedX.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RapidSpeedY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RapidSpeedY.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RapidSpeedZ.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RapidSpeedZ.Set">
+      <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ResetSafety">
@@ -2195,6 +2339,7 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RestorePersistentData">
       <LineId Id="5" Count="0" />
+      <LineId Id="27" Count="11" />
       <LineId Id="14" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="6" Count="0" />
@@ -2207,7 +2352,7 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ToolOverpass.Set">
-      <LineId Id="5" Count="3" />
+      <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

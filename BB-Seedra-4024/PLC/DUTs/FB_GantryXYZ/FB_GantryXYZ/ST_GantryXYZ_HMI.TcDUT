@@ -4,8 +4,7 @@
     <Declaration><![CDATA[TYPE ST_GantryXYZ_HMI :
     STRUCT
         Config  : ST_GantryXYZ_Config;
-		Command : ST_GantryXYZ_Command;
-		Status  : ST_GantryXYZ_Status;
+		Status 	: ST_GantryXYZ_Status;
     END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

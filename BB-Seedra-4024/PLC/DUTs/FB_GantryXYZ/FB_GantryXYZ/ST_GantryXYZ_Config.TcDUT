@@ -4,12 +4,18 @@
     <Declaration><![CDATA[TYPE ST_GantryXYZ_Config :
     STRUCT
 	CuttingHeightZ : REAL;
-	DimensionCorrection : REAL;
+	CuttingSpeedX :REAL;
+	CuttingSpeedY :REAL;
+	CuttingSpeedZ :REAL;
+	IdleTime :REAL;
 	PanelFrontLength : REAL;
 	PanelFrontWidht : REAL;
 	PanelHeight : REAL;
 	ProgramIdRequested : REAL;
 	RailHeightCorrection :REAL;
+	RapidSpeedX :REAL;
+	RapidSpeedY :REAL;
+	RapidSpeedZ :REAL;
 	ToolOverpass :REAL;
     END_STRUCT
 END_TYPE]]></Declaration>
