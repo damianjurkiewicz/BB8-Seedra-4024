@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"21"</v>
+          <v n="UniqueIdGenerator">"22"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -772,7 +772,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"MAIN.Seedra.GantryXYZ._CuttingHeightZ"</v>
+                      <v n="Value">"HMI_GantryXYZ.Config.CuttingHeightZ"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -786,18 +786,18 @@
                 <v n="VisualElementIdentifier">"GenElemInst_77"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="InputBoxInputAction[]">
+                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
                   <v>OnMouseClick</v>
                   <a cet="InputBoxInputAction">
                     <o>
                       <v n="InputBoxVariable">""</v>
                       <v n="InputType">"VisuDialogs.Numpad"</v>
-                      <v n="InputBoxMin">""</v>
-                      <v n="InputBoxMax">""</v>
+                      <v n="InputBoxMin">"0"</v>
+                      <v n="InputBoxMax">"5"</v>
                       <v n="InputBoxDialogTitle">""</v>
                       <v n="Password">false</v>
                       <v n="UseTextOutputVariable">true</v>
-                      <v n="TextOutputVariableInitialized">true</v>
+                      <v n="TextOutputVariableInitialized">false</v>
                       <v n="OtherVarConversion">""</v>
                       <v n="Format">""</v>
                       <v n="DialogPosition" t="DialogPositionSetting">UseGlobalSetting</v>
@@ -3001,7 +3001,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_123"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
+                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="InputBoxInputAction[]">
                   <v>OnMouseClick</v>
                   <a cet="InputBoxInputAction">
                     <o>
@@ -3310,7 +3310,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_127"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
+                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="InputBoxInputAction[]">
                   <v>OnMouseClick</v>
                   <a cet="InputBoxInputAction">
                     <o>
@@ -3619,7 +3619,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_132"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
+                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="InputBoxInputAction[]">
                   <v>OnMouseClick</v>
                   <a cet="InputBoxInputAction">
                     <o>
@@ -3928,7 +3928,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_136"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
+                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="InputBoxInputAction[]">
                   <v>OnMouseClick</v>
                   <a cet="InputBoxInputAction">
                     <o>
@@ -4237,7 +4237,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_140"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
+                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="InputBoxInputAction[]">
                   <v>OnMouseClick</v>
                   <a cet="InputBoxInputAction">
                     <o>
@@ -4546,7 +4546,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_144"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
+                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="InputBoxInputAction[]">
                   <v>OnMouseClick</v>
                   <a cet="InputBoxInputAction">
                     <o>
@@ -4855,7 +4855,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_148"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
+                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="InputBoxInputAction[]">
                   <v>OnMouseClick</v>
                   <a cet="InputBoxInputAction">
                     <o>
@@ -6705,6 +6705,11 @@
                 <v n="Id">21L</v>
                 <n n="Tag" />
                 <v n="Text">"	HMI : ST_PackMLBaseModule_HMI;"</v>
+              </o>
+              <o>
+                <v n="Id">22L</v>
+                <n n="Tag" />
+                <v n="Text">"	HMI_GantryXYZ : ST_GantryXYZ_HMI;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>

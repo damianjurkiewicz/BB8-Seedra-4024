@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <DUT Name="ST_GantryXYZ_HMI" Id="{42282f17-118a-4ed6-b5d0-a5b4c6e076c6}">
+    <Declaration><![CDATA[TYPE ST_GantryXYZ_HMI :
+    STRUCT
+        Config  : ST_GantryXYZ_Config;
+		Command : ST_GantryXYZ_Command;
+		Status  : ST_GantryXYZ_Status;
+    END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

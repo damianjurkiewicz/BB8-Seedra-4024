@@ -19,7 +19,19 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DUTs\E_RecipeID.TcDUT">
+    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\E_RecipeID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Config.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Command.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Status.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_HMI.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DUTs\MoveState_t.TcDUT">
@@ -127,6 +139,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DUTs" />
+    <Folder Include="DUTs\FB_GantryXYZ" />
+    <Folder Include="DUTs\FB_GantryXYZ\FB_GantryXYZ" />
     <Folder Include="GVLs" />
     <Folder Include="POUs\Components" />
     <Folder Include="POUs\Segments" />
