@@ -437,7 +437,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"HMI_GantryXYZ.Config.GroovingHeightZ"</v>
+                      <v n="Value">"HMI_GantryXYZ.Config.GrooveDepthZ"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -746,7 +746,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"HMI_GantryXYZ.Config.ToolOverpass"</v>
+                      <v n="Value">"HMI_GantryXYZ.Config.GroovingOverpass"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -766,8 +766,8 @@
                     <o>
                       <v n="InputBoxVariable">""</v>
                       <v n="InputType">"VisuDialogs.Numpad"</v>
-                      <v n="InputBoxMin">""</v>
-                      <v n="InputBoxMax">""</v>
+                      <v n="InputBoxMin">"1"</v>
+                      <v n="InputBoxMax">"50"</v>
                       <v n="InputBoxDialogTitle">""</v>
                       <v n="Password">false</v>
                       <v n="UseTextOutputVariable">true</v>
@@ -1293,7 +1293,7 @@
                     </o>
                     <o>
                       <v n="Id">390574330L</v>
-                      <v n="Value">"Cutting Speed Y"</v>
+                      <v n="Value">"Cutting Speed X"</v>
                     </o>
                     <o>
                       <v n="Id">3729828405L</v>
@@ -1336,7 +1336,7 @@
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
-                      <v n="Value">"270"</v>
+                      <v n="Value">"177"</v>
                     </o>
                   </l>
                 </o>
@@ -3159,7 +3159,7 @@
                     </o>
                     <o>
                       <v n="Id">390574330L</v>
-                      <v n="Value">"%0.2f"</v>
+                      <v n="Value">"%s"</v>
                     </o>
                     <o>
                       <v n="Id">2597686782L</v>
@@ -3171,7 +3171,7 @@
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
-                      <v n="Value">"816"</v>
+                      <v n="Value">"685"</v>
                     </o>
                   </l>
                 </o>
@@ -3476,7 +3476,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"HMI_GantryXYZ.Config.IdleTime"</v>
+                      <v n="Value">"HMI_GantryXYZ.Config.GroovingIdleTime"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -3497,7 +3497,7 @@
                       <v n="InputBoxVariable">""</v>
                       <v n="InputType">"VisuDialogs.Numpad"</v>
                       <v n="InputBoxMin">"1"</v>
-                      <v n="InputBoxMax">"10000"</v>
+                      <v n="InputBoxMax">"5"</v>
                       <v n="InputBoxDialogTitle">""</v>
                       <v n="Password">false</v>
                       <v n="UseTextOutputVariable">true</v>
@@ -3785,7 +3785,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">""</v>
+                      <v n="Value">"HMI_GantryXYZ.Config.CuttingSpeedY"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -3805,8 +3805,8 @@
                     <o>
                       <v n="InputBoxVariable">""</v>
                       <v n="InputType">"VisuDialogs.Numpad"</v>
-                      <v n="InputBoxMin">""</v>
-                      <v n="InputBoxMax">""</v>
+                      <v n="InputBoxMin">"1"</v>
+                      <v n="InputBoxMax">"200"</v>
                       <v n="InputBoxDialogTitle">""</v>
                       <v n="Password">false</v>
                       <v n="UseTextOutputVariable">true</v>
@@ -3894,7 +3894,7 @@
                     </o>
                     <o>
                       <v n="Id">390574330L</v>
-                      <v n="Value">"Cutting Speed X"</v>
+                      <v n="Value">"Cutting Speed Y"</v>
                     </o>
                     <o>
                       <v n="Id">3729828405L</v>
@@ -3937,7 +3937,7 @@
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
-                      <v n="Value">"177"</v>
+                      <v n="Value">"270"</v>
                     </o>
                   </l>
                 </o>
@@ -4094,7 +4094,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">""</v>
+                      <v n="Value">"HMI_GantryXYZ.Config.CuttingOverpass"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -4114,8 +4114,8 @@
                     <o>
                       <v n="InputBoxVariable">""</v>
                       <v n="InputType">"VisuDialogs.Numpad"</v>
-                      <v n="InputBoxMin">""</v>
-                      <v n="InputBoxMax">""</v>
+                      <v n="InputBoxMin">"0"</v>
+                      <v n="InputBoxMax">"50"</v>
                       <v n="InputBoxDialogTitle">""</v>
                       <v n="Password">false</v>
                       <v n="UseTextOutputVariable">true</v>
@@ -4403,7 +4403,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">""</v>
+                      <v n="Value">"HMI_GantryXYZ.Config.CuttingIdleTime"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -4423,8 +4423,8 @@
                     <o>
                       <v n="InputBoxVariable">""</v>
                       <v n="InputType">"VisuDialogs.Numpad"</v>
-                      <v n="InputBoxMin">""</v>
-                      <v n="InputBoxMax">""</v>
+                      <v n="InputBoxMin">"0"</v>
+                      <v n="InputBoxMax">"5"</v>
                       <v n="InputBoxDialogTitle">""</v>
                       <v n="Password">false</v>
                       <v n="UseTextOutputVariable">true</v>
@@ -4712,7 +4712,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">""</v>
+                      <v n="Value">"HMI_GantryXYZ.Config.CuttingSpeedX"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -4733,7 +4733,7 @@
                       <v n="InputBoxVariable">""</v>
                       <v n="InputType">"VisuDialogs.Numpad"</v>
                       <v n="InputBoxMin">"1"</v>
-                      <v n="InputBoxMax">"10000"</v>
+                      <v n="InputBoxMax">"200"</v>
                       <v n="InputBoxDialogTitle">""</v>
                       <v n="Password">false</v>
                       <v n="UseTextOutputVariable">true</v>
