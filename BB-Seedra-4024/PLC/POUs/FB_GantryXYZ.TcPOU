@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_GantryXYZ" Id="{474e1990-f731-0ed9-052c-42626742a38f}" SpecialFunc="None">
-    <Declaration><![CDATA[//{attribute 'conditionalshow'}
+    <Declaration><![CDATA[{attribute 'conditionalshow'}
 FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule
 VAR
     // Sub module definitions here
@@ -18,8 +18,6 @@ VAR
 
     // Alarms for this module
     GantryAlarms : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
-	
-	CoolingEnsable				AT%Q*		:	BOOL; 
 	
     // Properties
     _HomingStepX :			INT;
@@ -53,10 +51,10 @@ VAR
 END_VAR
 
 VAR PERSISTENT
-    _CuttingHeightZ 		:REAL;
-	_CuttingSpeedX 			:REAL;
-	_CuttingSpeedY 			:REAL;
-	_CuttingSpeedZ 			:REAL;
+    _GroovingHeightZ 		:REAL;
+	_GroovingSpeedX 		:REAL;
+	_GroovingSpeedY 		:REAL;
+	_GroovingSpeedZ 		:REAL;
     _PanelFrontWidht 		:REAL;
     _PanelFrontLength 		:REAL;
     _PanelHeight 			:REAL;
@@ -403,74 +401,6 @@ SUPER^.CreateEvents();]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="CuttingHeightZ" Id="{4c86fbb5-f7fe-4ab0-abb5-4601fd04a1c4}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CuttingHeightZ : REAL]]></Declaration>
-      <Get Name="Get" Id="{a83b65c4-5ea3-488c-967b-3ee17e2e67f9}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CuttingHeightZ := _CuttingHeightZ;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{3fde4dcd-fcc8-4a85-8a9a-5adb0df55581}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CuttingHeightZ := CuttingHeightZ;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="CuttingSpeedX" Id="{ab870480-cf07-40c0-bfcb-dd69cb432ee7}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CuttingSpeedX : REAL]]></Declaration>
-      <Get Name="Get" Id="{6314d467-3274-40d3-b79c-da2e9e92d14f}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CuttingSpeedX := _CuttingSpeedX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{187fbc7b-15d7-49b2-9b45-3a42d4ac6f21}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CuttingSpeedX := CuttingSpeedX;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="CuttingSpeedY" Id="{dbf5c766-18d1-470a-99da-17fb86de0bc4}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CuttingSpeedY : REAL]]></Declaration>
-      <Get Name="Get" Id="{857e501f-f2f5-4e77-9eae-4cbc8957979e}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CuttingSpeedY := _CuttingSpeedY;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{e1f697d5-7820-41ea-a263-d25f9b120395}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CuttingSpeedY := CuttingSpeedY;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="CuttingSpeedZ" Id="{1df46c0c-e665-451c-ba3a-e7e742b71643}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CuttingSpeedZ : REAL]]></Declaration>
-      <Get Name="Get" Id="{bacd8e8f-7f73-4606-b74b-5e23e6d6dcf2}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CuttingSpeedZ := _CuttingSpeedZ;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{dea83ede-69cc-4213-8244-a1bc2a541f42}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CuttingSpeedZ := CuttingSpeedZ;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <Method Name="CyclicLogic" Id="{0cfbfa67-40d6-05d6-0515-ef1c50353a78}">
       <Declaration><![CDATA[METHOD CyclicLogic
 VAR_INPUT
@@ -617,8 +547,8 @@ END_IF
 
 40: 
     IF IO.PistonSensorCutX THEN
-	AxisX.Velocity := _CuttingSpeedX;
-	AxisY.Velocity := _CuttingSpeedY;
+	AxisX.Velocity := _GroovingSpeedX;
+	AxisY.Velocity := _GroovingSpeedY;
 	ExecutorStep := 50;
     END_IF
 		
@@ -730,8 +660,8 @@ END_IF
 
 40: 
     IF IO.PistonSensorCutY THEN
-	AxisX.Velocity := _CuttingSpeedX;
-	AxisY.Velocity := _CuttingSpeedY;
+	AxisX.Velocity := _GroovingSpeedX;
+	AxisY.Velocity := _GroovingSpeedY;
 	ExecutorStep := 50;
     END_IF
 		
@@ -788,8 +718,8 @@ END_IF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Method Name="ExecuteSegmentsMill" Id="{3ee66abc-6845-49e5-b2ff-149134d7252b}" FolderPath="MyMethods\Segments\">
-      <Declaration><![CDATA[METHOD ExecuteSegmentsMill : BOOL
+    <Method Name="ExecuteSegmentsGroove" Id="{3ee66abc-6845-49e5-b2ff-149134d7252b}" FolderPath="MyMethods\Segments\">
+      <Declaration><![CDATA[METHOD ExecuteSegmentsGroove : BOOL
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE ExecutorStep OF
@@ -803,7 +733,7 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
     IF SegmentsToGroove <= 0 THEN
         // Nie ma czego ciąć
         IO.SpindleEnable := FALSE;
-        ExecuteSegmentsMill := TRUE;
+        ExecuteSegmentsGroove := TRUE;
         RETURN;
     END_IF;
 
@@ -836,19 +766,19 @@ END_IF
     IF AxisX.InPosition AND AxisY.InPosition THEN
 		IO.SpindleEnable := TRUE;
 		IO.CoolingEnable := TRUE;
-        AxisZ.Velocity := _CuttingSpeedZ;
+        AxisZ.Velocity := _GroovingSpeedZ;
         ExecutorStep := 30;
     END_IF
 
 	
 30:
-    AxisZ.MoveAbsolute(_CuttingHeightZ, 0);
+    AxisZ.MoveAbsolute(_GroovingHeightZ, 0);
     ExecutorStep := 40;	
 	
 40: 
     IF AxisZ.InPosition THEN
-        AxisX.Velocity := _CuttingSpeedX;
-        AxisY.Velocity := _CuttingSpeedY;
+        AxisX.Velocity := _GroovingSpeedX;
+        AxisY.Velocity := _GroovingSpeedY;
         ExecutorStep := 50;
     END_IF
 	
@@ -891,10 +821,78 @@ END_IF
 // -------- Zakończenie --------
 1000:
 	ExecutorStep := 0;
-    ExecuteSegmentsMill := TRUE;
+    ExecuteSegmentsGroove := TRUE;
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Property Name="GroovingHeightZ" Id="{4c86fbb5-f7fe-4ab0-abb5-4601fd04a1c4}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC GroovingHeightZ : REAL]]></Declaration>
+      <Get Name="Get" Id="{a83b65c4-5ea3-488c-967b-3ee17e2e67f9}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GroovingHeightZ := _GroovingHeightZ;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{3fde4dcd-fcc8-4a85-8a9a-5adb0df55581}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_GroovingHeightZ := GroovingHeightZ;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="GroovingSpeedX" Id="{ab870480-cf07-40c0-bfcb-dd69cb432ee7}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC GroovingSpeedX : REAL]]></Declaration>
+      <Get Name="Get" Id="{6314d467-3274-40d3-b79c-da2e9e92d14f}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GroovingSpeedX := _GroovingSpeedX;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{187fbc7b-15d7-49b2-9b45-3a42d4ac6f21}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_GroovingSpeedX := GroovingSpeedX;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="GroovingSpeedY" Id="{dbf5c766-18d1-470a-99da-17fb86de0bc4}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC GroovingSpeedY : REAL]]></Declaration>
+      <Get Name="Get" Id="{857e501f-f2f5-4e77-9eae-4cbc8957979e}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GroovingSpeedY := _GroovingSpeedY;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{e1f697d5-7820-41ea-a263-d25f9b120395}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_GroovingSpeedY := GroovingSpeedY;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="GroovingSpeedZ" Id="{1df46c0c-e665-451c-ba3a-e7e742b71643}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC GroovingSpeedZ : REAL]]></Declaration>
+      <Get Name="Get" Id="{bacd8e8f-7f73-4606-b74b-5e23e6d6dcf2}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GroovingSpeedZ := _GroovingSpeedZ;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{dea83ede-69cc-4213-8244-a1bc2a541f42}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_GroovingSpeedZ := GroovingSpeedZ;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="HMICommunication" Id="{0dce72f4-da14-4dd2-b6a3-5db9db3404e0}">
       <Declaration><![CDATA[// Provides interlocks for HMI control and updates HMI status information for this module
 //Only in this place HMI input can overwrite internal data 
@@ -904,10 +902,10 @@ METHOD PROTECTED HMICommunication
         <ST><![CDATA[SUPER^.HMICommunication();
 
 
-_CuttingHeightZ       := GantryXYZ_HMI.Config.CuttingHeightZ;		
-_CuttingSpeedX        := GantryXYZ_HMI.Config.CuttingSpeedX;		
-_CuttingSpeedY        := GantryXYZ_HMI.Config.CuttingSpeedY;		
-_CuttingSpeedZ        := GantryXYZ_HMI.Config.CuttingSpeedZ;		
+_GroovingHeightZ       := GantryXYZ_HMI.Config.GroovingHeightZ;		
+_GroovingSpeedX        := GantryXYZ_HMI.Config.GroovingSpeedX;		
+_GroovingSpeedY        := GantryXYZ_HMI.Config.GroovingSpeedY;		
+_GroovingSpeedZ        := GantryXYZ_HMI.Config.GroovingSpeedZ;		
 _PanelFrontWidht      := GantryXYZ_HMI.Config.PanelFrontWidht;		
 _PanelFrontLength     := GantryXYZ_HMI.Config.PanelFrontLength;		
 _PanelHeight          := GantryXYZ_HMI.Config.PanelHeight;	
@@ -1440,7 +1438,7 @@ END_VAR
         OrchestratorStep := 10;
 
     10: 
-        IF ExecuteSegmentsMill() THEN
+        IF ExecuteSegmentsGroove() THEN
            OrchestratorStep := 20;
         END_IF
 		
@@ -1841,10 +1839,10 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GantryXYZ_HMI.Config.CuttingHeightZ       := _CuttingHeightZ;		
-GantryXYZ_HMI.Config.CuttingSpeedX        := _CuttingSpeedX;		
-GantryXYZ_HMI.Config.CuttingSpeedY        := _CuttingSpeedY;		
-GantryXYZ_HMI.Config.CuttingSpeedZ        := _CuttingSpeedZ;		
+GantryXYZ_HMI.Config.GroovingHeightZ       := _GroovingHeightZ;		
+GantryXYZ_HMI.Config.GroovingSpeedX        := _GroovingSpeedX;		
+GantryXYZ_HMI.Config.GroovingSpeedY        := _GroovingSpeedY;		
+GantryXYZ_HMI.Config.GroovingSpeedZ        := _GroovingSpeedZ;		
 GantryXYZ_HMI.Config.PanelFrontWidht      := _PanelFrontWidht;		
 GantryXYZ_HMI.Config.PanelFrontLength     := _PanelFrontLength;		
 GantryXYZ_HMI.Config.PanelHeight          := _PanelHeight;	
@@ -2023,34 +2021,6 @@ END_IF]]></ST>
     <LineIds Name="FB_GantryXYZ.CurrentSpeed.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingHeightZ.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingSpeedX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingSpeedX.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingSpeedY.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingSpeedY.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingSpeedZ.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingSpeedZ.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ.CyclicLogic">
       <LineId Id="3" Count="3" />
       <LineId Id="20" Count="5" />
@@ -2104,31 +2074,37 @@ END_IF]]></ST>
       <LineId Id="900" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.ExecuteSegmentsMill">
-      <LineId Id="627" Count="41" />
-      <LineId Id="739" Count="0" />
-      <LineId Id="743" Count="0" />
-      <LineId Id="669" Count="2" />
-      <LineId Id="740" Count="0" />
-      <LineId Id="672" Count="0" />
-      <LineId Id="674" Count="2" />
-      <LineId Id="742" Count="0" />
-      <LineId Id="678" Count="1" />
-      <LineId Id="681" Count="1" />
-      <LineId Id="685" Count="1" />
-      <LineId Id="744" Count="0" />
-      <LineId Id="691" Count="0" />
-      <LineId Id="737" Count="1" />
-      <LineId Id="698" Count="1" />
-      <LineId Id="702" Count="0" />
-      <LineId Id="747" Count="0" />
-      <LineId Id="703" Count="2" />
-      <LineId Id="745" Count="0" />
-      <LineId Id="707" Count="5" />
-      <LineId Id="714" Count="20" />
-      <LineId Id="736" Count="0" />
-      <LineId Id="735" Count="0" />
+    <LineIds Name="FB_GantryXYZ.ExecuteSegmentsGroove">
+      <LineId Id="750" Count="99" />
       <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.GroovingHeightZ.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.GroovingHeightZ.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.GroovingSpeedX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.GroovingSpeedX.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.GroovingSpeedY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.GroovingSpeedY.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.GroovingSpeedZ.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.GroovingSpeedZ.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HMICommunication">
       <LineId Id="6" Count="0" />

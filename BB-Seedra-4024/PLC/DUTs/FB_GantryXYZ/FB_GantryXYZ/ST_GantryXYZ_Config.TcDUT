@@ -3,10 +3,10 @@
   <DUT Name="ST_GantryXYZ_Config" Id="{9175d3d8-e623-4395-a625-175ecc53cdb9}">
     <Declaration><![CDATA[TYPE ST_GantryXYZ_Config :
     STRUCT
-	CuttingHeightZ : REAL;
-	CuttingSpeedX :REAL;
-	CuttingSpeedY :REAL;
-	CuttingSpeedZ :REAL;
+	GroovingHeightZ : REAL;
+	GroovingSpeedX :REAL;
+	GroovingSpeedY :REAL;
+	GroovingSpeedZ :REAL;
 	IdleTime :REAL;
 	PanelFrontLength : REAL;
 	PanelFrontWidht : REAL;
