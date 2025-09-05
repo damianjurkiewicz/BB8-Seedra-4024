@@ -55,6 +55,10 @@ VAR PERSISTENT
 	_CuttingSpeedY			:REAL;
 	_CuttingIdleTime		:REAL;
 	_CuttingOverpass		:REAL;
+	_CutterXOffsetX			:REAL;
+	_CutterXOffsetY			:REAL;
+	_CutterYOffsetX			:REAL;
+	_CutterYOffsetY			:REAL;	
     _GrooveDepthZ 			:REAL;
 	_GroovingSpeedX 		:REAL;
 	_GroovingSpeedY 		:REAL;
@@ -451,6 +455,74 @@ SUPER^.CreateEvents();]]></ST>
         </Implementation>
       </Get>
     </Property>
+    <Property Name="CutterXOffsetX" Id="{ec876c40-72b1-49ef-b4a8-dafc4e3faf39}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CutterXOffsetX : REAL]]></Declaration>
+      <Get Name="Get" Id="{84da6823-a94d-424f-a88e-9f4900452f7f}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CutterXOffsetX := _CutterXOffsetX;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{415034c5-edcb-4d81-8764-a7aa31c1615f}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CutterXOffsetX := CutterXOffsetX;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CutterXOffsetY" Id="{195bbbbb-15a8-436d-866c-ecc00711e6f4}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CutterXOffsetY : REAL]]></Declaration>
+      <Get Name="Get" Id="{c99ef4e3-05c1-488d-a09a-ef00fdd76f8d}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CutterXOffsetY := _CutterXOffsetY;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{dfc0ea26-14ea-4173-aef3-e2791575f96a}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CutterXOffsetY := CutterXOffsetY;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CutterYOffsetX" Id="{2d729998-2abb-43f8-849d-8b6a18e55ff7}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CutterYOffsetX : REAL]]></Declaration>
+      <Get Name="Get" Id="{dd957d56-9ca4-4d71-901a-4eee0dcc7dcb}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CutterYOffsetX := _CutterYOffsetX;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{8614b2fc-b567-4793-b660-6be46ebcc9c1}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CutterYOffsetX := CutterYOffsetX;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CutterYOffsetY" Id="{f510443c-1bf0-4520-86a8-c58e1e7a4692}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CutterYOffsetY : REAL]]></Declaration>
+      <Get Name="Get" Id="{0ec517ed-6f75-4191-aed5-4585f3f07608}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CutterYOffsetY := _CutterYOffsetY;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{a114f71c-22b7-478b-aa78-245d801668e5}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CutterYOffsetY := CutterYOffsetY;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="CuttingIdleTime" Id="{61054465-d4b7-49c6-8b84-c09fde09dffb}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY PUBLIC CuttingIdleTime : REAL]]></Declaration>
       <Get Name="Get" Id="{fd9fc4d0-2df8-4834-aea2-4450714f930b}">
@@ -659,21 +731,21 @@ END_IF
 
 30:
     IO.PistonValveCutX := TRUE;
-	IF SequenceTimer(1) THEN //in seconds
+	IF SequenceTimerSeconds(1) THEN //in seconds
 		ExecutorStep := 40;
 	END_IF
 
 40: 
     IF IO.PistonSensorCutX THEN
-	AxisX.Velocity := _GroovingSpeedX;
-	AxisY.Velocity := _GroovingSpeedY;
+	AxisX.Velocity := _CuttingSpeedX;
+	AxisY.Velocity := _CuttingSpeedY;
 	ExecutorStep := 50;
     END_IF
 		
 	
 50:
    
-   	IF SequenceTimer(_GroovingIdleTime) THEN
+   	IF SequenceTimerSeconds(_CuttingIdleTime) THEN
 		ExecutorStep := 60;
 	END_IF
 
@@ -692,7 +764,7 @@ END_IF
 80:
     IO.PistonValveCutX := FALSE;
     
-	IF SequenceTimer(1) THEN //in seconds
+	IF SequenceTimerSeconds(1) THEN //in seconds
 		ExecutorStep := 85;
 	END_IF
 	
@@ -772,21 +844,21 @@ END_IF
 
 30:
     IO.PistonValveCutY := TRUE;
-	IF SequenceTimer(1) THEN //in seconds
+	IF SequenceTimerSeconds(1) THEN //in seconds
 		ExecutorStep := 40;
 	END_IF
 
 40: 
     IF IO.PistonSensorCutY THEN
-	AxisX.Velocity := _GroovingSpeedX;
-	AxisY.Velocity := _GroovingSpeedY;
+	AxisX.Velocity := _CuttingSpeedX;
+	AxisY.Velocity := _CuttingSpeedY;
 	ExecutorStep := 50;
     END_IF
 		
 	
 50:
    
-   	IF SequenceTimer(_GroovingIdleTime) THEN
+   	IF SequenceTimerSeconds(_CuttingIdleTime) THEN
 		ExecutorStep := 60;
 	END_IF
 
@@ -805,7 +877,7 @@ END_IF
 80:
     IO.PistonValveCutY := FALSE;
     
-	IF SequenceTimer(1) THEN //in seconds
+	IF SequenceTimerSeconds(1) THEN 
 		ExecutorStep := 85;
 	END_IF
 	
@@ -901,7 +973,7 @@ END_IF
     END_IF
 	
 50: 
-	IF SequenceTimer(_GroovingIdleTime) THEN
+	IF SequenceTimerSeconds(_GroovingIdleTime) THEN
 		ExecutorStep := 60;
 	END_IF
 	
@@ -1053,23 +1125,28 @@ METHOD PROTECTED HMICommunication
       <Implementation>
         <ST><![CDATA[SUPER^.HMICommunication();
 
+_CutterXOffsetX       := GantryXYZ_HMI.Config.CutterXOffsetX;
+_CutterXOffsetY       := GantryXYZ_HMI.Config.CutterXOffsetY;
+_CutterYOffsetX       := GantryXYZ_HMI.Config.CutterYOffsetX;
+_CutterYOffsetY       := GantryXYZ_HMI.Config.CutterYOffsetY;
 _CuttingSpeedX        := GantryXYZ_HMI.Config.CuttingSpeedX;
 _CuttingSpeedY        := GantryXYZ_HMI.Config.CuttingSpeedY;
 _CuttingIdleTime      := GantryXYZ_HMI.Config.CuttingIdleTime;
 _CuttingOverpass      := GantryXYZ_HMI.Config.CuttingOverpass;
-_GrooveDepthZ         := GantryXYZ_HMI.Config.GrooveDepthZ;		
-_GroovingSpeedX       := GantryXYZ_HMI.Config.GroovingSpeedX;		
-_GroovingSpeedY       := GantryXYZ_HMI.Config.GroovingSpeedY;		
-_GroovingSpeedZ       := GantryXYZ_HMI.Config.GroovingSpeedZ;		
-_PanelFrontWidht      := GantryXYZ_HMI.Config.PanelFrontWidht;		
-_PanelFrontLength     := GantryXYZ_HMI.Config.PanelFrontLength;		
-_PanelHeight          := GantryXYZ_HMI.Config.PanelHeight;	
+_GrooveDepthZ         := GantryXYZ_HMI.Config.GrooveDepthZ;
+_GroovingSpeedX       := GantryXYZ_HMI.Config.GroovingSpeedX;
+_GroovingSpeedY       := GantryXYZ_HMI.Config.GroovingSpeedY;
+_GroovingSpeedZ       := GantryXYZ_HMI.Config.GroovingSpeedZ;
+_PanelFrontWidht      := GantryXYZ_HMI.Config.PanelFrontWidht;
+_PanelFrontLength     := GantryXYZ_HMI.Config.PanelFrontLength;
+_PanelHeight          := GantryXYZ_HMI.Config.PanelHeight;
+_ProgramIdRequested   := GantryXYZ_HMI.Command.ProgramIdRequested;
 _RailHeightCorrection := GantryXYZ_HMI.Config.RailHeightCorrection;
-_RapidSpeedX          := GantryXYZ_HMI.Config.RapidSpeedX;			
-_RapidSpeedY          := GantryXYZ_HMI.Config.RapidSpeedY;	
-_RapidSpeedZ          := GantryXYZ_HMI.Config.RapidSpeedZ;	
-_GroovingIdleTime     := GantryXYZ_HMI.Config.GroovingIdleTime;			
-_GroovingOverpass     := GantryXYZ_HMI.Config.GroovingOverpass;			
+_RapidSpeedX          := GantryXYZ_HMI.Config.RapidSpeedX;
+_RapidSpeedY          := GantryXYZ_HMI.Config.RapidSpeedY;
+_RapidSpeedZ          := GantryXYZ_HMI.Config.RapidSpeedZ;
+_GroovingIdleTime     := GantryXYZ_HMI.Config.GroovingIdleTime;
+_GroovingOverpass     := GantryXYZ_HMI.Config.GroovingOverpass;
 
 
 ]]></ST>
@@ -1559,7 +1636,6 @@ END_VAR
 					END_IF
 					
 					E_RecipeID.eBorgoWings:
-					Trace('Czy wybralem program BorgoWings??');
 					IF BuildSegments_BorgoWings() THEN
 						OrchestratorStep := OrchestratorStep + 10;
 					END_IF
@@ -1570,8 +1646,6 @@ END_VAR
 					END_IF
 					
 				END_CASE        
-
-
 
         OrchestratorStep := 10;
 
@@ -1976,30 +2050,35 @@ END_VAR
 //Only _Variables are PERSISTENT, This method is executed during the initialization
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[GantryXYZ_HMI.Config.CuttingSpeedX        := _CuttingSpeedX;
+        <ST><![CDATA[
+GantryXYZ_HMI.Config.CutterXOffsetX       := _CutterXOffsetX;
+GantryXYZ_HMI.Config.CutterXOffsetY       := _CutterXOffsetY;
+GantryXYZ_HMI.Config.CutterYOffsetX       := _CutterYOffsetX;
+GantryXYZ_HMI.Config.CutterYOffsetY       := _CutterYOffsetY;
+GantryXYZ_HMI.Config.CuttingSpeedX        := _CuttingSpeedX;
 GantryXYZ_HMI.Config.CuttingSpeedY        := _CuttingSpeedY;
 GantryXYZ_HMI.Config.CuttingIdleTime      := _CuttingIdleTime;
 GantryXYZ_HMI.Config.CuttingOverpass      := _CuttingOverpass;
-GantryXYZ_HMI.Config.GrooveDepthZ         := _GrooveDepthZ;		
-GantryXYZ_HMI.Config.GroovingSpeedX       := _GroovingSpeedX;		
-GantryXYZ_HMI.Config.GroovingSpeedY       := _GroovingSpeedY;		
+GantryXYZ_HMI.Config.GrooveDepthZ         := _GrooveDepthZ;
+GantryXYZ_HMI.Config.GroovingSpeedX       := _GroovingSpeedX;
+GantryXYZ_HMI.Config.GroovingSpeedY       := _GroovingSpeedY;
 GantryXYZ_HMI.Config.GroovingSpeedZ       := _GroovingSpeedZ;
-GantryXYZ_HMI.Config.GroovingIdleTime     := _GroovingIdleTime;			
-GantryXYZ_HMI.Config.GroovingOverpass     := _GroovingOverpass;			
-GantryXYZ_HMI.Config.PanelFrontLength     := _PanelFrontLength;		
-GantryXYZ_HMI.Config.PanelFrontWidht      := _PanelFrontWidht;		
-GantryXYZ_HMI.Config.PanelHeight          := _PanelHeight;	
+GantryXYZ_HMI.Config.GroovingIdleTime     := _GroovingIdleTime;
+GantryXYZ_HMI.Config.GroovingOverpass     := _GroovingOverpass;
+GantryXYZ_HMI.Config.PanelFrontLength     := _PanelFrontLength;
+GantryXYZ_HMI.Config.PanelFrontWidht      := _PanelFrontWidht;
+GantryXYZ_HMI.Config.PanelHeight          := _PanelHeight;
 GantryXYZ_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
-GantryXYZ_HMI.Config.RapidSpeedX          := _RapidSpeedX;			
-GantryXYZ_HMI.Config.RapidSpeedY          := _RapidSpeedY;	
-GantryXYZ_HMI.Config.RapidSpeedZ          := _RapidSpeedZ;	
+GantryXYZ_HMI.Config.RapidSpeedX          := _RapidSpeedX;
+GantryXYZ_HMI.Config.RapidSpeedY          := _RapidSpeedY;
+GantryXYZ_HMI.Config.RapidSpeedZ          := _RapidSpeedZ;
 
 
 RestorePersistentData := TRUE;]]></ST>
       </Implementation>
     </Method>
-    <Method Name="SequenceTimer" Id="{2e721ea1-cfa0-448e-b2fb-baa077a6b9b3}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD SequenceTimer : BOOL
+    <Method Name="SequenceTimerSeconds" Id="{2e721ea1-cfa0-448e-b2fb-baa077a6b9b3}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD SequenceTimerSeconds : BOOL
 VAR_INPUT
 	WaitingTime :REAL;
 END_VAR
@@ -2012,7 +2091,7 @@ END_VAR
         <ST><![CDATA[ Timer(IN := TRUE, PT := REAL_TO_TIME(WaitingTime * 1000.0));
  IF Timer.Q THEN
 	Timer(IN := FALSE);
-	SequenceTimer := TRUE;
+	SequenceTimerSeconds := TRUE;
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -2137,6 +2216,34 @@ END_IF]]></ST>
     <LineIds Name="FB_GantryXYZ.CurrentSpeed.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterXOffsetX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterXOffsetX.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterXOffsetY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterXOffsetY.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterYOffsetX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterYOffsetX.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterYOffsetY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterYOffsetY.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.CuttingIdleTime.Get">
       <LineId Id="4" Count="0" />
     </LineIds>
@@ -2201,12 +2308,7 @@ END_IF]]></ST>
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutX">
-      <LineId Id="794" Count="54" />
-      <LineId Id="850" Count="0" />
-      <LineId Id="852" Count="5" />
-      <LineId Id="859" Count="40" />
-      <LineId Id="901" Count="1" />
-      <LineId Id="900" Count="0" />
+      <LineId Id="904" Count="105" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutY">
@@ -2266,11 +2368,17 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HMICommunication">
       <LineId Id="6" Count="0" />
+      <LineId Id="105" Count="3" />
       <LineId Id="93" Count="0" />
       <LineId Id="92" Count="0" />
       <LineId Id="70" Count="0" />
       <LineId Id="94" Count="1" />
-      <LineId Id="77" Count="11" />
+      <LineId Id="77" Count="6" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="103" Count="0" />
+      <LineId Id="85" Count="1" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="88" Count="0" />
       <LineId Id="27" Count="0" />
       <LineId Id="38" Count="0" />
       <LineId Id="41" Count="0" />
@@ -2341,7 +2449,9 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.MachiningOrchestrator">
-      <LineId Id="2896" Count="39" />
+      <LineId Id="2896" Count="14" />
+      <LineId Id="2912" Count="9" />
+      <LineId Id="2924" Count="11" />
       <LineId Id="2945" Count="0" />
       <LineId Id="2947" Count="2" />
       <LineId Id="2946" Count="0" />
@@ -2467,6 +2577,8 @@ END_IF]]></ST>
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RestorePersistentData">
+      <LineId Id="51" Count="0" />
+      <LineId Id="53" Count="3" />
       <LineId Id="5" Count="0" />
       <LineId Id="44" Count="2" />
       <LineId Id="27" Count="3" />
@@ -2479,7 +2591,7 @@ END_IF]]></ST>
       <LineId Id="9" Count="0" />
       <LineId Id="6" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.SequenceTimer">
+    <LineIds Name="FB_GantryXYZ.SequenceTimerSeconds">
       <LineId Id="23" Count="3" />
       <LineId Id="7" Count="0" />
     </LineIds>

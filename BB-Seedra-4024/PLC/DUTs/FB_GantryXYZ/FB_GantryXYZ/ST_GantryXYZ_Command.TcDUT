@@ -3,7 +3,7 @@
   <DUT Name="ST_GantryXYZ_Command" Id="{c40493e7-97c3-4ac7-8908-87425e964d7d}">
     <Declaration><![CDATA[TYPE ST_GantryXYZ_Command :
     STRUCT
-		ProgramIdRequested : REAL;
+		ProgramIdRequested : E_RecipeID;
     END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>
