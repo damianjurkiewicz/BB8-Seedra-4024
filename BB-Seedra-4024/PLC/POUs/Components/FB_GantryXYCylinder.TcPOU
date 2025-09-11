@@ -8,7 +8,11 @@
 FUNCTION_BLOCK FB_GantryXYCylinder EXTENDS FB_ComponentBase IMPLEMENTS I_Cylinder
 VAR
     //Output
-    Output AT %Q* : BOOL;
+   
+
+	
+	PistonSensorCutY 			AT%I*		:	BOOL;
+	PistonValveCutY				AT%Q*		:	BOOL;
 
     // Internal variables
     _ExtendRequest  : BOOL;
@@ -28,7 +32,6 @@ VAR
 
     //HMI 
     Cylinder_HMI : ST_CylinderX_HMI;
-	AxeYConfig_HMI : ST_AxisBase_HMI;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -47,42 +50,38 @@ END_VAR]]></Declaration>
     <Method Name="CyclicLogic" Id="{523e51c2-13b6-03e9-1aa1-a3c583ef5375}" FolderPath="I_CyclicFB\">
       <Declaration><![CDATA[METHOD CyclicLogic]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//One shot the requests
+        <ST><![CDATA[// One shot the requests
 Extend_RTRIG(CLK := _ExtendRequest);
 Retract_RTRIG(CLK := _RetractRequest);
 
-//Handle Extend
+// Handle Extend
 IF Extend_RTRIG.Q THEN
-    Output          := TRUE;
+    PistonValveCutY := TRUE;
     _Extending      := TRUE;
     _Retracting     := FALSE;
     _Retracted      := FALSE;
     _RetractRequest := FALSE;
 END_IF
 
-//Handle Retract
+// Handle Retract
 IF Retract_RTRIG.Q THEN
-    Output         := FALSE;
-    _Extending     := FALSE;
-    _Retracting    := TRUE;
-    _Extended      := FALSE;
-    _ExtendRequest := FALSE;
+    PistonValveCutY := FALSE;
+    _Extending      := FALSE;
+    _Retracting     := TRUE;
+    _Extended       := FALSE;
+    _ExtendRequest  := FALSE;
 END_IF
 
-//Handle the time to Extend/Retract
-Extend_TON(IN := _Extending, PT := LREAL_TO_TIME(_ExtendTime));
-Retract_TON(IN := _Retracting, PT := LREAL_TO_TIME(_RetractTime));
-IF Extend_TON.Q THEN
-    _Extended  := TRUE;
-    _Extending := FALSE;
-END_IF
+// Aktualizacja stanu wyłącznie z czujnika
+_Extended  := PistonSensorCutY;
+_Retracted := NOT PistonSensorCutY;
 
-IF Retract_TON.Q THEN
-    _Retracted  := TRUE;
-    _Retracting := FALSE;
-END_IF
+// Status ruchu – tylko gdy trwa przejście
+_Extending  := _Extending  AND NOT _Extended;
+_Retracting := _Retracting AND NOT _Retracted;
 
-SUPER^.CyclicLogic();]]></ST>
+SUPER^.CyclicLogic();
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="Extend" Id="{f94e6f21-1340-0909-053a-ec233f6345e3}" FolderPath="I_Cylinder\">
@@ -150,8 +149,8 @@ METHOD PROTECTED Initialize : BOOL;
 
 //! @description This method is called by <c>CyclicLogic()</c> as required]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//Set the cylinder to retracted
-IF Output THEN
+        <ST><![CDATA[
+IF PistonSensorCutY THEN
     _Extended  := TRUE;
     _Retracted := FALSE;
 ELSE
@@ -164,7 +163,6 @@ _ExtendRequest  := FALSE;
 _Retracting     := FALSE;
 _RetractRequest := FALSE;
 
-//Call base class Initialize
 Initialize := SUPER^.Initialize();]]></ST>
       </Implementation>
     </Method>
@@ -220,7 +218,7 @@ END_VAR]]></Declaration>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYCylinder.CyclicLogic">
-      <LineId Id="3" Count="34" />
+      <LineId Id="39" Count="30" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYCylinder.Extend">
@@ -241,7 +239,7 @@ END_VAR]]></Declaration>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYCylinder.Initialize">
-      <LineId Id="3" Count="14" />
+      <LineId Id="21" Count="13" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYCylinder.Monitoring">

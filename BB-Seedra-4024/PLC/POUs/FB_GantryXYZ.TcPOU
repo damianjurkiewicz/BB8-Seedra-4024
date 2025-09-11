@@ -117,7 +117,7 @@ CASE SequenceState OF
 		IO.CoolingEnable := FALSE;
 		
 		IO.PistonValveCutX := FALSE;
-		IO.PistonValveCutY := FALSE;
+		//IO.PistonValveCutY := FALSE;
 
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
@@ -843,13 +843,12 @@ END_IF
 
 
 30:
-    IO.PistonValveCutY := TRUE;
-	IF SequenceTimerSeconds(1) THEN //in seconds
-		ExecutorStep := 40;
-	END_IF
+	GantryCylinder.Extend();
+	ExecutorStep := 40;
 
 40: 
-    IF IO.PistonSensorCutY THEN
+	IF GantryCylinder.Extended THEN
+    //IF IO.PistonSensorCutY THEN
 	AxisX.Velocity := _CuttingSpeedX;
 	AxisY.Velocity := _CuttingSpeedY;
 	ExecutorStep := 50;
@@ -857,7 +856,6 @@ END_IF
 		
 	
 50:
-   
    	IF SequenceTimerSeconds(_CuttingIdleTime) THEN
 		ExecutorStep := 60;
 	END_IF
@@ -875,25 +873,24 @@ END_IF
 
 // -------- Retrakt Z i przygotowanie następnego --------
 80:
-    IO.PistonValveCutY := FALSE;
-    
-	IF SequenceTimerSeconds(1) THEN 
+	GantryCylinder.Retract();
+//	IO.PistonValveCutY := FALSE;
 		ExecutorStep := 85;
-	END_IF
 	
-85: IF NOT IO.PistonSensorCutY  THEN
+85: 
+	IF GantryCylinder.Retracted THEN
+	//IF NOT IO.PistonSensorCutY  THEN
 		 iSegmentsToCutY := iSegmentsToCutY + 1; 
 		 ExecutorStep := 90;
 	END_IF	
 
 90:
-    IF  AxisX.InPosition AND AxisY.InPosition THEN
+    IF SequenceTimerSeconds(_CuttingIdleTime) THEN
         AxisX.Velocity := _RapidSpeedX;
         AxisY.Velocity := _RapidSpeedY;
 
         
         IF iSegmentsToCutY > SegmentsToCutY THEN
-            IO.SpindleEnable := FALSE;
             ExecutorStep := 1000; // koniec
         ELSE
             ExecutorStep := 10;   // następny odcinek
@@ -978,10 +975,10 @@ END_IF
 	END_IF
 	
 60:
-
     AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X, 0);
     AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y, 0);
     ExecutorStep := 70;
+	
 	
 70: 
     IF AxisX.InPosition AND AxisY.InPosition THEN
@@ -993,9 +990,17 @@ END_IF
 80:
     AxisZ.MoveAbsolute(0,0);
     ExecutorStep := 90;
-
+	
 90:
-    IF AxisZ.InPosition THEN
+ 
+	IF AxisZ.InPosition THEN
+		ExecutorStep := 100;
+	END_IF
+
+	
+
+100:
+    IF SequenceTimerSeconds(_GroovingIdleTime) THEN
        AxisX.Velocity := _RapidSpeedX;
        AxisY.Velocity := _RapidSpeedY;
 
@@ -1650,9 +1655,9 @@ END_VAR
         OrchestratorStep := 10;
 
     10: 
-        IF ExecuteSegmentsGroove() THEN
+       // IF ExecuteSegmentsGroove() THEN
            OrchestratorStep := 20;
-        END_IF
+    //    END_IF
 		
 	20: 
 	 	IF ExecuteSegmentsCutY() THEN
@@ -2312,16 +2317,36 @@ END_IF]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutY">
-      <LineId Id="794" Count="54" />
+      <LineId Id="794" Count="43" />
+      <LineId Id="904" Count="1" />
+      <LineId Id="842" Count="1" />
+      <LineId Id="910" Count="0" />
+      <LineId Id="844" Count="4" />
       <LineId Id="850" Count="0" />
-      <LineId Id="852" Count="5" />
-      <LineId Id="859" Count="40" />
+      <LineId Id="852" Count="1" />
+      <LineId Id="855" Count="2" />
+      <LineId Id="859" Count="14" />
+      <LineId Id="907" Count="0" />
+      <LineId Id="876" Count="0" />
+      <LineId Id="878" Count="1" />
+      <LineId Id="908" Count="1" />
+      <LineId Id="880" Count="10" />
+      <LineId Id="892" Count="7" />
       <LineId Id="901" Count="1" />
       <LineId Id="900" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsGroove">
-      <LineId Id="750" Count="99" />
+      <LineId Id="750" Count="65" />
+      <LineId Id="817" Count="2" />
+      <LineId Id="851" Count="0" />
+      <LineId Id="820" Count="10" />
+      <LineId Id="852" Count="1" />
+      <LineId Id="856" Count="0" />
+      <LineId Id="863" Count="2" />
+      <LineId Id="855" Count="0" />
+      <LineId Id="859" Count="0" />
+      <LineId Id="831" Count="18" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.GrooveDepthZ.Get">
