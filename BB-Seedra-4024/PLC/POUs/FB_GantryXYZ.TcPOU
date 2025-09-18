@@ -13,8 +13,8 @@ VAR
     AxisX : FB_Component_BasicAxis := (Name := 'AxisX');
     AxisY : FB_Component_BasicAxis := (Name := 'AxisY');
     AxisZ : FB_Component_BasicAxis := (Name := 'AxisZ');
-    GantryCylinder : FB_GantryXYCylinder := (Name := 'Cylinder');
-
+    CylinderCuttingY : FB_GantryXYCylinder := (Name := 'Cylinder Y');
+	
 
     // Alarms for this module
     GantryAlarms : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
@@ -55,8 +55,8 @@ VAR PERSISTENT
 	_CuttingSpeedY			:REAL;
 	_CuttingIdleTime		:REAL;
 	_CuttingOverpass		:REAL;
-	_CutterXOffsetX			:REAL;
-	_CutterXOffsetY			:REAL;
+	_SpindleOffsetX			:REAL;
+	_SpindleOffsetY			:REAL;
 	_CutterYOffsetX			:REAL;
 	_CutterYOffsetY			:REAL;	
     _GrooveDepthZ 			:REAL;
@@ -65,7 +65,7 @@ VAR PERSISTENT
 	_GroovingSpeedZ 		:REAL;
 	_GroovingIdleTime 		:REAL;
     _GroovingOverpass 		:REAL;
-    _PanelFrontWidht 		:REAL;
+    _PanelFrontWidth 		:REAL;
     _PanelFrontLength 		:REAL;
     _PanelHeight 			:REAL;
     _RailHeightCorrection	:REAL;
@@ -279,50 +279,85 @@ BuildSegments_BorgoFlaps := TRUE;]]></ST>
     </Method>
     <Method Name="BuildSegments_BorgoWings" Id="{0600b631-5666-4473-9115-8ec263b291bb}" FolderPath="MyMethods\Segments\">
       <Declaration><![CDATA[METHOD BuildSegments_BorgoWings : BOOL
-
+VAR_INST
+	TotalLength :REAL;
+	TotalWidth  :REAL;
+	WingHeight  :REAL;
+	FlapHeight  :REAL;
+END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//  Start → Stop, Milling Segments
+        <ST><![CDATA[//Natural language parameters;
+TotalLength := PanelFrontLength + 2 * _PanelHeight;
+TotalWidth := PanelFrontWidth + 2 * _PanelHeight; 
+
+//  Start → Stop, Milling Segments
 SegmentsToGroove := 4;
 
-SegmentGrooves[1].Start.X := 500;
-SegmentGrooves[1].Start.Y := 500;
-SegmentGrooves[1].Stop.X  := 0;
-SegmentGrooves[1].Stop.Y  := 500;
+SegmentGrooves[1].Start.X := _GroovingOverpass  + _PanelHeight + _PanelFrontWidth + _PanelHeight + _GroovingOverpass;
+SegmentGrooves[1].Start.Y :=  _GroovingOverpass + _PanelHeight + PanelFrontLength;
+SegmentGrooves[1].Stop.X := 0;
+SegmentGrooves[1].Stop.Y :=  _GroovingOverpass + _PanelHeight + PanelFrontLength;
 
-SegmentGrooves[2].Start.X := 500;
-SegmentGrooves[2].Start.Y := 0;
-SegmentGrooves[2].Stop.X  := 0; 
-SegmentGrooves[2].Stop.Y  := 0;
+SegmentGrooves[2].Start.X := _GroovingOverpass  + _PanelHeight + _PanelFrontWidth + _PanelHeight + _GroovingOverpass;
+SegmentGrooves[2].Start.Y := _GroovingOverpass + _PanelHeight;
+SegmentGrooves[2].Stop.X :=  0; 
+SegmentGrooves[2].Stop.Y := _GroovingOverpass + _PanelHeight;
 
-SegmentGrooves[3].Start.X := 500;
-SegmentGrooves[3].Start.Y := 500;
-SegmentGrooves[3].Stop.X  := 500;
-SegmentGrooves[3].Stop.Y  := 0;
+SegmentGrooves[3].Start.X := _GroovingOverpass + _PanelHeight + _PanelFrontWidth;
+SegmentGrooves[3].Start.Y := _GroovingOverpass + _PanelHeight + _PanelFrontLength + _PanelHeight + _GroovingOverpass;
+SegmentGrooves[3].Stop.X := _GroovingOverpass + _PanelHeight + _PanelFrontWidth;
+SegmentGrooves[3].Stop.Y := 0;
 
-SegmentGrooves[4].Start.X := 0;
-SegmentGrooves[4].Start.Y := 500;
-SegmentGrooves[4].Stop.X  := 0;
-SegmentGrooves[4].Stop.Y  := 0;
+SegmentGrooves[4].Start.X := _GroovingOverpass + _PanelHeight;
+SegmentGrooves[4].Start.Y :=  _GroovingOverpass + _PanelHeight + _PanelFrontLength + _PanelHeight + _GroovingOverpass;
+SegmentGrooves[4].Stop.X := _GroovingOverpass + _PanelHeight;
+SegmentGrooves[4].Stop.Y := 0;
 
 //  Start → Stop, CutY Segments
-SegmentsToCutY := 2;
+SegmentsToCutY := 6;
 
-SegmentCutY[1].Start.X := 0; 
-SegmentCutY[1].Start.Y := 500;  
-SegmentCutY[1].Stop.X  := 0; 
-SegmentCutY[1].Stop.Y  := 0;
-SegmentCutY[2].Start.X := 500; 
-SegmentCutY[2].Start.Y := 500;  
-SegmentCutY[2].Stop.X  := 500; 
-SegmentCutY[2].Stop.Y  := 0;
+//Short Box Segments
+SegmentCutY[1].Start.X := _CuttingOverpass + _PanelHeight + _PanelFrontWidth + _PanelHeight + _CuttingOverpass; 
+SegmentCutY[1].Start.Y := _CuttingOverpass + _PanelHeight + PanelFrontLength; 
+SegmentCutY[1].Stop.X  := _CuttingOverpass + _PanelHeight + _PanelFrontWidth; 
+SegmentCutY[1].Stop.Y  := _CuttingOverpass + _PanelHeight + PanelFrontLength;
 
-SegmentsToCutX := 2;
+SegmentCutY[2].Start.X := _CuttingOverpass + _PanelHeight; 
+SegmentCutY[2].Start.Y := _CuttingOverpass + _PanelHeight + PanelFrontLength;
+SegmentCutY[2].Stop.X  := 0; 
+SegmentCutY[2].Stop.Y  := _CuttingOverpass + _PanelHeight + PanelFrontLength;
+
+SegmentCutY[3].Start.X := _CuttingOverpass + _PanelHeight + _PanelFrontWidth + _PanelHeight + _CuttingOverpass;
+SegmentCutY[3].Start.Y := _CuttingOverpass + _PanelHeight;
+SegmentCutY[3].Stop.X :=  _CuttingOverpass + _PanelHeight + _PanelFrontWidth; 
+SegmentCutY[3].Stop.Y :=  _CuttingOverpass + _PanelHeight;
+
+SegmentCutY[4].Start.X := _CuttingOverpass + _PanelHeight;
+SegmentCutY[4].Start.Y := _CuttingOverpass + _PanelHeight;
+SegmentCutY[4].Stop.X :=  0; 
+SegmentCutY[4].Stop.Y :=  _CuttingOverpass + _PanelHeight;
+
+//Panel Dimensions
+SegmentCutY[5].Start.X := _CuttingOverpass + _PanelHeight +_PanelFrontWidth + _PanelHeight + _CuttingOverpass; 
+SegmentCutY[5].Start.Y := _CuttingOverpass + _PanelHeight + _PanelFrontLength + _PanelHeight;  
+SegmentCutY[5].Stop.X  := 0; 
+SegmentCutY[5].Stop.Y  := _CuttingOverpass + _PanelHeight + _PanelFrontLength + _PanelHeight;
+
+SegmentCutY[6].Start.X := _CuttingOverpass + _PanelHeight +_PanelFrontWidth + _PanelHeight + _CuttingOverpass;  
+SegmentCutY[6].Start.Y := _CuttingOverpass + _PanelHeight;   
+SegmentCutY[6].Stop.X  := 0; 
+SegmentCutY[6].Stop.Y  := _CuttingOverpass + _PanelHeight;
+
+
+
+SegmentsToCutX := 6;
 
 SegmentCutX[1].Start.X := 500; 
 SegmentCutX[1].Start.Y := 500;  
 SegmentCutX[1].Stop.X  := 500; 
 SegmentCutX[1].Stop.Y  := 0;
+
 SegmentCutX[2].Start.X := 0; 
 SegmentCutX[2].Start.Y := 500;  
 SegmentCutX[2].Stop.X  := 0; 
@@ -332,6 +367,69 @@ SegmentCutX[2].Stop.Y  := 0;
 
 BuildSegments_BorgoWings := TRUE;
 ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="BuildSegments_Calibration" Id="{0bc1bcc0-1e48-4916-b44b-21d9143ba598}" FolderPath="MyMethods\Segments\">
+      <Declaration><![CDATA[METHOD BuildSegments_Calibration : BOOL
+VAR_INST
+	TotalLength :REAL;
+	TotalWidth  :REAL;
+	WingHeight  :REAL;
+	FlapHeight  :REAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//  Start → Stop, Milling Segments
+SegmentsToGroove := 4;
+
+SegmentGrooves[1].Start.X := 300;
+SegmentGrooves[1].Start.Y := 300;
+SegmentGrooves[1].Stop.X  := 50;
+SegmentGrooves[1].Stop.Y  := 300;
+
+SegmentGrooves[2].Start.X := 300;
+SegmentGrooves[2].Start.Y := 50;
+SegmentGrooves[2].Stop.X  := 50; 
+SegmentGrooves[2].Stop.Y  := 50;
+
+SegmentGrooves[3].Start.X := 300;
+SegmentGrooves[3].Start.Y := 300;
+SegmentGrooves[3].Stop.X  := 300;
+SegmentGrooves[3].Stop.Y  := 50;
+
+SegmentGrooves[4].Start.X := 50;
+SegmentGrooves[4].Start.Y := 300;
+SegmentGrooves[4].Stop.X  := 50;
+SegmentGrooves[4].Stop.Y  := 50;
+
+//  Start → Stop, CutY Segments
+SegmentsToCutY := 2;
+
+SegmentCutY[1].Start.X := 300; 
+SegmentCutY[1].Start.Y := 300;  
+SegmentCutY[1].Stop.X  := 300; 
+SegmentCutY[1].Stop.Y  := 50;
+
+SegmentCutY[2].Start.X := 50; 
+SegmentCutY[2].Start.Y := 300;  
+SegmentCutY[2].Stop.X  := 50; 
+SegmentCutY[2].Stop.Y  := 50;
+
+SegmentsToCutX := 2;
+
+SegmentCutX[1].Start.X := 300;
+SegmentCutX[1].Start.Y := 300; 
+SegmentCutX[1].Stop.X  := 50;
+SegmentCutX[1].Stop.Y  := 300;
+                               
+SegmentCutX[2].Start.X := 300;
+SegmentCutX[2].Start.Y := 50; 
+SegmentCutX[2].Stop.X  := 50; 
+SegmentCutX[2].Stop.Y  := 50;
+
+
+
+BuildSegments_BorgoFlaps := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
@@ -454,40 +552,6 @@ SUPER^.CreateEvents();]]></ST>
           <ST><![CDATA[CurrentSpeed := _CurrentSpeed;]]></ST>
         </Implementation>
       </Get>
-    </Property>
-    <Property Name="CutterXOffsetX" Id="{ec876c40-72b1-49ef-b4a8-dafc4e3faf39}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CutterXOffsetX : REAL]]></Declaration>
-      <Get Name="Get" Id="{84da6823-a94d-424f-a88e-9f4900452f7f}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CutterXOffsetX := _CutterXOffsetX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{415034c5-edcb-4d81-8764-a7aa31c1615f}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CutterXOffsetX := CutterXOffsetX;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="CutterXOffsetY" Id="{195bbbbb-15a8-436d-866c-ecc00711e6f4}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CutterXOffsetY : REAL]]></Declaration>
-      <Get Name="Get" Id="{c99ef4e3-05c1-488d-a09a-ef00fdd76f8d}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CutterXOffsetY := _CutterXOffsetY;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{dfc0ea26-14ea-4173-aef3-e2791575f96a}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CutterXOffsetY := CutterXOffsetY;
-]]></ST>
-        </Implementation>
-      </Set>
     </Property>
     <Property Name="CutterYOffsetX" Id="{2d729998-2abb-43f8-849d-8b6a18e55ff7}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY PUBLIC CutterYOffsetX : REAL]]></Declaration>
@@ -709,7 +773,7 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
     AxisY.Velocity := _RapidSpeedY;
     AxisZ.Velocity := _RapidSpeedZ;
 
-	iSegmentsToCutY := 0;
+	iSegmentsToCutX := 0;
 	
 	IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
 		iSegmentsToCutX := iSegmentsToCutX + 1;
@@ -719,8 +783,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.X, 0);
-    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.Y, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Start.X + _CutterYOffsetX, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Start.Y + _CutterYOffsetY, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -730,13 +794,12 @@ END_IF
 
 
 30:
-    IO.PistonValveCutX := TRUE;
-	IF SequenceTimerSeconds(1) THEN //in seconds
-		ExecutorStep := 40;
-	END_IF
+	CylinderCuttingY.Extend();
+	ExecutorStep := 40;
 
 40: 
-    IF IO.PistonSensorCutX THEN
+	IF CylinderCuttingY.Extended THEN
+    //IF IO.PistonSensorCutY THEN
 	AxisX.Velocity := _CuttingSpeedX;
 	AxisY.Velocity := _CuttingSpeedY;
 	ExecutorStep := 50;
@@ -744,15 +807,14 @@ END_IF
 		
 	
 50:
-   
    	IF SequenceTimerSeconds(_CuttingIdleTime) THEN
 		ExecutorStep := 60;
 	END_IF
 
 // -------- Cięcie XY do końca odcinka --------
 60:
-    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.X, 0);
-    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.Y, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Stop.X + _CutterYOffsetX, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Stop.Y + _CutterYOffsetY, 0);
     ExecutorStep := 70;
 
 70: // czekamy na koniec cięcia
@@ -762,25 +824,24 @@ END_IF
 
 // -------- Retrakt Z i przygotowanie następnego --------
 80:
-    IO.PistonValveCutX := FALSE;
-    
-	IF SequenceTimerSeconds(1) THEN //in seconds
+	CylinderCuttingY.Retract();
+//	IO.PistonValveCutY := FALSE;
 		ExecutorStep := 85;
-	END_IF
 	
-85: IF NOT IO.PistonSensorCutX  THEN
+85: 
+	IF CylinderCuttingY.Retracted THEN
+	//IF NOT IO.PistonSensorCutY  THEN
 		 iSegmentsToCutX := iSegmentsToCutX + 1; 
 		 ExecutorStep := 90;
 	END_IF	
 
 90:
-    IF  AxisX.InPosition AND AxisY.InPosition THEN
+    IF SequenceTimerSeconds(_CuttingIdleTime) THEN
         AxisX.Velocity := _RapidSpeedX;
         AxisY.Velocity := _RapidSpeedY;
 
         
         IF iSegmentsToCutX > SegmentsToCutX THEN
-            IO.SpindleEnable := FALSE;
             ExecutorStep := 1000; // koniec
         ELSE
             ExecutorStep := 10;   // następny odcinek
@@ -832,8 +893,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.X, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.Y, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.X + _CutterYOffsetX, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.Y + _CutterYOffsetY, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -843,11 +904,11 @@ END_IF
 
 
 30:
-	GantryCylinder.Extend();
+	CylinderCuttingY.Extend();
 	ExecutorStep := 40;
 
 40: 
-	IF GantryCylinder.Extended THEN
+	IF CylinderCuttingY.Extended THEN
     //IF IO.PistonSensorCutY THEN
 	AxisX.Velocity := _CuttingSpeedX;
 	AxisY.Velocity := _CuttingSpeedY;
@@ -862,8 +923,8 @@ END_IF
 
 // -------- Cięcie XY do końca odcinka --------
 60:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.X, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.Y, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.X + _CutterYOffsetX, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.Y + _CutterYOffsetY, 0);
     ExecutorStep := 70;
 
 70: // czekamy na koniec cięcia
@@ -873,12 +934,12 @@ END_IF
 
 // -------- Retrakt Z i przygotowanie następnego --------
 80:
-	GantryCylinder.Retract();
+	CylinderCuttingY.Retract();
 //	IO.PistonValveCutY := FALSE;
 		ExecutorStep := 85;
 	
 85: 
-	IF GantryCylinder.Retracted THEN
+	IF CylinderCuttingY.Retracted THEN
 	//IF NOT IO.PistonSensorCutY  THEN
 		 iSegmentsToCutY := iSegmentsToCutY + 1; 
 		 ExecutorStep := 90;
@@ -945,8 +1006,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X, 0);
-    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y, 0);
+    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X + _SpindleOffsetX, 0);
+    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y + _SpindleOffsetY, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -975,8 +1036,8 @@ END_IF
 	END_IF
 	
 60:
-    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X, 0);
-    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y, 0);
+    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X + _SpindleOffsetX, 0);
+    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y + _SpindleOffsetY, 0);
     ExecutorStep := 70;
 	
 	
@@ -1130,8 +1191,8 @@ METHOD PROTECTED HMICommunication
       <Implementation>
         <ST><![CDATA[SUPER^.HMICommunication();
 
-_CutterXOffsetX       := GantryXYZ_HMI.Config.CutterXOffsetX;
-_CutterXOffsetY       := GantryXYZ_HMI.Config.CutterXOffsetY;
+_SpindleOffsetX       := GantryXYZ_HMI.Config.CutterXOffsetX;
+_SpindleOffsetY       := GantryXYZ_HMI.Config.CutterXOffsetY;
 _CutterYOffsetX       := GantryXYZ_HMI.Config.CutterYOffsetX;
 _CutterYOffsetY       := GantryXYZ_HMI.Config.CutterYOffsetY;
 _CuttingSpeedX        := GantryXYZ_HMI.Config.CuttingSpeedX;
@@ -1142,7 +1203,7 @@ _GrooveDepthZ         := GantryXYZ_HMI.Config.GrooveDepthZ;
 _GroovingSpeedX       := GantryXYZ_HMI.Config.GroovingSpeedX;
 _GroovingSpeedY       := GantryXYZ_HMI.Config.GroovingSpeedY;
 _GroovingSpeedZ       := GantryXYZ_HMI.Config.GroovingSpeedZ;
-_PanelFrontWidht      := GantryXYZ_HMI.Config.PanelFrontWidht;
+_PanelFrontWidth      := GantryXYZ_HMI.Config.PanelFrontWidht;
 _PanelFrontLength     := GantryXYZ_HMI.Config.PanelFrontLength;
 _PanelHeight          := GantryXYZ_HMI.Config.PanelHeight;
 _ProgramIdRequested   := GantryXYZ_HMI.Command.ProgramIdRequested;
@@ -1593,7 +1654,7 @@ CASE DescendantSequenceState OF
 		RegisterComponent(AxisX);
 		RegisterComponent(AxisY);	
 		RegisterComponent(AxisZ);	
-		RegisterComponent(GantryCylinder);
+		RegisterComponent(CylinderCuttingY);
         _LogModeChanges         := FALSE;
         _LogStateChanges        := FALSE;
         DescendantSequenceState := DescendantSequenceState + 10;
@@ -1641,7 +1702,7 @@ END_VAR
 					END_IF
 					
 					E_RecipeID.eBorgoWings:
-					IF BuildSegments_BorgoWings() THEN
+					IF BuildSegments_Calibration() THEN
 						OrchestratorStep := OrchestratorStep + 10;
 					END_IF
 					
@@ -1655,9 +1716,9 @@ END_VAR
         OrchestratorStep := 10;
 
     10: 
-       // IF ExecuteSegmentsGroove() THEN
+        IF ExecuteSegmentsGroove() THEN
            OrchestratorStep := 20;
-    //    END_IF
+        END_IF
 		
 	20: 
 	 	IF ExecuteSegmentsCutY() THEN
@@ -1693,19 +1754,19 @@ END_CASE]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="PanelFrontWidht" Id="{f3e0dbc8-c3fa-460e-86ce-eb87111125e9}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontWidht : REAL]]></Declaration>
+    <Property Name="PanelFrontWidth" Id="{f3e0dbc8-c3fa-460e-86ce-eb87111125e9}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontWidth : REAL]]></Declaration>
       <Get Name="Get" Id="{337b7ccf-7529-41b1-81a1-e9c0f98de875}">
         <Declaration><![CDATA[
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[PanelFrontWidht := _PanelFrontWidht;]]></ST>
+          <ST><![CDATA[PanelFrontWidth := _PanelFrontWidth;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{6f7f0fd9-fb5c-4077-ab43-02d47a14a15f}">
         <Declaration><![CDATA[]]></Declaration>
         <Implementation>
-          <ST><![CDATA[_PanelFrontWidht := PanelFrontWidht;
+          <ST><![CDATA[_PanelFrontWidth := PanelFrontWidth;
 ]]></ST>
         </Implementation>
       </Set>
@@ -2056,8 +2117,8 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GantryXYZ_HMI.Config.CutterXOffsetX       := _CutterXOffsetX;
-GantryXYZ_HMI.Config.CutterXOffsetY       := _CutterXOffsetY;
+GantryXYZ_HMI.Config.CutterXOffsetX       := _SpindleOffsetX;
+GantryXYZ_HMI.Config.CutterXOffsetY       := _SpindleOffsetY;
 GantryXYZ_HMI.Config.CutterYOffsetX       := _CutterYOffsetX;
 GantryXYZ_HMI.Config.CutterYOffsetY       := _CutterYOffsetY;
 GantryXYZ_HMI.Config.CuttingSpeedX        := _CuttingSpeedX;
@@ -2071,7 +2132,7 @@ GantryXYZ_HMI.Config.GroovingSpeedZ       := _GroovingSpeedZ;
 GantryXYZ_HMI.Config.GroovingIdleTime     := _GroovingIdleTime;
 GantryXYZ_HMI.Config.GroovingOverpass     := _GroovingOverpass;
 GantryXYZ_HMI.Config.PanelFrontLength     := _PanelFrontLength;
-GantryXYZ_HMI.Config.PanelFrontWidht      := _PanelFrontWidht;
+GantryXYZ_HMI.Config.PanelFrontWidht      := _PanelFrontWidth;
 GantryXYZ_HMI.Config.PanelHeight          := _PanelHeight;
 GantryXYZ_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
 GantryXYZ_HMI.Config.RapidSpeedX          := _RapidSpeedX;
@@ -2100,6 +2161,40 @@ END_VAR
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <Property Name="SpindleOffsetX" Id="{ec876c40-72b1-49ef-b4a8-dafc4e3faf39}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC SpindleOffsetX : REAL]]></Declaration>
+      <Get Name="Get" Id="{84da6823-a94d-424f-a88e-9f4900452f7f}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SpindleOffsetX := _SpindleOffsetX;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{415034c5-edcb-4d81-8764-a7aa31c1615f}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_SpindleOffsetX := SpindleOffsetX;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="SpindleOffsetY" Id="{195bbbbb-15a8-436d-866c-ecc00711e6f4}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC SpindleOffsetY : REAL]]></Declaration>
+      <Get Name="Get" Id="{c99ef4e3-05c1-488d-a09a-ef00fdd76f8d}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SpindleOffsetY := _SpindleOffsetY;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{dfc0ea26-14ea-4173-aef3-e2791575f96a}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_SpindleOffsetY := SpindleOffsetY;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <LineIds Name="FB_GantryXYZ">
       <LineId Id="49" Count="0" />
       <LineId Id="45" Count="0" />
@@ -2149,35 +2244,28 @@ END_IF]]></ST>
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoWings">
-      <LineId Id="70" Count="2" />
-      <LineId Id="107" Count="0" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="108" Count="0" />
-      <LineId Id="117" Count="0" />
-      <LineId Id="122" Count="0" />
-      <LineId Id="109" Count="0" />
-      <LineId Id="116" Count="0" />
-      <LineId Id="110" Count="0" />
-      <LineId Id="115" Count="0" />
-      <LineId Id="123" Count="0" />
-      <LineId Id="111" Count="0" />
-      <LineId Id="118" Count="0" />
-      <LineId Id="112" Count="0" />
-      <LineId Id="119" Count="0" />
-      <LineId Id="124" Count="0" />
-      <LineId Id="113" Count="0" />
-      <LineId Id="120" Count="0" />
-      <LineId Id="97" Count="0" />
-      <LineId Id="121" Count="0" />
-      <LineId Id="77" Count="1" />
-      <LineId Id="85" Count="2" />
-      <LineId Id="98" Count="2" />
-      <LineId Id="88" Count="0" />
-      <LineId Id="101" Count="2" />
-      <LineId Id="129" Count="9" />
-      <LineId Id="128" Count="0" />
-      <LineId Id="89" Count="1" />
-      <LineId Id="92" Count="1" />
+      <LineId Id="185" Count="0" />
+      <LineId Id="188" Count="27" />
+      <LineId Id="272" Count="0" />
+      <LineId Id="216" Count="0" />
+      <LineId Id="273" Count="17" />
+      <LineId Id="248" Count="0" />
+      <LineId Id="271" Count="0" />
+      <LineId Id="254" Count="4" />
+      <LineId Id="260" Count="4" />
+      <LineId Id="259" Count="0" />
+      <LineId Id="253" Count="0" />
+      <LineId Id="225" Count="6" />
+      <LineId Id="291" Count="0" />
+      <LineId Id="232" Count="7" />
+      <LineId Id="27" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.BuildSegments_Calibration">
+      <LineId Id="306" Count="29" />
+      <LineId Id="354" Count="0" />
+      <LineId Id="336" Count="10" />
+      <LineId Id="355" Count="0" />
+      <LineId Id="347" Count="6" />
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
@@ -2219,20 +2307,6 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CurrentSpeed.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterXOffsetX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterXOffsetX.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterXOffsetY.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterXOffsetY.Set">
-      <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CutterYOffsetX.Get">
@@ -2313,7 +2387,7 @@ END_IF]]></ST>
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutX">
-      <LineId Id="904" Count="105" />
+      <LineId Id="1011" Count="102" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutY">
@@ -2490,10 +2564,10 @@ END_IF]]></ST>
       <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.PanelFrontWidht.Get">
+    <LineIds Name="FB_GantryXYZ.PanelFrontWidth.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.PanelFrontWidht.Set">
+    <LineIds Name="FB_GantryXYZ.PanelFrontWidth.Set">
       <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -2619,6 +2693,20 @@ END_IF]]></ST>
     <LineIds Name="FB_GantryXYZ.SequenceTimerSeconds">
       <LineId Id="23" Count="3" />
       <LineId Id="7" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.SpindleOffsetX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.SpindleOffsetX.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.SpindleOffsetY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.SpindleOffsetY.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
