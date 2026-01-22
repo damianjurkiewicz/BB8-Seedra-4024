@@ -21,11 +21,13 @@
 	ProximitySensorY			AT%I*		:	BOOL;
 	ProximitySensorZ			AT%I*		:	BOOL;
 	
-    //PistonSensorCutY 			AT%I*		:	BOOL;
+    PistonSensorCutY 			AT%I*		:	BOOL;
 	PistonSensorCutX			AT%I*		:	BOOL;
 	
-	//PistonValveCutY				AT%Q*		:	BOOL;
+	PistonValveCutY				AT%Q*		:	BOOL;
 	PistonValveCutX				AT%Q*		:	BOOL;	
+	
+	
 
 
 END_VAR]]></Declaration>

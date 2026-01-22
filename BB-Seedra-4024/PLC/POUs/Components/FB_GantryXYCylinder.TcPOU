@@ -13,6 +13,9 @@ VAR
 	
 	PistonSensorCutY 			AT%I*		:	BOOL;
 	PistonValveCutY				AT%Q*		:	BOOL;
+	
+	PistonSensorCutX 			AT%I*		:	BOOL;
+	PistonValveCutX				AT%Q*		:	BOOL;
 
     // Internal variables
     _ExtendRequest  : BOOL;

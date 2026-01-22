@@ -117,7 +117,7 @@ CASE SequenceState OF
 		IO.CoolingEnable := FALSE;
 		
 		IO.PistonValveCutX := FALSE;
-		//IO.PistonValveCutY := FALSE;
+		IO.PistonValveCutY := FALSE;
 
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
@@ -272,8 +272,6 @@ SegmentCutX[2].Start.Y := 500;
 SegmentCutX[2].Stop.X  := 0; 
 SegmentCutX[2].Stop.Y  := 0;
 
-
-
 BuildSegments_BorgoFlaps := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -294,60 +292,60 @@ TotalWidth := PanelFrontWidth + 2 * _PanelHeight;
 //  Start → Stop, Milling Segments
 SegmentsToGroove := 4;
 
-SegmentGrooves[1].Start.X := _GroovingOverpass  + _PanelHeight + _PanelFrontWidth + _PanelHeight + _GroovingOverpass;
-SegmentGrooves[1].Start.Y :=  _GroovingOverpass + _PanelHeight + PanelFrontLength;
+SegmentGrooves[1].Start.X :=_PanelHeight + _PanelFrontWidth + _PanelHeight;
+SegmentGrooves[1].Start.Y := _PanelHeight + _PanelFrontLength;
 SegmentGrooves[1].Stop.X := 0;
-SegmentGrooves[1].Stop.Y :=  _GroovingOverpass + _PanelHeight + PanelFrontLength;
+SegmentGrooves[1].Stop.Y := _PanelHeight + _PanelFrontLength;
 
-SegmentGrooves[2].Start.X := _GroovingOverpass  + _PanelHeight + _PanelFrontWidth + _PanelHeight + _GroovingOverpass;
-SegmentGrooves[2].Start.Y := _GroovingOverpass + _PanelHeight;
+SegmentGrooves[2].Start.X := _PanelHeight + _PanelFrontWidth + _PanelHeight;
+SegmentGrooves[2].Start.Y := _PanelHeight;
 SegmentGrooves[2].Stop.X :=  0; 
-SegmentGrooves[2].Stop.Y := _GroovingOverpass + _PanelHeight;
+SegmentGrooves[2].Stop.Y := _PanelHeight;
 
-SegmentGrooves[3].Start.X := _GroovingOverpass + _PanelHeight + _PanelFrontWidth;
-SegmentGrooves[3].Start.Y := _GroovingOverpass + _PanelHeight + _PanelFrontLength + _PanelHeight + _GroovingOverpass;
-SegmentGrooves[3].Stop.X := _GroovingOverpass + _PanelHeight + _PanelFrontWidth;
+SegmentGrooves[3].Start.X := _PanelHeight + _PanelFrontWidth;
+SegmentGrooves[3].Start.Y := _PanelHeight + _PanelFrontLength + _PanelHeight;
+SegmentGrooves[3].Stop.X := _PanelHeight + _PanelFrontWidth;
 SegmentGrooves[3].Stop.Y := 0;
 
-SegmentGrooves[4].Start.X := _GroovingOverpass + _PanelHeight;
-SegmentGrooves[4].Start.Y :=  _GroovingOverpass + _PanelHeight + _PanelFrontLength + _PanelHeight + _GroovingOverpass;
-SegmentGrooves[4].Stop.X := _GroovingOverpass + _PanelHeight;
+SegmentGrooves[4].Start.X := _PanelHeight;
+SegmentGrooves[4].Start.Y := _PanelHeight + _PanelFrontLength + _PanelHeight;
+SegmentGrooves[4].Stop.X := _PanelHeight;
 SegmentGrooves[4].Stop.Y := 0;
 
 //  Start → Stop, CutY Segments
 SegmentsToCutY := 6;
 
 //Short Box Segments
-SegmentCutY[1].Start.X := _CuttingOverpass + _PanelHeight + _PanelFrontWidth + _PanelHeight + _CuttingOverpass; 
-SegmentCutY[1].Start.Y := _CuttingOverpass + _PanelHeight + PanelFrontLength; 
-SegmentCutY[1].Stop.X  := _CuttingOverpass + _PanelHeight + _PanelFrontWidth; 
-SegmentCutY[1].Stop.Y  := _CuttingOverpass + _PanelHeight + PanelFrontLength;
+SegmentCutY[1].Start.X := _PanelHeight + _PanelFrontWidth + _PanelHeight; 
+SegmentCutY[1].Start.Y := _PanelHeight + _PanelFrontLength; 
+SegmentCutY[1].Stop.X  := _PanelHeight + _PanelFrontWidth; 
+SegmentCutY[1].Stop.Y  := _PanelHeight + _PanelFrontLength;
 
-SegmentCutY[2].Start.X := _CuttingOverpass + _PanelHeight; 
-SegmentCutY[2].Start.Y := _CuttingOverpass + _PanelHeight + PanelFrontLength;
+SegmentCutY[2].Start.X := _PanelHeight; 
+SegmentCutY[2].Start.Y := _PanelHeight + _PanelFrontLength;
 SegmentCutY[2].Stop.X  := 0; 
-SegmentCutY[2].Stop.Y  := _CuttingOverpass + _PanelHeight + PanelFrontLength;
+SegmentCutY[2].Stop.Y  := _PanelHeight + _PanelFrontLength;
 
-SegmentCutY[3].Start.X := _CuttingOverpass + _PanelHeight + _PanelFrontWidth + _PanelHeight + _CuttingOverpass;
-SegmentCutY[3].Start.Y := _CuttingOverpass + _PanelHeight;
-SegmentCutY[3].Stop.X :=  _CuttingOverpass + _PanelHeight + _PanelFrontWidth; 
-SegmentCutY[3].Stop.Y :=  _CuttingOverpass + _PanelHeight;
+SegmentCutY[3].Start.X := _PanelHeight + _PanelFrontWidth + _PanelHeight;
+SegmentCutY[3].Start.Y := _PanelHeight;
+SegmentCutY[3].Stop.X := _PanelHeight + _PanelFrontWidth; 
+SegmentCutY[3].Stop.Y := _PanelHeight;
 
-SegmentCutY[4].Start.X := _CuttingOverpass + _PanelHeight;
-SegmentCutY[4].Start.Y := _CuttingOverpass + _PanelHeight;
+SegmentCutY[4].Start.X := _PanelHeight;
+SegmentCutY[4].Start.Y := _PanelHeight;
 SegmentCutY[4].Stop.X :=  0; 
-SegmentCutY[4].Stop.Y :=  _CuttingOverpass + _PanelHeight;
+SegmentCutY[4].Stop.Y := _PanelHeight;
 
 //Panel Dimensions
-SegmentCutY[5].Start.X := _CuttingOverpass + _PanelHeight +_PanelFrontWidth + _PanelHeight + _CuttingOverpass; 
-SegmentCutY[5].Start.Y := _CuttingOverpass + _PanelHeight + _PanelFrontLength + _PanelHeight;  
+SegmentCutY[5].Start.X := _PanelHeight +_PanelFrontWidth + _PanelHeight; 
+SegmentCutY[5].Start.Y := _PanelHeight + _PanelFrontLength + _PanelHeight;  
 SegmentCutY[5].Stop.X  := 0; 
-SegmentCutY[5].Stop.Y  := _CuttingOverpass + _PanelHeight + _PanelFrontLength + _PanelHeight;
+SegmentCutY[5].Stop.Y  := _PanelHeight + _PanelFrontLength + _PanelHeight;
 
-SegmentCutY[6].Start.X := _CuttingOverpass + _PanelHeight +_PanelFrontWidth + _PanelHeight + _CuttingOverpass;  
-SegmentCutY[6].Start.Y := _CuttingOverpass + _PanelHeight;   
+SegmentCutY[6].Start.X := _PanelHeight +_PanelFrontWidth + _PanelHeight;  
+SegmentCutY[6].Start.Y := _PanelHeight;   
 SegmentCutY[6].Stop.X  := 0; 
-SegmentCutY[6].Stop.Y  := _CuttingOverpass + _PanelHeight;
+SegmentCutY[6].Stop.Y  := _PanelHeight;
 
 
 
@@ -427,9 +425,7 @@ SegmentCutX[2].Start.Y := 50;
 SegmentCutX[2].Stop.X  := 50; 
 SegmentCutX[2].Stop.Y  := 50;
 
-
-
-BuildSegments_BorgoFlaps := TRUE;]]></ST>
+BuildSegments_Calibration := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
@@ -783,8 +779,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Start.X + _CutterYOffsetX, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Start.Y + _CutterYOffsetY, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Start.X + 130.0, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Start.Y + 64.0, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -813,8 +809,8 @@ END_IF
 
 // -------- Cięcie XY do końca odcinka --------
 60:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Stop.X + _CutterYOffsetX, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Stop.Y + _CutterYOffsetY, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Stop.X + 130.0, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Stop.Y + 64.0, 0);
     ExecutorStep := 70;
 
 70: // czekamy na koniec cięcia
@@ -893,8 +889,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.X + _CutterYOffsetX, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.Y + _CutterYOffsetY, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.X + 109, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.Y + 32, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -923,8 +919,8 @@ END_IF
 
 // -------- Cięcie XY do końca odcinka --------
 60:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.X + _CutterYOffsetX, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.Y + _CutterYOffsetY, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.X + 109, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.Y + 32, 0);
     ExecutorStep := 70;
 
 70: // czekamy na koniec cięcia
@@ -1006,8 +1002,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X + _SpindleOffsetX, 0);
-    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y + _SpindleOffsetY, 0);
+    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X, 0);
+    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -1036,8 +1032,8 @@ END_IF
 	END_IF
 	
 60:
-    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X + _SpindleOffsetX, 0);
-    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y + _SpindleOffsetY, 0);
+    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X, 0);
+    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y, 0);
     ExecutorStep := 70;
 	
 	
@@ -2240,7 +2236,8 @@ END_IF]]></ST>
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoFlaps">
-      <LineId Id="32" Count="47" />
+      <LineId Id="32" Count="44" />
+      <LineId Id="79" Count="0" />
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoWings">
@@ -2265,7 +2262,8 @@ END_IF]]></ST>
       <LineId Id="354" Count="0" />
       <LineId Id="336" Count="10" />
       <LineId Id="355" Count="0" />
-      <LineId Id="347" Count="6" />
+      <LineId Id="347" Count="3" />
+      <LineId Id="353" Count="0" />
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
