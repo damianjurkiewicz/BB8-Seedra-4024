@@ -13,7 +13,8 @@ VAR
     AxisX : FB_Component_BasicAxis := (Name := 'AxisX');
     AxisY : FB_Component_BasicAxis := (Name := 'AxisY');
     AxisZ : FB_Component_BasicAxis := (Name := 'AxisZ');
-    CylinderCuttingY : FB_GantryXYCylinder := (Name := 'Cylinder Y');
+    CylinderCuttingY : FB_CylinderCutY := (Name := 'Cylinder Y');
+	CylinderCuttingX : FB_CylinderCutX := (Name := 'Cylinder X');
 	
 
     // Alarms for this module
@@ -278,88 +279,151 @@ BuildSegments_BorgoFlaps := TRUE;]]></ST>
     <Method Name="BuildSegments_BorgoWings" Id="{0600b631-5666-4473-9115-8ec263b291bb}" FolderPath="MyMethods\Segments\">
       <Declaration><![CDATA[METHOD BuildSegments_BorgoWings : BOOL
 VAR_INST
-	TotalLength :REAL;
-	TotalWidth  :REAL;
-	WingHeight  :REAL;
-	FlapHeight  :REAL;
+	TotalY 		:REAL;
+	TotalX  	:REAL;
+	ShorterY  	:REAL;
+	ShorterX  	:REAL;
 END_VAR
-]]></Declaration>
+
+//We cut here BorgoWings it means, panel will be installed on wings
+// It means we have to make flaps shorter]]></Declaration>
       <Implementation>
         <ST><![CDATA[//Natural language parameters;
-TotalLength := PanelFrontLength + 2 * _PanelHeight;
-TotalWidth := PanelFrontWidth + 2 * _PanelHeight; 
+TotalY := PanelFrontLength + 2 * _PanelHeight;
+TotalX := PanelFrontWidth + 2 * _PanelHeight;
+ShorterY := TotalY - _PanelHeight;
+ShorterX := TotalX - _PanelHeight;
+
+
 
 //  Start → Stop, Milling Segments
 SegmentsToGroove := 4;
 
-SegmentGrooves[1].Start.X :=_PanelHeight + _PanelFrontWidth + _PanelHeight;
-SegmentGrooves[1].Start.Y := _PanelHeight + _PanelFrontLength;
+///////////////
+SegmentGrooves[1].Start.X := TotalX;
 SegmentGrooves[1].Stop.X := 0;
-SegmentGrooves[1].Stop.Y := _PanelHeight + _PanelFrontLength;
 
-SegmentGrooves[2].Start.X := _PanelHeight + _PanelFrontWidth + _PanelHeight;
-SegmentGrooves[2].Start.Y := _PanelHeight;
+SegmentGrooves[1].Start.Y := ShorterY;
+SegmentGrooves[1].Stop.Y := ShorterY;
+
+///////////////
+SegmentGrooves[2].Start.X := TotalX;
 SegmentGrooves[2].Stop.X :=  0; 
-SegmentGrooves[2].Stop.Y := _PanelHeight;
 
-SegmentGrooves[3].Start.X := _PanelHeight + _PanelFrontWidth;
-SegmentGrooves[3].Start.Y := _PanelHeight + _PanelFrontLength + _PanelHeight;
-SegmentGrooves[3].Stop.X := _PanelHeight + _PanelFrontWidth;
+SegmentGrooves[2].Start.Y := _PanelHeight;
+SegmentGrooves[2].Stop.Y :=  _PanelHeight;
+
+//////////////
+SegmentGrooves[3].Start.X := ShorterX;
+SegmentGrooves[3].Stop.X := ShorterX;
+
+SegmentGrooves[3].Start.Y := TotalY;
 SegmentGrooves[3].Stop.Y := 0;
 
-SegmentGrooves[4].Start.X := _PanelHeight;
-SegmentGrooves[4].Start.Y := _PanelHeight + _PanelFrontLength + _PanelHeight;
-SegmentGrooves[4].Stop.X := _PanelHeight;
+/////////////
+SegmentGrooves[4].Start.Y := TotalY;
 SegmentGrooves[4].Stop.Y := 0;
 
-//  Start → Stop, CutY Segments
+SegmentGrooves[4].Start.X := _PanelHeight;
+SegmentGrooves[4].Stop.X := _PanelHeight;
+
+
+////////////
+// Cut Y //
+///////////
+SegmentsToCutX := 6;
+
+//Short Box Segments
+SegmentCutX[1].Start.X := TotalX;
+SegmentCutX[1].Stop.X  := ShorterX;
+
+SegmentCutX[1].Start.Y := ShorterY;
+SegmentCutX[1].Stop.Y  := ShorterY;
+
+///////////////
+SegmentCutX[2].Start.X := _PanelHeight;
+SegmentCutX[2].Stop.X  := 0;
+
+SegmentCutX[2].Start.Y := ShorterY;
+SegmentCutX[2].Stop.Y  := ShorterY;
+
+///////////////
+SegmentCutX[3].Start.X := TotalX;
+SegmentCutX[3].Stop.X := ShorterX;
+
+SegmentCutX[3].Start.Y := _PanelHeight;
+SegmentCutX[3].Stop.Y := _PanelHeight;
+
+///////////////
+SegmentCutX[4].Start.X := _PanelHeight;
+SegmentCutX[4].Stop.X :=  0;
+
+SegmentCutX[4].Start.Y := _PanelHeight;
+SegmentCutX[4].Stop.Y := _PanelHeight;
+
+//Panel Dimensions Shorter Flaps
+
+
+SegmentCutX[5].Start.X := TotalX;
+SegmentCutX[5].Stop.X  := 0;
+
+SegmentCutX[5].Start.Y := TotalY - _RailHeightCorrection;
+SegmentCutX[5].Stop.Y  := TotalY - _RailHeightCorrection;
+
+///////////////
+SegmentCutX[6].Start.X := TotalX;
+SegmentCutX[6].Stop.X  := 0;
+
+SegmentCutX[6].Start.Y := _RailHeightCorrection;
+SegmentCutX[6].Stop.Y  := _RailHeightCorrection;
+
+
+////////////
+// Cut Y //
+///////////
+
 SegmentsToCutY := 6;
 
 //Short Box Segments
-SegmentCutY[1].Start.X := _PanelHeight + _PanelFrontWidth + _PanelHeight; 
-SegmentCutY[1].Start.Y := _PanelHeight + _PanelFrontLength; 
-SegmentCutY[1].Stop.X  := _PanelHeight + _PanelFrontWidth; 
-SegmentCutY[1].Stop.Y  := _PanelHeight + _PanelFrontLength;
+SegmentCutY[1].Start.X := ShorterX;
+SegmentCutY[1].Stop.X  := ShorterX;
 
-SegmentCutY[2].Start.X := _PanelHeight; 
-SegmentCutY[2].Start.Y := _PanelHeight + _PanelFrontLength;
-SegmentCutY[2].Stop.X  := 0; 
-SegmentCutY[2].Stop.Y  := _PanelHeight + _PanelFrontLength;
+SegmentCutY[1].Start.Y := TotalY;
+SegmentCutY[1].Stop.Y  := ShorterY;
 
-SegmentCutY[3].Start.X := _PanelHeight + _PanelFrontWidth + _PanelHeight;
+///////////////
+SegmentCutY[2].Start.X := _PanelHeight;
+SegmentCutY[2].Stop.X  := _PanelHeight;
+
+SegmentCutY[2].Start.Y := TotalY;
+SegmentCutY[2].Stop.Y  := ShorterY;
+
+///////////////
+SegmentCutY[3].Start.X := ShorterX;
+SegmentCutY[3].Stop.X  := ShorterX;
+
 SegmentCutY[3].Start.Y := _PanelHeight;
-SegmentCutY[3].Stop.X := _PanelHeight + _PanelFrontWidth; 
-SegmentCutY[3].Stop.Y := _PanelHeight;
+SegmentCutY[3].Stop.Y  := 0;
 
+///////////////
 SegmentCutY[4].Start.X := _PanelHeight;
+SegmentCutY[4].Stop.X  := _PanelHeight;
+
 SegmentCutY[4].Start.Y := _PanelHeight;
-SegmentCutY[4].Stop.X :=  0; 
-SegmentCutY[4].Stop.Y := _PanelHeight;
+SegmentCutY[4].Stop.Y  := 0;
 
 //Panel Dimensions
-SegmentCutY[5].Start.X := _PanelHeight +_PanelFrontWidth + _PanelHeight; 
-SegmentCutY[5].Start.Y := _PanelHeight + _PanelFrontLength + _PanelHeight;  
-SegmentCutY[5].Stop.X  := 0; 
-SegmentCutY[5].Stop.Y  := _PanelHeight + _PanelFrontLength + _PanelHeight;
+SegmentCutY[5].Start.X := TotalX;
+SegmentCutY[5].Stop.X  := TotalX;
 
-SegmentCutY[6].Start.X := _PanelHeight +_PanelFrontWidth + _PanelHeight;  
-SegmentCutY[6].Start.Y := _PanelHeight;   
-SegmentCutY[6].Stop.X  := 0; 
-SegmentCutY[6].Stop.Y  := _PanelHeight;
+SegmentCutY[5].Start.Y := TotalY;
+SegmentCutY[5].Stop.Y  := 0;
+///////////////
+SegmentCutY[6].Start.X := _PanelHeight;
+SegmentCutY[6].Stop.X  := _PanelHeight;
 
-
-
-SegmentsToCutX := 6;
-
-SegmentCutX[1].Start.X := 500; 
-SegmentCutX[1].Start.Y := 500;  
-SegmentCutX[1].Stop.X  := 500; 
-SegmentCutX[1].Stop.Y  := 0;
-
-SegmentCutX[2].Start.X := 0; 
-SegmentCutX[2].Start.Y := 500;  
-SegmentCutX[2].Stop.X  := 0; 
-SegmentCutX[2].Stop.Y  := 0;
+SegmentCutY[6].Start.Y := TotalY;
+SegmentCutY[6].Stop.Y  := 0;
 
 
 
@@ -779,8 +843,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Start.X + 130.0, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Start.Y + 64.0, 0);
+    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.X + 130.0, 0);
+    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.Y + 64.0, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -790,11 +854,11 @@ END_IF
 
 
 30:
-	CylinderCuttingY.Extend();
+	CylinderCuttingX.Extend();
 	ExecutorStep := 40;
 
 40: 
-	IF CylinderCuttingY.Extended THEN
+	IF CylinderCuttingX.Extended THEN
     //IF IO.PistonSensorCutY THEN
 	AxisX.Velocity := _CuttingSpeedX;
 	AxisY.Velocity := _CuttingSpeedY;
@@ -809,8 +873,8 @@ END_IF
 
 // -------- Cięcie XY do końca odcinka --------
 60:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Stop.X + 130.0, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutX].Stop.Y + 64.0, 0);
+    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.X + 130.0, 0);
+    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.Y + 64.0, 0);
     ExecutorStep := 70;
 
 70: // czekamy na koniec cięcia
@@ -820,12 +884,12 @@ END_IF
 
 // -------- Retrakt Z i przygotowanie następnego --------
 80:
-	CylinderCuttingY.Retract();
+	CylinderCuttingX.Retract();
 //	IO.PistonValveCutY := FALSE;
 		ExecutorStep := 85;
 	
 85: 
-	IF CylinderCuttingY.Retracted THEN
+	IF CylinderCuttingX.Retracted THEN
 	//IF NOT IO.PistonSensorCutY  THEN
 		 iSegmentsToCutX := iSegmentsToCutX + 1; 
 		 ExecutorStep := 90;
@@ -2241,20 +2305,55 @@ END_IF]]></ST>
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoWings">
-      <LineId Id="185" Count="0" />
-      <LineId Id="188" Count="27" />
-      <LineId Id="272" Count="0" />
-      <LineId Id="216" Count="0" />
-      <LineId Id="273" Count="17" />
-      <LineId Id="248" Count="0" />
-      <LineId Id="271" Count="0" />
-      <LineId Id="254" Count="4" />
-      <LineId Id="260" Count="4" />
-      <LineId Id="259" Count="0" />
-      <LineId Id="253" Count="0" />
-      <LineId Id="225" Count="6" />
-      <LineId Id="291" Count="0" />
-      <LineId Id="232" Count="7" />
+      <LineId Id="948" Count="4" />
+      <LineId Id="1112" Count="0" />
+      <LineId Id="1098" Count="0" />
+      <LineId Id="1093" Count="0" />
+      <LineId Id="955" Count="4" />
+      <LineId Id="1099" Count="1" />
+      <LineId Id="960" Count="0" />
+      <LineId Id="963" Count="3" />
+      <LineId Id="1101" Count="1" />
+      <LineId Id="967" Count="0" />
+      <LineId Id="970" Count="3" />
+      <LineId Id="1103" Count="1" />
+      <LineId Id="974" Count="0" />
+      <LineId Id="977" Count="2" />
+      <LineId Id="1105" Count="1" />
+      <LineId Id="1108" Count="1" />
+      <LineId Id="980" Count="0" />
+      <LineId Id="984" Count="0" />
+      <LineId Id="986" Count="7" />
+      <LineId Id="1078" Count="1" />
+      <LineId Id="994" Count="0" />
+      <LineId Id="997" Count="3" />
+      <LineId Id="1080" Count="1" />
+      <LineId Id="1001" Count="0" />
+      <LineId Id="1004" Count="3" />
+      <LineId Id="1082" Count="1" />
+      <LineId Id="1008" Count="0" />
+      <LineId Id="1011" Count="3" />
+      <LineId Id="1113" Count="1" />
+      <LineId Id="1015" Count="0" />
+      <LineId Id="1017" Count="0" />
+      <LineId Id="1019" Count="1" />
+      <LineId Id="1167" Count="0" />
+      <LineId Id="1021" Count="1" />
+      <LineId Id="1084" Count="1" />
+      <LineId Id="1023" Count="0" />
+      <LineId Id="1026" Count="3" />
+      <LineId Id="1086" Count="1" />
+      <LineId Id="1030" Count="0" />
+      <LineId Id="1088" Count="0" />
+      <LineId Id="1034" Count="8" />
+      <LineId Id="1127" Count="4" />
+      <LineId Id="1162" Count="0" />
+      <LineId Id="1132" Count="5" />
+      <LineId Id="1163" Count="0" />
+      <LineId Id="1138" Count="5" />
+      <LineId Id="1164" Count="0" />
+      <LineId Id="1144" Count="17" />
+      <LineId Id="1072" Count="4" />
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.BuildSegments_Calibration">
