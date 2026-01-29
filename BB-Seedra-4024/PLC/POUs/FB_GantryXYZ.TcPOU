@@ -56,8 +56,8 @@ VAR PERSISTENT
 	_CuttingSpeedY			:REAL;
 	_CuttingIdleTime		:REAL;
 	_CuttingOverpass		:REAL;
-	_SpindleOffsetX			:REAL;
-	_SpindleOffsetY			:REAL;
+	_CutterXOffsetX			:REAL;
+	_CutterXOffsetY			:REAL;
 	_CutterYOffsetX			:REAL;
 	_CutterYOffsetY			:REAL;	
     _GrooveDepthZ 			:REAL;
@@ -117,8 +117,8 @@ CASE SequenceState OF
 		IO.SpindleEnable := FALSE;
 		IO.CoolingEnable := FALSE;
 		
-		IO.PistonValveCutX := FALSE;
-		IO.PistonValveCutY := FALSE;
+		CylinderCuttingX.Retract();
+		CylinderCuttingY.Retract();
 
 		THIS^.HomingStepX := 0;
 		THIS^.HomingStepY := 0;
@@ -155,7 +155,6 @@ END_CASE
 		SequenceState := SequenceState + 10;
 	
 	20:
-
 		StateTasksComplete := TRUE;
 		SUPER^.Aborting();
 	END_CASE
@@ -613,6 +612,40 @@ SUPER^.CreateEvents();]]></ST>
         </Implementation>
       </Get>
     </Property>
+    <Property Name="CutterXOffsetX" Id="{ec876c40-72b1-49ef-b4a8-dafc4e3faf39}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CutterXOffsetX : REAL]]></Declaration>
+      <Get Name="Get" Id="{84da6823-a94d-424f-a88e-9f4900452f7f}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CutterXOffsetX := _CutterXOffsetX;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{415034c5-edcb-4d81-8764-a7aa31c1615f}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CutterXOffsetX := CutterXOffsetX;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CutterXOffsetY" Id="{195bbbbb-15a8-436d-866c-ecc00711e6f4}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC CutterXOffsetY : REAL]]></Declaration>
+      <Get Name="Get" Id="{c99ef4e3-05c1-488d-a09a-ef00fdd76f8d}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CutterXOffsetY := _CutterXOffsetY;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{dfc0ea26-14ea-4173-aef3-e2791575f96a}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CutterXOffsetY := CutterXOffsetY;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="CutterYOffsetX" Id="{2d729998-2abb-43f8-849d-8b6a18e55ff7}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY PUBLIC CutterYOffsetX : REAL]]></Declaration>
       <Get Name="Get" Id="{dd957d56-9ca4-4d71-901a-4eee0dcc7dcb}">
@@ -815,7 +848,7 @@ END_CASE]]></ST>
 // -------- Inicjalizacja pierwszego segmentu --------
 0:
 IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
-			 Trace('SegmentExecutionY');
+			 Trace('SegmentExecutionX');
 			 
 			 
     IF SegmentsToCutX <= 0 THEN
@@ -843,8 +876,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.X + 130.0, 0);
-    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.Y + 64.0, 0);
+    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.X + _CutterXOffsetX, 0);
+    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.Y + _CutterXOffsetY, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -859,7 +892,6 @@ END_IF
 
 40: 
 	IF CylinderCuttingX.Extended THEN
-    //IF IO.PistonSensorCutY THEN
 	AxisX.Velocity := _CuttingSpeedX;
 	AxisY.Velocity := _CuttingSpeedY;
 	ExecutorStep := 50;
@@ -873,8 +905,8 @@ END_IF
 
 // -------- Cięcie XY do końca odcinka --------
 60:
-    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.X + 130.0, 0);
-    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.Y + 64.0, 0);
+    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.X + _CutterXOffsetX, 0);
+    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.Y + _CutterXOffsetY, 0);
     ExecutorStep := 70;
 
 70: // czekamy na koniec cięcia
@@ -885,12 +917,10 @@ END_IF
 // -------- Retrakt Z i przygotowanie następnego --------
 80:
 	CylinderCuttingX.Retract();
-//	IO.PistonValveCutY := FALSE;
 		ExecutorStep := 85;
 	
 85: 
 	IF CylinderCuttingX.Retracted THEN
-	//IF NOT IO.PistonSensorCutY  THEN
 		 iSegmentsToCutX := iSegmentsToCutX + 1; 
 		 ExecutorStep := 90;
 	END_IF	
@@ -911,7 +941,7 @@ END_IF
 // -------- Zakończenie --------
 1000:
 	ExecutorStep := 0;
-	Trace('SegmentExecutionYFINISHED');
+	Trace('SegmentExecutionX-FINISHED');
     ExecuteSegmentsCutX := TRUE;
 END_CASE]]></ST>
       </Implementation>
@@ -953,8 +983,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.X + 109, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.Y + 32, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.X + _CutterYOffsetX, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.Y + _CutterYOffsetY, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -983,8 +1013,8 @@ END_IF
 
 // -------- Cięcie XY do końca odcinka --------
 60:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.X + 109, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.Y + 32, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.X + _CutterYOffsetX, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.Y + _CutterYOffsetY, 0);
     ExecutorStep := 70;
 
 70: // czekamy na koniec cięcia
@@ -1251,8 +1281,8 @@ METHOD PROTECTED HMICommunication
       <Implementation>
         <ST><![CDATA[SUPER^.HMICommunication();
 
-_SpindleOffsetX       := GantryXYZ_HMI.Config.CutterXOffsetX;
-_SpindleOffsetY       := GantryXYZ_HMI.Config.CutterXOffsetY;
+_CutterXOffsetX       := GantryXYZ_HMI.Config.CutterXOffsetX;
+_CutterXOffsetY       := GantryXYZ_HMI.Config.CutterXOffsetY;
 _CutterYOffsetX       := GantryXYZ_HMI.Config.CutterYOffsetX;
 _CutterYOffsetY       := GantryXYZ_HMI.Config.CutterYOffsetY;
 _CuttingSpeedX        := GantryXYZ_HMI.Config.CuttingSpeedX;
@@ -1763,7 +1793,7 @@ END_VAR
 					END_IF
 					
 					E_RecipeID.eBorgoWings:
-					IF BuildSegments_Calibration() THEN
+					IF BuildSegments_BorgoWings() THEN
 						OrchestratorStep := OrchestratorStep + 10;
 					END_IF
 					
@@ -1787,9 +1817,9 @@ END_VAR
         END_IF
 		
 	30: 
-	 	//IF ExecuteSegmentsCutX() THEN
+	 	IF ExecuteSegmentsCutX() THEN
             OrchestratorStep := 40;
-        //END_IF	
+        END_IF	
 
     40:
         IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
@@ -2178,8 +2208,8 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-GantryXYZ_HMI.Config.CutterXOffsetX       := _SpindleOffsetX;
-GantryXYZ_HMI.Config.CutterXOffsetY       := _SpindleOffsetY;
+GantryXYZ_HMI.Config.CutterXOffsetX       := _CutterXOffsetX;
+GantryXYZ_HMI.Config.CutterXOffsetY       := _CutterXOffsetY;
 GantryXYZ_HMI.Config.CutterYOffsetX       := _CutterYOffsetX;
 GantryXYZ_HMI.Config.CutterYOffsetY       := _CutterYOffsetY;
 GantryXYZ_HMI.Config.CuttingSpeedX        := _CuttingSpeedX;
@@ -2222,40 +2252,6 @@ END_VAR
 END_IF]]></ST>
       </Implementation>
     </Method>
-    <Property Name="SpindleOffsetX" Id="{ec876c40-72b1-49ef-b4a8-dafc4e3faf39}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC SpindleOffsetX : REAL]]></Declaration>
-      <Get Name="Get" Id="{84da6823-a94d-424f-a88e-9f4900452f7f}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[SpindleOffsetX := _SpindleOffsetX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{415034c5-edcb-4d81-8764-a7aa31c1615f}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_SpindleOffsetX := SpindleOffsetX;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="SpindleOffsetY" Id="{195bbbbb-15a8-436d-866c-ecc00711e6f4}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC SpindleOffsetY : REAL]]></Declaration>
-      <Get Name="Get" Id="{c99ef4e3-05c1-488d-a09a-ef00fdd76f8d}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[SpindleOffsetY := _SpindleOffsetY;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{dfc0ea26-14ea-4173-aef3-e2791575f96a}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_SpindleOffsetY := SpindleOffsetY;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <LineIds Name="FB_GantryXYZ">
       <LineId Id="49" Count="0" />
       <LineId Id="45" Count="0" />
@@ -2269,7 +2265,9 @@ END_IF]]></ST>
       <LineId Id="132" Count="0" />
       <LineId Id="124" Count="0" />
       <LineId Id="140" Count="0" />
-      <LineId Id="247" Count="2" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="257" Count="0" />
+      <LineId Id="259" Count="0" />
       <LineId Id="230" Count="0" />
       <LineId Id="112" Count="1" />
       <LineId Id="121" Count="1" />
@@ -2288,7 +2286,7 @@ END_IF]]></ST>
       <LineId Id="209" Count="0" />
       <LineId Id="211" Count="5" />
       <LineId Id="220" Count="0" />
-      <LineId Id="217" Count="2" />
+      <LineId Id="218" Count="1" />
       <LineId Id="190" Count="0" />
       <LineId Id="199" Count="0" />
       <LineId Id="153" Count="0" />
@@ -2407,6 +2405,20 @@ END_IF]]></ST>
     <LineIds Name="FB_GantryXYZ.CurrentSpeed.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterXOffsetX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterXOffsetX.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterXOffsetY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CutterXOffsetY.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.CutterYOffsetX.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -2485,7 +2497,10 @@ END_IF]]></ST>
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutX">
-      <LineId Id="1011" Count="102" />
+      <LineId Id="1011" Count="48" />
+      <LineId Id="1061" Count="24" />
+      <LineId Id="1087" Count="3" />
+      <LineId Id="1092" Count="21" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutY">
@@ -2792,20 +2807,6 @@ END_IF]]></ST>
     <LineIds Name="FB_GantryXYZ.SequenceTimerSeconds">
       <LineId Id="23" Count="3" />
       <LineId Id="7" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.SpindleOffsetX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.SpindleOffsetX.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.SpindleOffsetY.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.SpindleOffsetY.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
