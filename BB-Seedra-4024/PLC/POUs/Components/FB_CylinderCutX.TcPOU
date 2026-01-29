@@ -4,8 +4,8 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_CylinderCutX EXTENDS FB_ComponentBase IMPLEMENTS I_Cylinder
 VAR
     
-   	_CylinderSensorCutX 			AT%I*		:	BOOL;
-	_CylinderValveCutX				AT%Q*		:	BOOL;
+   	CylinderSensorCutX 			AT%I*		:	BOOL;
+	CylinderValveCutX			AT%Q*		:	BOOL;
 
 
     _ExtendRequestX  : BOOL;
@@ -41,8 +41,8 @@ END_VAR]]></Declaration>
       <Declaration><![CDATA[METHOD CyclicLogic]]></Declaration>
       <Implementation>
         <ST><![CDATA[// One shot the requests
-Extend_RTRIG(CLK := _ExtendRequest);
-Retract_RTRIG(CLK := _RetractRequest);
+Extend_RTRIG(CLK := _ExtendRequestX);
+Retract_RTRIG(CLK := _RetractRequestX);
 
 // Handle Extend
 IF Extend_RTRIG.Q THEN
@@ -77,8 +77,8 @@ SUPER^.CyclicLogic();
     <Method Name="Extend" Id="{ddb1a4c0-2458-4226-b284-f5ac382d347c}" FolderPath="I_Cylinder\">
       <Declaration><![CDATA[METHOD Extend]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_ExtendRequest  := TRUE;
-_RetractRequest := FALSE;]]></ST>
+        <ST><![CDATA[_ExtendRequestX  := TRUE;
+_RetractRequestX := FALSE;]]></ST>
       </Implementation>
     </Method>
     <Property Name="Extended" Id="{1eb0eef5-7872-4e02-b38c-f05cddbbc353}" FolderPath="I_Cylinder\">
@@ -87,7 +87,7 @@ _RetractRequest := FALSE;]]></ST>
         <Declaration><![CDATA[VAR
 END_VAR]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ExtendedX := _ExtendedX;]]></ST>
+          <ST><![CDATA[Extended := _ExtendedX;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -101,9 +101,9 @@ END_VAR]]></Declaration>
 //Handle the requests to extend and retract
 IF ComponentBase_HMI.Status.HMIControlAvailable THEN
     IF Cylinder_HMI.Command.RetractExtendX THEN
-        ExtendX();
+        Extend();
     ELSIF Cylinder_HMI.Command.RetractCylinderX THEN
-        RetractX();
+        Retract();
     END_IF
 END_IF
 
@@ -112,8 +112,7 @@ Cylinder_HMI.Status.ExtendedX    := _ExtendedX;
 Cylinder_HMI.Status.ExtendingX   := _ExtendingX;
 Cylinder_HMI.Status.RetractedX   := _RetractedX;
 Cylinder_HMI.Status.RetractingX  := _RetractingX;
-Cylinder_HMI.Config.ExtendTimeX  := _ExtendTimeX;
-Cylinder_HMI.Config.RetractTimeX := _RetractTimeX;]]></ST>
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="Initialize" Id="{ba8ff5ec-04c4-4da9-9ad0-5df11ced28f9}">
@@ -163,7 +162,7 @@ _RetractRequestX := TRUE;]]></ST>
         <Declaration><![CDATA[VAR
 END_VAR]]></Declaration>
         <Implementation>
-          <ST><![CDATA[RetractedX := _RetractedX;]]></ST>
+          <ST><![CDATA[Retracted := _RetractedX;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -185,7 +184,7 @@ END_VAR]]></Declaration>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderCutX.HMICommunication">
-      <LineId Id="3" Count="16" />
+      <LineId Id="3" Count="15" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderCutX.Initialize">
