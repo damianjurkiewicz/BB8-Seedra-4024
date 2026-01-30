@@ -5,8 +5,8 @@
 FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule
 VAR
     // Sub module definitions here
-
-    // List of sub modules
+	
+	// List of sub modules
     ipSubModules_Init : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
 
     // Component definitions here
@@ -73,6 +73,7 @@ VAR PERSISTENT
     _RapidSpeedX 			:REAL;
     _RapidSpeedY 			:REAL;
     _RapidSpeedZ 			:REAL;
+	_GlobalOffset 			:INT;
 END_VAR
 
 VAR CONSTANT
@@ -328,12 +329,12 @@ SegmentGrooves[4].Stop.X := _PanelHeight;
 
 
 ////////////
-// Cut Y //
+// Cut X //
 ///////////
 SegmentsToCutX := 6;
 
 //Short Box Segments
-SegmentCutX[1].Start.X := TotalX;
+SegmentCutX[1].Start.X := TotalX + _CuttingOverpass;
 SegmentCutX[1].Stop.X  := ShorterX;
 
 SegmentCutX[1].Start.Y := ShorterY;
@@ -341,13 +342,13 @@ SegmentCutX[1].Stop.Y  := ShorterY;
 
 ///////////////
 SegmentCutX[2].Start.X := _PanelHeight;
-SegmentCutX[2].Stop.X  := 0;
+SegmentCutX[2].Stop.X  := -_CuttingOverpass;
 
 SegmentCutX[2].Start.Y := ShorterY;
 SegmentCutX[2].Stop.Y  := ShorterY;
 
 ///////////////
-SegmentCutX[3].Start.X := TotalX;
+SegmentCutX[3].Start.X := TotalX + _CuttingOverpass;
 SegmentCutX[3].Stop.X := ShorterX;
 
 SegmentCutX[3].Start.Y := _PanelHeight;
@@ -355,7 +356,7 @@ SegmentCutX[3].Stop.Y := _PanelHeight;
 
 ///////////////
 SegmentCutX[4].Start.X := _PanelHeight;
-SegmentCutX[4].Stop.X :=  0;
+SegmentCutX[4].Stop.X :=  -_CuttingOverpass;
 
 SegmentCutX[4].Start.Y := _PanelHeight;
 SegmentCutX[4].Stop.Y := _PanelHeight;
@@ -363,15 +364,15 @@ SegmentCutX[4].Stop.Y := _PanelHeight;
 //Panel Dimensions Shorter Flaps
 
 
-SegmentCutX[5].Start.X := TotalX;
-SegmentCutX[5].Stop.X  := 0;
+SegmentCutX[5].Start.X := TotalX + _CuttingOverpass;
+SegmentCutX[5].Stop.X  := - _CuttingOverpass;
 
 SegmentCutX[5].Start.Y := TotalY - _RailHeightCorrection;
 SegmentCutX[5].Stop.Y  := TotalY - _RailHeightCorrection;
 
 ///////////////
-SegmentCutX[6].Start.X := TotalX;
-SegmentCutX[6].Stop.X  := 0;
+SegmentCutX[6].Start.X := TotalX + _CuttingOverpass;
+SegmentCutX[6].Stop.X  := - _CuttingOverpass;
 
 SegmentCutX[6].Start.Y := _RailHeightCorrection;
 SegmentCutX[6].Stop.Y  := _RailHeightCorrection;
@@ -387,14 +388,14 @@ SegmentsToCutY := 6;
 SegmentCutY[1].Start.X := ShorterX;
 SegmentCutY[1].Stop.X  := ShorterX;
 
-SegmentCutY[1].Start.Y := TotalY;
+SegmentCutY[1].Start.Y := TotalY + _CuttingOverpass;
 SegmentCutY[1].Stop.Y  := ShorterY;
 
 ///////////////
 SegmentCutY[2].Start.X := _PanelHeight;
 SegmentCutY[2].Stop.X  := _PanelHeight;
 
-SegmentCutY[2].Start.Y := TotalY;
+SegmentCutY[2].Start.Y := TotalY + _CuttingOverpass;
 SegmentCutY[2].Stop.Y  := ShorterY;
 
 ///////////////
@@ -402,27 +403,27 @@ SegmentCutY[3].Start.X := ShorterX;
 SegmentCutY[3].Stop.X  := ShorterX;
 
 SegmentCutY[3].Start.Y := _PanelHeight;
-SegmentCutY[3].Stop.Y  := 0;
+SegmentCutY[3].Stop.Y  := -_CuttingOverpass;
 
 ///////////////
 SegmentCutY[4].Start.X := _PanelHeight;
 SegmentCutY[4].Stop.X  := _PanelHeight;
 
 SegmentCutY[4].Start.Y := _PanelHeight;
-SegmentCutY[4].Stop.Y  := 0;
+SegmentCutY[4].Stop.Y  := -_CuttingOverpass;
 
 //Panel Dimensions
 SegmentCutY[5].Start.X := TotalX;
 SegmentCutY[5].Stop.X  := TotalX;
 
-SegmentCutY[5].Start.Y := TotalY;
-SegmentCutY[5].Stop.Y  := 0;
+SegmentCutY[5].Start.Y := TotalY + _CuttingOverpass;
+SegmentCutY[5].Stop.Y  := -_CuttingOverpass;
 ///////////////
-SegmentCutY[6].Start.X := _PanelHeight;
-SegmentCutY[6].Stop.X  := _PanelHeight;
+SegmentCutY[6].Start.X := 0;
+SegmentCutY[6].Stop.X  := 0;
 
-SegmentCutY[6].Start.Y := TotalY;
-SegmentCutY[6].Stop.Y  := 0;
+SegmentCutY[6].Start.Y := TotalY + _CuttingOverpass;
+SegmentCutY[6].Stop.Y  := - _CuttingOverpass;
 
 
 
@@ -876,8 +877,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.X + _CutterXOffsetX, 0);
-    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.Y + _CutterXOffsetY, 0);
+    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.X + _CutterXOffsetX + _GlobalOffset, 0);
+    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.Y + _CutterXOffsetY + _GlobalOffset, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -905,8 +906,8 @@ END_IF
 
 // -------- Cięcie XY do końca odcinka --------
 60:
-    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.X + _CutterXOffsetX, 0);
-    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.Y + _CutterXOffsetY, 0);
+    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.X + _CutterXOffsetX + _GlobalOffset, 0);
+    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.Y + _CutterXOffsetY + _GlobalOffset, 0);
     ExecutorStep := 70;
 
 70: // czekamy na koniec cięcia
@@ -983,8 +984,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.X + _CutterYOffsetX, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.Y + _CutterYOffsetY, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.X + _CutterYOffsetX + _GlobalOffset, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.Y + _CutterYOffsetY + _GlobalOffset, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -1013,8 +1014,8 @@ END_IF
 
 // -------- Cięcie XY do końca odcinka --------
 60:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.X + _CutterYOffsetX, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.Y + _CutterYOffsetY, 0);
+    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.X + _CutterYOffsetX + _GlobalOffset, 0);
+    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.Y + _CutterYOffsetY + _GlobalOffset, 0);
     ExecutorStep := 70;
 
 70: // czekamy na koniec cięcia
@@ -1096,8 +1097,8 @@ IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
 END_IF
 
 10:
-    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X, 0);
-    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y, 0);
+    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X + _GlobalOffset, 0);
+    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y + _GlobalOffset, 0);
     ExecutorStep := 20;
 
 20: // czekamy na pozycję XY
@@ -1126,8 +1127,8 @@ END_IF
 	END_IF
 	
 60:
-    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X, 0);
-    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y, 0);
+    AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X + _GlobalOffset, 0);
+    AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y + _GlobalOffset, 0);
     ExecutorStep := 70;
 	
 	
@@ -1171,6 +1172,23 @@ END_IF
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Property Name="GlobalOffset" Id="{c8ddd37c-b19a-4d4e-a71b-b97d8605e766}" FolderPath="Properties\Config\">
+      <Declaration><![CDATA[PROPERTY PUBLIC GlobalOffset : INT]]></Declaration>
+      <Get Name="Get" Id="{688e3d94-1410-4383-b142-64e21d43f1a6}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GlobalOffset := _GlobalOffset;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{5f121375-3c35-4dc4-9401-8a845e0cf0c0}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_GlobalOffset := GlobalOffset;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="GrooveDepthZ" Id="{4c86fbb5-f7fe-4ab0-abb5-4601fd04a1c4}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY PUBLIC GrooveDepthZ : REAL]]></Declaration>
       <Get Name="Get" Id="{a83b65c4-5ea3-488c-967b-3ee17e2e67f9}">
@@ -1303,6 +1321,9 @@ _RapidSpeedY          := GantryXYZ_HMI.Config.RapidSpeedY;
 _RapidSpeedZ          := GantryXYZ_HMI.Config.RapidSpeedZ;
 _GroovingIdleTime     := GantryXYZ_HMI.Config.GroovingIdleTime;
 _GroovingOverpass     := GantryXYZ_HMI.Config.GroovingOverpass;
+_GlobalOffset		  := GantryXYZ_HMI.Config.GlobalOffset;
+
+
 
 
 ]]></ST>
@@ -2229,6 +2250,8 @@ GantryXYZ_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
 GantryXYZ_HMI.Config.RapidSpeedX          := _RapidSpeedX;
 GantryXYZ_HMI.Config.RapidSpeedY          := _RapidSpeedY;
 GantryXYZ_HMI.Config.RapidSpeedZ          := _RapidSpeedZ;
+GantryXYZ_HMI.Config.GlobalOffset		  := _GlobalOffset;
+
 
 
 RestorePersistentData := TRUE;]]></ST>
@@ -2536,6 +2559,13 @@ END_IF]]></ST>
       <LineId Id="831" Count="18" />
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.GlobalOffset.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.GlobalOffset.Set">
+      <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.GrooveDepthZ.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -2592,6 +2622,7 @@ END_IF]]></ST>
       <LineId Id="104" Count="0" />
       <LineId Id="88" Count="0" />
       <LineId Id="27" Count="0" />
+      <LineId Id="113" Count="2" />
       <LineId Id="38" Count="0" />
       <LineId Id="41" Count="0" />
       <LineId Id="37" Count="0" />
@@ -2800,6 +2831,7 @@ END_IF]]></ST>
       <LineId Id="43" Count="0" />
       <LineId Id="31" Count="0" />
       <LineId Id="33" Count="4" />
+      <LineId Id="59" Count="1" />
       <LineId Id="14" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="6" Count="0" />

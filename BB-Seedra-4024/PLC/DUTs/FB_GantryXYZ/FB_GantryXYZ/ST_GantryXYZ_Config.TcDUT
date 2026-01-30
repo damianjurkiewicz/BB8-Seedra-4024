@@ -3,7 +3,6 @@
   <DUT Name="ST_GantryXYZ_Config" Id="{9175d3d8-e623-4395-a625-175ecc53cdb9}">
     <Declaration><![CDATA[TYPE ST_GantryXYZ_Config :
     STRUCT
-	
 	CutterXOffsetX :REAL;
 	CutterXOffsetY :REAL;
 	CutterYOffsetX :REAL;
@@ -25,6 +24,7 @@
 	RapidSpeedX :REAL;
 	RapidSpeedY :REAL;
 	RapidSpeedZ :REAL;
+	GlobalOffset :INT;
     END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>
