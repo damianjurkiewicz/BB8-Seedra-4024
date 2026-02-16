@@ -512,8 +512,8 @@
                       <v n="Id">493260384L</v>
                       <l n="Value" t="ArrayList" cet="NamedStyleColor">
                         <o>
-                          <v n="Color">-8355712</v>
-                          <v n="CanonicalName">"Darkgray"</v>
+                          <v n="Color">-2830136</v>
+                          <v n="CanonicalName">"Lightgray"</v>
                         </o>
                       </l>
                     </o>
@@ -551,7 +551,7 @@
                     </o>
                     <o>
                       <v n="Id">1999528970L</v>
-                      <v n="Value">"&lt;toggle/tap variable&gt;"</v>
+                      <v n="Value">"HMI.Status.State = E_PMLState.ePMLState_Idle"</v>
                     </o>
                     <o>
                       <v n="Id">3719097617L</v>
@@ -635,15 +635,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_138"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="STSnippetInputAction[]">
-                  <v>OnMouseClick</v>
-                  <a cet="STSnippetInputAction">
-                    <o>
-                      <v n="STSnippet">"HMI.Command.State := E_PMLCommand.ePMLCommand_Clear;
-"</v>
-                    </o>
-                  </a>
-                </d>
+                <d n="VisualElementInputActions" t="Hashtable" />
                 <v n="VisualElementIdentification">{5b309c51-ab27-4940-af85-e9c70a82b90b}</v>
                 <v n="VisualElementOwningObjectGuid">{5eb24302-7c74-4cb0-913c-af4cad05dac4}</v>
                 <a n="LMGuids" et="Guid" />
@@ -708,8 +700,8 @@
                       <v n="Id">493260384L</v>
                       <l n="Value" t="ArrayList" cet="NamedStyleColor">
                         <o>
-                          <v n="Color">-8355712</v>
-                          <v n="CanonicalName">"Darkgray"</v>
+                          <v n="Color">-2830136</v>
+                          <v n="CanonicalName">"Lightgray"</v>
                         </o>
                       </l>
                     </o>
@@ -747,7 +739,7 @@
                     </o>
                     <o>
                       <v n="Id">1999528970L</v>
-                      <v n="Value">"&lt;toggle/tap variable&gt;"</v>
+                      <v n="Value">"HMI.Status.State = E_PMLState.ePMLState_Idle"</v>
                     </o>
                     <o>
                       <v n="Id">3719097617L</v>
@@ -835,15 +827,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_140"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="STSnippetInputAction[]">
-                  <v>OnMouseClick</v>
-                  <a cet="STSnippetInputAction">
-                    <o>
-                      <v n="STSnippet">"HMI.Command.State := E_PMLCommand.ePMLCommand_Clear;
-"</v>
-                    </o>
-                  </a>
-                </d>
+                <d n="VisualElementInputActions" t="Hashtable" />
                 <v n="VisualElementIdentification">{946ea9e5-7d51-40d7-9a9d-f80662999cbe}</v>
                 <v n="VisualElementOwningObjectGuid">{5eb24302-7c74-4cb0-913c-af4cad05dac4}</v>
                 <a n="LMGuids" et="Guid" />

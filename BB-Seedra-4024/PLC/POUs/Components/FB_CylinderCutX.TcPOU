@@ -1,0 +1,208 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_CylinderCutX" Id="{264d7628-92d6-4793-ab2e-0fdd41979bbf}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_CylinderCutX EXTENDS FB_ComponentBase IMPLEMENTS I_Cylinder
+VAR
+    
+   	CylinderSensorCutX 			AT%I*		:	BOOL;
+	CylinderValveCutX			AT%Q*		:	BOOL;
+
+
+    _ExtendRequestX  : BOOL;
+    _RetractRequestX : BOOL;
+    _ExtendedX       : BOOL;
+    _RetractedX      : BOOL;
+    _ExtendingX      : BOOL;
+    _RetractingX     : BOOL;
+
+
+
+    Extend_RTRIG  : R_TRIG;
+    Retract_RTRIG : R_TRIG;
+
+    //HMI 
+    Cylinder_HMI : ST_Cylinder_HMI;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Folder Name="I_ComponentBase" Id="{f559450c-ac92-42b8-948d-4319dcd66586}" />
+    <Folder Name="I_CyclicFB" Id="{06d0f814-9e61-4022-8b49-954679eac850}" />
+    <Folder Name="I_Cylinder" Id="{23231c33-e76f-4db7-9535-6a6ba8d8bb21}" />
+    <Method Name="CreateEvents" Id="{b37c1c7a-2ee5-4bc0-bd63-7a1bd375f4f8}" FolderPath="I_ComponentBase\">
+      <Declaration><![CDATA[METHOD PROTECTED CreateEvents
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.CreateEvents();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic" Id="{9cd1ea00-8a5e-4fbd-a921-2bb3db34198f}" FolderPath="I_CyclicFB\">
+      <Declaration><![CDATA[METHOD CyclicLogic]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// One shot the requests
+Extend_RTRIG(CLK := _ExtendRequestX);
+Retract_RTRIG(CLK := _RetractRequestX);
+
+// Handle Extend
+IF Extend_RTRIG.Q THEN
+    CylinderValveCutX := TRUE;
+    _ExtendingX      := TRUE;
+    _RetractingX     := FALSE;
+    _RetractedX      := FALSE;
+    _RetractRequestX := FALSE;
+END_IF
+
+// Handle Retract
+IF Retract_RTRIG.Q THEN
+    CylinderValveCutX := FALSE;
+    _ExtendingX      := FALSE;
+    _RetractingX     := TRUE;
+    _ExtendedX       := FALSE;
+    _ExtendRequestX  := FALSE;
+END_IF
+
+// Aktualizacja stanu wyłącznie z czujnika
+_ExtendedX  := CylinderSensorCutX;
+_RetractedX := NOT CylinderSensorCutX;
+
+// Status ruchu – tylko gdy trwa przejście
+_ExtendingX  := _ExtendingX  AND NOT _ExtendedX;
+_RetractingX := _RetractingX AND NOT _RetractedX;
+
+SUPER^.CyclicLogic();
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Extend" Id="{ddb1a4c0-2458-4226-b284-f5ac382d347c}" FolderPath="I_Cylinder\">
+      <Declaration><![CDATA[METHOD Extend]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_ExtendRequestX  := TRUE;
+_RetractRequestX := FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Extended" Id="{1eb0eef5-7872-4e02-b38c-f05cddbbc353}" FolderPath="I_Cylinder\">
+      <Declaration><![CDATA[PROPERTY Extended : BOOL]]></Declaration>
+      <Get Name="Get" Id="{88ee6066-a111-4e25-836f-5aab3305bf2e}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Extended := _ExtendedX;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="HMICommunication" Id="{b22c0ddf-b951-40f3-9594-3d06c6305168}" FolderPath="I_ComponentBase\">
+      <Declaration><![CDATA[METHOD PROTECTED HMICommunication
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.HMICommunication();
+
+//Handle the requests to extend and retract
+IF ComponentBase_HMI.Status.HMIControlAvailable THEN
+    IF Cylinder_HMI.Command.RetractExtendX THEN
+        Extend();
+    ELSIF Cylinder_HMI.Command.RetractCylinderX THEN
+        Retract();
+    END_IF
+END_IF
+
+//Update HMI status info
+Cylinder_HMI.Status.ExtendedX    := _ExtendedX;
+Cylinder_HMI.Status.ExtendingX   := _ExtendingX;
+Cylinder_HMI.Status.RetractedX   := _RetractedX;
+Cylinder_HMI.Status.RetractingX  := _RetractingX;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Initialize" Id="{ba8ff5ec-04c4-4da9-9ad0-5df11ced28f9}">
+      <Declaration><![CDATA[//! @summary Basic component initialization logic
+METHOD PROTECTED Initialize : BOOL;
+
+//! @description This method is called by <c>CyclicLogic()</c> as required]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+IF CylinderSensorCutX THEN
+    _ExtendedX  := TRUE;
+    _RetractedX := FALSE;
+ELSE
+    _ExtendedX  := FALSE;
+    _RetractedX := TRUE;
+END_IF
+
+_ExtendingX      := FALSE;
+_ExtendRequestX  := FALSE;
+_RetractingX     := FALSE;
+_RetractRequestX := FALSE;
+
+Initialize := SUPER^.Initialize();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Monitoring" Id="{8ba17133-ef6f-49ff-9719-2b67cb73a455}" FolderPath="I_ComponentBase\">
+      <Declaration><![CDATA[METHOD PROTECTED Monitoring
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Busy    := _ExtendingX OR _RetractingX;
+_Error   := FALSE;
+_ErrorID := 0;
+SUPER^.Monitoring();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Retract" Id="{9cc3c678-2df3-46c2-9291-f83f618c1985}" FolderPath="I_Cylinder\">
+      <Declaration><![CDATA[METHOD Retract]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_ExtendRequestX  := FALSE;
+_RetractRequestX := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Retracted" Id="{c9e67c1e-2567-4eaa-a173-7c4db4a9f724}" FolderPath="I_Cylinder\">
+      <Declaration><![CDATA[PROPERTY Retracted : BOOL]]></Declaration>
+      <Get Name="Get" Id="{9d70c136-c25b-4efd-b8d4-0f770186e108}">
+        <Declaration><![CDATA[VAR
+END_VAR]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Retracted := _RetractedX;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_CylinderCutX">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.CreateEvents">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.CyclicLogic">
+      <LineId Id="39" Count="30" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.Extend">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.Extended.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.HMICommunication">
+      <LineId Id="3" Count="15" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.Initialize">
+      <LineId Id="21" Count="5" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="28" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.Monitoring">
+      <LineId Id="3" Count="2" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.Retract">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.Retracted.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

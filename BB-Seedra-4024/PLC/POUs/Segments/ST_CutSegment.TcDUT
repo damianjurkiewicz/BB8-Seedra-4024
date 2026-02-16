@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <DUT Name="ST_CutSegment" Id="{b794d264-2357-4592-8640-a344546459cc}">
+    <Declaration><![CDATA[TYPE ST_CutSegment :
+STRUCT
+    Start : ST_PointXY;
+    Stop  : ST_PointXY;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

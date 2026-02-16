@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"21"</v>
+          <v n="UniqueIdGenerator">"22"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -481,7 +481,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"MAIN.Seedra.GantryXYZ._PanelFrontWidht"</v>
+                      <v n="Value">"HMI_GantryXYZ.Config.PanelFrontWidht"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -790,7 +790,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"MAIN.Seedra.GantryXYZ._PanelHeight"</v>
+                      <v n="Value">"HMI_GantryXYZ.Config.PanelHeight"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -804,7 +804,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_74"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="InputBoxInputAction[]">
+                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
                   <v>OnMouseClick</v>
                   <a cet="InputBoxInputAction">
                     <o>
@@ -1111,6 +1111,11 @@
                 <v n="Text">"	HMI : ST_PackMLBaseModule_HMI;"</v>
               </o>
               <o>
+                <v n="Id">22L</v>
+                <n n="Tag" />
+                <v n="Text">"	HMI_GantryXYZ : ST_GantryXYZ_HMI;"</v>
+              </o>
+              <o>
                 <v n="Id">1L</v>
                 <n n="Tag" />
                 <v n="Text">"END_VAR"</v>
@@ -1162,6 +1167,7 @@
         <Type n="Guid">System.Guid</Type>
         <Type n="Hashtable">System.Collections.Hashtable</Type>
         <Type n="HotkeyConfiguration">{6b108d46-58af-4e41-a3f4-174d8f160cc4}</Type>
+        <Type n="IInputAction[]">_3S.CoDeSys.VisualElem.IInputAction[], VisualElem, Version=3.5.13.0, Culture=neutral, PublicKeyToken=null</Type>
         <Type n="InputBoxInputAction">{e8e7e747-f76f-4dee-ab1c-b9637e41ac26}</Type>
         <Type n="InputBoxInputAction[]">_3S.CoDeSys.VisualElem.InputBoxInputAction[], VisualElem.plugin, Version=3.5.13.32, Culture=neutral, PublicKeyToken=null</Type>
         <Type n="Int16">System.Int16</Type>

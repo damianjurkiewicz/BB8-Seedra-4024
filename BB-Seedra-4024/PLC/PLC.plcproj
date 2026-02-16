@@ -19,6 +19,21 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\E_RecipeID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Status.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Config.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_HMI.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Command.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\MoveState_t.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -37,22 +52,25 @@
     <Compile Include="PlcTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\FB_GantryXYCylinder.TcPOU">
+    <Compile Include="POUs\Components\FB_CylinderCutY.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Components\FB_CylinderCutX.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Components\I_Cylinder.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\ST_CylinderX_Command.TcDUT">
+    <Compile Include="POUs\Components\ST_Cylinder_Command.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\ST_CylinderX_Config.TcDUT">
+    <Compile Include="POUs\Components\ST_Cylinder_Config.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\ST_CylinderX_HMI.TcDUT">
+    <Compile Include="POUs\Components\ST_Cylinder_HMI.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\ST_CylinderX_Status.TcDUT">
+    <Compile Include="POUs\Components\ST_Cylinder_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\FB_GantryXYZ.TcPOU">
@@ -68,6 +86,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\SAFETY.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Segments\ST_CutSegment.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Segments\ST_PointXY.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SafetyTask.TcTTO">
@@ -118,8 +142,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DUTs" />
+    <Folder Include="DUTs\FB_GantryXYZ" />
+    <Folder Include="DUTs\FB_GantryXYZ\FB_GantryXYZ" />
     <Folder Include="GVLs" />
     <Folder Include="POUs\Components" />
+    <Folder Include="POUs\Segments" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
     <Folder Include="VISUs\Modes" />
