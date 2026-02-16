@@ -224,54 +224,52 @@ BuildSegments_Arona := TRUE;]]></ST>
     </Method>
     <Method Name="BuildSegments_BorgoFlaps" Id="{30aff943-63a2-49df-9f71-8b8f78deda49}" FolderPath="MyMethods\Segments\">
       <Declaration><![CDATA[METHOD BuildSegments_BorgoFlaps : BOOL
+VAR_INST
+	TotalY :REAL;
+	TotalX :REAL;
+END_VAR
 
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//  Start → Stop, Milling Segments
+        <ST><![CDATA[TotalY := PanelFrontLength;
+TotalX := PanelFrontWidth;
+
 SegmentsToGroove := 4;
 
-SegmentGrooves[1].Start.X := 500;
-SegmentGrooves[1].Start.Y := 500;
-SegmentGrooves[1].Stop.X  := 0;
-SegmentGrooves[1].Stop.Y  := 500;
+///////////////
+SegmentGrooves[1].Start.X := TotalX;
+SegmentGrooves[1].Stop.X := 0;
 
-SegmentGrooves[2].Start.X := 500;
-SegmentGrooves[2].Start.Y := 0;
-SegmentGrooves[2].Stop.X  := 0; 
-SegmentGrooves[2].Stop.Y  := 0;
+SegmentGrooves[1].Start.Y := TotalY;
+SegmentGrooves[1].Stop.Y := TotalY;
 
-SegmentGrooves[3].Start.X := 500;
-SegmentGrooves[3].Start.Y := 500;
-SegmentGrooves[3].Stop.X  := 500;
-SegmentGrooves[3].Stop.Y  := 0;
+///////////////
+SegmentGrooves[2].Start.X := TotalX;
+SegmentGrooves[2].Stop.X :=  0; 
+
+SegmentGrooves[2].Start.Y :=0;
+SegmentGrooves[2].Stop.Y :=  0;
+
+//////////////
+SegmentGrooves[3].Start.X := TotalX;
+SegmentGrooves[3].Stop.X := TotalX;
+
+SegmentGrooves[3].Start.Y := TotalY;
+SegmentGrooves[3].Stop.Y := 0;
+
+/////////////
+SegmentGrooves[4].Start.Y := TotalY;
+SegmentGrooves[4].Stop.Y := 0;
 
 SegmentGrooves[4].Start.X := 0;
-SegmentGrooves[4].Start.Y := 500;
-SegmentGrooves[4].Stop.X  := 0;
-SegmentGrooves[4].Stop.Y  := 0;
+SegmentGrooves[4].Stop.X := 0;
 
 //  Start → Stop, CutY Segments
-SegmentsToCutY := 2;
+SegmentsToCutY := 0;
 
-SegmentCutY[1].Start.X := 0; 
-SegmentCutY[1].Start.Y := 500;  
-SegmentCutY[1].Stop.X  := 0; 
-SegmentCutY[1].Stop.Y  := 0;
-SegmentCutY[2].Start.X := 500; 
-SegmentCutY[2].Start.Y := 500;  
-SegmentCutY[2].Stop.X  := 500; 
-SegmentCutY[2].Stop.Y  := 0;
 
-SegmentsToCutX := 2;
+SegmentsToCutX := 0;
 
-SegmentCutX[1].Start.X := 500; 
-SegmentCutX[1].Start.Y := 500;  
-SegmentCutX[1].Stop.X  := 500; 
-SegmentCutX[1].Stop.Y  := 0;
-SegmentCutX[2].Start.X := 0; 
-SegmentCutX[2].Start.Y := 500;  
-SegmentCutX[2].Stop.X  := 0; 
-SegmentCutX[2].Stop.Y  := 0;
 
 BuildSegments_BorgoFlaps := TRUE;]]></ST>
       </Implementation>
@@ -2322,8 +2320,7 @@ END_IF]]></ST>
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoFlaps">
-      <LineId Id="32" Count="44" />
-      <LineId Id="79" Count="0" />
+      <LineId Id="82" Count="39" />
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoWings">
