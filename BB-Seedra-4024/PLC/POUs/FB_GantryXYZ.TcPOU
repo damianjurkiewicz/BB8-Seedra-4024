@@ -1069,6 +1069,7 @@ VAR_INST
 iPass : INT;
 currentDepth : LREAL;
 g1, g2, g3 : LREAL;
+v1, v2, v3 : LREAL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE ExecutorStep OF
@@ -1079,6 +1080,9 @@ END_VAR]]></Declaration>
         g1 := 2.0; 
         g2 := 3.0; 
         g3 := 4.0; 
+		v1 := 1.0;
+		v2 := 0.8;
+		v3 := 0.1;
 
         IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
             
@@ -1157,8 +1161,20 @@ END_VAR]]></Declaration>
     40: 
         IF AxisZ.InPosition THEN
             Trace(Message:= 'Step 40: Z InPosition -> Going to 50');
-            AxisX.Velocity := _GroovingSpeedX;
-            AxisY.Velocity := _GroovingSpeedY;
+        CASE iPass OF
+            1:
+				AxisX.Velocity := _GroovingSpeedX * v1;
+            	AxisY.Velocity := _GroovingSpeedY * v1;
+            2: 
+				AxisX.Velocity := _GroovingSpeedX * v2;
+            	AxisY.Velocity := _GroovingSpeedY * v2;
+            3: 
+				AxisX.Velocity := _GroovingSpeedX * v3;
+            	AxisY.Velocity := _GroovingSpeedY * v3;
+        ELSE
+            currentDepth := _GrooveDepthZ;
+        END_CASE;
+
             ExecutorStep := 50;
         END_IF;
 
@@ -2656,7 +2672,18 @@ END_IF]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsGroove">
-      <LineId Id="2168" Count="121" />
+      <LineId Id="2168" Count="7" />
+      <LineId Id="2385" Count="2" />
+      <LineId Id="2176" Count="77" />
+      <LineId Id="2371" Count="1" />
+      <LineId Id="2378" Count="1" />
+      <LineId Id="2373" Count="0" />
+      <LineId Id="2380" Count="1" />
+      <LineId Id="2374" Count="0" />
+      <LineId Id="2382" Count="1" />
+      <LineId Id="2375" Count="1" />
+      <LineId Id="2370" Count="0" />
+      <LineId Id="2255" Count="34" />
       <LineId Id="2359" Count="0" />
       <LineId Id="2364" Count="0" />
       <LineId Id="2361" Count="2" />
