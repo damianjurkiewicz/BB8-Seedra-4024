@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="POU" Id="{847c73f1-03d5-438e-8c80-a8688f33b764}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK POU IMPLEMENTS I_MotionSequence
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="Axis" Id="{9624fc7a-694e-456a-89fa-4841d426b894}">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY Axis : SPT_Motion_Control.I_BasicAxis
+]]></Declaration>
+      <Get Name="Get" Id="{b8b8a5bc-8475-4b15-93cc-8411bebc7f92}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{4f48fd23-d0d3-4a64-83de-e3339973b271}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Busy" Id="{3af299dd-d587-4916-9eb7-4c6567e6925f}">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY Busy : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{16c83bfe-2b6e-46cc-82b6-508a903ed8f6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="CyclicLogic" Id="{345e28d8-22a0-45d0-ae39-86bf8772e24c}">
+      <Declaration><![CDATA[{warning 'add method implementation '}
+METHOD CyclicLogic
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Error" Id="{1ba3bb96-1926-4e8f-80e7-5515c03484da}">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY Error : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{4b26aa62-2ed0-4b8c-a3ba-f40b41261d03}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ErrorID" Id="{9eda1583-ef2b-4ad4-86b7-14f4bf07a9d6}">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY ErrorID : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{817af6d5-443a-4891-927c-add61de93c32}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{6f7c17b7-6166-47e8-9554-38432d3ea426}">
+      <Declaration><![CDATA[{warning 'add method implementation '}
+METHOD Execute : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="InitComplete" Id="{4a042cfe-21e0-4815-a248-c0858b873497}">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY InitComplete : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{4eb81cd4-e2b6-4275-a0c4-3583129ed9d0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="POU">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="POU.Axis.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="POU.Axis.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="POU.Busy.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="POU.CyclicLogic">
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="POU.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="POU.ErrorID.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="POU.Execute">
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="POU.InitComplete.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,207 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Homing_StandardNC" Id="{a68036c7-0906-4add-a8ec-d72fc1d336c0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Homing_StandardNC EXTENDS FB_CyclicFB IMPLEMENTS I_MotionSequence
+VAR
+	_Axis : I_BasicAxis;
+	fbMcHome : MC_Home;
+	
+	_bBusy, _bDone, _bError :BOOL;
+	_bErrorID :UDINT;
+	
+	nStep :INT;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Abort" Id="{771dc933-2c39-43b9-9ff8-76313dbd940b}">
+      <Declaration><![CDATA[METHOD Abort
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+_bBusy := FALSE;
+nStep := 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Axis" Id="{33e35a1f-2c3a-4bfc-bb60-bae2383b8b6a}">
+      <Declaration><![CDATA[
+PROPERTY Axis : SPT_Motion_Control.I_BasicAxis
+]]></Declaration>
+      <Get Name="Get" Id="{9ab12adb-c510-4298-96a4-7ffd2581d5f0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Axis := _Axis;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{f767de7a-c1ca-4f02-9738-024b1923a2d6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Axis := Axis;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Busy" Id="{3753885d-a220-4799-8eac-648e681e4eb9}">
+      <Declaration><![CDATA[
+PROPERTY Busy : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{9fbfda9d-4904-4f9f-af47-7c558ece42f7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Busy := _bBusy;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="CyclicLogic" Id="{3ee0a176-f137-4cd7-8aa9-6d46284035d2}">
+      <Declaration><![CDATA[
+METHOD CyclicLogic
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE nStep OF
+    0: // IDLE
+        fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+
+    10: // TRIGGER HOMING
+        fbMcHome(
+            Axis        := _Axis.Axis, 
+            Execute     := TRUE, 
+            HomingMode  := MC_DefaultHoming, // <--- CZYTAJ Z PARAMETRÓW NC!
+            bCalibrationCam := FALSE // Tutaj można podpiąć wejście, jeśli nie jest zlinkowane w NC
+        );
+        
+        // Czekamy aż blok przyjmie komendę
+        IF fbMcHome.Busy THEN
+            nStep := 20;
+        ELSIF fbMcHome.Error THEN
+            nStep := 99;
+        END_IF
+
+    20: // WAIT FOR DONE
+        // Wywołanie cykliczne
+        fbMcHome(Axis := _Axis.Axis);
+        
+        IF fbMcHome.Done THEN
+            _bBusy := FALSE;
+            _bDone := TRUE;
+            nStep := 0; // Koniec sukcesem
+        ELSIF fbMcHome.Error THEN
+            nStep := 99;
+        END_IF
+
+    99: // ERROR HANDLING
+        _bBusy    := FALSE;
+        _bError   := TRUE;
+        _bErrorID := fbMcHome.ErrorID;
+        nStep    := 0;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Done" Id="{9532d168-c50e-4321-997d-12356c697dc4}">
+      <Declaration><![CDATA[PROPERTY Done : BOOL]]></Declaration>
+      <Get Name="Get" Id="{7e511263-a7b0-4b27-955f-f0a16a22967b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Done := _bDone;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Error" Id="{2ddf9516-adeb-45ba-822f-111669b0c9f8}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{3b22b156-3aae-4113-bcf9-ab311e7522b3}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := _bError;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ErrorID" Id="{08ec2b8b-d1ff-44e7-afef-4ed219024905}">
+      <Declaration><![CDATA[PROPERTY ErrorID : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{cbcd4fa1-fdf1-4329-aec3-52e3cfc72aa6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ErrorID := _bErrorID;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{0ce6e478-7e33-4c23-994a-236e753a0719}">
+      <Declaration><![CDATA[
+METHOD Execute : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Reset i start
+IF _Axis = 0 THEN RETURN; END_IF
+
+_bBusy       := TRUE;
+_bDone       := FALSE;
+_bError      := FALSE;
+_bErrorID    := 0;
+nStep       := 10; // Start sekwencji]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="InitComplete" Id="{adc32464-ccda-44e3-9865-b1afc471c266}">
+      <Declaration><![CDATA[PROPERTY InitComplete : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{d4f7d374-0999-4a2e-a160-1af9fa417971}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_Homing_StandardNC">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.Abort">
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.Axis.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.Axis.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.Busy.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.CyclicLogic">
+      <LineId Id="5" Count="35" />
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.Done.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.ErrorID.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.Execute">
+      <LineId Id="5" Count="6" />
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.InitComplete.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

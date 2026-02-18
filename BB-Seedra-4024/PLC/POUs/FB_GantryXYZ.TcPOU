@@ -49,6 +49,12 @@ VAR
 	ExecutorStep :				INT := 0;
 	
 	GantryXYZ_HMI : ST_GantryXYZ_HMI;
+	
+	//Test
+	fbHomeStratX : FB_Homing_StandardNC;
+    fbHomeStratY : FB_Homing_StandardNC;
+    fbHomeStratZ : FB_Homing_StandardNC;
+	
 END_VAR
 
 VAR PERSISTENT
@@ -126,7 +132,15 @@ CASE SequenceState OF
 		THIS^.HomingStepZ := 0;
 		OrchestratorStep := 0;
 		ExecutorStep := 0;
+		
+		//test
+		fbHomeStratX.Abort();
+        fbHomeStratY.Abort();
+        fbHomeStratZ.Abort();
+		
 		SequenceState := SequenceState + 10;
+		
+		
 	20:
 
 		StateTasksComplete := TRUE;
@@ -771,6 +785,10 @@ _CurrentSpeed := SQRT( AxisX.SetVelocity*AxisX.SetVelocity + AxisY.SetVelocity*A
 
 
 SUPER^.CyclicLogic();
+
+fbHomeStratX.CyclicLogic();
+fbHomeStratY.CyclicLogic();
+fbHomeStratZ.CyclicLogic();
 
 //Set the current alarm severity for this module
 _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentSeverity := _CurrentAlarmSeverity);
@@ -1772,6 +1790,18 @@ CASE DescendantSequenceState OF
         DescendantSequenceState := DescendantSequenceState + 10;
     10:
 		IF RestorePersistentData() THEN
+		
+		// Przypisanie osi do strategii
+		fbHomeStratX.Axis := AxisX;
+		fbHomeStratY.Axis := AxisY;
+		fbHomeStratZ.Axis := AxisZ;
+		
+		// Wstrzyknięcie strategii do osi (Dependency Injection)
+		AxisX.HomeMethod := fbHomeStratX;
+		AxisY.HomeMethod := fbHomeStratY;
+		AxisZ.HomeMethod := fbHomeStratZ;
+		
+		
         DescendantSequenceState := DescendantSequenceState + 10;
 		//initialize persistent
 		END_IF
@@ -2104,25 +2134,29 @@ END_VAR
 				SequenceState := SequenceState + 5;
 		
 			10: 
-				IF HomingZ() THEN
-					SequenceState := SequenceState + 10;
-					flagZ := TRUE;
-				END_IF	
+				AxisX.Home();
+				AxisY.Home();
+				AxisZ.Home();
+				
+//				IF HomingZ() THEN
+//					SequenceState := SequenceState + 10;
+//					flagZ := TRUE;
+//				END_IF	
 				
 			20:	
-				IF HomingY() THEN
-					flagY := TRUE;
-				END_IF
+//				IF HomingY() THEN
+//					flagY := TRUE;
+//				END_IF
 				
 
 				
-				IF HomingX() THEN
-					flagX := TRUE;
-				END_IF
+//				IF HomingX() THEN
+//					flagX := TRUE;
+//				END_IF
 					
 				
-			
-			IF flagX AND flagY AND flagZ THEN
+			IF AxisX.Axis.Status.Homed AND AxisY.Axis.Status.Homed AND AxisZ.Axis.Status.Homed THEN
+//			IF flagX AND flagY AND flagZ THEN
 				Trace('All Axes Homing completed');
 				flagX :=0; 
 				flagY :=0; 
@@ -2133,8 +2167,8 @@ END_VAR
 				THIS^.HomingStepY := 0;
 				THIS^.HomingStepZ := 0;
 				SequenceState := 40;
-			END_IF			
-					
+//			END_IF			
+			END_IF		
 			40:		
 				StateTasksComplete := TRUE;
 				SUPER^.Resetting();
@@ -2295,7 +2329,13 @@ END_IF]]></ST>
       <LineId Id="112" Count="1" />
       <LineId Id="121" Count="1" />
       <LineId Id="246" Count="0" />
-      <LineId Id="114" Count="3" />
+      <LineId Id="269" Count="1" />
+      <LineId Id="273" Count="1" />
+      <LineId Id="272" Count="0" />
+      <LineId Id="271" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="267" Count="1" />
+      <LineId Id="115" Count="2" />
       <LineId Id="154" Count="0" />
       <LineId Id="118" Count="0" />
       <LineId Id="181" Count="2" />
@@ -2491,6 +2531,8 @@ END_IF]]></ST>
       <LineId Id="26" Count="2" />
       <LineId Id="31" Count="0" />
       <LineId Id="7" Count="1" />
+      <LineId Id="35" Count="2" />
+      <LineId Id="34" Count="0" />
       <LineId Id="12" Count="4" />
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -2684,6 +2726,11 @@ END_IF]]></ST>
       <LineId Id="90" Count="0" />
       <LineId Id="10" Count="3" />
       <LineId Id="80" Count="0" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="106" Count="7" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="101" Count="0" />
       <LineId Id="41" Count="0" />
       <LineId Id="79" Count="0" />
       <LineId Id="78" Count="0" />
@@ -2772,6 +2819,8 @@ END_IF]]></ST>
       <LineId Id="445" Count="1" />
       <LineId Id="115" Count="0" />
       <LineId Id="226" Count="0" />
+      <LineId Id="525" Count="1" />
+      <LineId Id="523" Count="1" />
       <LineId Id="229" Count="0" />
       <LineId Id="231" Count="0" />
       <LineId Id="230" Count="0" />
