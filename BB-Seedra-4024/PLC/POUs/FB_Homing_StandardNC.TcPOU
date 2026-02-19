@@ -11,8 +11,12 @@ VAR
 	
 	nStep :INT;
 	
+	
+	
 END_VAR
-]]></Declaration>
+VAR_INPUT
+bSensorInput :BOOL;	
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
@@ -24,7 +28,8 @@ END_VAR
       <Implementation>
         <ST><![CDATA[fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
 _bBusy := FALSE;
-nStep := 0;]]></ST>
+nStep := 0;
+]]></ST>
       </Implementation>
     </Method>
     <Property Name="Axis" Id="{33e35a1f-2c3a-4bfc-bb60-bae2383b8b6a}">
@@ -75,7 +80,7 @@ METHOD CyclicLogic
             Axis        := _Axis.Axis, 
             Execute     := TRUE, 
             HomingMode  := MC_DefaultHoming, // <--- CZYTAJ Z PARAMETRÓW NC!
-            bCalibrationCam := FALSE // Tutaj można podpiąć wejście, jeśli nie jest zlinkowane w NC
+            bCalibrationCam := bSensorInput,
         );
         
         // Czekamy aż blok przyjmie komendę
@@ -87,7 +92,10 @@ METHOD CyclicLogic
 
     20: // WAIT FOR DONE
         // Wywołanie cykliczne
-        fbMcHome(Axis := _Axis.Axis);
+		fbMcHome(
+            Axis := _Axis.Axis,
+            bCalibrationCam := bSensorInput 
+        );
         
         IF fbMcHome.Done THEN
             _bBusy := FALSE;
@@ -152,7 +160,8 @@ _bBusy       := TRUE;
 _bDone       := FALSE;
 _bError      := FALSE;
 _bErrorID    := 0;
-nStep       := 10; // Start sekwencji]]></ST>
+nStep       := 10; // Start sekwencji
+Execute := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Property Name="InitComplete" Id="{adc32464-ccda-44e3-9865-b1afc471c266}">
@@ -173,6 +182,7 @@ END_VAR
     <LineIds Name="FB_Homing_StandardNC.Abort">
       <LineId Id="6" Count="1" />
       <LineId Id="5" Count="0" />
+      <LineId Id="13" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_StandardNC.Axis.Get">
       <LineId Id="2" Count="0" />
@@ -184,7 +194,10 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_StandardNC.CyclicLogic">
-      <LineId Id="5" Count="35" />
+      <LineId Id="5" Count="20" />
+      <LineId Id="44" Count="2" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="27" Count="13" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_StandardNC.Done.Get">
@@ -199,6 +212,7 @@ END_VAR
     <LineIds Name="FB_Homing_StandardNC.Execute">
       <LineId Id="5" Count="6" />
       <LineId Id="4" Count="0" />
+      <LineId Id="14" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_StandardNC.InitComplete.Get">
       <LineId Id="2" Count="0" />
