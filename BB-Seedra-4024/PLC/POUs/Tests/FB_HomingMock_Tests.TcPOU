@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_HomingMock_Tests" Id="{6656c6c9-c1f1-4e04-bbe0-3bda78bdaa4c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_HomingMock_Tests EXTENDS FB_TestSuite
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_MockSetsDoneFlag();]]></ST>
+    </Implementation>
+    <Method Name="Test_MockSetsDoneFlag" Id="{c1daf4d1-3b40-4a02-b7b0-1421614a5175}">
+      <Declaration><![CDATA[METHOD PRIVATE Test_MockSetsDoneFlag : REFERENCE TO FB_Test
+VAR_INST
+	fbMockHoming : FB_Homing_Mock;
+	bExecuteInit : BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// 1. Zaczynamy test i nadajemy mu nazwę (pojawia się w raporcie)
+TcUnit.TEST('Test_MockSetsDoneFlag');
+
+// ==========================================
+// ARRANGE & ACT (Przygotowanie i Akcja)
+// ==========================================
+IF NOT bExecuteInit THEN
+    // Wysyłamy komendę do naszego specjalisty tylko w pierwszym cyklu
+    fbMockHoming.Execute();
+    bExecuteInit := TRUE;
+END_IF
+
+// Kręcimy logiką cykliczną Mocka, żeby timer mógł odliczać czas
+fbMockHoming.CyclicLogic();
+
+// ==========================================
+// ASSERT (Sprawdzenie wyniku)
+// ==========================================
+
+// Czekamy, aż Mock zgłosi, że skończył (lub zrzuci błędem)
+IF fbMockHoming.Busy OR fbMockHoming.Error THEN
+    
+    // Używamy AssertEquals, żeby sprawdzić, czy oczekiwany stan zgadza się z rzeczywistym    
+	 THIS^.AssertEquals_BOOL(
+        Expected := TRUE, 
+        Actual   := fbMockHoming.Busy, 
+        Message  := 'Mock Homing powinien wystawic flage Done na TRUE'
+    );
+    
+    THIS^.AssertEquals_BOOL(
+        Expected := FALSE, 
+        Actual   := fbMockHoming.Error, 
+        Message  := 'Mock Homing nie powinien rzucac bledem'
+    );
+
+    // 3. Konczymy test!
+	 TEST_FINISHED();
+	
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_HomingMock_Tests">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_HomingMock_Tests.Test_MockSetsDoneFlag">
+      <LineId Id="8" Count="17" />
+      <LineId Id="44" Count="0" />
+      <LineId Id="26" Count="3" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="31" Count="12" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

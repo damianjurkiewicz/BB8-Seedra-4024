@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Homing_Mock" Id="{e31a3749-123b-4dfb-ad39-aa25645894ff}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Homing_Mock EXTENDS FB_CyclicFB IMPLEMENTS I_MotionSequence
+VAR
+	// Wewnętrzne flagi interfejsu
+    _bBusy    : BOOL;
+    _bInitComplete    : BOOL;
+	_bDone :BOOL;
+    _bError   : BOOL;
+    _iErrorID : UDINT;
+    
+    // Zmienne naszego Mocka
+    nStep    : INT;
+    tTimer   : TON;
+    
+    // Referencja do osi (żeby wymusić flagę Homed)
+    _Axis    : I_BasicAxis;
+    fbSetPos : MC_SetPosition;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="Axis" Id="{0f65bf00-67fe-4aba-8137-b51d116c1159}">
+      <Declaration><![CDATA[
+PROPERTY Axis : SPT_Motion_Control.I_BasicAxis
+]]></Declaration>
+      <Get Name="Get" Id="{e9e4b2b8-db7b-4d3f-90bf-522581a11a2c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Axis := _Axis;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{f6d5b25c-c61c-4423-b3ae-eca06aecc471}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Axis := Axis;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Busy" Id="{43351339-3329-4098-9bdf-09b26ee270da}">
+      <Declaration><![CDATA[PROPERTY Busy : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{81eeacd2-966d-4849-b300-eeeb505be167}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Busy:=_bBusy;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="CyclicLogic" Id="{17f462d7-3d9f-4c9b-bb5b-b5a89fe32605}">
+      <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE nStep OF
+    0:
+        // Idle - czekamy na Execute
+        
+    10:
+        // Udajemy bazowanie - czekamy 2 sekundy
+        tTimer(IN := TRUE, PT := T#2S);
+        
+        IF tTimer.Q THEN
+            tTimer(IN := FALSE);
+            nStep := 20;
+        END_IF
+        
+    20:
+        // Oszukujemy NC - ustawiamy pozycję na 0.0 i wymuszamy flagę Homed
+        fbSetPos(
+            Axis     := _Axis.Axis, 
+            Execute  := TRUE, 
+            Position := 0.0, 
+            Mode     := FALSE // Wymusza absolutne ustawienie pozycji
+        );
+        
+        IF fbSetPos.Done THEN
+            fbSetPos(Axis := _Axis.Axis, Execute := FALSE); // Reset bloku
+            nStep := 30;
+        END_IF
+        
+    30:
+        // Sukces!
+        _bBusy := FALSE;
+        _bDone := TRUE;
+        nStep := 0;
+        
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Error" Id="{833f06a6-c2fe-4eb5-9e4d-6e7b38e40001}">
+      <Declaration><![CDATA[
+PROPERTY Error : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{0808e801-ef4f-4a63-99a7-98f653003203}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := _bError;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ErrorID" Id="{b89fed01-dea3-431d-b1bd-6f652b1e4c5f}">
+      <Declaration><![CDATA[
+PROPERTY ErrorID : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{9b26b192-a953-4eb3-bdfe-c36ba145afad}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ErrorID := _iErrorID;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{938833ed-e6b3-4e5e-9c5c-e8e12ac7416a}">
+      <Declaration><![CDATA[METHOD PUBLIC Execute : BOOL]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF nStep = 0 THEN
+    _bBusy    := TRUE;
+    _bDone    := FALSE;
+    _bError   := FALSE;
+    _iErrorID := 0;
+    nStep    := 10;
+END_IF
+
+Execute := TRUE; // Potwierdzamy przyjęcie rozkazu]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="InitComplete" Id="{eb4b3d66-90ef-4785-803b-ec27b572a39e}">
+      <Declaration><![CDATA[PROPERTY InitComplete : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{fd92954a-0b4b-49ed-9012-202593124c18}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[InitComplete := _bInitComplete;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_Homing_Mock">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Mock.Axis.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Mock.Axis.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Mock.Busy.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Mock.CyclicLogic">
+      <LineId Id="8" Count="32" />
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Mock.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Mock.ErrorID.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Mock.Execute">
+      <LineId Id="6" Count="7" />
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Mock.InitComplete.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

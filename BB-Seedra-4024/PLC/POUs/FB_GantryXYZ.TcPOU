@@ -50,10 +50,15 @@ VAR
 	
 	GantryXYZ_HMI : ST_GantryXYZ_HMI;
 	
-	//Test
+	//Stanard Strategies
 	fbHomeStratX : FB_Homing_StandardNC;
     fbHomeStratY : FB_Homing_StandardNC;
     fbHomeStratZ : FB_Homing_StandardNC;
+	
+	//Mock Strategies
+	fbMockHomeX  : FB_Homing_Mock;
+	
+	bSimulationMOde  :BOOL := TRUE ;
 	
 END_VAR
 
@@ -790,6 +795,11 @@ _CurrentSpeed := SQRT( AxisX.SetVelocity*AxisX.SetVelocity + AxisY.SetVelocity*A
 
 SUPER^.CyclicLogic();
 
+IF bSimulationMode THEN
+	fbMockHomeX.CyclicLogic();
+	
+ELSE
+	
 fbHomeStratX.bSensorInput := IO.ProximitySensorX;
 fbHomeStratY.bSensorInput := IO.ProximitySensorY;
 fbHomeStratZ.bSensorInput := IO.ProximitySensorZ;
@@ -797,6 +807,10 @@ fbHomeStratZ.bSensorInput := IO.ProximitySensorZ;
 fbHomeStratX.CyclicLogic();
 fbHomeStratY.CyclicLogic();
 fbHomeStratZ.CyclicLogic();
+
+	
+END_IF
+
 
 //Set the current alarm severity for this module
 _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentSeverity := _CurrentAlarmSeverity);
@@ -1887,6 +1901,10 @@ CASE DescendantSequenceState OF
     10:
 		IF RestorePersistentData() THEN
 		
+		IF bSimulationMode THEN
+			fbMockHomeX.Axis := AxisX;
+			AxisX.HomeMethod := fbMockHomeX;
+		ELSE
 		// Przypisanie osi do strategii
 		fbHomeStratX.Axis := AxisX;
 		fbHomeStratY.Axis := AxisY;
@@ -1896,7 +1914,7 @@ CASE DescendantSequenceState OF
 		AxisX.HomeMethod := fbHomeStratX;
 		AxisY.HomeMethod := fbHomeStratY;
 		AxisZ.HomeMethod := fbHomeStratZ;
-		
+		END_IF
 		
         DescendantSequenceState := DescendantSequenceState + 10;
 		//initialize persistent
@@ -2194,9 +2212,6 @@ END_CASE
 VAR
 	i				: UDINT;
 	SubModulesReady : BOOL := TRUE;
-	
-
-	
 END_VAR
 
 VAR_INST
@@ -2207,162 +2222,138 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE _CurrentMode OF
+    //================================= PRODUCTION MODE ==================================
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        CASE SequenceState OF
+            0:
+                NoStateTasksToComplete := FALSE;
+                SequenceState := SequenceState + 5;
 
-	//=================================PRODUCTION MODE==================================
-	E_PMLUnitMode.ePMLUnitMode_Production:
-		CASE SequenceState OF
-			0:
-				NoStateTasksToComplete := FALSE;
-				SequenceState := SequenceState + 5;
-
-
-			5:
-
-				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
-				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
-		
-				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
-				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
-		
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);	
-				
-				SequenceState := SequenceState + 5;
-		
-			10: 
-      			
-			  AxisX.Enable();
-			  AxisY.Enable();
-			  AxisZ.Enable();
-	 
-			SequenceState := 12;
-		
-		12:
+            5:
+                AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);   
+                AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
         
-        // 2. Czekamy, aż napędy "wstaną" i zameldują gotowość
-        IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
-            SequenceState := 15;
-        END_IF
+                AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);   
+                AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
         
-15:
-        // 1. "Bombardujemy" osie komendami, dopóki każda z osobna nie odpowie TRUE
-        IF NOT flagX THEN flagX := AxisX.Home(); END_IF
-        IF NOT flagY THEN flagY := AxisY.Home(); END_IF
-        IF NOT flagZ THEN flagZ := AxisZ.Home(); END_IF
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);    
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);  
+                
+                SequenceState := SequenceState + 5;
+        
+            10: 
+                AxisX.Enable();
+                AxisY.Enable();
+                AxisZ.Enable();
+                SequenceState := 12;
+        
+            12:
+                IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+                    SequenceState := 15;
+                END_IF
+                
+            15:
+                IF NOT flagX THEN flagX := AxisX.Home(); END_IF
+                IF NOT flagY THEN flagY := AxisY.Home(); END_IF
+                IF NOT flagZ THEN flagZ := AxisZ.Home(); END_IF
 
-        // 2. Kiedy cała trójka potwierdziła przyjęcie rozkazu:
-        IF flagX AND flagY AND flagZ THEN
-            // Czyścimy flagi przed następnym użyciem maszyny!
-            flagX := FALSE;
-            flagY := FALSE;
-            flagZ := FALSE;
+                IF flagX AND flagY AND flagZ THEN
+                    flagX := FALSE;
+                    flagY := FALSE;
+                    flagZ := FALSE;
+                    SequenceState := 20; 
+                END_IF
+                    
+            20:         
+                IF AxisX.Axis.Status.Homed AND AxisY.Axis.Status.Homed AND AxisZ.Axis.Status.Homed THEN
+                    Trace('All Axes Homing completed');
+                    flagX := FALSE; 
+                    flagY := FALSE; 
+                    flagZ := FALSE;
+                    OrchestratorStep := 0;
+                    ExecutorStep := 0;
+                    THIS^.HomingStepX := 0;
+                    THIS^.HomingStepY := 0;
+                    THIS^.HomingStepZ := 0;
+                    SequenceState := 40;
+                END_IF      
+
+            40:     
+                StateTasksComplete := TRUE;
+                SUPER^.Resetting();
+        END_CASE
+
+    //========================= MAINTENANCE & MANUAL MODE ===============================
+    E_PMLUnitMode.ePMLUnitMode_Maintenance:
+        CASE SequenceState OF
+            0:
+                NoStateTasksToComplete := FALSE;
+                SequenceState := SequenceState + 10; 
+        
+            10: 
+                AxisX.Enable();
+                AxisY.Enable();
+                AxisZ.Enable(); 
+                
+                IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+                    SequenceState := SequenceState + 10;
+                END_IF
+                
+            20: 
+                AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);   
+                AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+        
+                AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);   
+                AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+        
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);    
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
             
-            SequenceState := 20; // Idziemy czekać na koniec ruchu
-        END_IF
-					
-	20:			
-//			IF AxisX.Axis.Status.Homed AND AxisY.Axis.Status.Homed AND AxisZ.Axis.Status.Homed THEN
-			IF AxisX.Axis.Status.Homed AND AxisY.Axis.Status.Homed AND AxisZ.Axis.Status.Homed THEN
-//			IF flagX AND flagY AND flagZ THEN
+                SequenceState := SequenceState + 10;
 
-				Trace('All Axes Homing completed');
-				flagX :=0; 
-				flagY :=0; 
-				flagZ :=0;
-				OrchestratorStep := 0;
-				ExecutorStep := 0;
-				THIS^.HomingStepX := 0;
-				THIS^.HomingStepY := 0;
-				THIS^.HomingStepZ := 0;
-				SequenceState := 40;
-//			END_IF			
-			END_IF		
-			40:		
-				StateTasksComplete := TRUE;
-				SUPER^.Resetting();
-		END_CASE
+            30:
+                SequenceState := SequenceState + 10;
+                    
+            40:     
+                StateTasksComplete := TRUE;
+                SUPER^.Resetting();
+        END_CASE
+    
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+        CASE SequenceState OF
+            0:
+                NoStateTasksToComplete := FALSE;
+                SequenceState := SequenceState + 10; 
+        
+            10: 
+                AxisX.Enable();
+                AxisY.Enable();
+                AxisZ.Enable(); 
+                
+                IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+                    SequenceState := SequenceState + 10;
+                END_IF
+                
+            20: 
+                AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);   
+                AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+        
+                AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);   
+                AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+        
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);    
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
+            
+                SequenceState := SequenceState + 10;
 
-	//=================================MAINTENANCE & MANUAL MODE==================================
-	E_PMLUnitMode.ePMLUnitMode_Maintenance:
-
-	CASE SequenceState OF
-			0:
-				NoStateTasksToComplete := FALSE;
-				SequenceState := SequenceState + 10;	
-		
-			10: 
-				AxisX.Enable();
-				AxisY.Enable();
-				AxisZ.Enable();	
-				
-				IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
-					SequenceState := SequenceState + 10;
-				END_IF
-				
-			20:	
-
-				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
-				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
-		
-				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
-				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
-		
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
-			
-				SequenceState := SequenceState + 10;
-			30:
-	
-				SequenceState := SequenceState + 10;
-					
-			40:		
-				StateTasksComplete := TRUE;
-				SUPER^.Resetting();
-		END_CASE
-	
- 	E_PMLUnitMode.ePMLUnitMode_Manual:
-			
-	CASE SequenceState OF
-			0:
-				NoStateTasksToComplete := FALSE;
-				SequenceState := SequenceState + 10;	
-		
-			10: 
-				AxisX.Enable();
-				AxisY.Enable();
-				AxisZ.Enable();	
-				
-				IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
-					SequenceState := SequenceState + 10;
-				END_IF
-				
-			20:	
-
-				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
-				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
-		
-				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
-				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
-		
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
-			
-				SequenceState := SequenceState + 10;
-			30:
-	
-				SequenceState := SequenceState + 10;
-					
-			40:		
-				StateTasksComplete := TRUE;
-				SUPER^.Resetting();
-		END_CASE
-		
-	
-	END_CASE
-		
-
-
-]]></ST>
+            30:
+                SequenceState := SequenceState + 10;
+                    
+            40:     
+                StateTasksComplete := TRUE;
+                SUPER^.Resetting();
+        END_CASE
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="RestorePersistentData" Id="{9e1193e7-d277-4fd9-ac0c-81f097451afd}">
@@ -2638,10 +2629,16 @@ END_IF]]></ST>
       <LineId Id="26" Count="2" />
       <LineId Id="31" Count="0" />
       <LineId Id="7" Count="1" />
-      <LineId Id="41" Count="2" />
-      <LineId Id="40" Count="0" />
-      <LineId Id="35" Count="2" />
-      <LineId Id="34" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="52" Count="1" />
+      <LineId Id="55" Count="6" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="41" Count="0" />
       <LineId Id="12" Count="4" />
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -2829,6 +2826,9 @@ END_IF]]></ST>
       <LineId Id="10" Count="3" />
       <LineId Id="80" Count="0" />
       <LineId Id="100" Count="0" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="125" Count="1" />
+      <LineId Id="124" Count="0" />
       <LineId Id="106" Count="7" />
       <LineId Id="102" Count="0" />
       <LineId Id="105" Count="0" />
@@ -2911,57 +2911,7 @@ END_IF]]></ST>
       <LineId Id="111" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
-      <LineId Id="82" Count="5" />
-      <LineId Id="89" Count="0" />
-      <LineId Id="91" Count="0" />
-      <LineId Id="434" Count="1" />
-      <LineId Id="433" Count="0" />
-      <LineId Id="437" Count="7" />
-      <LineId Id="436" Count="0" />
-      <LineId Id="445" Count="1" />
-      <LineId Id="115" Count="0" />
-      <LineId Id="542" Count="4" />
-      <LineId Id="558" Count="3" />
-      <LineId Id="547" Count="5" />
-      <LineId Id="569" Count="13" />
-      <LineId Id="199" Count="0" />
-      <LineId Id="181" Count="0" />
-      <LineId Id="179" Count="0" />
-      <LineId Id="149" Count="0" />
-      <LineId Id="565" Count="0" />
-      <LineId Id="184" Count="0" />
-      <LineId Id="568" Count="0" />
-      <LineId Id="185" Count="0" />
-      <LineId Id="237" Count="2" />
-      <LineId Id="225" Count="0" />
-      <LineId Id="508" Count="0" />
-      <LineId Id="211" Count="2" />
-      <LineId Id="186" Count="0" />
-      <LineId Id="183" Count="0" />
-      <LineId Id="125" Count="0" />
-      <LineId Id="94" Count="5" />
-      <LineId Id="337" Count="0" />
-      <LineId Id="365" Count="0" />
-      <LineId Id="461" Count="32" />
-      <LineId Id="366" Count="1" />
-      <LineId Id="364" Count="0" />
-      <LineId Id="335" Count="0" />
-      <LineId Id="377" Count="5" />
-      <LineId Id="416" Count="1" />
-      <LineId Id="386" Count="0" />
-      <LineId Id="418" Count="3" />
-      <LineId Id="387" Count="1" />
-      <LineId Id="422" Count="0" />
-      <LineId Id="425" Count="6" />
-      <LineId Id="397" Count="0" />
-      <LineId Id="423" Count="1" />
-      <LineId Id="398" Count="0" />
-      <LineId Id="411" Count="0" />
-      <LineId Id="432" Count="0" />
-      <LineId Id="412" Count="3" />
-      <LineId Id="374" Count="1" />
-      <LineId Id="256" Count="1" />
-      <LineId Id="101" Count="2" />
+      <LineId Id="597" Count="131" />
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RestorePersistentData">

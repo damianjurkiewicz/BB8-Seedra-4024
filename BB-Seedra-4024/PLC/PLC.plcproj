@@ -76,6 +76,9 @@
     <Compile Include="POUs\FB_GantryXYZ.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\FB_Homing_Mock.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\FB_Homing_StandardNC.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -98,6 +101,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Segments\ST_PointXY.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Tests\FB_HomingMock_Tests.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SafetyTask.TcTTO">
@@ -152,6 +158,7 @@
     <Folder Include="DUTs\FB_GantryXYZ\FB_GantryXYZ" />
     <Folder Include="GVLs" />
     <Folder Include="POUs\Components" />
+    <Folder Include="POUs\Tests" />
     <Folder Include="POUs\Segments" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
@@ -245,6 +252,7 @@
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Utilities">
       <DefaultResolution>Tc2_Utilities, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Utilities</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc3_EventLogger">
       <DefaultResolution>Tc3_EventLogger, * (Beckhoff Automation GmbH)</DefaultResolution>
@@ -257,6 +265,9 @@
     <PlaceholderReference Include="Tc3_PackML_V2">
       <DefaultResolution>Tc3_PackML_V2, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_PackML_V2</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="TcUnit">
+      <DefaultResolution>TcUnit, * (www.tcunit.org)</DefaultResolution>
     </PlaceholderReference>
     <PlaceholderReference Include="VisuDialogs">
       <DefaultResolution>VisuDialogs, * (System)</DefaultResolution>

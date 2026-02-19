@@ -7,9 +7,12 @@
 		Seedra          : FB_Machine := (Name := 'SeedraMAIN');
 		InitComplete    : BOOL;
 		RebootSystem	: NT_Reboot;
+		fbHomingTests : FB_HomingMock_Tests;
 	END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[CyclicLogic();]]></ST>
+      <ST><![CDATA[CyclicLogic();
+TcUnit.RUN();
+]]></ST>
     </Implementation>
     <Method Name="CyclicLogic" Id="{85924404-3ac7-07ce-3884-239a0c5cad48}">
       <Declaration><![CDATA[METHOD CyclicLogic
@@ -40,6 +43,7 @@ Initialize := TRUE;]]></ST>
     </Method>
     <LineIds Name="MAIN">
       <LineId Id="2" Count="0" />
+      <LineId Id="10" Count="1" />
     </LineIds>
     <LineIds Name="MAIN.CyclicLogic">
       <LineId Id="3" Count="8" />
