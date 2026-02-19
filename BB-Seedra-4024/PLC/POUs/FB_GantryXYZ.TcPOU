@@ -1068,27 +1068,31 @@ END_CASE]]></ST>
 VAR_INST
 iPass : INT;
 currentDepth : LREAL;
-g1, g2, g3 : LREAL;
-v1, v2, v3 : LREAL;
+g1, g2, g3, g4, g5 : LREAL;
+v1, v2, v3, v4, v5 : LREAL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE ExecutorStep OF
 
     // -------- Inicjalizacja --------
     0:
-        // Konfiguracja
-        g1 := 2.0; 
-        g2 := 3.0; 
-        g3 := 4.0; 
-		v1 := 1.0;
-		v2 := 0.8;
-		v3 := 0.1;
+        // Konfiguracja głębokości (g) i mnożników prędkości (v)
+        g1 := 3.5; 
+        g2 := 2.5; 
+        g3 := 1.5; 
+        g4 := 0.5;
+        g5 := 0.0; // Ostatnie przejście na pełną głębokość
+
+        v1 := 2.0;
+        v2 := 2.0;
+        v3 := 2.0;
+        v4 := 2.0;
+        v5 := 0.7; // Np. wolniej na wykończenie
 
         IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
             
-            // Logujemy tylko raz przy wejściu w warunek
             IF iSegmentsToGroove = 0 THEN 
-                Trace(Message:= 'Step 0: Start Initialization'); 
+                Trace(Message:= 'Step 0: Start Initialization (5 Passes Mode)'); 
             END_IF;
 
             IF SegmentsToGroove <= 0 THEN
@@ -1098,7 +1102,7 @@ END_VAR]]></Declaration>
                 RETURN;
             END_IF;
 
-            // Jednorazowe nastawy
+            // Jednorazowe nastawy dynamiki
             AxisX.Acceleration := 500; AxisX.Deceleration := 8000;
             AxisY.Acceleration := 500; AxisY.Deceleration := 8000;
             AxisZ.Acceleration := 500; AxisZ.Deceleration := 8000;
@@ -1107,7 +1111,7 @@ END_VAR]]></Declaration>
             AxisY.Velocity := _RapidSpeedY;
             AxisZ.Velocity := _RapidSpeedZ;
 
-            IO.SpindleEnable := FALSE;
+            IO.SpindleEnable := TRUE;
             IO.CoolingEnable := FALSE;
 
             iSegmentsToGroove := 1;
@@ -1120,11 +1124,7 @@ END_VAR]]></Declaration>
         END_IF;
 
     10: 
-        Trace(Message:= 'Step 10: Rapid Move to Start XY');
-        
-        // Logowanie wartości Start X i Start Y
-        Trace(Message:= CONCAT('StartX value is: ', TO_STRING(SegmentGrooves[iSegmentsToGroove].Start.X + _GlobalOffset)));
-        Trace(Message:= CONCAT('StartY value is: ', TO_STRING(SegmentGrooves[iSegmentsToGroove].Start.Y + _GlobalOffset)));
+        Trace(Message:= CONCAT('Step 10: Rapid to Start XY. Pass: ', TO_STRING(iPass)));
         
         AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X + _GlobalOffset, 0);
         AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y + _GlobalOffset, 0);
@@ -1132,7 +1132,6 @@ END_VAR]]></Declaration>
 
     20: 
         IF AxisX.InPosition AND AxisY.InPosition THEN
-            Trace(Message:= 'Step 20: XY InPosition -> Spindle ON -> Going to 30');
             IO.SpindleEnable := TRUE;
             IO.CoolingEnable := TRUE;
             AxisZ.Velocity := _GroovingSpeedZ;
@@ -1140,56 +1139,53 @@ END_VAR]]></Declaration>
         END_IF;
 
     30: 
-        Trace(Message:= 'Step 30: Calculating Depth');
+        // Wybór głębokości dla 5 przejść
         CASE iPass OF
             1: currentDepth := _GrooveDepthZ - g1;
             2: currentDepth := _GrooveDepthZ - g2;
             3: currentDepth := _GrooveDepthZ - g3;
+            4: currentDepth := _GrooveDepthZ - g4;
+            5: currentDepth := _GrooveDepthZ - g5;
         ELSE
             currentDepth := _GrooveDepthZ;
         END_CASE;
 
-        Trace(Message:= CONCAT('Step 30: Moving Z to Depth: ', TO_STRING(currentDepth)));
-        
-        IF iPass = 1 THEN Trace(Message:= 'Step 30: Pass 1'); END_IF;
-        IF iPass = 2 THEN Trace(Message:= 'Step 30: Pass 2'); END_IF;
-        IF iPass = 3 THEN Trace(Message:= 'Step 30: Pass 3'); END_IF;
+        Trace(Message:= CONCAT('Step 30: Pass ', CONCAT(TO_STRING(iPass), CONCAT(' Moving Z to: ', TO_STRING(currentDepth)))));
 
         AxisZ.MoveAbsolute(currentDepth, 0);
         ExecutorStep := 40;
 
     40: 
         IF AxisZ.InPosition THEN
-            Trace(Message:= 'Step 40: Z InPosition -> Going to 50');
-        CASE iPass OF
-            1:
-				AxisX.Velocity := _GroovingSpeedX * v1;
-            	AxisY.Velocity := _GroovingSpeedY * v1;
-            2: 
-				AxisX.Velocity := _GroovingSpeedX * v2;
-            	AxisY.Velocity := _GroovingSpeedY * v2;
-            3: 
-				AxisX.Velocity := _GroovingSpeedX * v3;
-            	AxisY.Velocity := _GroovingSpeedY * v3;
-        ELSE
-            currentDepth := _GrooveDepthZ;
-        END_CASE;
+            // Wybór prędkości posuwu dla 5 przejść
+            CASE iPass OF
+                1:
+                    AxisX.Velocity := _GroovingSpeedX * v1;
+                    AxisY.Velocity := _GroovingSpeedY * v1;
+                2: 
+                    AxisX.Velocity := _GroovingSpeedX * v2;
+                    AxisY.Velocity := _GroovingSpeedY * v2;
+                3: 
+                    AxisX.Velocity := _GroovingSpeedX * v3;
+                    AxisY.Velocity := _GroovingSpeedY * v3;
+                4: 
+                    AxisX.Velocity := _GroovingSpeedX * v4;
+                    AxisY.Velocity := _GroovingSpeedY * v4;
+                5: 
+                    AxisX.Velocity := _GroovingSpeedX * v5;
+                    AxisY.Velocity := _GroovingSpeedY * v5;
+            END_CASE;
 
             ExecutorStep := 50;
         END_IF;
 
     50: 
         IF SequenceTimerSeconds(_GroovingIdleTime) THEN
-            Trace(Message:= 'Step 50: Timer finished -> Going to 60');
             ExecutorStep := 60;
         END_IF;
 
     60: 
-        Trace(Message:= 'Step 60: Cutting Move Start -> Stop');
-        
-        // Logowanie wartości Stop X i Stop Y
-        Trace(Message:= CONCAT('StopX value is: ', TO_STRING(SegmentGrooves[iSegmentsToGroove].Stop.X + _GlobalOffset)));
-        Trace(Message:= CONCAT('StopY value is: ', TO_STRING(SegmentGrooves[iSegmentsToGroove].Stop.Y + _GlobalOffset)));
+        Trace(Message:= 'Step 60: Cutting Move to Stop XY');
         
         AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X + _GlobalOffset, 0);
         AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y + _GlobalOffset, 0);
@@ -1197,89 +1193,72 @@ END_VAR]]></Declaration>
 
     70: 
         IF AxisX.InPosition AND AxisY.InPosition AND AxisZ.InPosition THEN
-            Trace(Message:= 'Step 70: Cut Finished. Checking Logic...');
-            
-            IF iPass = 3 THEN
-                Trace(Message:= 'Step 70: Pass is 3 -> Going to 75 (Return Path)');
+            // Sprawdzamy czy to ostatnie przejście (teraz 5)
+            IF iPass = 5 THEN
+                Trace(Message:= 'Step 70: Pass 5 (Final) -> Going to Return Path');
                 ExecutorStep := 74;
             ELSE
-                Trace(Message:= 'Step 70: Pass is 1 or 2 -> Going to 80 (Lift Z)');
+                Trace(Message:= 'Step 70: Intermediate Pass -> Lifting Z');
                 AxisZ.Velocity := _RapidSpeedZ;
-                IO.CoolingEnable := FALSE;
                 ExecutorStep := 80;
             END_IF;
         END_IF;
-		
-	74:
-		IF SequenceTimerSeconds(0.5) THEN
-            Trace(Message:= 'Step 74: Timer finished -> Going to 75');
+        
+    74:
+        IF SequenceTimerSeconds(0.5) THEN
             ExecutorStep := 75;
         END_IF;
 
     75: 
-        Trace(Message:= 'Step 75: Moving Back Stop -> Start (Z stays down)');
-		Trace(Message:= CONCAT('StartX value is: ', TO_STRING(SegmentGrooves[iSegmentsToGroove].Start.X + _GlobalOffset)));
-        Trace(Message:= CONCAT('StartY value is: ', TO_STRING(SegmentGrooves[iSegmentsToGroove].Start.Y + _GlobalOffset)));
-		
-		//IF ( NOT AxisX.Busy OR NOT AxisY.Busy OR NOT AxisZ.Busy) THEN    
+        Trace(Message:= 'Step 75: Cleaning Return (Z stays down)');
         AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X + _GlobalOffset, 0);
         AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y + _GlobalOffset, 0);
-		//END_IF
-		
-     //   IF (AxisX.Busy OR AxisY.Busy) OR (NOT AxisX.InPosition OR NOT AxisY.InPosition) THEN    
-            ExecutorStep := 76;
-     //  END_IF
+        ExecutorStep := 76;
         
     76: 
         IF AxisX.InPosition AND AxisY.InPosition THEN
-            Trace(Message:= 'Step 76: Returned to Start -> Going to 80 (Lift Z)');
             AxisZ.Velocity := _RapidSpeedZ;
-            IO.CoolingEnable := FALSE;
             ExecutorStep := 80; 
         END_IF;
 
     80: 
-        Trace(Message:= 'Step 80: Lifting Z to 0');
+        Trace(Message:= 'Step 80: Lifting Z to Safe 0');
         AxisZ.MoveAbsolute(0, 0);
         ExecutorStep := 90;
 
     90: 
         IF AxisZ.InPosition THEN
-            Trace(Message:= 'Step 90: Z Safe -> Going to 100');
             ExecutorStep := 100;
         END_IF;
 
     100: 
         IF SequenceTimerSeconds(_GroovingIdleTime) THEN
-            Trace(Message:= 'Step 100: Timer Done. Updating indexes...');
             
             AxisX.Velocity := _RapidSpeedX;
             AxisY.Velocity := _RapidSpeedY;
             
             iSegmentsToGroove := iSegmentsToGroove + 1;
 
+            // Logika zmiany przejścia lub zakończenia
             IF iSegmentsToGroove > SegmentsToGroove THEN
-                Trace(Message:= 'Step 100: All segments done in this pass.');
-                
-                IF iPass < 3 THEN
-                    Trace(Message:= CONCAT('Step 100: Pass ', CONCAT(TO_STRING(iPass), ' finished. Incremented Pass -> Going to 10')));
+                IF iPass < 5 THEN
+                    Trace(Message:= CONCAT('Step 100: Pass ', CONCAT(TO_STRING(iPass), ' finished. Moving to next pass.')));
                     iPass := iPass + 1;       
                     iSegmentsToGroove := 1;   
                     ExecutorStep := 10;       
                 ELSE
-                    Trace(Message:= 'Step 100: All Passes DONE (Pass=3). Going to 1000');
+                    Trace(Message:= 'Step 100: ALL 5 PASSES DONE. Finishing.');
                     IO.SpindleEnable := FALSE; 
                     IO.CoolingEnable := FALSE; 
                     ExecutorStep := 1000;      
                 END_IF;
             ELSE
-                Trace(Message:= 'Step 100: More segments in this pass -> Going to 10');
                 ExecutorStep := 10;
             END_IF;
         END_IF;
 
     1000:
-        Trace(Message:= 'Step 1000: FINISH - Resetting Step to 0');
+        Trace(Message:= 'Step 1000: FINISH');
         ExecutorStep := 0;
         ExecuteSegmentsGroove := TRUE;
 
@@ -1770,6 +1749,7 @@ END_CASE]]></ST>
 		IF AxisZ.Enabled THEN
 			AxisZ.Acceleration := 100;
 			AxisZ.Deceleration := 15000;
+			AxisZ.Velocity := 20;
 			//Trace('Enabled Axis Z');
 			_HomingStepZ := _HomingStepZ + 10;
 		END_IF
@@ -1788,7 +1768,7 @@ END_CASE]]></ST>
 		END_IF
 		
 	30:
-		IF AxisZ.MoveVelocity(-100, FALSE) THEN
+		IF AxisZ.MoveVelocity(-50, FALSE) THEN
 			//Trace('Szybki ruch, szukam krancowki Z');
             _HomingStepZ := _HomingStepZ + 10;
         END_IF
@@ -2672,31 +2652,7 @@ END_IF]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsGroove">
-      <LineId Id="2168" Count="7" />
-      <LineId Id="2385" Count="2" />
-      <LineId Id="2176" Count="77" />
-      <LineId Id="2371" Count="1" />
-      <LineId Id="2378" Count="1" />
-      <LineId Id="2373" Count="0" />
-      <LineId Id="2380" Count="1" />
-      <LineId Id="2374" Count="0" />
-      <LineId Id="2382" Count="1" />
-      <LineId Id="2375" Count="1" />
-      <LineId Id="2370" Count="0" />
-      <LineId Id="2255" Count="34" />
-      <LineId Id="2359" Count="0" />
-      <LineId Id="2364" Count="0" />
-      <LineId Id="2361" Count="2" />
-      <LineId Id="2360" Count="0" />
-      <LineId Id="2290" Count="2" />
-      <LineId Id="2353" Count="1" />
-      <LineId Id="2357" Count="0" />
-      <LineId Id="2355" Count="0" />
-      <LineId Id="2352" Count="0" />
-      <LineId Id="2294" Count="0" />
-      <LineId Id="2356" Count="0" />
-      <LineId Id="2358" Count="0" />
-      <LineId Id="2295" Count="56" />
+      <LineId Id="2388" Count="189" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.GlobalOffset.Get">
@@ -2812,7 +2768,9 @@ END_IF]]></ST>
     <LineIds Name="FB_GantryXYZ.HomingZ">
       <LineId Id="988" Count="3" />
       <LineId Id="1097" Count="0" />
-      <LineId Id="992" Count="82" />
+      <LineId Id="992" Count="9" />
+      <LineId Id="1100" Count="0" />
+      <LineId Id="1002" Count="72" />
       <LineId Id="1093" Count="0" />
       <LineId Id="1075" Count="13" />
       <LineId Id="314" Count="0" />
