@@ -1551,8 +1551,8 @@ External Setpoint Generation:
 				<Axis Id="1" CreateSymbols="true" AxisType="1">
 					<Name>Axis Z</Name>
 					<AxisPara>
-						<Dynamic Acceleration="523.497" Deceleration="523.497" Jerk="1570.49"/>
-						<Velo RefSearch="50" RefSync="10" SlowManual="17.4499" FastManual="104.6994" Fast="348.998" Maximum="348.998"/>
+						<Dynamic Acceleration="536.919" Deceleration="536.919" Jerk="1610.757"/>
+						<Velo RefSearch="3.57946" RefSync="3.57946" SlowManual="17.8973" FastManual="107.3838" Fast="357.946" Maximum="357.946"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
@@ -1619,7 +1619,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="383.8978" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="393.7406" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -1696,8 +1696,8 @@ External Setpoint Generation:
 				<Axis Id="2" CreateSymbols="true" AxisType="1">
 					<Name>Axis Y</Name>
 					<AxisPara>
-						<Dynamic Acceleration="630.88" Deceleration="630.88" Jerk="1892.64"/>
-						<Velo RefSearch="50" RefSync="10" SlowManual="21.02935" FastManual="126.1761" Fast="420.587" Maximum="420.587"/>
+						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14"/>
+						<Velo RefSearch="5.3692" RefSync="5.3692" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
@@ -1764,7 +1764,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="462.6457" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="590.612" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -1842,7 +1842,7 @@ External Setpoint Generation:
 					<Name>Axis X</Name>
 					<AxisPara>
 						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14"/>
-						<Velo RefSearch="50" RefSync="10" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
+						<Velo RefSearch="5.3692" RefSync="5.3692" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
@@ -1987,7 +1987,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{605716F8-876B-CC27-C5F6-A65EC24C6000}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{8E0E5259-3F7F-F4C1-D1E7-3D3ACCF5B62C}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -3315,7 +3315,7 @@ External Setpoint Generation:
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>3.9</Value>
+													<Value>4</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
@@ -4411,7 +4411,7 @@ Bit 8 - 15 : reserved]]></Comment>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>4.7</Value>
+													<Value>6</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
