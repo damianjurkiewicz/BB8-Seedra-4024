@@ -1823,7 +1823,7 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>32784</Index>
               <SubIndex>21</SubIndex>
-              <Data>1f010000</Data>
+              <Data>e8030000</Data>
             </InitCmd>
             <InitCmd>
               <Transition>PS</Transition>
@@ -1832,7 +1832,7 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>32784</Index>
               <SubIndex>20</SubIndex>
-              <Data>96000000</Data>
+              <Data>28000000</Data>
             </InitCmd>
             <InitCmd>
               <Transition>PS</Transition>
@@ -1851,6 +1851,15 @@ Bit 8 - 15 : reserved</Comment>
               <Index>28688</Index>
               <SubIndex>3</SubIndex>
               <Data>08</Data>
+            </InitCmd>
+            <InitCmd>
+              <Transition>PS</Transition>
+              <Comment><![CDATA[DRV Amplifier Settings / Position loop proportional gain]]></Comment>
+              <Timeout>0</Timeout>
+              <Ccs>1</Ccs>
+              <Index>32784</Index>
+              <SubIndex>23</SubIndex>
+              <Data>b0040000</Data>
             </InitCmd>
           </InitCmds>
           <CanOpenType>39</CanOpenType>
