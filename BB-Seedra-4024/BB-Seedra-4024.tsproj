@@ -1552,9 +1552,7 @@ External Setpoint Generation:
 					<Name>Axis Z</Name>
 					<AxisPara>
 						<Dynamic Acceleration="536.919" Deceleration="536.919" Jerk="1610.757"/>
-						<Velo RefSearch="3.57946" RefSync="3.57946" SlowManual="17.8973" FastManual="107.3838" Fast="357.946" Maximum="357.946"/>
-						<PositionAreaControl Enable="false"/>
-						<TargetPosControl Enable="false"/>
+						<Velo RefSearch="100" RefSync="10" SlowManual="17.8973" FastManual="107.3838" Fast="357.946" Maximum="357.946"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
@@ -1677,7 +1675,6 @@ External Setpoint Generation:
 					</Drive>
 					<Controller Name="Ctrl" CtrType="1">
 						<CtrPara PriorControlFactor="1">
-							<PosDiffControl Enable="false"/>
 							<Observer BandWidth="20"/>
 						</CtrPara>
 					</Controller>
@@ -1700,9 +1697,7 @@ External Setpoint Generation:
 					<Name>Axis Y</Name>
 					<AxisPara>
 						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14"/>
-						<Velo RefSearch="5.3692" RefSync="5.3692" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
-						<PositionAreaControl Enable="false"/>
-						<TargetPosControl Enable="false"/>
+						<Velo RefSearch="100" RefSync="10" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
@@ -1825,7 +1820,6 @@ External Setpoint Generation:
 					</Drive>
 					<Controller Name="Ctrl" CtrType="1">
 						<CtrPara PriorControlFactor="1">
-							<PosDiffControl Enable="false"/>
 							<Observer BandWidth="20"/>
 						</CtrPara>
 					</Controller>
@@ -1848,9 +1842,7 @@ External Setpoint Generation:
 					<Name>Axis X</Name>
 					<AxisPara>
 						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14"/>
-						<Velo RefSearch="5.3692" RefSync="5.3692" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
-						<PositionAreaControl Enable="false"/>
-						<TargetPosControl Enable="false"/>
+						<Velo RefSearch="100" RefSync="10" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
@@ -1973,7 +1965,6 @@ External Setpoint Generation:
 					</Drive>
 					<Controller Name="Ctrl" CtrType="1">
 						<CtrPara PriorControlFactor="1">
-							<PosDiffControl Enable="false"/>
 							<Observer BandWidth="20"/>
 						</CtrPara>
 					</Controller>
@@ -5622,11 +5613,11 @@ Bit 8 - 15 : reserved]]></Comment>
 							<MBoxUserCmdData>020003000a0000001f00000000000000000000000000000000000000000000002010700b02000000e803445256204f757470757473202f20546f72717565206c696d69746174696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000a0000003700000000000000000000000000000000000000000000002010801302000000530044525620416d706c69666965722053657474696e6773202f2043757272656e74206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000a0000003300000000000000000000000000000000000000000000002010801202000000050044525620416d706c69666965722053657474696e6773202f2043757272656e74206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c00000038000000000000000000000000000000000000000000000020108015040000002003000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c00000034000000000000000000000000000000000000000000000020108014040000003c00000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c0000003800000000000000000000000000000000000000000000002010801504000000bc02000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c00000034000000000000000000000000000000000000000000000020108014040000005000000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000900000027000000000000000000000000000000000000000000000020008001010000000046422053657474696e6773202f20496e7665727420666565646261636b20646972656374696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>0200030009000000200000000000000000000000000000000000000000000000201070030100000008445256204f757470757473202f204d6f646573206f66206f7065726174696f6e00</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c0000003800000000000000000000000000000000000000000000002010801704000000b004000044525620416d706c69666965722053657474696e6773202f20506f736974696f6e206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c0000003800000000000000000000000000000000000000000000002010801704000000e803000044525620416d706c69666965722053657474696e6773202f20506f736974696f6e206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
 							<Pdo Name="FB Position" Index="#x1a00" Flags="#x0010" SyncMan="3">
 								<Entry Name="Position" BitLen="32" Index="#x6000" Sub="#x11">
 									<Type>UDINT</Type>
