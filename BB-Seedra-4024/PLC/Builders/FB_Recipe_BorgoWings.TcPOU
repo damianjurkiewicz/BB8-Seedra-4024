@@ -1,0 +1,193 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Recipe_BorgoWings" Id="{e7d2f4d3-092a-4e05-8540-d19433846328}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Recipe_BorgoWings IMPLEMENTS I_RecipeBuilder
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{e8b4ce39-30ef-4837-8e63-92b63e7d547d}">
+      <Declaration><![CDATA[{warning 'add method implementation '}
+METHOD Build : BOOL
+VAR_INPUT
+	PanelWidth	: REAL;
+	PanelLength	: REAL;
+	PanelHeight	: REAL;
+	CuttingOverpass	: REAL;
+	RailHeightCorrection	: REAL;
+END_VAR
+VAR_OUTPUT
+	(* Zwracamy wyliczone segmenty i ich ilość*)
+	SegmentsGroove	: ARRAY [1..32] OF ST_CutSegment;
+	SegmentsToGroove	: INT;
+	SegmentsCutX	: ARRAY [1..32] OF ST_CutSegment;
+	SegmentsToCutX	: INT;
+	SegmentsCutY	: ARRAY [1..32] OF ST_CutSegment;
+	SegmentsToCutY	: INT;
+END_VAR
+VAR
+    TotalY   : REAL;
+    TotalX   : REAL;
+    ShorterY : REAL;
+    ShorterX : REAL;
+	SegmentCutX: INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//Natural language parameters;
+TotalY := PanelFrontLength + 2 * _PanelHeight;
+TotalX := PanelFrontWidth + 2 * PanelHeight;
+ShorterY := TotalY - PanelHeight;
+ShorterX := TotalX - PanelHeight;
+
+
+
+//  Start → Stop, Milling Segments
+SegmentsToGroove := 4;
+
+///////////////
+SegmentsGroove[1].Start.X := TotalX;
+SegmentsGroove[1].Stop.X := 0;
+
+SegmentsGroove[1].Start.Y := ShorterY;
+SegmentsGroove[1].Stop.Y := ShorterY;
+
+///////////////
+SegmentsGroove[2].Start.X := TotalX;
+SegmentsGroove[2].Stop.X :=  0; 
+
+SegmentsGroove[2].Start.Y := PanelHeight;
+SegmentsGroove[2].Stop.Y :=  PanelHeight;
+
+//////////////
+SegmentsGroove[3].Start.X := ShorterX;
+SegmentsGroove[3].Stop.X := ShorterX;
+
+SegmentsGroove[3].Start.Y := TotalY;
+SegmentsGroove[3].Stop.Y := 0;
+
+/////////////
+SegmentsGroove[4].Start.Y := TotalY;
+SegmentsGroove[4].Stop.Y := 0;
+
+SegmentsGroove[4].Start.X := PanelHeight;
+SegmentsGroove[4].Stop.X := PanelHeight;
+
+
+////////////
+// Cut X //
+///////////
+SegmentsToCutX := 6;
+
+//Short Box Segments
+SegmentsCutX[1].Start.X := TotalX + CuttingOverpass;
+SegmentsCutX[1].Stop.X  := ShorterX;
+
+SegmentsCutX[1].Start.Y := ShorterY;
+SegmentsCutX[1].Stop.Y  := ShorterY;
+
+///////////////
+SegmentsCutX[2].Start.X := PanelHeight;
+SegmentsCutX[2].Stop.X  := -CuttingOverpass;
+
+SegmentsCutX[2].Start.Y := ShorterY;
+SegmentsCutX[2].Stop.Y  := ShorterY;
+
+///////////////
+SegmentsCutX[3].Start.X := TotalX + CuttingOverpass;
+SegmentsCutX[3].Stop.X := ShorterX;
+
+SegmentsCutX[3].Start.Y := PanelHeight;
+SegmentsCutX[3].Stop.Y := PanelHeight;
+
+///////////////
+SegmentsCutX[4].Start.X := PanelHeight;
+SegmentsCutX[4].Stop.X :=  -CuttingOverpass;
+
+SegmentsCutX[4].Start.Y := PanelHeight;
+SegmentsCutX[4].Stop.Y := PanelHeight;
+
+//Panel Dimensions Shorter Flaps
+
+
+SegmentsCutX[5].Start.X := TotalX + CuttingOverpass;
+SegmentsCutX[5].Stop.X  := - CuttingOverpass;
+
+SegmentsCutX[5].Start.Y := TotalY - RailHeightCorrection;
+SegmentsCutX[5].Stop.Y  := TotalY - RailHeightCorrection;
+
+///////////////
+SegmentsCutX[6].Start.X := TotalX + CuttingOverpass;
+SegmentsCutX[6].Stop.X  := - CuttingOverpass;
+
+SegmentsCutX[6].Start.Y := RailHeightCorrection;
+SegmentsCutX[6].Stop.Y  := RailHeightCorrection;
+
+
+////////////
+// Cut Y //
+///////////
+
+SegmentsToCutY := 6;
+
+//Short Box Segments
+SegmentsCutY[1].Start.X := ShorterX;
+SegmentsCutY[1].Stop.X  := ShorterX;
+
+SegmentsCutY[1].Start.Y := TotalY + CuttingOverpass;
+SegmentsCutY[1].Stop.Y  := ShorterY;
+
+///////////////
+SegmentsCutY[2].Start.X := PanelHeight;
+SegmentsCutY[2].Stop.X  := PanelHeight;
+
+SegmentsCutY[2].Start.Y := TotalY + CuttingOverpass;
+SegmentsCutY[2].Stop.Y  := ShorterY;
+
+///////////////
+SegmentsCutY[3].Start.X := ShorterX;
+SegmentsCutY[3].Stop.X  := ShorterX;
+
+SegmentsCutY[3].Start.Y := PanelHeight;
+SegmentsCutY[3].Stop.Y  := -CuttingOverpass;
+
+///////////////
+SegmentsCutY[4].Start.X := PanelHeight;
+SegmentsCutY[4].Stop.X  := PanelHeight;
+
+SegmentsCutY[4].Start.Y := PanelHeight;
+SegmentsCutY[4].Stop.Y  := -CuttingOverpass;
+
+//Panel Dimensions
+SegmentsCutY[5].Start.X := TotalX;
+SegmentsCutY[5].Stop.X  := TotalX;
+
+SegmentsCutY[5].Start.Y := TotalY + CuttingOverpass;
+SegmentsCutY[5].Stop.Y  := -CuttingOverpass;
+///////////////
+SegmentsCutY[6].Start.X := 0;
+SegmentsCutY[6].Stop.X  := 0;
+
+SegmentsCutY[6].Start.Y := TotalY + CuttingOverpass;
+SegmentsCutY[6].Stop.Y  := - CuttingOverpass;
+
+
+
+Build := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Recipe_BorgoWings">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Recipe_BorgoWings.Build">
+      <LineId Id="200" Count="139" />
+      <LineId Id="20" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

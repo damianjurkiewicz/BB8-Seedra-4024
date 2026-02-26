@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Recipe_Arona" Id="{4fcb8948-e995-423b-b09c-d938abff6839}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Recipe_Arona IMPLEMENTS I_RecipeBuilder
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{406f9129-3379-4add-be80-6fbcfb7e730f}">
+      <Declaration><![CDATA[{warning 'add method implementation '}
+METHOD Build : BOOL
+VAR_INPUT
+	PanelWidth	: REAL;
+	PanelLength	: REAL;
+	PanelHeight	: REAL;
+	CuttingOverpass	: REAL;
+	RailHeightCorrection	: REAL;
+END_VAR
+VAR_OUTPUT
+	(* Zwracamy wyliczone segmenty i ich ilość*)
+	SegmentsGroove	: ARRAY [1..32] OF ST_CutSegment;
+	SegmentsToGroove	: INT;
+	SegmentsCutX	: ARRAY [1..32] OF ST_CutSegment;
+	SegmentsToCutX	: INT;
+	SegmentsCutY	: ARRAY [1..32] OF ST_CutSegment;
+	SegmentsToCutY	: INT;
+END_VAR
+VAR
+    TotalY   : REAL;
+    TotalX   : REAL;
+    ShorterY : REAL;
+    ShorterX : REAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//  Start → Stop, Milling Segments
+SegmentsToGroove := 4;
+
+SegmentsGroove[1].Start.X := 500;
+SegmentsGroove[1].Start.Y := 500;
+SegmentsGroove[1].Stop.X  := 0;
+SegmentsGroove[1].Stop.Y  := 500;
+
+SegmentsGroove[2].Start.X := 500;
+SegmentsGroove[2].Start.Y := 0;
+SegmentsGroove[2].Stop.X  := 0; 
+SegmentsGroove[2].Stop.Y  := 0;
+
+SegmentsGroove[3].Start.X := 500;
+SegmentsGroove[3].Start.Y := 500;
+SegmentsGroove[3].Stop.X  := 500;
+SegmentsGroove[3].Stop.Y  := 0;
+
+SegmentsGroove[4].Start.X := 0;
+SegmentsGroove[4].Start.Y := 500;
+SegmentsGroove[4].Stop.X  := 0;
+SegmentsGroove[4].Stop.Y  := 0;
+
+//  Start → Stop, CutY Segments
+SegmentsToCutY := 2;
+
+SegmentsCutY[1].Start.X := 0; 
+SegmentsCutY[1].Start.Y := 500;  
+SegmentsCutY[1].Stop.X  := 0; 
+SegmentsCutY[1].Stop.Y  := 0;
+SegmentsCutY[2].Start.X := 500; 
+SegmentsCutY[2].Start.Y := 500;  
+SegmentsCutY[2].Stop.X  := 500; 
+SegmentsCutY[2].Stop.Y  := 0;
+
+SegmentsToCutX := 2;
+
+SegmentsCutX[1].Start.X := 500; 
+SegmentsCutX[1].Start.Y := 500;  
+SegmentsCutX[1].Stop.X  := 500; 
+SegmentsCutX[1].Stop.Y  := 0;
+SegmentsCutX[2].Start.X := 0; 
+SegmentsCutX[2].Start.Y := 500;  
+SegmentsCutX[2].Stop.X  := 0; 
+SegmentsCutX[2].Stop.Y  := 0;
+
+
+
+Build := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Recipe_Arona">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Recipe_Arona.Build">
+      <LineId Id="59" Count="47" />
+      <LineId Id="20" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

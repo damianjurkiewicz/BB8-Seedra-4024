@@ -4,7 +4,16 @@
     <Declaration><![CDATA[{attribute 'conditionalshow'}
 FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule
 VAR
-    // Sub module definitions here
+	//
+	// W sekcji VAR w FB_GantryXYZ dodaj:
+    
+    // --- BUILDERY RECEPTUR ---
+    RecipeBorgoFlaps : FB_Recipe_BorgoFlaps;
+    
+    ipActiveBuilder  : I_RecipeBuilder; // Wskaźnik na interfejs aktualnie używanego przepisu    
+
+
+	// Sub module definitions here
 	
 	// List of sub modules
     ipSubModules_Init : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
@@ -178,336 +187,6 @@ END_CASE
 	END_CASE
 
 ]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="BuildSegments_Arona" Id="{e84aaa35-d3d2-459f-b6b9-b01f1c51048b}" FolderPath="MyMethods\Segments\">
-      <Declaration><![CDATA[METHOD BuildSegments_Arona : BOOL
-
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[//  Start → Stop, Milling Segments
-SegmentsToGroove := 4;
-
-SegmentGrooves[1].Start.X := 500;
-SegmentGrooves[1].Start.Y := 500;
-SegmentGrooves[1].Stop.X  := 0;
-SegmentGrooves[1].Stop.Y  := 500;
-
-SegmentGrooves[2].Start.X := 500;
-SegmentGrooves[2].Start.Y := 0;
-SegmentGrooves[2].Stop.X  := 0; 
-SegmentGrooves[2].Stop.Y  := 0;
-
-SegmentGrooves[3].Start.X := 500;
-SegmentGrooves[3].Start.Y := 500;
-SegmentGrooves[3].Stop.X  := 500;
-SegmentGrooves[3].Stop.Y  := 0;
-
-SegmentGrooves[4].Start.X := 0;
-SegmentGrooves[4].Start.Y := 500;
-SegmentGrooves[4].Stop.X  := 0;
-SegmentGrooves[4].Stop.Y  := 0;
-
-//  Start → Stop, CutY Segments
-SegmentsToCutY := 2;
-
-SegmentCutY[1].Start.X := 0; 
-SegmentCutY[1].Start.Y := 500;  
-SegmentCutY[1].Stop.X  := 0; 
-SegmentCutY[1].Stop.Y  := 0;
-SegmentCutY[2].Start.X := 500; 
-SegmentCutY[2].Start.Y := 500;  
-SegmentCutY[2].Stop.X  := 500; 
-SegmentCutY[2].Stop.Y  := 0;
-
-SegmentsToCutX := 2;
-
-SegmentCutX[1].Start.X := 500; 
-SegmentCutX[1].Start.Y := 500;  
-SegmentCutX[1].Stop.X  := 500; 
-SegmentCutX[1].Stop.Y  := 0;
-SegmentCutX[2].Start.X := 0; 
-SegmentCutX[2].Start.Y := 500;  
-SegmentCutX[2].Stop.X  := 0; 
-SegmentCutX[2].Stop.Y  := 0;
-
-
-
-BuildSegments_Arona := TRUE;]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="BuildSegments_BorgoFlaps" Id="{30aff943-63a2-49df-9f71-8b8f78deda49}" FolderPath="MyMethods\Segments\">
-      <Declaration><![CDATA[METHOD BuildSegments_BorgoFlaps : BOOL
-VAR_INST
-	TotalY 		:REAL;
-	TotalX  	:REAL;
-	ShorterY  	:REAL;
-	ShorterX  	:REAL;
-END_VAR]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[//Natural language parameters;
-TotalY := PanelFrontLength + 2 * _PanelHeight;
-TotalX := PanelFrontWidth + 2 * _PanelHeight;
-ShorterY := TotalY - _PanelHeight;
-ShorterX := TotalX - _PanelHeight;
-
-
-SegmentsToGroove := 4;
-
-///////////////
-SegmentGrooves[1].Start.X := TotalX;
-SegmentGrooves[1].Stop.X := 0;
-
-SegmentGrooves[1].Start.Y := ShorterY;
-SegmentGrooves[1].Stop.Y := ShorterY;
-
-/////////////
-SegmentGrooves[2].Start.Y := TotalY;
-SegmentGrooves[2].Stop.Y := 0;
-
-SegmentGrooves[2].Start.X := _PanelHeight;
-SegmentGrooves[2].Stop.X := _PanelHeight;
-
-///////////////
-SegmentGrooves[3].Start.X := 0;
-SegmentGrooves[3].Stop.X :=  TotalX; 
-
-SegmentGrooves[3].Start.Y := _PanelHeight;
-SegmentGrooves[3].Stop.Y :=  _PanelHeight;
-
-//////////////
-SegmentGrooves[4].Start.X := ShorterX;
-SegmentGrooves[4].Stop.X := ShorterX;
-
-SegmentGrooves[4].Start.Y := 0;
-SegmentGrooves[4].Stop.Y := TotalY;
-
-
-
-
-
-//  Start → Stop, CutY Segments
-SegmentsToCutY := 0;
-
-SegmentsToCutX := 0;
-
-BuildSegments_BorgoFlaps := TRUE;]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="BuildSegments_BorgoWings" Id="{0600b631-5666-4473-9115-8ec263b291bb}" FolderPath="MyMethods\Segments\">
-      <Declaration><![CDATA[METHOD BuildSegments_BorgoWings : BOOL
-VAR_INST
-	TotalY 		:REAL;
-	TotalX  	:REAL;
-	ShorterY  	:REAL;
-	ShorterX  	:REAL;
-END_VAR
-
-//We cut here BorgoWings it means, panel will be installed on wings
-// It means we have to make flaps shorter]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[//Natural language parameters;
-TotalY := PanelFrontLength + 2 * _PanelHeight;
-TotalX := PanelFrontWidth + 2 * _PanelHeight;
-ShorterY := TotalY - _PanelHeight;
-ShorterX := TotalX - _PanelHeight;
-
-
-
-//  Start → Stop, Milling Segments
-SegmentsToGroove := 4;
-
-///////////////
-SegmentGrooves[1].Start.X := TotalX;
-SegmentGrooves[1].Stop.X := 0;
-
-SegmentGrooves[1].Start.Y := ShorterY;
-SegmentGrooves[1].Stop.Y := ShorterY;
-
-///////////////
-SegmentGrooves[2].Start.X := TotalX;
-SegmentGrooves[2].Stop.X :=  0; 
-
-SegmentGrooves[2].Start.Y := _PanelHeight;
-SegmentGrooves[2].Stop.Y :=  _PanelHeight;
-
-//////////////
-SegmentGrooves[3].Start.X := ShorterX;
-SegmentGrooves[3].Stop.X := ShorterX;
-
-SegmentGrooves[3].Start.Y := TotalY;
-SegmentGrooves[3].Stop.Y := 0;
-
-/////////////
-SegmentGrooves[4].Start.Y := TotalY;
-SegmentGrooves[4].Stop.Y := 0;
-
-SegmentGrooves[4].Start.X := _PanelHeight;
-SegmentGrooves[4].Stop.X := _PanelHeight;
-
-
-////////////
-// Cut X //
-///////////
-SegmentsToCutX := 6;
-
-//Short Box Segments
-SegmentCutX[1].Start.X := TotalX + _CuttingOverpass;
-SegmentCutX[1].Stop.X  := ShorterX;
-
-SegmentCutX[1].Start.Y := ShorterY;
-SegmentCutX[1].Stop.Y  := ShorterY;
-
-///////////////
-SegmentCutX[2].Start.X := _PanelHeight;
-SegmentCutX[2].Stop.X  := -_CuttingOverpass;
-
-SegmentCutX[2].Start.Y := ShorterY;
-SegmentCutX[2].Stop.Y  := ShorterY;
-
-///////////////
-SegmentCutX[3].Start.X := TotalX + _CuttingOverpass;
-SegmentCutX[3].Stop.X := ShorterX;
-
-SegmentCutX[3].Start.Y := _PanelHeight;
-SegmentCutX[3].Stop.Y := _PanelHeight;
-
-///////////////
-SegmentCutX[4].Start.X := _PanelHeight;
-SegmentCutX[4].Stop.X :=  -_CuttingOverpass;
-
-SegmentCutX[4].Start.Y := _PanelHeight;
-SegmentCutX[4].Stop.Y := _PanelHeight;
-
-//Panel Dimensions Shorter Flaps
-
-
-SegmentCutX[5].Start.X := TotalX + _CuttingOverpass;
-SegmentCutX[5].Stop.X  := - _CuttingOverpass;
-
-SegmentCutX[5].Start.Y := TotalY - _RailHeightCorrection;
-SegmentCutX[5].Stop.Y  := TotalY - _RailHeightCorrection;
-
-///////////////
-SegmentCutX[6].Start.X := TotalX + _CuttingOverpass;
-SegmentCutX[6].Stop.X  := - _CuttingOverpass;
-
-SegmentCutX[6].Start.Y := _RailHeightCorrection;
-SegmentCutX[6].Stop.Y  := _RailHeightCorrection;
-
-
-////////////
-// Cut Y //
-///////////
-
-SegmentsToCutY := 6;
-
-//Short Box Segments
-SegmentCutY[1].Start.X := ShorterX;
-SegmentCutY[1].Stop.X  := ShorterX;
-
-SegmentCutY[1].Start.Y := TotalY + _CuttingOverpass;
-SegmentCutY[1].Stop.Y  := ShorterY;
-
-///////////////
-SegmentCutY[2].Start.X := _PanelHeight;
-SegmentCutY[2].Stop.X  := _PanelHeight;
-
-SegmentCutY[2].Start.Y := TotalY + _CuttingOverpass;
-SegmentCutY[2].Stop.Y  := ShorterY;
-
-///////////////
-SegmentCutY[3].Start.X := ShorterX;
-SegmentCutY[3].Stop.X  := ShorterX;
-
-SegmentCutY[3].Start.Y := _PanelHeight;
-SegmentCutY[3].Stop.Y  := -_CuttingOverpass;
-
-///////////////
-SegmentCutY[4].Start.X := _PanelHeight;
-SegmentCutY[4].Stop.X  := _PanelHeight;
-
-SegmentCutY[4].Start.Y := _PanelHeight;
-SegmentCutY[4].Stop.Y  := -_CuttingOverpass;
-
-//Panel Dimensions
-SegmentCutY[5].Start.X := TotalX;
-SegmentCutY[5].Stop.X  := TotalX;
-
-SegmentCutY[5].Start.Y := TotalY + _CuttingOverpass;
-SegmentCutY[5].Stop.Y  := -_CuttingOverpass;
-///////////////
-SegmentCutY[6].Start.X := 0;
-SegmentCutY[6].Stop.X  := 0;
-
-SegmentCutY[6].Start.Y := TotalY + _CuttingOverpass;
-SegmentCutY[6].Stop.Y  := - _CuttingOverpass;
-
-
-
-BuildSegments_BorgoWings := TRUE;
-]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="BuildSegments_Calibration" Id="{0bc1bcc0-1e48-4916-b44b-21d9143ba598}" FolderPath="MyMethods\Segments\">
-      <Declaration><![CDATA[METHOD BuildSegments_Calibration : BOOL
-VAR_INST
-	TotalLength :REAL;
-	TotalWidth  :REAL;
-	WingHeight  :REAL;
-	FlapHeight  :REAL;
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[//  Start → Stop, Milling Segments
-SegmentsToGroove := 4;
-
-SegmentGrooves[1].Start.X := 300;
-SegmentGrooves[1].Start.Y := 300;
-SegmentGrooves[1].Stop.X  := 50;
-SegmentGrooves[1].Stop.Y  := 300;
-
-SegmentGrooves[2].Start.X := 300;
-SegmentGrooves[2].Start.Y := 50;
-SegmentGrooves[2].Stop.X  := 50; 
-SegmentGrooves[2].Stop.Y  := 50;
-
-SegmentGrooves[3].Start.X := 300;
-SegmentGrooves[3].Start.Y := 300;
-SegmentGrooves[3].Stop.X  := 300;
-SegmentGrooves[3].Stop.Y  := 50;
-
-SegmentGrooves[4].Start.X := 50;
-SegmentGrooves[4].Start.Y := 300;
-SegmentGrooves[4].Stop.X  := 50;
-SegmentGrooves[4].Stop.Y  := 50;
-
-//  Start → Stop, CutY Segments
-SegmentsToCutY := 2;
-
-SegmentCutY[1].Start.X := 300; 
-SegmentCutY[1].Start.Y := 300;  
-SegmentCutY[1].Stop.X  := 300; 
-SegmentCutY[1].Stop.Y  := 50;
-
-SegmentCutY[2].Start.X := 50; 
-SegmentCutY[2].Start.Y := 300;  
-SegmentCutY[2].Stop.X  := 50; 
-SegmentCutY[2].Stop.Y  := 50;
-
-SegmentsToCutX := 2;
-
-SegmentCutX[1].Start.X := 300;
-SegmentCutX[1].Start.Y := 300; 
-SegmentCutX[1].Stop.X  := 50;
-SegmentCutX[1].Stop.Y  := 300;
-                               
-SegmentCutX[2].Start.X := 300;
-SegmentCutX[2].Start.Y := 50; 
-SegmentCutX[2].Stop.X  := 50; 
-SegmentCutX[2].Stop.Y  := 50;
-
-BuildSegments_Calibration := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
@@ -1527,340 +1206,6 @@ END_CASE]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Method Name="HomingX" Id="{3a7dd60d-4e3b-4739-b0ec-f4ab527c9236}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD HomingX : BOOL
-
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE _HomingStepX OF
-		
-	0:
-		HomingX := FALSE;
-		
-		
-		IF AxisX.Enable() THEN
-			
-			//Trace('Enable Axis X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-		
-	10:
-		IF AxisX.Enabled THEN
-			AxisX.Acceleration := 100;
-			AxisX.Deceleration := 15000;
-			//Trace('Enabled Axis X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-
-	20:
-		IF IO.ProximitySensorX THEN
-			IF AxisX.Stop() THEN
-				IF NOT AxisX.Busy THEN
-				AxisX.Home();
-				////Trace('Start na krańcówce X');
-				_HomingStepX := 80;
-				END_IF
-			END_IF
-		ELSE		
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-		
-	30:
-		IF AxisX.MoveVelocity(-100, FALSE) THEN
-			////Trace('Szybki ruch, szukam krancowki X');
-            _HomingStepX := _HomingStepX + 10;
-        END_IF
-		
-	
-	40: 
-		IF IO.ProximitySensorX THEN
-			
-		IF AxisX.Stop() THEN
-			IF NOT AxisX.Busy THEN
-				//Trace('Spotkałem krańcówkę X');
-				_HomingStepX := _HomingStepX + 10;
-			END_IF
-		END_IF
-		
-		END_IF
-
-	50:
-		IF AxisX.MoveRelative(30,FALSE) THEN
-			//Trace('Odsunięcie od krańcówki, po szybkim X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-		
-	60: 
-		IF AxisX.MoveVelocity(-10,FALSE) THEN
-			//Trace('Spokojny powrot X');		
-			_HomingStepX := _HomingStepX + 10;
-		END_IF	
-		
-	70:
-		IF IO.ProximitySensorX THEN
-			IF AxisX.Stop() THEN
-				//Trace('Stop do precyzyjnego X');
-				_HomingStepX := _HomingStepX + 10; // Przechodzimy do czekania na zatrzymanie
-			END_IF
-		END_IF
-
-	80:
-		IF NOT AxisX.Busy THEN
-			IF AxisX.Home() THEN
-				_HomingStepX := _HomingStepX + 10;
-				//Trace('Precyzyjny Home wykonany X');
-			END_IF
-		END_IF
-
-
-	90:	
-		IF AxisX.MoveRelative(2.0, FALSE) THEN
-			//Trace('Odsunięcie od krańcówki o 2mm X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-	
-	100:
-		IF NOT AxisX.Busy THEN
-		
-			IF AxisX.Home() THEN
-				//Trace('Ustawienie nowego zera po odsunięciu X');
-				_HomingStepX := _HomingStepX + 10;
-			END_IF
-		END_IF
-	
-	110:
-		HomingX := TRUE;
-		//Trace('Homing zakończony pomyślnie X');
-		
-			
-	END_CASE
-	
-
-]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="HomingY" Id="{7cf726af-0fa2-4719-9f55-f55ebcdc06af}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD HomingY : BOOL
-
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE _HomingStepY OF
-		
-	0:
-		HomingY := FALSE;
-			
-		IF AxisY.Enable() THEN
-			
-			//Trace('Enable Axis Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-		
-	10:
-		IF AxisY.Enabled THEN
-			AxisY.Acceleration := 100;
-			AxisY.Deceleration := 15000;
-			//Trace('Enabled Axis Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-
-	20:
-		IF IO.ProximitySensorY THEN
-			IF AxisY.Stop() THEN
-				IF NOT AxisY.Busy THEN
-				AxisY.Home();
-				//Trace('Start na krańcówce Y');
-				_HomingStepY := 80;
-				END_IF
-			END_IF
-		ELSE		
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-		
-	30:
-		IF AxisY.MoveVelocity(-80, FALSE) THEN
-			//Trace('Szybki ruch, szukam krancowki Y');
-            _HomingStepY := _HomingStepY + 10;
-        END_IF
-		
-	
-	40: 
-		IF IO.ProximitySensorY THEN
-			
-		IF AxisY.Stop() THEN
-			IF NOT AxisY.Busy THEN
-				//Trace('Spotkałem krańcówkę Y');
-				_HomingStepY := _HomingStepY + 10;
-			END_IF
-		END_IF
-		
-		END_IF
-
-	50:
-		IF AxisY.MoveRelative(30,FALSE) THEN
-			//Trace('Odsunięcie od krańcówki, po szybkim Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-		
-	60: 
-		IF AxisY.MoveVelocity(-10,FALSE) THEN
-			//Trace('Spokojny powrot Y');		
-			_HomingStepY := _HomingStepY + 10;
-		END_IF	
-		
-	70:
-		IF IO.ProximitySensorY THEN
-			IF AxisY.Stop() THEN
-				//Trace('Stop do precyzyjnego Y');
-				_HomingStepY := _HomingStepY + 10; // Przechodzimy do czekania na zatrzymanie
-			END_IF
-		END_IF
-
-	80:
-		IF NOT AxisY.Busy THEN
-			IF AxisY.Home() THEN
-				_HomingStepY := _HomingStepY + 10;
-				//Trace('Precyzyjny Home wykonany Y');
-			END_IF
-		END_IF
-
-
-	90:	
-		IF AxisY.MoveRelative(2.0, FALSE) THEN
-			//Trace('Odsunięcie od krańcówki o 2mm Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-	
-	100:
-		IF NOT AxisY.Busy THEN
-		
-			IF AxisY.Home() THEN
-				//Trace('Ustawienie nowego zera po odsunięciu Y');
-				_HomingStepY := _HomingStepY + 10;
-			END_IF
-		END_IF
-	
-	110:
-		HomingY := TRUE;
-		//Trace('Homing zakończony pomyślnie Y');
-		
-			
-	END_CASE
-	
-
-]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="HomingZ" Id="{59c5c153-dee1-4d97-aac8-e655f142ebf1}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD HomingZ : BOOL
-
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE _HomingStepZ OF
-		
-	0:
-		HomingZ := FALSE;	
-		
-		IF AxisZ.Enable() THEN
-			
-			//Trace('Enable Axis Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-		
-	10:
-		IF AxisZ.Enabled THEN
-			AxisZ.Acceleration := 100;
-			AxisZ.Deceleration := 15000;
-			//Trace('Enabled Axis Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-
-	20:
-		IF IO.ProximitySensorZ THEN
-			IF AxisZ.Stop() THEN
-				IF NOT AxisZ.Busy THEN
-				AxisZ.Home();
-				//Trace('Start na krańcówce Z');
-				_HomingStepZ := 80;
-				END_IF
-			END_IF
-		ELSE		
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-		
-	30:
-		IF AxisZ.MoveVelocity(-100, FALSE) THEN
-			//Trace('Szybki ruch, szukam krancowki Z');
-            _HomingStepZ := _HomingStepZ + 10;
-        END_IF
-		
-	
-	40: 
-		IF IO.ProximitySensorZ THEN
-			
-		IF AxisZ.Stop() THEN
-			IF NOT AxisZ.Busy THEN
-				//Trace('Spotkałem krańcówkę Z');
-				_HomingStepZ := _HomingStepZ + 10;
-			END_IF
-		END_IF
-		
-		END_IF
-
-	50:
-		IF AxisZ.MoveRelative(5,FALSE) THEN
-			//Trace('Odsunięcie od krańcówki, po szybkim Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-		
-	60: 
-		IF AxisZ.MoveVelocity(-10,FALSE) THEN
-			//Trace('Spokojny powrot Z');		
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF	
-		
-	70:
-		IF IO.ProximitySensorZ THEN
-			IF AxisZ.Stop() THEN
-				//Trace('Stop do precyzyjnego Z');
-				_HomingStepZ := _HomingStepZ + 10; // Przechodzimy do czekania na zatrzymanie
-			END_IF
-		END_IF
-
-	80:
-		IF NOT AxisZ.Busy THEN
-			IF AxisZ.Home() THEN
-				_HomingStepZ := _HomingStepZ + 10;
-				//Trace('Precyzyjny Home wykonany Z');
-			END_IF
-		END_IF
-
-
-	90:	
-		IF AxisZ.MoveRelative(2.0, FALSE) THEN
-			//Trace('Odsunięcie od krańcówki o 2mm Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-	
-	100:
-		IF NOT AxisZ.Busy THEN		
-		
-			IF AxisZ.Home() THEN
-				//Trace('Ustawienie nowego zera po odsunięciu Z');
-				_HomingStepZ := _HomingStepZ + 10;
-			END_IF
-		END_IF
-	
-	110:
-		HomingZ := TRUE;
-		//Trace('Homing zakończony pomyślnie Z');
-		
-			
-	END_CASE
-	
-
-]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="Initialize" Id="{ba85f303-ffbe-03ad-229b-3741bd93e6e2}">
       <Declaration><![CDATA[//! @summary Basic module initialization logic
 METHOD PROTECTED Initialize : BOOL;
@@ -1932,25 +1277,6 @@ END_VAR
       
 
     5: // Zbuduj odcinki dla tego programu
-				CASE _ProgramIdRequested OF
-					
-					E_RecipeID.eBorgoFlaps:
-					IF BuildSegments_BorgoFlaps() THEN
-						OrchestratorStep := OrchestratorStep + 10;
-					END_IF
-					
-					E_RecipeID.eBorgoWings:
-					IF BuildSegments_BorgoWings() THEN
-						OrchestratorStep := OrchestratorStep + 10;
-					END_IF
-					
-					E_RecipeID.eArona:
-					IF BuildSegments_Arona() THEN
-						OrchestratorStep := OrchestratorStep + 10;
-					END_IF
-					
-				END_CASE        
-
         OrchestratorStep := 10;
 
     10: 
@@ -2208,161 +1534,224 @@ END_VAR
       <Implementation>
         <ST><![CDATA[CASE _CurrentMode OF
 
-	//=================================PRODUCTION MODE==================================
-	E_PMLUnitMode.ePMLUnitMode_Production:
-		CASE SequenceState OF
-			0:
-				NoStateTasksToComplete := FALSE;
-				SequenceState := SequenceState + 5;
+    //=================================PRODUCTION MODE==================================
+    E_PMLUnitMode.ePMLUnitMode_Production:
+
+        CASE SequenceState OF
+
+            0:
+                NoStateTasksToComplete := FALSE;
+                SequenceState := SequenceState + 5;
 
 
-			5:
+            5:
+                AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);
+                AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
 
-				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
-				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
-		
-				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
-				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
-		
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);	
-				
-				SequenceState := SequenceState + 5;
-		
-			10: 
-      			
-			  AxisX.Enable();
-			  AxisY.Enable();
-			  AxisZ.Enable();
-	 
-			SequenceState := 12;
-		
-		12:
-        
-        // 2. Czekamy, aż napędy "wstaną" i zameldują gotowość
-        IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
-            SequenceState := 15;
-        END_IF
-        
-15:
-        // 1. "Bombardujemy" osie komendami, dopóki każda z osobna nie odpowie TRUE
-        IF NOT flagX THEN flagX := AxisX.Home(); END_IF
-        IF NOT flagY THEN flagY := AxisY.Home(); END_IF
-        IF NOT flagZ THEN flagZ := AxisZ.Home(); END_IF
+                AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);
+                AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
 
-        // 2. Kiedy cała trójka potwierdziła przyjęcie rozkazu:
-        IF flagX AND flagY AND flagZ THEN
-            // Czyścimy flagi przed następnym użyciem maszyny!
-            flagX := FALSE;
-            flagY := FALSE;
-            flagZ := FALSE;
-            
-            SequenceState := 20; // Idziemy czekać na koniec ruchu
-        END_IF
-					
-	20:			
-//			IF AxisX.Axis.Status.Homed AND AxisY.Axis.Status.Homed AND AxisZ.Axis.Status.Homed THEN
-			IF AxisX.Axis.Status.Homed AND AxisY.Axis.Status.Homed AND AxisZ.Axis.Status.Homed THEN
-//			IF flagX AND flagY AND flagZ THEN
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
 
-				Trace('All Axes Homing completed');
-				flagX :=0; 
-				flagY :=0; 
-				flagZ :=0;
-				OrchestratorStep := 0;
-				ExecutorStep := 0;
-				THIS^.HomingStepX := 0;
-				THIS^.HomingStepY := 0;
-				THIS^.HomingStepZ := 0;
-				SequenceState := 40;
-//			END_IF			
-			END_IF		
-			40:		
-				StateTasksComplete := TRUE;
-				SUPER^.Resetting();
-		END_CASE
-
-	//=================================MAINTENANCE & MANUAL MODE==================================
-	E_PMLUnitMode.ePMLUnitMode_Maintenance:
-
-	CASE SequenceState OF
-			0:
-				NoStateTasksToComplete := FALSE;
-				SequenceState := SequenceState + 10;	
-		
-			10: 
-				AxisX.Enable();
-				AxisY.Enable();
-				AxisZ.Enable();	
-				
-				IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
-					SequenceState := SequenceState + 10;
-				END_IF
-				
-			20:	
-
-				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
-				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
-		
-				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
-				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
-		
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
-			
-				SequenceState := SequenceState + 10;
-			30:
-	
-				SequenceState := SequenceState + 10;
-					
-			40:		
-				StateTasksComplete := TRUE;
-				SUPER^.Resetting();
-		END_CASE
-	
- 	E_PMLUnitMode.ePMLUnitMode_Manual:
-			
-	CASE SequenceState OF
-			0:
-				NoStateTasksToComplete := FALSE;
-				SequenceState := SequenceState + 10;	
-		
-			10: 
-				AxisX.Enable();
-				AxisY.Enable();
-				AxisZ.Enable();	
-				
-				IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
-					SequenceState := SequenceState + 10;
-				END_IF
-				
-			20:	
-
-				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
-				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
-		
-				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
-				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
-		
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
-			
-				SequenceState := SequenceState + 10;
-			30:
-	
-				SequenceState := SequenceState + 10;
-					
-			40:		
-				StateTasksComplete := TRUE;
-				SUPER^.Resetting();
-		END_CASE
-		
-	
-	END_CASE
-		
+                SequenceState := SequenceState + 5;
 
 
-]]></ST>
+            10:
+                AxisX.Enable();
+                AxisY.Enable();
+                AxisZ.Enable();
+
+                SequenceState := 12;
+
+
+            12:
+                // 2. Czekamy, aż napędy "wstaną" i zameldują gotowość
+                IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+                    SequenceState := 15;
+                END_IF
+
+
+            15:
+                // 1. "Bombardujemy" osie komendami, dopóki każda z osobna nie odpowie TRUE
+                IF NOT flagX THEN
+                    flagX := AxisX.Home();
+                END_IF
+
+                IF NOT flagY THEN
+                    flagY := AxisY.Home();
+                END_IF
+
+                IF NOT flagZ THEN
+                    flagZ := AxisZ.Home();
+                END_IF
+
+                // 2. Kiedy cała trójka potwierdziła przyjęcie rozkazu:
+                IF flagX AND flagY AND flagZ THEN
+                    // Czyścimy flagi przed następnym użyciem maszyny!
+                    flagX := FALSE;
+                    flagY := FALSE;
+                    flagZ := FALSE;
+
+                    SequenceState := 20; // Idziemy czekać na koniec ruchu
+                END_IF
+
+
+            20:
+                IF AxisX.Axis.Status.Homed
+                   AND AxisY.Axis.Status.Homed
+                   AND AxisZ.Axis.Status.Homed THEN
+
+                    Trace('All Axes Homing completed');
+
+                    flagX := 0;
+                    flagY := 0;
+                    flagZ := 0;
+
+                    OrchestratorStep := 0;
+                    ExecutorStep := 0;
+
+                    THIS^.HomingStepX := 0;
+                    THIS^.HomingStepY := 0;
+                    THIS^.HomingStepZ := 0;
+
+                    SequenceState := 30;
+                END_IF
+
+
+            30:
+                // 1. Przypisanie aktywnego buildera na podstawie HMI
+                CASE _ProgramIdRequested OF
+                    E_RecipeID.eBorgoFlaps:
+                        ipActiveBuilder := RecipeBorgoFlaps;
+                ELSE
+                    ipActiveBuilder := 0; // Zabezpieczenie przed brakiem wyboru
+                END_CASE
+
+                // 2. Wywołanie metody Build i zapisanie wyników do pamięci FB_GantryXYZ
+                IF ipActiveBuilder <> 0 THEN
+
+                    IF ipActiveBuilder.Build(
+                        PanelWidth           := _PanelFrontWidth,
+                        PanelLength          := _PanelFrontLength,
+                        PanelHeight          := _PanelHeight,
+                        CuttingOverpass      := _CuttingOverpass,
+                        RailHeightCorrection := _RailHeightCorrection,
+
+                        // Zapisujemy wyliczone segmenty do Twoich wewnętrznych tablic w Gantry
+                        SegmentsGroove   => THIS^.SegmentGrooves,
+                        SegmentsToGroove => THIS^.SegmentsToGroove,
+                        SegmentsCutX     => THIS^.SegmentCutX,
+                        SegmentsToCutX   => THIS^.SegmentsToCutX,
+                        SegmentsCutY     => THIS^.SegmentCutY,
+                        SegmentsToCutY   => THIS^.SegmentsToCutY
+                    ) THEN
+
+                        // Tu można przejść do kolejnego SequenceState, albo zakończyć Resetting
+                        StateTasksComplete := TRUE;
+                        SUPER^.Resetting();
+
+                    END_IF
+
+                ELSE
+                    // Brak wybranego programu
+                    StateTasksComplete := TRUE;
+                    SUPER^.Resetting();
+                END_IF
+
+
+        END_CASE
+
+
+
+    //=================================MAINTENANCE & MANUAL MODE==================================
+    E_PMLUnitMode.ePMLUnitMode_Maintenance:
+
+        CASE SequenceState OF
+
+            0:
+                NoStateTasksToComplete := FALSE;
+                SequenceState := SequenceState + 10;
+
+
+            10:
+                AxisX.Enable();
+                AxisY.Enable();
+                AxisZ.Enable();
+
+                IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+                    SequenceState := SequenceState + 10;
+                END_IF
+
+
+            20:
+                AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);
+                AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+
+                AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);
+                AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
+
+                SequenceState := SequenceState + 10;
+
+
+            30:
+                SequenceState := SequenceState + 10;
+
+
+            40:
+                StateTasksComplete := TRUE;
+                SUPER^.Resetting();
+
+        END_CASE
+
+
+
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+
+        CASE SequenceState OF
+
+            0:
+                NoStateTasksToComplete := FALSE;
+                SequenceState := SequenceState + 10;
+
+
+            10:
+                AxisX.Enable();
+                AxisY.Enable();
+                AxisZ.Enable();
+
+                IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+                    SequenceState := SequenceState + 10;
+                END_IF
+
+
+            20:
+                AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);
+                AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+
+                AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);
+                AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);
+                AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
+
+                SequenceState := SequenceState + 10;
+
+
+            30:
+                SequenceState := SequenceState + 10;
+
+
+            40:
+                StateTasksComplete := TRUE;
+                SUPER^.Resetting();
+
+        END_CASE
+
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="RestorePersistentData" Id="{9e1193e7-d277-4fd9-ac0c-81f097451afd}">
@@ -2464,75 +1853,6 @@ END_IF]]></ST>
       <LineId Id="152" Count="0" />
       <LineId Id="119" Count="0" />
       <LineId Id="29" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.BuildSegments_Arona">
-      <LineId Id="32" Count="47" />
-      <LineId Id="27" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoFlaps">
-      <LineId Id="92" Count="45" />
-      <LineId Id="27" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.BuildSegments_BorgoWings">
-      <LineId Id="948" Count="4" />
-      <LineId Id="1112" Count="0" />
-      <LineId Id="1098" Count="0" />
-      <LineId Id="1093" Count="0" />
-      <LineId Id="955" Count="4" />
-      <LineId Id="1099" Count="1" />
-      <LineId Id="960" Count="0" />
-      <LineId Id="963" Count="3" />
-      <LineId Id="1101" Count="1" />
-      <LineId Id="967" Count="0" />
-      <LineId Id="970" Count="3" />
-      <LineId Id="1103" Count="1" />
-      <LineId Id="974" Count="0" />
-      <LineId Id="977" Count="2" />
-      <LineId Id="1105" Count="1" />
-      <LineId Id="1108" Count="1" />
-      <LineId Id="980" Count="0" />
-      <LineId Id="984" Count="0" />
-      <LineId Id="986" Count="7" />
-      <LineId Id="1078" Count="1" />
-      <LineId Id="994" Count="0" />
-      <LineId Id="997" Count="3" />
-      <LineId Id="1080" Count="1" />
-      <LineId Id="1001" Count="0" />
-      <LineId Id="1004" Count="3" />
-      <LineId Id="1082" Count="1" />
-      <LineId Id="1008" Count="0" />
-      <LineId Id="1011" Count="3" />
-      <LineId Id="1113" Count="1" />
-      <LineId Id="1015" Count="0" />
-      <LineId Id="1017" Count="0" />
-      <LineId Id="1019" Count="1" />
-      <LineId Id="1167" Count="0" />
-      <LineId Id="1021" Count="1" />
-      <LineId Id="1084" Count="1" />
-      <LineId Id="1023" Count="0" />
-      <LineId Id="1026" Count="3" />
-      <LineId Id="1086" Count="1" />
-      <LineId Id="1030" Count="0" />
-      <LineId Id="1088" Count="0" />
-      <LineId Id="1034" Count="8" />
-      <LineId Id="1127" Count="4" />
-      <LineId Id="1162" Count="0" />
-      <LineId Id="1132" Count="5" />
-      <LineId Id="1163" Count="0" />
-      <LineId Id="1138" Count="5" />
-      <LineId Id="1164" Count="0" />
-      <LineId Id="1144" Count="17" />
-      <LineId Id="1072" Count="4" />
-      <LineId Id="27" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.BuildSegments_Calibration">
-      <LineId Id="306" Count="29" />
-      <LineId Id="354" Count="0" />
-      <LineId Id="336" Count="10" />
-      <LineId Id="355" Count="0" />
-      <LineId Id="347" Count="3" />
-      <LineId Id="353" Count="0" />
-      <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
       <LineId Id="28" Count="5" />
@@ -2796,31 +2116,6 @@ END_IF]]></ST>
       <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingX">
-      <LineId Id="888" Count="3" />
-      <LineId Id="995" Count="0" />
-      <LineId Id="997" Count="0" />
-      <LineId Id="892" Count="82" />
-      <LineId Id="993" Count="0" />
-      <LineId Id="975" Count="13" />
-      <LineId Id="314" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingY">
-      <LineId Id="793" Count="3" />
-      <LineId Id="901" Count="0" />
-      <LineId Id="797" Count="82" />
-      <LineId Id="899" Count="0" />
-      <LineId Id="880" Count="13" />
-      <LineId Id="314" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingZ">
-      <LineId Id="988" Count="3" />
-      <LineId Id="1097" Count="0" />
-      <LineId Id="992" Count="82" />
-      <LineId Id="1093" Count="0" />
-      <LineId Id="1075" Count="13" />
-      <LineId Id="314" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
       <LineId Id="3" Count="4" />
       <LineId Id="68" Count="0" />
@@ -2842,9 +2137,8 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.MachiningOrchestrator">
-      <LineId Id="2896" Count="14" />
-      <LineId Id="2912" Count="9" />
-      <LineId Id="2924" Count="11" />
+      <LineId Id="2896" Count="6" />
+      <LineId Id="2925" Count="10" />
       <LineId Id="2945" Count="0" />
       <LineId Id="2947" Count="2" />
       <LineId Id="2946" Count="0" />
@@ -2911,57 +2205,8 @@ END_IF]]></ST>
       <LineId Id="111" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
-      <LineId Id="82" Count="5" />
-      <LineId Id="89" Count="0" />
-      <LineId Id="91" Count="0" />
-      <LineId Id="434" Count="1" />
-      <LineId Id="433" Count="0" />
-      <LineId Id="437" Count="7" />
-      <LineId Id="436" Count="0" />
-      <LineId Id="445" Count="1" />
-      <LineId Id="115" Count="0" />
-      <LineId Id="542" Count="4" />
-      <LineId Id="558" Count="3" />
-      <LineId Id="547" Count="5" />
-      <LineId Id="569" Count="13" />
-      <LineId Id="199" Count="0" />
-      <LineId Id="181" Count="0" />
-      <LineId Id="179" Count="0" />
-      <LineId Id="149" Count="0" />
-      <LineId Id="565" Count="0" />
-      <LineId Id="184" Count="0" />
-      <LineId Id="568" Count="0" />
-      <LineId Id="185" Count="0" />
-      <LineId Id="237" Count="2" />
-      <LineId Id="225" Count="0" />
-      <LineId Id="508" Count="0" />
-      <LineId Id="211" Count="2" />
-      <LineId Id="186" Count="0" />
-      <LineId Id="183" Count="0" />
-      <LineId Id="125" Count="0" />
-      <LineId Id="94" Count="5" />
-      <LineId Id="337" Count="0" />
-      <LineId Id="365" Count="0" />
-      <LineId Id="461" Count="32" />
-      <LineId Id="366" Count="1" />
-      <LineId Id="364" Count="0" />
-      <LineId Id="335" Count="0" />
-      <LineId Id="377" Count="5" />
-      <LineId Id="416" Count="1" />
-      <LineId Id="386" Count="0" />
-      <LineId Id="418" Count="3" />
-      <LineId Id="387" Count="1" />
-      <LineId Id="422" Count="0" />
-      <LineId Id="425" Count="6" />
-      <LineId Id="397" Count="0" />
-      <LineId Id="423" Count="1" />
-      <LineId Id="398" Count="0" />
-      <LineId Id="411" Count="0" />
-      <LineId Id="432" Count="0" />
-      <LineId Id="412" Count="3" />
-      <LineId Id="374" Count="1" />
-      <LineId Id="256" Count="1" />
-      <LineId Id="101" Count="2" />
+      <LineId Id="636" Count="125" />
+      <LineId Id="766" Count="92" />
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RestorePersistentData">

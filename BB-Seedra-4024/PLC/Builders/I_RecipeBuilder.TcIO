@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <Itf Name="I_RecipeBuilder" Id="{36800402-6cf0-4647-81a8-eb2cedcd2dc1}">
+    <Declaration><![CDATA[INTERFACE I_RecipeBuilder
+]]></Declaration>
+    <Method Name="Build" Id="{c09be119-3937-4a1a-9b08-f0b7fdecc5a6}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+VAR_INPUT
+    PanelWidth           : REAL;
+    PanelLength          : REAL;
+    PanelHeight          : REAL;
+    CuttingOverpass      : REAL;
+    RailHeightCorrection : REAL;
+END_VAR
+VAR_OUTPUT
+    // Zwracamy wyliczone segmenty i ich ilość
+    SegmentsGroove       : ARRAY[1..32] OF ST_CutSegment;
+    SegmentsToGroove     : INT;
+    
+    SegmentsCutX         : ARRAY[1..32] OF ST_CutSegment;
+    SegmentsToCutX       : INT;
+    
+    SegmentsCutY         : ARRAY[1..32] OF ST_CutSegment;
+    SegmentsToCutY       : INT;
+END_VAR]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

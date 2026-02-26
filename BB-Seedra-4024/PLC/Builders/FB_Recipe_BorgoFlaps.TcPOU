@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Recipe_BorgoFlaps" Id="{bb14164e-8458-40ae-8f72-6fc21866bdd0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Recipe_BorgoFlaps IMPLEMENTS I_RecipeBuilder
+VAR_INPUT
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{ed031188-d25f-45a2-b725-f41b8eafee32}">
+      <Declaration><![CDATA[{warning 'add method implementation '}
+METHOD Build : BOOL
+VAR_INPUT
+	PanelWidth	: REAL;
+	PanelLength	: REAL;
+	PanelHeight	: REAL;
+	CuttingOverpass	: REAL;
+	RailHeightCorrection	: REAL;
+END_VAR
+VAR_OUTPUT
+	(* Zwracamy wyliczone segmenty i ich ilość*)
+	SegmentsGroove	: ARRAY [1..32] OF ST_CutSegment;
+	SegmentsToGroove	: INT;
+	SegmentsCutX	: ARRAY [1..32] OF ST_CutSegment;
+	SegmentsToCutX	: INT;
+	SegmentsCutY	: ARRAY [1..32] OF ST_CutSegment;
+	SegmentsToCutY	: INT;
+END_VAR
+VAR
+    TotalY   : REAL;
+    TotalX   : REAL;
+    ShorterY : REAL;
+    ShorterX : REAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Natural language parameters;
+TotalY := PanelLength + 2 * PanelHeight;
+TotalX := PanelWidth + 2 * PanelHeight;
+ShorterY := TotalY - PanelHeight;
+ShorterX := TotalX - PanelHeight;
+
+// Start → Stop, Milling Segments
+SegmentsToGroove := 4;
+
+SegmentsGroove[1].Start.X := TotalX;
+SegmentsGroove[1].Stop.X  := 0;
+SegmentsGroove[1].Start.Y := ShorterY;
+SegmentsGroove[1].Stop.Y  := ShorterY;
+
+SegmentsGroove[2].Start.Y := TotalY;
+SegmentsGroove[2].Stop.Y  := 0;
+SegmentsGroove[2].Start.X := PanelHeight;
+SegmentsGroove[2].Stop.X  := PanelHeight;
+
+SegmentsGroove[3].Start.X := 0;
+SegmentsGroove[3].Stop.X  := TotalX;
+SegmentsGroove[3].Start.Y := PanelHeight;
+SegmentsGroove[3].Stop.Y  := PanelHeight;
+
+SegmentsGroove[4].Start.X := ShorterX;
+SegmentsGroove[4].Stop.X  := ShorterX;
+SegmentsGroove[4].Start.Y := 0;
+SegmentsGroove[4].Stop.Y  := TotalY;
+
+// Start → Stop, CutY Segments
+SegmentsToCutY := 0;
+SegmentsToCutX := 0;
+
+Build := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Recipe_BorgoFlaps">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Recipe_BorgoFlaps.Build">
+      <LineId Id="26" Count="32" />
+      <LineId Id="20" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

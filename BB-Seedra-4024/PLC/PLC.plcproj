@@ -19,6 +19,18 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Builders\FB_Recipe_BorgoFlaps.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builders\FB_Recipe_Arona.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builders\FB_Recipe_BorgoWings.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Builders\I_RecipeBuilder.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\E_RecipeID.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -151,6 +163,7 @@
     <Folder Include="DUTs\FB_GantryXYZ" />
     <Folder Include="DUTs\FB_GantryXYZ\FB_GantryXYZ" />
     <Folder Include="GVLs" />
+    <Folder Include="Builders" />
     <Folder Include="POUs\Components" />
     <Folder Include="POUs\Segments" />
     <Folder Include="VISUs" />
