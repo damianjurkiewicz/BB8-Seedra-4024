@@ -15,7 +15,18 @@ VAR
     AxisZ : FB_Component_BasicAxis := (Name := 'AxisZ');
     CylinderCuttingY : FB_CylinderCutY := (Name := 'Cylinder Y');
 	CylinderCuttingX : FB_CylinderCutX := (Name := 'Cylinder X');
+	///setpoint
+	AxisVirtual : FB_Component_BasicAxis := (Name := 'AxisVirtual');
 	
+	ExtGenX : FB_ExternalSetpointGenerator;
+    ExtGenY : FB_ExternalSetpointGenerator;
+	
+	SetPosVirtual : MC_SetPosition;
+	
+	CircleRadius  : LREAL := 100.0; // Promień koła
+    CircleCenterX : LREAL := 500.0; // Środek X
+    CircleCenterY : LREAL := 500.0; // Środek Y
+	//setpoint
 
     // Alarms for this module
     GantryAlarms : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
@@ -449,67 +460,6 @@ BuildSegments_BorgoWings := TRUE;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="BuildSegments_Calibration" Id="{0bc1bcc0-1e48-4916-b44b-21d9143ba598}" FolderPath="MyMethods\Segments\">
-      <Declaration><![CDATA[METHOD BuildSegments_Calibration : BOOL
-VAR_INST
-	TotalLength :REAL;
-	TotalWidth  :REAL;
-	WingHeight  :REAL;
-	FlapHeight  :REAL;
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[//  Start → Stop, Milling Segments
-SegmentsToGroove := 4;
-
-SegmentGrooves[1].Start.X := 300;
-SegmentGrooves[1].Start.Y := 300;
-SegmentGrooves[1].Stop.X  := 50;
-SegmentGrooves[1].Stop.Y  := 300;
-
-SegmentGrooves[2].Start.X := 300;
-SegmentGrooves[2].Start.Y := 50;
-SegmentGrooves[2].Stop.X  := 50; 
-SegmentGrooves[2].Stop.Y  := 50;
-
-SegmentGrooves[3].Start.X := 300;
-SegmentGrooves[3].Start.Y := 300;
-SegmentGrooves[3].Stop.X  := 300;
-SegmentGrooves[3].Stop.Y  := 50;
-
-SegmentGrooves[4].Start.X := 50;
-SegmentGrooves[4].Start.Y := 300;
-SegmentGrooves[4].Stop.X  := 50;
-SegmentGrooves[4].Stop.Y  := 50;
-
-//  Start → Stop, CutY Segments
-SegmentsToCutY := 2;
-
-SegmentCutY[1].Start.X := 300; 
-SegmentCutY[1].Start.Y := 300;  
-SegmentCutY[1].Stop.X  := 300; 
-SegmentCutY[1].Stop.Y  := 50;
-
-SegmentCutY[2].Start.X := 50; 
-SegmentCutY[2].Start.Y := 300;  
-SegmentCutY[2].Stop.X  := 50; 
-SegmentCutY[2].Stop.Y  := 50;
-
-SegmentsToCutX := 2;
-
-SegmentCutX[1].Start.X := 300;
-SegmentCutX[1].Start.Y := 300; 
-SegmentCutX[1].Stop.X  := 50;
-SegmentCutX[1].Stop.Y  := 300;
-                               
-SegmentCutX[2].Start.X := 300;
-SegmentCutX[2].Start.Y := 50; 
-SegmentCutX[2].Stop.X  := 50; 
-SegmentCutX[2].Stop.Y  := 50;
-
-BuildSegments_Calibration := TRUE;]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
       <Declaration><![CDATA[METHOD PROTECTED Clearing
 VAR
@@ -798,8 +748,14 @@ fbHomeStratX.CyclicLogic();
 fbHomeStratY.CyclicLogic();
 fbHomeStratZ.CyclicLogic();
 
+
+// Wywołanie logiki naszych generatorów
+ExtGenX.CyclicLogic();
+ExtGenY.CyclicLogic();
+
 //Set the current alarm severity for this module
 _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentSeverity := _CurrentAlarmSeverity);
+
 
 //Simulate Alarm Messaging
 ]]></ST>
@@ -864,6 +820,200 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
 		;
 END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecuteCircleCut" Id="{6342a1e1-5f01-4080-8bd2-63cb683a7668}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD ExecuteCircleCut : BOOL
+VAR_INST
+    iPass : INT;
+    currentDepth : LREAL;
+    g1, g2, g3, g4, g5 : LREAL;
+    v1, v2, v3, v4, v5 : LREAL;
+    
+    lrRealRadius : LREAL;
+    lrStartPosX  : LREAL;
+    lrStartPosY  : LREAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//---------------------------------------------------------
+
+CASE ExecutorStep OF
+
+    // -------- Inicjalizacja --------
+    0:
+        g1 := 3.5; g2 := 3.5; g3 := 1.5; g4 := 0.0; g5 := 0.0; 
+        v1 := 1.0; v2 := 1.0; v3 := 1.0; v4 := 0.4; v5 := 0.4;
+
+        IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() AND AxisVirtual.Enable() THEN
+            
+            // Jednorazowe nastawy dynamiki
+            AxisX.Acceleration := 500; AxisX.Deceleration := 8000;
+            AxisY.Acceleration := 500; AxisY.Deceleration := 8000;
+            AxisZ.Acceleration := 500; AxisZ.Deceleration := 8000;
+            
+            // Konfiguracja samej osi wirtualnej!
+            AxisVirtual.Acceleration := 500;
+            AxisVirtual.Deceleration := 8000;
+
+            AxisX.Velocity := _RapidSpeedX;
+            AxisY.Velocity := _RapidSpeedY;
+            AxisZ.Velocity := _RapidSpeedZ;
+
+            IO.SpindleEnable := TRUE;
+            IO.CoolingEnable := FALSE;
+
+            iPass := 1; 
+            
+            // Obliczenie wejścia w materiał (kąt 0 -> COS=1, SIN=0)
+            lrRealRadius := CircleRadius - (_CutterXOffsetX / 2.0);
+            lrStartPosX := CircleCenterX + lrRealRadius;
+            lrStartPosY := CircleCenterY;
+
+            IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
+                ExecutorStep := 10;
+            END_IF
+        END_IF;
+
+    // -------- Dojazd do krawędzi okręgu (Kąt = 0) --------
+    10: 
+        Trace(Message:= CONCAT('Step 10: Rapid to Circle Start XY. Pass: ', TO_STRING(iPass)));
+        AxisX.MoveAbsolute(lrStartPosX + _GlobalOffset, 0);
+        AxisY.MoveAbsolute(lrStartPosY + _GlobalOffset, 0);
+        ExecutorStep := 20;
+
+    20: 
+        IF AxisX.InPosition AND AxisY.InPosition THEN
+            IO.SpindleEnable := TRUE;
+            IO.CoolingEnable := TRUE;
+            AxisZ.Velocity := _GroovingSpeedZ;
+            ExecutorStep := 25;
+        END_IF;
+
+    // -------- Zerowanie Osi Wirtualnej (Kąt ustawiony na 0) --------
+    25:
+        SetPosVirtual(Axis := AxisVirtual.Axis, Execute := TRUE, Position := 0.0);
+        IF SetPosVirtual.Done THEN
+            SetPosVirtual(Axis := AxisVirtual.Axis, Execute := FALSE);
+            ExecutorStep := 30;
+        END_IF
+
+    // -------- Zjazd Z w dół --------
+    30: 
+        CASE iPass OF
+            1: currentDepth := _GrooveDepthZ - g1;
+            2: currentDepth := _GrooveDepthZ - g2;
+            3: currentDepth := _GrooveDepthZ - g3;
+            4: currentDepth := _GrooveDepthZ - g4;
+            5: currentDepth := _GrooveDepthZ - g5;
+        ELSE
+            currentDepth := _GrooveDepthZ;
+        END_CASE;
+
+        AxisZ.MoveAbsolute(currentDepth, 0);
+        ExecutorStep := 40;
+
+    40: 
+        IF AxisZ.InPosition THEN
+            // Zamiast ustawiać prędkość X/Y, ustawiamy prędkość Osi Wirtualnej!
+            CASE iPass OF
+                1: AxisVirtual.Velocity := _GroovingSpeedX * v1;
+                2: AxisVirtual.Velocity := _GroovingSpeedX * v2;
+                3: AxisVirtual.Velocity := _GroovingSpeedX * v3;
+                4: AxisVirtual.Velocity := _GroovingSpeedX * v4;
+                5: AxisVirtual.Velocity := _GroovingSpeedX * v5;
+            END_CASE;
+
+            ExecutorStep := 50;
+        END_IF;
+
+    50: 
+        IF SequenceTimerSeconds(_GroovingIdleTime) THEN
+            ExecutorStep := 60;
+        END_IF;
+
+    // -------- Aktywacja External Setpoint --------
+    60:
+        ExtGenX.Execute();
+        ExtGenY.Execute();
+        ExecutorStep := 65;
+
+    65:
+        // Czekamy chwilkę na załączenie generatorów (można dodać mały timer, lub sprawdzić Busy)
+        IF SequenceTimerSeconds(0.1) THEN
+            ExecutorStep := 70;
+        END_IF
+
+    // -------- START CIĘCIA (Oś wirtualna do 360 stopni) --------
+    70: 
+        Trace(Message:= 'Step 70: Cutting Circle (0 to 360 deg)');
+        AxisVirtual.MoveAbsolute(360.0, 0); // Parametr velocity nadpisany w kroku 40
+        ExecutorStep := 80;
+
+    // -------- Nasłuchiwanie i Karmienie (MAGIA DZIEJE SIĘ TUTAJ) --------
+    80: 
+        ExecuteCircleFeed(); // Wołane co cykl ładuje współrzędne z osi wirtualnej do X i Y
+        
+        IF AxisVirtual.InPosition THEN
+            ExecutorStep := 90;
+        END_IF;
+
+    // -------- Zatrzymanie generatorów --------
+    90:
+        ExtGenX.Disable();
+        ExtGenY.Disable();
+        ExecutorStep := 95;
+        
+    95:
+        // Podniesienie Z do góry
+        Trace(Message:= 'Step 95: Lifting Z to Safe 0');
+        AxisZ.Velocity := _RapidSpeedZ;
+        AxisZ.MoveAbsolute(0, 0);
+        ExecutorStep := 100;
+
+    100: 
+        IF AxisZ.InPosition THEN
+            IF iPass < 5 THEN
+                Trace(Message:= CONCAT('Step 100: Pass ', CONCAT(TO_STRING(iPass), ' finished. Next pass.')));
+                iPass := iPass + 1;       
+                // UWAGA! Ponieważ okrąg jest zamknięty, XY jest już fizycznie na starcie (kąt 360 = kąt 0)!
+                // Wracamy więc od razu do kroku 25 (żeby zresetować oś wirtualną na 0.0)
+                ExecutorStep := 25;        
+            ELSE
+                Trace(Message:= 'Step 100: ALL 5 PASSES DONE. Finishing.');
+                IO.SpindleEnable := FALSE; 
+                IO.CoolingEnable := FALSE; 
+                ExecutorStep := 1000;      
+            END_IF;
+        END_IF;
+
+    1000:
+        Trace(Message:= 'Step 1000: FINISH');
+        ExecutorStep := 0;
+        ExecuteCircleCut := TRUE;
+
+END_CASE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ExecuteCircleFeed" Id="{364172ba-0c2a-49df-bd9e-fdbb0e793ce9}" FolderPath="MyMethods\">
+      <Declaration><![CDATA[METHOD ExecuteCircleFeed : BOOL
+VAR
+    lrAngle : LREAL;
+    lrRealRadius : LREAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//---------------------------------------------------------
+
+// 1. Pobieramy "kąt" (0-360) z osi wirtualnej
+lrAngle := AxisVirtual.Axis.NcToPlc.ActPos;
+
+// 2. Uwzględniamy promień narzędzia (np. odejmujemy połowę średnicy frezu)
+lrRealRadius := CircleRadius - (_CutterXOffsetX / 2.0); // Zastąp to właściwym wymiarem z recepty
+
+// 3. Trygonometria - wpisujemy wyliczone wartości prosto do "Property" bloków ExtGen
+ExtGenX.Position := CircleCenterX + lrRealRadius * COS(lrAngle * PI / 180.0);
+ExtGenY.Position := CircleCenterY + lrRealRadius * SIN(lrAngle * PI / 180.0);]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecuteSegmentsCutX" Id="{94347c53-d843-4c0f-8fa0-b761cd0d80e2}" FolderPath="MyMethods\Segments\">
@@ -1527,340 +1677,6 @@ END_CASE]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Method Name="HomingX" Id="{3a7dd60d-4e3b-4739-b0ec-f4ab527c9236}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD HomingX : BOOL
-
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE _HomingStepX OF
-		
-	0:
-		HomingX := FALSE;
-		
-		
-		IF AxisX.Enable() THEN
-			
-			//Trace('Enable Axis X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-		
-	10:
-		IF AxisX.Enabled THEN
-			AxisX.Acceleration := 100;
-			AxisX.Deceleration := 15000;
-			//Trace('Enabled Axis X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-
-	20:
-		IF IO.ProximitySensorX THEN
-			IF AxisX.Stop() THEN
-				IF NOT AxisX.Busy THEN
-				AxisX.Home();
-				////Trace('Start na krańcówce X');
-				_HomingStepX := 80;
-				END_IF
-			END_IF
-		ELSE		
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-		
-	30:
-		IF AxisX.MoveVelocity(-100, FALSE) THEN
-			////Trace('Szybki ruch, szukam krancowki X');
-            _HomingStepX := _HomingStepX + 10;
-        END_IF
-		
-	
-	40: 
-		IF IO.ProximitySensorX THEN
-			
-		IF AxisX.Stop() THEN
-			IF NOT AxisX.Busy THEN
-				//Trace('Spotkałem krańcówkę X');
-				_HomingStepX := _HomingStepX + 10;
-			END_IF
-		END_IF
-		
-		END_IF
-
-	50:
-		IF AxisX.MoveRelative(30,FALSE) THEN
-			//Trace('Odsunięcie od krańcówki, po szybkim X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-		
-	60: 
-		IF AxisX.MoveVelocity(-10,FALSE) THEN
-			//Trace('Spokojny powrot X');		
-			_HomingStepX := _HomingStepX + 10;
-		END_IF	
-		
-	70:
-		IF IO.ProximitySensorX THEN
-			IF AxisX.Stop() THEN
-				//Trace('Stop do precyzyjnego X');
-				_HomingStepX := _HomingStepX + 10; // Przechodzimy do czekania na zatrzymanie
-			END_IF
-		END_IF
-
-	80:
-		IF NOT AxisX.Busy THEN
-			IF AxisX.Home() THEN
-				_HomingStepX := _HomingStepX + 10;
-				//Trace('Precyzyjny Home wykonany X');
-			END_IF
-		END_IF
-
-
-	90:	
-		IF AxisX.MoveRelative(2.0, FALSE) THEN
-			//Trace('Odsunięcie od krańcówki o 2mm X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-	
-	100:
-		IF NOT AxisX.Busy THEN
-		
-			IF AxisX.Home() THEN
-				//Trace('Ustawienie nowego zera po odsunięciu X');
-				_HomingStepX := _HomingStepX + 10;
-			END_IF
-		END_IF
-	
-	110:
-		HomingX := TRUE;
-		//Trace('Homing zakończony pomyślnie X');
-		
-			
-	END_CASE
-	
-
-]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="HomingY" Id="{7cf726af-0fa2-4719-9f55-f55ebcdc06af}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD HomingY : BOOL
-
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE _HomingStepY OF
-		
-	0:
-		HomingY := FALSE;
-			
-		IF AxisY.Enable() THEN
-			
-			//Trace('Enable Axis Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-		
-	10:
-		IF AxisY.Enabled THEN
-			AxisY.Acceleration := 100;
-			AxisY.Deceleration := 15000;
-			//Trace('Enabled Axis Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-
-	20:
-		IF IO.ProximitySensorY THEN
-			IF AxisY.Stop() THEN
-				IF NOT AxisY.Busy THEN
-				AxisY.Home();
-				//Trace('Start na krańcówce Y');
-				_HomingStepY := 80;
-				END_IF
-			END_IF
-		ELSE		
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-		
-	30:
-		IF AxisY.MoveVelocity(-80, FALSE) THEN
-			//Trace('Szybki ruch, szukam krancowki Y');
-            _HomingStepY := _HomingStepY + 10;
-        END_IF
-		
-	
-	40: 
-		IF IO.ProximitySensorY THEN
-			
-		IF AxisY.Stop() THEN
-			IF NOT AxisY.Busy THEN
-				//Trace('Spotkałem krańcówkę Y');
-				_HomingStepY := _HomingStepY + 10;
-			END_IF
-		END_IF
-		
-		END_IF
-
-	50:
-		IF AxisY.MoveRelative(30,FALSE) THEN
-			//Trace('Odsunięcie od krańcówki, po szybkim Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-		
-	60: 
-		IF AxisY.MoveVelocity(-10,FALSE) THEN
-			//Trace('Spokojny powrot Y');		
-			_HomingStepY := _HomingStepY + 10;
-		END_IF	
-		
-	70:
-		IF IO.ProximitySensorY THEN
-			IF AxisY.Stop() THEN
-				//Trace('Stop do precyzyjnego Y');
-				_HomingStepY := _HomingStepY + 10; // Przechodzimy do czekania na zatrzymanie
-			END_IF
-		END_IF
-
-	80:
-		IF NOT AxisY.Busy THEN
-			IF AxisY.Home() THEN
-				_HomingStepY := _HomingStepY + 10;
-				//Trace('Precyzyjny Home wykonany Y');
-			END_IF
-		END_IF
-
-
-	90:	
-		IF AxisY.MoveRelative(2.0, FALSE) THEN
-			//Trace('Odsunięcie od krańcówki o 2mm Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-	
-	100:
-		IF NOT AxisY.Busy THEN
-		
-			IF AxisY.Home() THEN
-				//Trace('Ustawienie nowego zera po odsunięciu Y');
-				_HomingStepY := _HomingStepY + 10;
-			END_IF
-		END_IF
-	
-	110:
-		HomingY := TRUE;
-		//Trace('Homing zakończony pomyślnie Y');
-		
-			
-	END_CASE
-	
-
-]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="HomingZ" Id="{59c5c153-dee1-4d97-aac8-e655f142ebf1}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD HomingZ : BOOL
-
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE _HomingStepZ OF
-		
-	0:
-		HomingZ := FALSE;	
-		
-		IF AxisZ.Enable() THEN
-			
-			//Trace('Enable Axis Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-		
-	10:
-		IF AxisZ.Enabled THEN
-			AxisZ.Acceleration := 100;
-			AxisZ.Deceleration := 15000;
-			//Trace('Enabled Axis Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-
-	20:
-		IF IO.ProximitySensorZ THEN
-			IF AxisZ.Stop() THEN
-				IF NOT AxisZ.Busy THEN
-				AxisZ.Home();
-				//Trace('Start na krańcówce Z');
-				_HomingStepZ := 80;
-				END_IF
-			END_IF
-		ELSE		
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-		
-	30:
-		IF AxisZ.MoveVelocity(-100, FALSE) THEN
-			//Trace('Szybki ruch, szukam krancowki Z');
-            _HomingStepZ := _HomingStepZ + 10;
-        END_IF
-		
-	
-	40: 
-		IF IO.ProximitySensorZ THEN
-			
-		IF AxisZ.Stop() THEN
-			IF NOT AxisZ.Busy THEN
-				//Trace('Spotkałem krańcówkę Z');
-				_HomingStepZ := _HomingStepZ + 10;
-			END_IF
-		END_IF
-		
-		END_IF
-
-	50:
-		IF AxisZ.MoveRelative(5,FALSE) THEN
-			//Trace('Odsunięcie od krańcówki, po szybkim Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-		
-	60: 
-		IF AxisZ.MoveVelocity(-10,FALSE) THEN
-			//Trace('Spokojny powrot Z');		
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF	
-		
-	70:
-		IF IO.ProximitySensorZ THEN
-			IF AxisZ.Stop() THEN
-				//Trace('Stop do precyzyjnego Z');
-				_HomingStepZ := _HomingStepZ + 10; // Przechodzimy do czekania na zatrzymanie
-			END_IF
-		END_IF
-
-	80:
-		IF NOT AxisZ.Busy THEN
-			IF AxisZ.Home() THEN
-				_HomingStepZ := _HomingStepZ + 10;
-				//Trace('Precyzyjny Home wykonany Z');
-			END_IF
-		END_IF
-
-
-	90:	
-		IF AxisZ.MoveRelative(2.0, FALSE) THEN
-			//Trace('Odsunięcie od krańcówki o 2mm Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-	
-	100:
-		IF NOT AxisZ.Busy THEN		
-		
-			IF AxisZ.Home() THEN
-				//Trace('Ustawienie nowego zera po odsunięciu Z');
-				_HomingStepZ := _HomingStepZ + 10;
-			END_IF
-		END_IF
-	
-	110:
-		HomingZ := TRUE;
-		//Trace('Homing zakończony pomyślnie Z');
-		
-			
-	END_CASE
-	
-
-]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="Initialize" Id="{ba85f303-ffbe-03ad-229b-3741bd93e6e2}">
       <Declaration><![CDATA[//! @summary Basic module initialization logic
 METHOD PROTECTED Initialize : BOOL;
@@ -1869,6 +1685,7 @@ VAR
     varInfo                  : __SYSTEM.VAR_INFO;
     AllSubUnitsInitialized   : BOOL := TRUE;
     AllComponentsInitialized : BOOL := TRUE;
+	Axis: INT;
 END_VAR
 
 //! @description This method is called by <c>CyclicLogic()</c> as required]]></Declaration>
@@ -1886,6 +1703,20 @@ CASE DescendantSequenceState OF
         DescendantSequenceState := DescendantSequenceState + 10;
     10:
 		IF RestorePersistentData() THEN
+		
+		// ---- DODANE KODY DLA KOŁA ----
+        RegisterComponent(AxisVirtual);
+        
+        // Przypisujemy fizyczne osie do bloków generatora
+        ExtGenX.Axis := AxisX;
+        ExtGenY.Axis := AxisY;
+        
+        // Przyspieszenia dla wejść "wirtualnych" (te sztywne wartości, o których mówiliśmy)
+        ExtGenX.Accel := 10000.0;
+        ExtGenX.Velocity := 1000.0;
+        ExtGenY.Accel := 10000.0;
+        ExtGenY.Velocity := 1000.0;
+        // ------------------------------
 		
 		// Przypisanie osi do strategii
 		fbHomeStratX.Axis := AxisX;
@@ -1945,7 +1776,7 @@ END_VAR
 					END_IF
 					
 					E_RecipeID.eArona:
-					IF BuildSegments_Arona() THEN
+					IF ExecuteCircleCut() THEN
 						OrchestratorStep := OrchestratorStep + 10;
 					END_IF
 					
@@ -2525,15 +2356,6 @@ END_IF]]></ST>
       <LineId Id="1072" Count="4" />
       <LineId Id="27" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.BuildSegments_Calibration">
-      <LineId Id="306" Count="29" />
-      <LineId Id="354" Count="0" />
-      <LineId Id="336" Count="10" />
-      <LineId Id="355" Count="0" />
-      <LineId Id="347" Count="3" />
-      <LineId Id="353" Count="0" />
-      <LineId Id="27" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
       <LineId Id="28" Count="5" />
       <LineId Id="78" Count="0" />
@@ -2642,7 +2464,11 @@ END_IF]]></ST>
       <LineId Id="40" Count="0" />
       <LineId Id="35" Count="2" />
       <LineId Id="34" Count="0" />
-      <LineId Id="12" Count="4" />
+      <LineId Id="51" Count="3" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="12" Count="2" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="15" Count="1" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
@@ -2669,6 +2495,14 @@ END_IF]]></ST>
       <LineId Id="40" Count="0" />
       <LineId Id="42" Count="3" />
       <LineId Id="23" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ExecuteCircleCut">
+      <LineId Id="16" Count="156" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ExecuteCircleFeed">
+      <LineId Id="10" Count="10" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutX">
       <LineId Id="1011" Count="48" />
@@ -2796,31 +2630,6 @@ END_IF]]></ST>
       <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingX">
-      <LineId Id="888" Count="3" />
-      <LineId Id="995" Count="0" />
-      <LineId Id="997" Count="0" />
-      <LineId Id="892" Count="82" />
-      <LineId Id="993" Count="0" />
-      <LineId Id="975" Count="13" />
-      <LineId Id="314" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingY">
-      <LineId Id="793" Count="3" />
-      <LineId Id="901" Count="0" />
-      <LineId Id="797" Count="82" />
-      <LineId Id="899" Count="0" />
-      <LineId Id="880" Count="13" />
-      <LineId Id="314" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingZ">
-      <LineId Id="988" Count="3" />
-      <LineId Id="1097" Count="0" />
-      <LineId Id="992" Count="82" />
-      <LineId Id="1093" Count="0" />
-      <LineId Id="1075" Count="13" />
-      <LineId Id="314" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
       <LineId Id="3" Count="4" />
       <LineId Id="68" Count="0" />
@@ -2829,6 +2638,8 @@ END_IF]]></ST>
       <LineId Id="10" Count="3" />
       <LineId Id="80" Count="0" />
       <LineId Id="100" Count="0" />
+      <LineId Id="125" Count="11" />
+      <LineId Id="123" Count="1" />
       <LineId Id="106" Count="7" />
       <LineId Id="102" Count="0" />
       <LineId Id="105" Count="0" />

@@ -73,6 +73,15 @@
     <Compile Include="POUs\Components\ST_Cylinder_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\ExternalSetpointGenerator\E_ExternalSPGen.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\ExternalSetpointGenerator\FB_ExternalSetpointGenerator.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\ExternalSetpointGenerator\I_ExternalSetpointGenerator.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\FB_GantryXYZ.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -152,6 +161,7 @@
     <Folder Include="DUTs\FB_GantryXYZ\FB_GantryXYZ" />
     <Folder Include="GVLs" />
     <Folder Include="POUs\Components" />
+    <Folder Include="POUs\ExternalSetpointGenerator" />
     <Folder Include="POUs\Segments" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
