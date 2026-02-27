@@ -5,6 +5,8 @@
 FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule
 VAR
     // Sub module definitions here
+	RecipeBuilder :FB_RecipeBuilderWings;
+	Kot 	:ST_RecipeBuilder_HMI;
 	
 	// List of sub modules
     ipSubModules_Init : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];

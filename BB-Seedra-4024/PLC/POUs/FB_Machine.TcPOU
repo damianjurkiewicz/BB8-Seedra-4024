@@ -91,6 +91,11 @@ END_IF
 SUPER^.CyclicLogic();
 
 
+// Przpisanie Wartości z HMI do persistent
+ConfigManager.PanelFrontLength := RecipeBuilderWings.RecipeBuilder_HMI.Config.PanelFrontLength;
+// W CyclicLogic maszyny czytasz to, co operator wpisał w stare pole Gantry:
+//ConfigManager.PanelFrontLength := GantryXYZ.GantryXYZ_HMI.Config.PanelFrontLength;
+
 //Here the alarms will raise and clear on its own if the input changes
 
 //NOT SafetyGlobalVariableList.eStopButton -> We Decouple physical button to Activate
@@ -158,10 +163,7 @@ IF GVL_Safety.eStopHMI THEN
 END_IF
 
 
-// Jeśli wartość na HMI Buildera się zmieniła, zapisz ją do pamieci trwałej:
-ConfigManager.PanelFrontLength := RecipeBuilderWings.RecipeBuilder_HMI.Config.PanelFrontLength;
-// W CyclicLogic maszyny czytasz to, co operator wpisał w stare pole Gantry:
-ConfigManager.PanelFrontLength := GantryXYZ.GantryXYZ_HMI.Config.PanelFrontLength;
+
 
 SUPER^.HMICommunication();]]></ST>
       </Implementation>
@@ -387,6 +389,9 @@ END_IF]]></ST>
       <LineId Id="18" Count="0" />
       <LineId Id="3" Count="5" />
       <LineId Id="45" Count="0" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="52" Count="2" />
+      <LineId Id="51" Count="0" />
       <LineId Id="47" Count="0" />
       <LineId Id="19" Count="0" />
       <LineId Id="39" Count="0" />
@@ -416,9 +421,7 @@ END_IF]]></ST>
       <LineId Id="13" Count="0" />
       <LineId Id="7" Count="0" />
       <LineId Id="12" Count="0" />
-      <LineId Id="17" Count="1" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="23" Count="0" />
+      <LineId Id="17" Count="0" />
       <LineId Id="22" Count="0" />
       <LineId Id="10" Count="0" />
       <LineId Id="5" Count="0" />
