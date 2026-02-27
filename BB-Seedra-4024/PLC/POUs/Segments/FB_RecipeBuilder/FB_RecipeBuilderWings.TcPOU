@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_RecipeBuilderWings" Id="{3f83a514-1f2f-4e3d-921c-ca7c0b60e17f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderWings EXTENDS FB_PackML_BaseModule IMPLEMENTS I_RecipeBuilder
+
+VAR
+	RecipeBuilder_HMI: ST_RecipeBuilder_HMI;
+
+
+END_VAR
+
+VAR PERSISTENT
+	_PanelFrontWidth		:REAL;    
+	_PanelFrontLength		:REAL;    
+	_PanelHeight			:REAL;    
+	_RailHeightCorrection	:REAL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{c08ade7c-db75-4c50-8457-5bb392619adf}">
+      <Declaration><![CDATA[{warning 'add method implementation '}
+METHOD Build : BOOL
+VAR_INPUT
+	PanelWidth	: REAL;
+	PanelLength	: REAL;
+	PanelHeight	: REAL;
+	CuttingOverpass	: REAL;
+	RailHeightCorrection	: REAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="HMICommunication" Id="{5b58a0e6-30db-439b-a833-a33f4b223005}">
+      <Declaration><![CDATA[// Provides interlocks for HMI control and updates HMI status information for this module
+METHOD PROTECTED HMICommunication
+
+// This method is called cyclically by CyclicLogic()
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_PanelFrontWidth      := RecipeBuilder_HMI.Config.PanelFrontWidht;
+_PanelFrontLength     := RecipeBuilder_HMI.Config.PanelFrontLength;
+_PanelHeight          := RecipeBuilder_HMI.Config.PanelHeight;
+_RailHeightCorrection := RecipeBuilder_HMI.Config.RailHeightCorrection;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="RestorePersistentData" Id="{12bd1134-b217-4197-a3c0-7b0f777de601}">
+      <Declaration><![CDATA[METHOD PUBLIC RestorePersistentData  : BOOL
+//Only _Variables are PERSISTENT, This method is executed during the initialization
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+RecipeBuilder_HMI.Config.PanelFrontLength := _PanelFrontLength;
+RecipeBuilder_HMI.Config.PanelFrontWidht  := _PanelFrontWidth;
+RecipeBuilder_HMI.Config.PanelHeight 	  := _PanelHeight;
+RecipeBuilder_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
+
+RestorePersistentData := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="SegmentsCutX" Id="{9152e646-9866-44c9-b9e6-5a764990d7d4}">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY SegmentsCutX : ARRAY [1..32] OF ST_CutSegment
+]]></Declaration>
+      <Get Name="Get" Id="{8272f94b-fbfa-4156-a332-efb73ed5cf2e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="SegmentsCutY" Id="{255ca92b-c547-401c-9784-b32df54e5e2a}">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY SegmentsCutY : ARRAY [1..32] OF ST_CutSegment
+]]></Declaration>
+      <Get Name="Get" Id="{4b559848-f1de-4c18-834d-4d2909a2699d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="SegmentsGroove" Id="{a6cc8c84-07e4-4531-824b-69c46a3f14a3}">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY SegmentsGroove : ARRAY [1..32] OF ST_CutSegment
+]]></Declaration>
+      <Get Name="Get" Id="{7a846cca-77b5-4d85-b851-6d33d3df4235}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="SegmentsToCutX" Id="{e45efa5d-ccfc-458e-9811-5f080acfb1d1}">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY SegmentsToCutX : INT
+]]></Declaration>
+      <Get Name="Get" Id="{58e9fc3c-a2ea-47ff-862f-fb085769cffc}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="SegmentsToCutY" Id="{0f05ab0b-f50d-4ba7-9a3d-ced7155bbd03}">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY SegmentsToCutY : INT
+]]></Declaration>
+      <Get Name="Get" Id="{dd01e30b-5156-462c-981f-e1777bde948b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="SegmentsToGroove" Id="{e4a3954d-3a1b-4d86-a891-2e859afd79f8}">
+      <Declaration><![CDATA[{warning 'add property implementation'}
+PROPERTY SegmentsToGroove : INT
+]]></Declaration>
+      <Get Name="Get" Id="{166af98c-be7e-4a9c-8000-ac82596ec13a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_RecipeBuilderWings">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.Build">
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.HMICommunication">
+      <LineId Id="6" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.RestorePersistentData">
+      <LineId Id="30" Count="5" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.SegmentsCutX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.SegmentsCutY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.SegmentsGroove.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.SegmentsToCutX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.SegmentsToCutY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.SegmentsToGroove.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

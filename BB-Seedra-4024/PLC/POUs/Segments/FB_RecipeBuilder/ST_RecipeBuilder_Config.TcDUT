@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <DUT Name="ST_RecipeBuilder_Config" Id="{dbdbd64a-f55f-4772-a86a-1207ae4f3c57}">
+    <Declaration><![CDATA[TYPE ST_RecipeBuilder_Config :
+    STRUCT
+	PanelFrontLength : REAL;
+	PanelFrontWidht : REAL;
+	PanelHeight : REAL;
+	RailHeightCorrection :REAL;
+    END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <Itf Name="I_RecipeBuilder" Id="{a1b2c3d4-1111-4222-b333-c4d5e6f7a8b9}">
+    <Declaration><![CDATA[INTERFACE I_RecipeBuilder]]></Declaration>
+    <Method Name="Build" Id="{b2c3d4e5-2222-4333-c444-d5e6f7a8b9c0}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+VAR_INPUT
+	PanelWidth	: REAL;
+	PanelLength	: REAL;
+	PanelHeight	: REAL;
+	CuttingOverpass	: REAL;
+	RailHeightCorrection	: REAL;
+END_VAR]]></Declaration>
+    </Method>
+    <Property Name="SegmentsCutX" Id="{a7b8c9d0-7777-4888-b999-c0d1e2f3a4b5}">
+      <Declaration><![CDATA[PROPERTY SegmentsCutX : ARRAY [1..32] OF ST_CutSegment]]></Declaration>
+      <Get Name="Get" Id="{b8c9d0e1-8888-4999-c000-d1e2f3a4b5c6}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="SegmentsCutY" Id="{e1f2a3b4-bbbb-4ccc-f333-a4b5c6d7e8f9}">
+      <Declaration><![CDATA[PROPERTY SegmentsCutY : ARRAY [1..32] OF ST_CutSegment]]></Declaration>
+      <Get Name="Get" Id="{f2a3b4c5-cccc-4ddd-a444-b5c6d7e8f9a0}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="SegmentsGroove" Id="{c3d4e5f6-3333-4444-d555-e6f7a8b9c0d1}">
+      <Declaration><![CDATA[PROPERTY SegmentsGroove : ARRAY [1..32] OF ST_CutSegment]]></Declaration>
+      <Get Name="Get" Id="{d4e5f6a7-4444-4555-e666-f7a8b9c0d1e2}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="SegmentsToCutX" Id="{c9d0e1f2-9999-4aaa-d111-e2f3a4b5c6d7}">
+      <Declaration><![CDATA[PROPERTY SegmentsToCutX : INT]]></Declaration>
+      <Get Name="Get" Id="{d0e1f2a3-aaaa-4bbb-e222-f3a4b5c6d7e8}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="SegmentsToCutY" Id="{a3b4c5d6-dddd-4eee-b555-c6d7e8f9a0b1}">
+      <Declaration><![CDATA[PROPERTY SegmentsToCutY : INT]]></Declaration>
+      <Get Name="Get" Id="{b4c5d6e7-eeee-4fff-c666-d7e8f9a0b1c2}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="SegmentsToGroove" Id="{e5f6a7b8-5555-4666-f777-a8b9c0d1e2f3}">
+      <Declaration><![CDATA[PROPERTY SegmentsToGroove : INT]]></Declaration>
+      <Get Name="Get" Id="{f6a7b8c9-6666-4777-a888-b9c0d1e2f3a4}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+  </Itf>
+</TcPlcObject>

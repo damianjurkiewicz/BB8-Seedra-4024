@@ -94,6 +94,18 @@
     <Compile Include="POUs\SAFETY.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Segments\FB_RecipeBuilder\FB_RecipeBuilderWings.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Segments\FB_RecipeBuilder\ST_RecipeBuilder_Config.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Segments\FB_RecipeBuilder\ST_RecipeBuilder_HMI.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Segments\I_RecipeBuilder.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Segments\ST_CutSegment.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -153,6 +165,7 @@
     <Folder Include="GVLs" />
     <Folder Include="POUs\Components" />
     <Folder Include="POUs\Segments" />
+    <Folder Include="POUs\Segments\FB_RecipeBuilder" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
     <Folder Include="VISUs\Modes" />

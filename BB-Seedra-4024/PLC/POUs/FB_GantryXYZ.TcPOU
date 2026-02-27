@@ -49,6 +49,7 @@ VAR
 	ExecutorStep :				INT := 0;
 	
 	GantryXYZ_HMI : ST_GantryXYZ_HMI;
+	RecipeBuilder_HMI : ST_RecipeBuilder_HMI;
 	
 	//Test
 	fbHomeStratX : FB_Homing_StandardNC;
@@ -1425,11 +1426,7 @@ _GrooveDepthZ         := GantryXYZ_HMI.Config.GrooveDepthZ;
 _GroovingSpeedX       := GantryXYZ_HMI.Config.GroovingSpeedX;
 _GroovingSpeedY       := GantryXYZ_HMI.Config.GroovingSpeedY;
 _GroovingSpeedZ       := GantryXYZ_HMI.Config.GroovingSpeedZ;
-_PanelFrontWidth      := GantryXYZ_HMI.Config.PanelFrontWidht;
-_PanelFrontLength     := GantryXYZ_HMI.Config.PanelFrontLength;
-_PanelHeight          := GantryXYZ_HMI.Config.PanelHeight;
 _ProgramIdRequested   := GantryXYZ_HMI.Command.ProgramIdRequested;
-_RailHeightCorrection := GantryXYZ_HMI.Config.RailHeightCorrection;
 _RapidSpeedX          := GantryXYZ_HMI.Config.RapidSpeedX;
 _RapidSpeedY          := GantryXYZ_HMI.Config.RapidSpeedY;
 _RapidSpeedZ          := GantryXYZ_HMI.Config.RapidSpeedZ;
@@ -1437,8 +1434,10 @@ _GroovingIdleTime     := GantryXYZ_HMI.Config.GroovingIdleTime;
 _GroovingOverpass     := GantryXYZ_HMI.Config.GroovingOverpass;
 _GlobalOffset		  := GantryXYZ_HMI.Config.GlobalOffset;
 
-
-
+_PanelFrontWidth      := GantryXYZ_HMI.Config.PanelFrontWidht;
+_PanelFrontLength     := GantryXYZ_HMI.Config.PanelFrontLength;
+_PanelHeight          := GantryXYZ_HMI.Config.PanelHeight;
+_RailHeightCorrection := GantryXYZ_HMI.Config.RailHeightCorrection;
 
 ]]></ST>
       </Implementation>
@@ -2385,16 +2384,20 @@ GantryXYZ_HMI.Config.GroovingSpeedY       := _GroovingSpeedY;
 GantryXYZ_HMI.Config.GroovingSpeedZ       := _GroovingSpeedZ;
 GantryXYZ_HMI.Config.GroovingIdleTime     := _GroovingIdleTime;
 GantryXYZ_HMI.Config.GroovingOverpass     := _GroovingOverpass;
-GantryXYZ_HMI.Config.PanelFrontLength     := _PanelFrontLength;
-GantryXYZ_HMI.Config.PanelFrontWidht      := _PanelFrontWidth;
-GantryXYZ_HMI.Config.PanelHeight          := _PanelHeight;
-GantryXYZ_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
 GantryXYZ_HMI.Config.RapidSpeedX          := _RapidSpeedX;
 GantryXYZ_HMI.Config.RapidSpeedY          := _RapidSpeedY;
 GantryXYZ_HMI.Config.RapidSpeedZ          := _RapidSpeedZ;
 GantryXYZ_HMI.Config.GlobalOffset		  := _GlobalOffset;
 
+GantryXYZ_HMI.Config.PanelFrontLength     := _PanelFrontLength;
+GantryXYZ_HMI.Config.PanelFrontWidht      := _PanelFrontWidth;
+GantryXYZ_HMI.Config.PanelHeight          := _PanelHeight;
+GantryXYZ_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
 
+RecipeBuilder_HMI.Config.PanelFrontLength := _PanelFrontLength;
+RecipeBuilder_HMI.Config.PanelFrontWidht  := _PanelFrontWidth;
+RecipeBuilder_HMI.Config.PanelHeight 	  := _PanelHeight;
+RecipeBuilder_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
 
 RestorePersistentData := TRUE;]]></ST>
       </Implementation>
@@ -2759,14 +2762,15 @@ END_IF]]></ST>
       <LineId Id="92" Count="0" />
       <LineId Id="70" Count="0" />
       <LineId Id="94" Count="1" />
-      <LineId Id="77" Count="6" />
+      <LineId Id="77" Count="3" />
       <LineId Id="109" Count="0" />
-      <LineId Id="103" Count="0" />
       <LineId Id="85" Count="1" />
       <LineId Id="104" Count="0" />
       <LineId Id="88" Count="0" />
       <LineId Id="27" Count="0" />
-      <LineId Id="113" Count="2" />
+      <LineId Id="113" Count="1" />
+      <LineId Id="119" Count="1" />
+      <LineId Id="115" Count="0" />
       <LineId Id="38" Count="0" />
       <LineId Id="41" Count="0" />
       <LineId Id="37" Count="0" />
@@ -2972,11 +2976,16 @@ END_IF]]></ST>
       <LineId Id="27" Count="3" />
       <LineId Id="48" Count="0" />
       <LineId Id="47" Count="0" />
-      <LineId Id="43" Count="0" />
-      <LineId Id="31" Count="0" />
-      <LineId Id="33" Count="4" />
-      <LineId Id="59" Count="1" />
+      <LineId Id="35" Count="2" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="63" Count="2" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="69" Count="0" />
       <LineId Id="14" Count="0" />
+      <LineId Id="70" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="6" Count="0" />
     </LineIds>
