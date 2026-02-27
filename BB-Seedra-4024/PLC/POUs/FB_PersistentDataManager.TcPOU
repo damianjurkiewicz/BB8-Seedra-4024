@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_PersistentDataManager" Id="{4ed47747-e9e7-4807-96fb-1abdb1959994}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_PersistentDataManager
+VAR
+	_PanelFrontLength :REAL := 1000.0;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="PanelFrontLength" Id="{ec437699-0ade-47f1-9695-bd6a4e131cab}">
+      <Declaration><![CDATA[PROPERTY PanelFrontLength : REAL]]></Declaration>
+      <Get Name="Get" Id="{c21d0621-6af8-425c-b89d-8ca4ccb651e7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[PanelFrontLength := _PanelFrontLength;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{9e692b1b-cce6-4edc-865b-4e54ac31a676}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_PanelFrontLength := PanelFrontLength;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_PersistentDataManager">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PersistentDataManager.PanelFrontLength.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PersistentDataManager.PanelFrontLength.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

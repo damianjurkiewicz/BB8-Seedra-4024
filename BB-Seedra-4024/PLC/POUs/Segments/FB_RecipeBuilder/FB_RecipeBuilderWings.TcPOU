@@ -5,13 +5,12 @@
 
 VAR
 	RecipeBuilder_HMI: ST_RecipeBuilder_HMI;
-
+	_PanelFrontLength		:REAL;  
 
 END_VAR
 
 VAR PERSISTENT
-	_PanelFrontWidth		:REAL;    
-	_PanelFrontLength		:REAL;    
+	_PanelFrontWidth		:REAL;      
 	_PanelHeight			:REAL;    
 	_RailHeightCorrection	:REAL;
 END_VAR]]></Declaration>
@@ -30,7 +29,8 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[
+Trace(Message:= CONCAT('The value is: ', TO_STRING(PanelFrontLength)));]]></ST>
       </Implementation>
     </Method>
     <Method Name="HMICommunication" Id="{5b58a0e6-30db-439b-a833-a33f4b223005}">
@@ -47,20 +47,28 @@ _RailHeightCorrection := RecipeBuilder_HMI.Config.RailHeightCorrection;
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="RestorePersistentData" Id="{12bd1134-b217-4197-a3c0-7b0f777de601}">
-      <Declaration><![CDATA[METHOD PUBLIC RestorePersistentData  : BOOL
-//Only _Variables are PERSISTENT, This method is executed during the initialization
+    <Property Name="PanelFrontLength" Id="{fc260de5-176f-4a8a-b82a-4db348843d9c}">
+      <Declaration><![CDATA[PROPERTY PanelFrontLength : REAL]]></Declaration>
+      <Get Name="Get" Id="{4f7cd8be-1e2f-4629-8efe-39a90ee45bee}">
+        <Declaration><![CDATA[VAR
+END_VAR
 ]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[
-RecipeBuilder_HMI.Config.PanelFrontLength := _PanelFrontLength;
-RecipeBuilder_HMI.Config.PanelFrontWidht  := _PanelFrontWidth;
-RecipeBuilder_HMI.Config.PanelHeight 	  := _PanelHeight;
-RecipeBuilder_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
-
-RestorePersistentData := TRUE;]]></ST>
-      </Implementation>
-    </Method>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{168e91f8-fc6b-4d27-a3d7-d2cd7e0d0d2f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[// SET
+_PanelFrontLength := PanelFrontLength;
+// Możesz tu od razu zaktualizować HMI, jeśli wolisz:
+RecipeBuilder_HMI.Config.PanelFrontLength := _PanelFrontLength;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="SegmentsCutX" Id="{9152e646-9866-44c9-b9e6-5a764990d7d4}">
       <Declaration><![CDATA[{warning 'add property implementation'}
 PROPERTY SegmentsCutX : ARRAY [1..32] OF ST_CutSegment
@@ -143,15 +151,19 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderWings.Build">
+      <LineId Id="21" Count="0" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderWings.HMICommunication">
       <LineId Id="6" Count="3" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderWings.RestorePersistentData">
-      <LineId Id="30" Count="5" />
-      <LineId Id="5" Count="0" />
+    <LineIds Name="FB_RecipeBuilderWings.PanelFrontLength.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.PanelFrontLength.Set">
+      <LineId Id="5" Count="2" />
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderWings.SegmentsCutX.Get">
       <LineId Id="2" Count="0" />
