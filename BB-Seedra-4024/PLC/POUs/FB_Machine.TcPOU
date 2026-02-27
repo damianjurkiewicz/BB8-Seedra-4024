@@ -253,8 +253,8 @@ METHOD PROTECTED ModeChanged
 VAR_INPUT
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[Trace('Mode was changed - ABORTING');
-ChangeState(E_PMLCommand.ePMLCommand_Abort);]]></ST>
+        <ST><![CDATA[//Trace('Mode was changed - ABORTING');
+//ChangeState(E_PMLCommand.ePMLCommand_Abort);]]></ST>
       </Implementation>
     </Method>
     <Method Name="Resetting" Id="{e510dc83-237a-4a59-97e9-db4b9408b4b7}" FolderPath="States\">
