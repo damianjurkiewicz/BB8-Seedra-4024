@@ -75,6 +75,7 @@ VAR PERSISTENT
 	_GroovingIdleTime 		:REAL;
     _GroovingOverpass 		:REAL;
     _PanelFrontWidth 		:REAL;
+	_PanelFrontLength		:REAL;
     _PanelHeight 			:REAL;
     _RailHeightCorrection	:REAL;
     _RapidSpeedX 			:REAL;
@@ -1948,7 +1949,7 @@ END_VAR
 E_RecipeID.eBorgoWings:
     // Sprawdzamy, czy maszyna "podpięła" nam buildera i czy wskaźnik nie jest pusty
     IF _RecipeBuilder <> 0 THEN
-        // Wywołanie metody Build przez zmienną wewnętrzną wskaźnika
+        // Wywołanie metody Build przez zmienną wewnętrzną wskaźnika// TUTAJ NIE SĄ PODPIETE ZMIENNE Z NOWEGO RECIPEBUILDERA
         IF _RecipeBuilder^.Build(
             PanelWidth           := _PanelFrontWidth, 
             PanelLength          := 0, // Przykładowa wartość
