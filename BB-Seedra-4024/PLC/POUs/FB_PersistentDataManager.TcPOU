@@ -2,8 +2,8 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_PersistentDataManager" Id="{4ed47747-e9e7-4807-96fb-1abdb1959994}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_PersistentDataManager
-VAR
-	_PanelFrontLength :REAL := 1000.0;
+VAR PERSISTENT
+	_PanelFrontLength :REAL;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
