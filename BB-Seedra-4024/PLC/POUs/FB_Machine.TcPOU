@@ -92,7 +92,7 @@ SUPER^.CyclicLogic();
 
 
 // Przpisanie Wartości z HMI do persistent
-ConfigManager.PanelFrontLength := RecipeBuilderWings.RecipeBuilder_HMI.Config.PanelFrontLength;
+ConfigManager.Config := RecipeBuilderWings.RecipeBuilder_HMI.Config;
 // W CyclicLogic maszyny czytasz to, co operator wpisał w stare pole Gantry:
 //ConfigManager.PanelFrontLength := GantryXYZ.GantryXYZ_HMI.Config.PanelFrontLength;
 
@@ -250,7 +250,7 @@ CASE DescendantSequenceState OF
 	40: 
 		// WSTRZYKNIĘCIE ZALEŻNOŚCI (Property Injection)
         // Bierzemy zapisaną wartość z ConfigManagera i wstrzykujemy do Buildera
-		RecipeBuilderWings.PanelFrontLength := ConfigManager.PanelFrontLength;
+		RecipeBuilderWings.Config := ConfigManager.Config;
         DescendantSequenceState := DescendantSequenceState + 10;	
 		
     50:

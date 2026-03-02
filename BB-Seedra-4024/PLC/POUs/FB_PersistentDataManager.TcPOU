@@ -4,36 +4,37 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_PersistentDataManager
 VAR PERSISTENT
 	_PanelFrontLength :REAL;
+	_Config : ST_REcipeBuilder_Config;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Property Name="PanelFrontLength" Id="{ec437699-0ade-47f1-9695-bd6a4e131cab}">
-      <Declaration><![CDATA[PROPERTY PanelFrontLength : REAL]]></Declaration>
-      <Get Name="Get" Id="{c21d0621-6af8-425c-b89d-8ca4ccb651e7}">
+    <Property Name="Config" Id="{1a5d92ef-6b65-43a4-903f-d617f66a22f2}">
+      <Declaration><![CDATA[PROPERTY Config : ST_RecipeBuilder_Config]]></Declaration>
+      <Get Name="Get" Id="{9300e8ec-af0f-4824-bd13-92b6592fc495}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[PanelFrontLength := _PanelFrontLength;]]></ST>
+          <ST><![CDATA[Config := _Config;]]></ST>
         </Implementation>
       </Get>
-      <Set Name="Set" Id="{9e692b1b-cce6-4edc-865b-4e54ac31a676}">
+      <Set Name="Set" Id="{4e6adcec-48a4-45cf-8715-df36f2a76f6a}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[_PanelFrontLength := PanelFrontLength;]]></ST>
+          <ST><![CDATA[_Config := Config;]]></ST>
         </Implementation>
       </Set>
     </Property>
     <LineIds Name="FB_PersistentDataManager">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_PersistentDataManager.PanelFrontLength.Get">
+    <LineIds Name="FB_PersistentDataManager.Config.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_PersistentDataManager.PanelFrontLength.Set">
+    <LineIds Name="FB_PersistentDataManager.Config.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

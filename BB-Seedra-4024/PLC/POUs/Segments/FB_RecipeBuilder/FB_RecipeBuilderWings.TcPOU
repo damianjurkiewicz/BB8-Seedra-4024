@@ -5,15 +5,14 @@
 
 VAR
 	RecipeBuilder_HMI: ST_RecipeBuilder_HMI;
+	_Config					:ST_RecipeBuilder_Config;
 	_PanelFrontLength		:REAL;  
-
-END_VAR
-
-VAR PERSISTENT
 	_PanelFrontWidth		:REAL;      
 	_PanelHeight			:REAL;    
 	_RailHeightCorrection	:REAL;
-END_VAR]]></Declaration>
+END_VAR
+
+]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
@@ -29,9 +28,28 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[
-Trace(Message:= CONCAT('The value is: ', TO_STRING(PanelFrontLength)));]]></ST>
+]]></ST>
       </Implementation>
     </Method>
+    <Property Name="Config" Id="{e53be9fd-6b88-49c9-8736-ae6ec54e43d8}">
+      <Declaration><![CDATA[PROPERTY Config : ST_RecipeBuilder_Config]]></Declaration>
+      <Get Name="Get" Id="{0bd9a01b-52a6-47dd-b6fc-d6ccf0a489a9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Config := _Config;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{e2eb298e-f304-4e9d-ab04-77a183356e49}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Config := Config;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="HMICommunication" Id="{5b58a0e6-30db-439b-a833-a33f4b223005}">
       <Declaration><![CDATA[// Provides interlocks for HMI control and updates HMI status information for this module
 METHOD PROTECTED HMICommunication
@@ -46,28 +64,6 @@ _RailHeightCorrection := RecipeBuilder_HMI.Config.RailHeightCorrection;
 ]]></ST>
       </Implementation>
     </Method>
-    <Property Name="PanelFrontLength" Id="{fc260de5-176f-4a8a-b82a-4db348843d9c}">
-      <Declaration><![CDATA[PROPERTY PanelFrontLength : REAL]]></Declaration>
-      <Get Name="Get" Id="{4f7cd8be-1e2f-4629-8efe-39a90ee45bee}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{168e91f8-fc6b-4d27-a3d7-d2cd7e0d0d2f}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[// SET
-_PanelFrontLength := PanelFrontLength;
-// Możesz tu od razu zaktualizować HMI, jeśli wolisz:
-RecipeBuilder_HMI.Config.PanelFrontLength := _PanelFrontLength;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <Property Name="SegmentsCutX" Id="{9152e646-9866-44c9-b9e6-5a764990d7d4}">
       <Declaration><![CDATA[PROPERTY SegmentsCutX : ARRAY [1..32] OF ST_CutSegment
 ]]></Declaration>
@@ -151,16 +147,15 @@ END_VAR
       <LineId Id="21" Count="0" />
       <LineId Id="11" Count="0" />
     </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.Config.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderWings.Config.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_RecipeBuilderWings.HMICommunication">
       <LineId Id="6" Count="3" />
       <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_RecipeBuilderWings.PanelFrontLength.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_RecipeBuilderWings.PanelFrontLength.Set">
-      <LineId Id="5" Count="2" />
-      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderWings.SegmentsCutX.Get">
       <LineId Id="2" Count="0" />

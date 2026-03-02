@@ -5,8 +5,8 @@
 FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule
 VAR
     // Sub module definitions here
-	RecipeBuilder :FB_RecipeBuilderWings;
-	Kot 	:ST_RecipeBuilder_HMI;
+	RecipeBuilder	:FB_RecipeBuilderWings;
+
 	
 	// List of sub modules
     ipSubModules_Init : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
@@ -75,7 +75,6 @@ VAR PERSISTENT
 	_GroovingIdleTime 		:REAL;
     _GroovingOverpass 		:REAL;
     _PanelFrontWidth 		:REAL;
-    _PanelFrontLength 		:REAL;
     _PanelHeight 			:REAL;
     _RailHeightCorrection	:REAL;
     _RapidSpeedX 			:REAL;
@@ -248,7 +247,7 @@ VAR_INST
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[//Natural language parameters;
-TotalY := PanelFrontLength + 2 * _PanelHeight;
+//TotalY := PanelFrontLength + 2 * _PanelHeight;
 TotalX := PanelFrontWidth + 2 * _PanelHeight;
 ShorterY := TotalY - _PanelHeight;
 ShorterX := TotalX - _PanelHeight;
@@ -309,7 +308,7 @@ END_VAR
 // It means we have to make flaps shorter]]></Declaration>
       <Implementation>
         <ST><![CDATA[//Natural language parameters;
-TotalY := PanelFrontLength + 2 * _PanelHeight;
+//TotalY := PanelFrontLength + 2 * _PanelHeight;
 TotalX := PanelFrontWidth + 2 * _PanelHeight;
 ShorterY := TotalY - _PanelHeight;
 ShorterX := TotalX - _PanelHeight;
@@ -1436,7 +1435,7 @@ _GroovingOverpass     := GantryXYZ_HMI.Config.GroovingOverpass;
 _GlobalOffset		  := GantryXYZ_HMI.Config.GlobalOffset;
 
 _PanelFrontWidth      := GantryXYZ_HMI.Config.PanelFrontWidht;
-_PanelFrontLength     := GantryXYZ_HMI.Config.PanelFrontLength;
+
 _PanelHeight          := GantryXYZ_HMI.Config.PanelHeight;
 _RailHeightCorrection := GantryXYZ_HMI.Config.RailHeightCorrection;
 
@@ -1975,23 +1974,6 @@ END_VAR
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="PanelFrontLength" Id="{d37d1986-191c-4359-b366-a37c4466a7c4}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontLength : REAL]]></Declaration>
-      <Get Name="Get" Id="{719609b4-0075-4953-8df2-a544ce507b40}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[PanelFrontLength := _PanelFrontLength;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{d74bf0f0-654e-45df-b754-63029e5c2a12}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_PanelFrontLength := PanelFrontLength;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <Property Name="PanelFrontWidth" Id="{f3e0dbc8-c3fa-460e-86ce-eb87111125e9}" FolderPath="Properties\Config\">
       <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontWidth : REAL]]></Declaration>
       <Get Name="Get" Id="{337b7ccf-7529-41b1-81a1-e9c0f98de875}">
@@ -2390,7 +2372,7 @@ GantryXYZ_HMI.Config.RapidSpeedY          := _RapidSpeedY;
 GantryXYZ_HMI.Config.RapidSpeedZ          := _RapidSpeedZ;
 GantryXYZ_HMI.Config.GlobalOffset		  := _GlobalOffset;
 
-GantryXYZ_HMI.Config.PanelFrontLength     := _PanelFrontLength;
+//GantryXYZ_HMI.Config.PanelFrontLength     := _PanelFrontLength;
 GantryXYZ_HMI.Config.PanelFrontWidht      := _PanelFrontWidth;
 GantryXYZ_HMI.Config.PanelHeight          := _PanelHeight;
 GantryXYZ_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
@@ -2851,13 +2833,6 @@ END_IF]]></ST>
       <LineId Id="2946" Count="0" />
       <LineId Id="2936" Count="4" />
       <LineId Id="19" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.PanelFrontLength.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.PanelFrontLength.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.PanelFrontWidth.Get">
       <LineId Id="2" Count="0" />
