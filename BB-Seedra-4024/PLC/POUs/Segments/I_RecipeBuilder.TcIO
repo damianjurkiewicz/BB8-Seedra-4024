@@ -12,6 +12,15 @@ VAR_INPUT
 	RailHeightCorrection	: REAL;
 END_VAR]]></Declaration>
     </Method>
+    <Property Name="Config" Id="{41a1f94d-1ba6-473a-8fd2-d71e6a5c7ac8}">
+      <Declaration><![CDATA[PROPERTY Config : ST_RecipeBuilder_Config]]></Declaration>
+      <Get Name="Get" Id="{9b92c909-482e-45d4-839d-e73654fca949}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{e3c0a41f-b8d2-4dbf-bb3c-74c7ca0bddef}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="SegmentsCutX" Id="{a7b8c9d0-7777-4888-b999-c0d1e2f3a4b5}">
       <Declaration><![CDATA[PROPERTY SegmentsCutX : ARRAY [1..32] OF ST_CutSegment]]></Declaration>
       <Get Name="Get" Id="{b8c9d0e1-8888-4999-c000-d1e2f3a4b5c6}">

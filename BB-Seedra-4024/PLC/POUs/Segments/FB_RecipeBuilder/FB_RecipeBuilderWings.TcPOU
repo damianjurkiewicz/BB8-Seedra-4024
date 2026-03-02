@@ -46,7 +46,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[_Config := Config;]]></ST>
+          <ST><![CDATA[RecipeBuilder_HMI.Config := Config;]]></ST>
         </Implementation>
       </Set>
     </Property>
