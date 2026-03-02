@@ -51,7 +51,6 @@ VAR
 	ExecutorStep :				INT := 0;
 	
 	GantryXYZ_HMI : ST_GantryXYZ_HMI;
-	RecipeBuilder_HMI : ST_RecipeBuilder_HMI;
 	
 	//Test
 	fbHomeStratX : FB_Homing_StandardNC;
@@ -2396,10 +2395,6 @@ GantryXYZ_HMI.Config.PanelFrontWidht      := _PanelFrontWidth;
 GantryXYZ_HMI.Config.PanelHeight          := _PanelHeight;
 GantryXYZ_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
 
-RecipeBuilder_HMI.Config.PanelFrontLength := _PanelFrontLength;
-RecipeBuilder_HMI.Config.PanelFrontWidht  := _PanelFrontWidth;
-RecipeBuilder_HMI.Config.PanelHeight 	  := _PanelHeight;
-RecipeBuilder_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
 
 RestorePersistentData := TRUE;]]></ST>
       </Implementation>
@@ -2984,10 +2979,6 @@ END_IF]]></ST>
       <LineId Id="63" Count="2" />
       <LineId Id="60" Count="0" />
       <LineId Id="68" Count="0" />
-      <LineId Id="67" Count="0" />
-      <LineId Id="69" Count="0" />
-      <LineId Id="14" Count="0" />
-      <LineId Id="70" Count="0" />
       <LineId Id="9" Count="0" />
       <LineId Id="6" Count="0" />
     </LineIds>

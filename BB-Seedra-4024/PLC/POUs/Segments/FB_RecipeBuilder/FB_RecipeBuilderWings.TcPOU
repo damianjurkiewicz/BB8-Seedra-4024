@@ -18,8 +18,7 @@ END_VAR]]></Declaration>
       <ST><![CDATA[]]></ST>
     </Implementation>
     <Method Name="Build" Id="{c08ade7c-db75-4c50-8457-5bb392619adf}">
-      <Declaration><![CDATA[{warning 'add method implementation '}
-METHOD Build : BOOL
+      <Declaration><![CDATA[METHOD Build : BOOL
 VAR_INPUT
 	PanelWidth	: REAL;
 	PanelLength	: REAL;
@@ -70,8 +69,7 @@ RecipeBuilder_HMI.Config.PanelFrontLength := _PanelFrontLength;]]></ST>
       </Set>
     </Property>
     <Property Name="SegmentsCutX" Id="{9152e646-9866-44c9-b9e6-5a764990d7d4}">
-      <Declaration><![CDATA[{warning 'add property implementation'}
-PROPERTY SegmentsCutX : ARRAY [1..32] OF ST_CutSegment
+      <Declaration><![CDATA[PROPERTY SegmentsCutX : ARRAY [1..32] OF ST_CutSegment
 ]]></Declaration>
       <Get Name="Get" Id="{8272f94b-fbfa-4156-a332-efb73ed5cf2e}">
         <Declaration><![CDATA[VAR
@@ -83,8 +81,7 @@ END_VAR
       </Get>
     </Property>
     <Property Name="SegmentsCutY" Id="{255ca92b-c547-401c-9784-b32df54e5e2a}">
-      <Declaration><![CDATA[{warning 'add property implementation'}
-PROPERTY SegmentsCutY : ARRAY [1..32] OF ST_CutSegment
+      <Declaration><![CDATA[PROPERTY SegmentsCutY : ARRAY [1..32] OF ST_CutSegment
 ]]></Declaration>
       <Get Name="Get" Id="{4b559848-f1de-4c18-834d-4d2909a2699d}">
         <Declaration><![CDATA[VAR
@@ -96,7 +93,7 @@ END_VAR
       </Get>
     </Property>
     <Property Name="SegmentsGroove" Id="{a6cc8c84-07e4-4531-824b-69c46a3f14a3}">
-      <Declaration><![CDATA[{warning 'add property implementation'}
+      <Declaration><![CDATA[
 PROPERTY SegmentsGroove : ARRAY [1..32] OF ST_CutSegment
 ]]></Declaration>
       <Get Name="Get" Id="{7a846cca-77b5-4d85-b851-6d33d3df4235}">
@@ -109,7 +106,7 @@ END_VAR
       </Get>
     </Property>
     <Property Name="SegmentsToCutX" Id="{e45efa5d-ccfc-458e-9811-5f080acfb1d1}">
-      <Declaration><![CDATA[{warning 'add property implementation'}
+      <Declaration><![CDATA[
 PROPERTY SegmentsToCutX : INT
 ]]></Declaration>
       <Get Name="Get" Id="{58e9fc3c-a2ea-47ff-862f-fb085769cffc}">
@@ -122,7 +119,7 @@ END_VAR
       </Get>
     </Property>
     <Property Name="SegmentsToCutY" Id="{0f05ab0b-f50d-4ba7-9a3d-ced7155bbd03}">
-      <Declaration><![CDATA[{warning 'add property implementation'}
+      <Declaration><![CDATA[
 PROPERTY SegmentsToCutY : INT
 ]]></Declaration>
       <Get Name="Get" Id="{dd01e30b-5156-462c-981f-e1777bde948b}">
@@ -135,7 +132,7 @@ END_VAR
       </Get>
     </Property>
     <Property Name="SegmentsToGroove" Id="{e4a3954d-3a1b-4d86-a891-2e859afd79f8}">
-      <Declaration><![CDATA[{warning 'add property implementation'}
+      <Declaration><![CDATA[
 PROPERTY SegmentsToGroove : INT
 ]]></Declaration>
       <Get Name="Get" Id="{166af98c-be7e-4a9c-8000-ac82596ec13a}">

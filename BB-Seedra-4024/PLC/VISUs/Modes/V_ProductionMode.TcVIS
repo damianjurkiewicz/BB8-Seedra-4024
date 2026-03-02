@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"21"</v>
+          <v n="UniqueIdGenerator">"22"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -1055,7 +1055,7 @@
                           </o>
                           <o>
                             <v n="Flags">2L</v>
-                            <n n="BasicTypeNodeValue" />
+                            <v n="BasicTypeNodeValue">"MAIN.Seedra.RecipeBuilderWings.RecipeBuilder_HMI"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1328,6 +1328,10 @@
                     <o>
                       <v n="Id">3596346601L</v>
                       <v n="Value">"MAIN.Seedra.GantryXYZ.GantryXYZ_HMI"</v>
+                    </o>
+                    <o>
+                      <v n="Id">3843536458L</v>
+                      <v n="Value">"MAIN.Seedra.RecipeBuilderWings.RecipeBuilder_HMI"</v>
                     </o>
                   </l>
                 </o>
@@ -3658,6 +3662,11 @@
                 <v n="Id">21L</v>
                 <n n="Tag" />
                 <v n="Text">"	HMI_GantryXYZ : ST_GantryXYZ_HMI;"</v>
+              </o>
+              <o>
+                <v n="Id">22L</v>
+                <n n="Tag" />
+                <v n="Text">"	HMI_Test : ST_RecipeBuilder_HMI;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>
