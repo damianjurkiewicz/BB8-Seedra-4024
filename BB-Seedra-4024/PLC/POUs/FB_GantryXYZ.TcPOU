@@ -233,7 +233,7 @@ SegmentCutX[2].Stop.X  := 0;
 SegmentCutX[2].Stop.Y  := 0;
 
 
-
+Trace('Build Arona');
 BuildSegments_Arona := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -291,7 +291,7 @@ SegmentGrooves[4].Stop.Y := TotalY;
 SegmentsToCutY := 0;
 
 SegmentsToCutX := 0;
-
+Trace('Build Flaps');
 BuildSegments_BorgoFlaps := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -445,7 +445,7 @@ SegmentCutY[6].Start.Y := TotalY + _CuttingOverpass;
 SegmentCutY[6].Stop.Y  := - _CuttingOverpass;
 
 
-
+Trace('Build Wings');
 BuildSegments_BorgoWings := TRUE;
 ]]></ST>
       </Implementation>
@@ -871,217 +871,222 @@ END_CASE]]></ST>
       <Declaration><![CDATA[METHOD ExecuteSegmentsCutX : BOOL
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE ExecutorStep OF
+        <ST><![CDATA[//CASE ExecutorStep OF
 
-// -------- Inicjalizacja pierwszego segmentu --------
-0:
-IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
-			 Trace('SegmentExecutionX');
+//// -------- Inicjalizacja pierwszego segmentu --------
+//0:
+//IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
+//			 Trace('SegmentExecutionX');
 			 
 			 
-    IF SegmentsToCutX <= 0 THEN
-        // Nie ma czego ciąć
-        ExecuteSegmentsCutX := TRUE;
-        RETURN;
-    END_IF;
+//    IF SegmentsToCutX <= 0 THEN
+//        // Nie ma czego ciąć
+//        ExecuteSegmentsCutX := TRUE;
+//        RETURN;
+//    END_IF;
 
-    // Jednorazowe nastawy:
-    AxisX.Acceleration := 500;   AxisX.Deceleration := 8000;
-    AxisY.Acceleration := 500;   AxisY.Deceleration := 8000;
-    AxisZ.Acceleration := 500;   AxisZ.Deceleration := 8000;
+//    // Jednorazowe nastawy:
+//    AxisX.Acceleration := 500;   AxisX.Deceleration := 8000;
+//    AxisY.Acceleration := 500;   AxisY.Deceleration := 8000;
+//    AxisZ.Acceleration := 500;   AxisZ.Deceleration := 8000;
 
-    AxisX.Velocity := _RapidSpeedX;
-    AxisY.Velocity := _RapidSpeedY;
-    AxisZ.Velocity := _RapidSpeedZ;
+//    AxisX.Velocity := _RapidSpeedX;
+//    AxisY.Velocity := _RapidSpeedY;
+//    AxisZ.Velocity := _RapidSpeedZ;
 
-	iSegmentsToCutX := 0;
+//	iSegmentsToCutX := 0;
 	
-	IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
-		iSegmentsToCutX := iSegmentsToCutX + 1;
-		ExecutorStep := 10;
-	END_IF	 
+//	IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
+//		iSegmentsToCutX := iSegmentsToCutX + 1;
+//		ExecutorStep := 10;
+//	END_IF	 
    
-END_IF
+//END_IF
 
-10:
-    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.X + _CutterXOffsetX + _GlobalOffset, 0);
-    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.Y + _CutterXOffsetY + _GlobalOffset, 0);
-    ExecutorStep := 20;
+//10:
+//    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.X + _CutterXOffsetX + _GlobalOffset, 0);
+//    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Start.Y + _CutterXOffsetY + _GlobalOffset, 0);
+//    ExecutorStep := 20;
 
-20: // czekamy na pozycję XY
-    IF AxisX.InPosition AND AxisY.InPosition THEN 
-        ExecutorStep := 30;
-    END_IF
+//20: // czekamy na pozycję XY
+//    IF AxisX.InPosition AND AxisY.InPosition THEN 
+//        ExecutorStep := 30;
+//    END_IF
 
 
-30:
-	CylinderCuttingX.Extend();
-	ExecutorStep := 40;
+//30:
+//	CylinderCuttingX.Extend();
+//	ExecutorStep := 40;
 
-40: 
-	IF CylinderCuttingX.Extended THEN
-	AxisX.Velocity := _CuttingSpeedX;
-	AxisY.Velocity := _CuttingSpeedY;
-	ExecutorStep := 50;
-    END_IF
+//40: 
+//	IF CylinderCuttingX.Extended THEN
+//	AxisX.Velocity := _CuttingSpeedX;
+//	AxisY.Velocity := _CuttingSpeedY;
+//	ExecutorStep := 50;
+//    END_IF
 		
 	
-50:
-   	IF SequenceTimerSeconds(_CuttingIdleTime) THEN
-		ExecutorStep := 60;
-	END_IF
+//50:
+//   	IF SequenceTimerSeconds(_CuttingIdleTime) THEN
+//		ExecutorStep := 60;
+//	END_IF
 
-// -------- Cięcie XY do końca odcinka --------
-60:
-    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.X + _CutterXOffsetX + _GlobalOffset, 0);
-    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.Y + _CutterXOffsetY + _GlobalOffset, 0);
-    ExecutorStep := 70;
+//// -------- Cięcie XY do końca odcinka --------
+//60:
+//    AxisX.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.X + _CutterXOffsetX + _GlobalOffset, 0);
+//    AxisY.MoveAbsolute(SegmentCutX[iSegmentsToCutX].Stop.Y + _CutterXOffsetY + _GlobalOffset, 0);
+//    ExecutorStep := 70;
 
-70: // czekamy na koniec cięcia
-    IF AxisX.InPosition AND AxisY.InPosition THEN
-        ExecutorStep := 80;
-    END_IF
+//70: // czekamy na koniec cięcia
+//    IF AxisX.InPosition AND AxisY.InPosition THEN
+//        ExecutorStep := 80;
+//    END_IF
 
-// -------- Retrakt Z i przygotowanie następnego --------
-80:
-	CylinderCuttingX.Retract();
-		ExecutorStep := 85;
+//// -------- Retrakt Z i przygotowanie następnego --------
+//80:
+//	CylinderCuttingX.Retract();
+//		ExecutorStep := 85;
 	
-85: 
-	IF CylinderCuttingX.Retracted THEN
-		 iSegmentsToCutX := iSegmentsToCutX + 1; 
-		 ExecutorStep := 90;
-	END_IF	
+//85: 
+//	IF CylinderCuttingX.Retracted THEN
+//		 iSegmentsToCutX := iSegmentsToCutX + 1; 
+//		 ExecutorStep := 90;
+//	END_IF	
 
-90:
-    IF SequenceTimerSeconds(_CuttingIdleTime) THEN
-        AxisX.Velocity := _RapidSpeedX;
-        AxisY.Velocity := _RapidSpeedY;
+//90:
+//    IF SequenceTimerSeconds(_CuttingIdleTime) THEN
+//        AxisX.Velocity := _RapidSpeedX;
+//        AxisY.Velocity := _RapidSpeedY;
 
         
-        IF iSegmentsToCutX > SegmentsToCutX THEN
-            ExecutorStep := 1000; // koniec
-        ELSE
-            ExecutorStep := 10;   // następny odcinek
-        END_IF
-    END_IF
+//        IF iSegmentsToCutX > SegmentsToCutX THEN
+//            ExecutorStep := 1000; // koniec
+//        ELSE
+//            ExecutorStep := 10;   // następny odcinek
+//        END_IF
+//    END_IF
 
-// -------- Zakończenie --------
-1000:
-	ExecutorStep := 0;
-	Trace('SegmentExecutionX-FINISHED');
-    ExecuteSegmentsCutX := TRUE;
-END_CASE]]></ST>
+//// -------- Zakończenie --------
+//1000:
+//	ExecutorStep := 0;
+//	Trace('SegmentExecutionX-FINISHED');
+//    ExecuteSegmentsCutX := TRUE;
+
+//END_CASE
+ExecuteSegmentsCutX := TRUE;
+Trace('CutX');]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecuteSegmentsCutY" Id="{dc7ba1fd-c66f-4871-a334-3c135aa8a2cb}" FolderPath="MyMethods\Segments\">
       <Declaration><![CDATA[METHOD ExecuteSegmentsCutY : BOOL
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE ExecutorStep OF
+        <ST><![CDATA[//CASE ExecutorStep OF
 
-// -------- Inicjalizacja pierwszego segmentu --------
-0:
-IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
-			 Trace('SegmentExecutionY');
+//// -------- Inicjalizacja pierwszego segmentu --------
+//0:
+//IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
+//			 Trace('SegmentExecutionY');
 			 
 			 
-    IF SegmentsToCutY <= 0 THEN
-        // Nie ma czego ciąć
-        ExecuteSegmentsCutY := TRUE;
-        RETURN;
-    END_IF;
+//    IF SegmentsToCutY <= 0 THEN
+//        // Nie ma czego ciąć
+//        ExecuteSegmentsCutY := TRUE;
+//        RETURN;
+//    END_IF;
 
-    // Jednorazowe nastawy:
-    AxisX.Acceleration := 500;   AxisX.Deceleration := 8000;
-    AxisY.Acceleration := 500;   AxisY.Deceleration := 8000;
-    AxisZ.Acceleration := 500;   AxisZ.Deceleration := 8000;
+//    // Jednorazowe nastawy:
+//    AxisX.Acceleration := 500;   AxisX.Deceleration := 8000;
+//    AxisY.Acceleration := 500;   AxisY.Deceleration := 8000;
+//    AxisZ.Acceleration := 500;   AxisZ.Deceleration := 8000;
 
-    AxisX.Velocity := _RapidSpeedX;
-    AxisY.Velocity := _RapidSpeedY;
-    AxisZ.Velocity := _RapidSpeedZ;
+//    AxisX.Velocity := _RapidSpeedX;
+//    AxisY.Velocity := _RapidSpeedY;
+//    AxisZ.Velocity := _RapidSpeedZ;
 
-	iSegmentsToCutY := 0;
+//	iSegmentsToCutY := 0;
 	
-	IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
-		iSegmentsToCutY := iSegmentsToCutY + 1;
-		ExecutorStep := 10;
-	END_IF	 
+//	IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
+//		iSegmentsToCutY := iSegmentsToCutY + 1;
+//		ExecutorStep := 10;
+//	END_IF	 
    
-END_IF
+//END_IF
 
-10:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.X + _CutterYOffsetX + _GlobalOffset, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.Y + _CutterYOffsetY + _GlobalOffset, 0);
-    ExecutorStep := 20;
+//10:
+//    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.X + _CutterYOffsetX + _GlobalOffset, 0);
+//    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Start.Y + _CutterYOffsetY + _GlobalOffset, 0);
+//    ExecutorStep := 20;
 
-20: // czekamy na pozycję XY
-    IF AxisX.InPosition AND AxisY.InPosition THEN 
-        ExecutorStep := 30;
-    END_IF
+//20: // czekamy na pozycję XY
+//    IF AxisX.InPosition AND AxisY.InPosition THEN 
+//        ExecutorStep := 30;
+//    END_IF
 
 
-30:
-	CylinderCuttingY.Extend();
-	ExecutorStep := 40;
+//30:
+//	CylinderCuttingY.Extend();
+//	ExecutorStep := 40;
 
-40: 
-	IF CylinderCuttingY.Extended THEN
-    //IF IO.PistonSensorCutY THEN
-	AxisX.Velocity := _CuttingSpeedX;
-	AxisY.Velocity := _CuttingSpeedY;
-	ExecutorStep := 50;
-    END_IF
+//40: 
+//	IF CylinderCuttingY.Extended THEN
+//    //IF IO.PistonSensorCutY THEN
+//	AxisX.Velocity := _CuttingSpeedX;
+//	AxisY.Velocity := _CuttingSpeedY;
+//	ExecutorStep := 50;
+//    END_IF
 		
 	
-50:
-   	IF SequenceTimerSeconds(_CuttingIdleTime) THEN
-		ExecutorStep := 60;
-	END_IF
+//50:
+//   	IF SequenceTimerSeconds(_CuttingIdleTime) THEN
+//		ExecutorStep := 60;
+//	END_IF
 
-// -------- Cięcie XY do końca odcinka --------
-60:
-    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.X + _CutterYOffsetX + _GlobalOffset, 0);
-    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.Y + _CutterYOffsetY + _GlobalOffset, 0);
-    ExecutorStep := 70;
+//// -------- Cięcie XY do końca odcinka --------
+//60:
+//    AxisX.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.X + _CutterYOffsetX + _GlobalOffset, 0);
+//    AxisY.MoveAbsolute(SegmentCutY[iSegmentsToCutY].Stop.Y + _CutterYOffsetY + _GlobalOffset, 0);
+//    ExecutorStep := 70;
 
-70: // czekamy na koniec cięcia
-    IF AxisX.InPosition AND AxisY.InPosition THEN
-        ExecutorStep := 80;
-    END_IF
+//70: // czekamy na koniec cięcia
+//    IF AxisX.InPosition AND AxisY.InPosition THEN
+//        ExecutorStep := 80;
+//    END_IF
 
-// -------- Retrakt Z i przygotowanie następnego --------
-80:
-	CylinderCuttingY.Retract();
-//	IO.PistonValveCutY := FALSE;
-		ExecutorStep := 85;
+//// -------- Retrakt Z i przygotowanie następnego --------
+//80:
+//	CylinderCuttingY.Retract();
+////	IO.PistonValveCutY := FALSE;
+//		ExecutorStep := 85;
 	
-85: 
-	IF CylinderCuttingY.Retracted THEN
-	//IF NOT IO.PistonSensorCutY  THEN
-		 iSegmentsToCutY := iSegmentsToCutY + 1; 
-		 ExecutorStep := 90;
-	END_IF	
+//85: 
+//	IF CylinderCuttingY.Retracted THEN
+//	//IF NOT IO.PistonSensorCutY  THEN
+//		 iSegmentsToCutY := iSegmentsToCutY + 1; 
+//		 ExecutorStep := 90;
+//	END_IF	
 
-90:
-    IF SequenceTimerSeconds(_CuttingIdleTime) THEN
-        AxisX.Velocity := _RapidSpeedX;
-        AxisY.Velocity := _RapidSpeedY;
+//90:
+//    IF SequenceTimerSeconds(_CuttingIdleTime) THEN
+//        AxisX.Velocity := _RapidSpeedX;
+//        AxisY.Velocity := _RapidSpeedY;
 
         
-        IF iSegmentsToCutY > SegmentsToCutY THEN
-            ExecutorStep := 1000; // koniec
-        ELSE
-            ExecutorStep := 10;   // następny odcinek
-        END_IF
-    END_IF
+//        IF iSegmentsToCutY > SegmentsToCutY THEN
+//            ExecutorStep := 1000; // koniec
+//        ELSE
+//            ExecutorStep := 10;   // następny odcinek
+//        END_IF
+//    END_IF
 
-// -------- Zakończenie --------
-1000:
-	ExecutorStep := 0;
-	Trace('SegmentExecutionYFINISHED');
-    ExecuteSegmentsCutY := TRUE;
-END_CASE]]></ST>
+//// -------- Zakończenie --------
+//1000:
+//	ExecutorStep := 0;
+//	Trace('SegmentExecutionYFINISHED');
+//    ExecuteSegmentsCutY := TRUE;
+//END_CASE
+ ExecuteSegmentsCutY := TRUE;
+ Trace('CutY');]]></ST>
       </Implementation>
     </Method>
     <Method Name="ExecuteSegmentsGroove" Id="{3ee66abc-6845-49e5-b2ff-149134d7252b}" FolderPath="MyMethods\Segments\">
@@ -1093,198 +1098,200 @@ g1, g2, g3, g4, g5 : LREAL;
 v1, v2, v3, v4, v5 : LREAL;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE ExecutorStep OF
+        <ST><![CDATA[//CASE ExecutorStep OF
 
-    // -------- Inicjalizacja --------
-    0:
-        // Konfiguracja głębokości (g) i mnożników prędkości (v)
-        g1 := 3.5; 
-        g2 := 3.5; 
-        g3 := 1.5; 
-        g4 := 0.0;
-        g5 := 0.0; // Ostatnie przejście na pełną głębokość
+//    // -------- Inicjalizacja --------
+//    0:
+//        // Konfiguracja głębokości (g) i mnożników prędkości (v)
+//        g1 := 3.5; 
+//        g2 := 3.5; 
+//        g3 := 1.5; 
+//        g4 := 0.0;
+//        g5 := 0.0; // Ostatnie przejście na pełną głębokość
 
-        v1 := 1.0;
-        v2 := 1.0;
-        v3 := 1.0;
-        v4 := 0.4;
-        v5 := 0.4; // Np. wolniej na wykończenie
+//        v1 := 1.0;
+//        v2 := 1.0;
+//        v3 := 1.0;
+//        v4 := 0.4;
+//        v5 := 0.4; // Np. wolniej na wykończenie
 
-        IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
+//        IF AxisX.Enable() AND AxisY.Enable() AND AxisZ.Enable() THEN
             
-            IF iSegmentsToGroove = 0 THEN 
-                Trace(Message:= 'Step 0: Start Initialization (5 Passes Mode)'); 
-            END_IF;
+//            IF iSegmentsToGroove = 0 THEN 
+//                Trace(Message:= 'Step 0: Start Initialization (5 Passes Mode)'); 
+//            END_IF;
 
-            IF SegmentsToGroove <= 0 THEN
-                Trace(Message:= 'Step 0: No segments, going to 1000');
-                IO.SpindleEnable := FALSE;
-                ExecutorStep := 1000;
-                RETURN;
-            END_IF;
+//            IF SegmentsToGroove <= 0 THEN
+//                Trace(Message:= 'Step 0: No segments, going to 1000');
+//                IO.SpindleEnable := FALSE;
+//                ExecutorStep := 1000;
+//                RETURN;
+//            END_IF;
 
-            // Jednorazowe nastawy dynamiki
-            AxisX.Acceleration := 500; AxisX.Deceleration := 8000;
-            AxisY.Acceleration := 500; AxisY.Deceleration := 8000;
-            AxisZ.Acceleration := 500; AxisZ.Deceleration := 8000;
+//            // Jednorazowe nastawy dynamiki
+//            AxisX.Acceleration := 500; AxisX.Deceleration := 8000;
+//            AxisY.Acceleration := 500; AxisY.Deceleration := 8000;
+//            AxisZ.Acceleration := 500; AxisZ.Deceleration := 8000;
 
-            AxisX.Velocity := _RapidSpeedX;
-            AxisY.Velocity := _RapidSpeedY;
-            AxisZ.Velocity := _RapidSpeedZ;
+//            AxisX.Velocity := _RapidSpeedX;
+//            AxisY.Velocity := _RapidSpeedY;
+//            AxisZ.Velocity := _RapidSpeedZ;
 
-            IO.SpindleEnable := TRUE;
-            IO.CoolingEnable := FALSE;
+//            IO.SpindleEnable := TRUE;
+//            IO.CoolingEnable := FALSE;
 
-            iSegmentsToGroove := 1;
-            //od którego poziomu zaczynac, ostroznie
-			iPass := 4; 
+//            iSegmentsToGroove := 1;
+//            //od którego poziomu zaczynac, ostroznie
+//			iPass := 4; 
 
-            IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
-                Trace(Message:= 'Step 0: Axes ready, going to 10');
-                ExecutorStep := 10;
-            END_IF
-        END_IF;
+//            IF NOT AxisX.Busy AND NOT AxisY.Busy AND NOT AxisZ.Busy THEN
+//                Trace(Message:= 'Step 0: Axes ready, going to 10');
+//                ExecutorStep := 10;
+//            END_IF
+//        END_IF;
 
-    10: 
-        Trace(Message:= CONCAT('Step 10: Rapid to Start XY. Pass: ', TO_STRING(iPass)));
+//    10: 
+//        Trace(Message:= CONCAT('Step 10: Rapid to Start XY. Pass: ', TO_STRING(iPass)));
         
-        AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X + _GlobalOffset, 0);
-        AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y + _GlobalOffset, 0);
-        ExecutorStep := 20;
+//        AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X + _GlobalOffset, 0);
+//        AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y + _GlobalOffset, 0);
+//        ExecutorStep := 20;
 
-    20: 
-        IF AxisX.InPosition AND AxisY.InPosition THEN
-            IO.SpindleEnable := TRUE;
-            IO.CoolingEnable := TRUE;
-            AxisZ.Velocity := _GroovingSpeedZ;
-            ExecutorStep := 30;
-        END_IF;
+//    20: 
+//        IF AxisX.InPosition AND AxisY.InPosition THEN
+//            IO.SpindleEnable := TRUE;
+//            IO.CoolingEnable := TRUE;
+//            AxisZ.Velocity := _GroovingSpeedZ;
+//            ExecutorStep := 30;
+//        END_IF;
 
-    30: 
-        // Wybór głębokości dla 5 przejść
-        CASE iPass OF
-            1: currentDepth := _GrooveDepthZ - g1;
-            2: currentDepth := _GrooveDepthZ - g2;
-            3: currentDepth := _GrooveDepthZ - g3;
-            4: currentDepth := _GrooveDepthZ - g4;
-            5: currentDepth := _GrooveDepthZ - g5;
-        ELSE
-            currentDepth := _GrooveDepthZ;
-        END_CASE;
+//    30: 
+//        // Wybór głębokości dla 5 przejść
+//        CASE iPass OF
+//            1: currentDepth := _GrooveDepthZ - g1;
+//            2: currentDepth := _GrooveDepthZ - g2;
+//            3: currentDepth := _GrooveDepthZ - g3;
+//            4: currentDepth := _GrooveDepthZ - g4;
+//            5: currentDepth := _GrooveDepthZ - g5;
+//        ELSE
+//            currentDepth := _GrooveDepthZ;
+//        END_CASE;
 
-        Trace(Message:= CONCAT('Step 30: Pass ', CONCAT(TO_STRING(iPass), CONCAT(' Moving Z to: ', TO_STRING(currentDepth)))));
+//        Trace(Message:= CONCAT('Step 30: Pass ', CONCAT(TO_STRING(iPass), CONCAT(' Moving Z to: ', TO_STRING(currentDepth)))));
 
-        AxisZ.MoveAbsolute(currentDepth, 0);
-        ExecutorStep := 40;
+//        AxisZ.MoveAbsolute(currentDepth, 0);
+//        ExecutorStep := 40;
 
-    40: 
-        IF AxisZ.InPosition THEN
-            // Wybór prędkości posuwu dla 5 przejść
-            CASE iPass OF
-                1:
-                    AxisX.Velocity := _GroovingSpeedX * v1;
-                    AxisY.Velocity := _GroovingSpeedY * v1;
-                2: 
-                    AxisX.Velocity := _GroovingSpeedX * v2;
-                    AxisY.Velocity := _GroovingSpeedY * v2;
-                3: 
-                    AxisX.Velocity := _GroovingSpeedX * v3;
-                    AxisY.Velocity := _GroovingSpeedY * v3;
-                4: 
-                    AxisX.Velocity := _GroovingSpeedX * v4;
-                    AxisY.Velocity := _GroovingSpeedY * v4;
-                5: 
-                    AxisX.Velocity := _GroovingSpeedX * v5;
-                    AxisY.Velocity := _GroovingSpeedY * v5;
-            END_CASE;
+//    40: 
+//        IF AxisZ.InPosition THEN
+//            // Wybór prędkości posuwu dla 5 przejść
+//            CASE iPass OF
+//                1:
+//                    AxisX.Velocity := _GroovingSpeedX * v1;
+//                    AxisY.Velocity := _GroovingSpeedY * v1;
+//                2: 
+//                    AxisX.Velocity := _GroovingSpeedX * v2;
+//                    AxisY.Velocity := _GroovingSpeedY * v2;
+//                3: 
+//                    AxisX.Velocity := _GroovingSpeedX * v3;
+//                    AxisY.Velocity := _GroovingSpeedY * v3;
+//                4: 
+//                    AxisX.Velocity := _GroovingSpeedX * v4;
+//                    AxisY.Velocity := _GroovingSpeedY * v4;
+//                5: 
+//                    AxisX.Velocity := _GroovingSpeedX * v5;
+//                    AxisY.Velocity := _GroovingSpeedY * v5;
+//            END_CASE;
 
-            ExecutorStep := 50;
-        END_IF;
+//            ExecutorStep := 50;
+//        END_IF;
 
-    50: 
-        IF SequenceTimerSeconds(_GroovingIdleTime) THEN
-            ExecutorStep := 60;
-        END_IF;
+//    50: 
+//        IF SequenceTimerSeconds(_GroovingIdleTime) THEN
+//            ExecutorStep := 60;
+//        END_IF;
 
-    60: 
-        Trace(Message:= 'Step 60: Cutting Move to Stop XY');
+//    60: 
+//        Trace(Message:= 'Step 60: Cutting Move to Stop XY');
         
-        AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X + _GlobalOffset, 0);
-        AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y + _GlobalOffset, 0);
-        ExecutorStep := 70;
+//        AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.X + _GlobalOffset, 0);
+//        AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Stop.Y + _GlobalOffset, 0);
+//        ExecutorStep := 70;
 
-    70: 
-        IF AxisX.InPosition AND AxisY.InPosition AND AxisZ.InPosition THEN
-            // Sprawdzamy czy to ostatnie przejście (teraz 5)
-            IF iPass = 5 THEN
-                Trace(Message:= 'Step 70: Pass 5 (Final) -> Going to Return Path');
-                ExecutorStep := 74;
-            ELSE
-                Trace(Message:= 'Step 70: Intermediate Pass -> Lifting Z');
-                AxisZ.Velocity := _RapidSpeedZ;
-                ExecutorStep := 80;
-            END_IF;
-        END_IF;
+//    70: 
+//        IF AxisX.InPosition AND AxisY.InPosition AND AxisZ.InPosition THEN
+//            // Sprawdzamy czy to ostatnie przejście (teraz 5)
+//            IF iPass = 5 THEN
+//                Trace(Message:= 'Step 70: Pass 5 (Final) -> Going to Return Path');
+//                ExecutorStep := 74;
+//            ELSE
+//                Trace(Message:= 'Step 70: Intermediate Pass -> Lifting Z');
+//                AxisZ.Velocity := _RapidSpeedZ;
+//                ExecutorStep := 80;
+//            END_IF;
+//        END_IF;
         
-    74:
-        IF SequenceTimerSeconds(0.5) THEN
-            ExecutorStep := 75;
-        END_IF;
+//    74:
+//        IF SequenceTimerSeconds(0.5) THEN
+//            ExecutorStep := 75;
+//        END_IF;
 
-    75: 
-        Trace(Message:= 'Step 75: Cleaning Return (Z stays down)');
-        AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X + _GlobalOffset, 0);
-        AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y + _GlobalOffset, 0);
-        ExecutorStep := 76;
+//    75: 
+//        Trace(Message:= 'Step 75: Cleaning Return (Z stays down)');
+//        AxisX.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.X + _GlobalOffset, 0);
+//        AxisY.MoveAbsolute(SegmentGrooves[iSegmentsToGroove].Start.Y + _GlobalOffset, 0);
+//        ExecutorStep := 76;
         
-    76: 
-        IF AxisX.InPosition AND AxisY.InPosition THEN
-            AxisZ.Velocity := _RapidSpeedZ;
-            ExecutorStep := 80; 
-        END_IF;
+//    76: 
+//        IF AxisX.InPosition AND AxisY.InPosition THEN
+//            AxisZ.Velocity := _RapidSpeedZ;
+//            ExecutorStep := 80; 
+//        END_IF;
 
-    80: 
-        Trace(Message:= 'Step 80: Lifting Z to Safe 0');
-        AxisZ.MoveAbsolute(0, 0);
-        ExecutorStep := 90;
+//    80: 
+//        Trace(Message:= 'Step 80: Lifting Z to Safe 0');
+//        AxisZ.MoveAbsolute(0, 0);
+//        ExecutorStep := 90;
 
-    90: 
-        IF AxisZ.InPosition THEN
-            ExecutorStep := 100;
-        END_IF;
+//    90: 
+//        IF AxisZ.InPosition THEN
+//            ExecutorStep := 100;
+//        END_IF;
 
-    100: 
-        IF SequenceTimerSeconds(_GroovingIdleTime) THEN
+//    100: 
+//        IF SequenceTimerSeconds(_GroovingIdleTime) THEN
             
-            AxisX.Velocity := _RapidSpeedX;
-            AxisY.Velocity := _RapidSpeedY;
+//            AxisX.Velocity := _RapidSpeedX;
+//            AxisY.Velocity := _RapidSpeedY;
             
-            iSegmentsToGroove := iSegmentsToGroove + 1;
+//            iSegmentsToGroove := iSegmentsToGroove + 1;
 
-            // Logika zmiany przejścia lub zakończenia
-            IF iSegmentsToGroove > SegmentsToGroove THEN
-                IF iPass < 5 THEN
-                    Trace(Message:= CONCAT('Step 100: Pass ', CONCAT(TO_STRING(iPass), ' finished. Moving to next pass.')));
-                    iPass := iPass + 1;       
-                    iSegmentsToGroove := 1;   
-                    ExecutorStep := 10;       
-                ELSE
-                    Trace(Message:= 'Step 100: ALL 5 PASSES DONE. Finishing.');
-                    IO.SpindleEnable := FALSE; 
-                    IO.CoolingEnable := FALSE; 
-                    ExecutorStep := 1000;      
-                END_IF;
-            ELSE
-                ExecutorStep := 10;
-            END_IF;
-        END_IF;
+//            // Logika zmiany przejścia lub zakończenia
+//            IF iSegmentsToGroove > SegmentsToGroove THEN
+//                IF iPass < 5 THEN
+//                    Trace(Message:= CONCAT('Step 100: Pass ', CONCAT(TO_STRING(iPass), ' finished. Moving to next pass.')));
+//                    iPass := iPass + 1;       
+//                    iSegmentsToGroove := 1;   
+//                    ExecutorStep := 10;       
+//                ELSE
+//                    Trace(Message:= 'Step 100: ALL 5 PASSES DONE. Finishing.');
+//                    IO.SpindleEnable := FALSE; 
+//                    IO.CoolingEnable := FALSE; 
+//                    ExecutorStep := 1000;      
+//                END_IF;
+//            ELSE
+//                ExecutorStep := 10;
+//            END_IF;
+//        END_IF;
 
-    1000:
-        Trace(Message:= 'Step 1000: FINISH');
-        ExecutorStep := 0;
-        ExecuteSegmentsGroove := TRUE;
+//    1000:
+//        Trace(Message:= 'Step 1000: FINISH');
+//        ExecutorStep := 0;
+//        ExecuteSegmentsGroove := TRUE;
 
-END_CASE;]]></ST>
+//END_CASE;
+ExecuteSegmentsGroove := TRUE;
+Trace('Groove');]]></ST>
       </Implementation>
     </Method>
     <Property Name="GlobalOffset" Id="{c8ddd37c-b19a-4d4e-a71b-b97d8605e766}" FolderPath="Properties\Config\">
@@ -1967,10 +1974,11 @@ END_VAR
             OrchestratorStep := 40;
         END_IF	
 
-    40:
-        IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
+    40:	
+		//TEMPORARY COMMENT DISABLE FOR TESTING 
+        //IF AxisZ.InPosition AND AxisX.InPosition AND AxisY.InPosition THEN
             MachiningOrchestrator := TRUE;
-        END_IF
+        //END_IF
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -2657,7 +2665,9 @@ END_IF]]></ST>
       <LineId Id="1061" Count="24" />
       <LineId Id="1087" Count="3" />
       <LineId Id="1092" Count="21" />
+      <LineId Id="1115" Count="0" />
       <LineId Id="5" Count="0" />
+      <LineId Id="1116" Count="1" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutY">
       <LineId Id="794" Count="43" />
@@ -2678,12 +2688,14 @@ END_IF]]></ST>
       <LineId Id="901" Count="1" />
       <LineId Id="900" Count="0" />
       <LineId Id="5" Count="0" />
+      <LineId Id="912" Count="1" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsGroove">
       <LineId Id="867" Count="43" />
       <LineId Id="1069" Count="0" />
       <LineId Id="911" Count="145" />
       <LineId Id="5" Count="0" />
+      <LineId Id="1076" Count="1" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.GlobalOffset.Get">
       <LineId Id="2" Count="0" />
@@ -2831,7 +2843,9 @@ END_IF]]></ST>
       <LineId Id="2945" Count="0" />
       <LineId Id="2947" Count="2" />
       <LineId Id="2946" Count="0" />
-      <LineId Id="2936" Count="4" />
+      <LineId Id="2936" Count="1" />
+      <LineId Id="2954" Count="0" />
+      <LineId Id="2938" Count="2" />
       <LineId Id="19" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.PanelFrontWidth.Get">
