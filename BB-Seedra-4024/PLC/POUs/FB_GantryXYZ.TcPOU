@@ -5,7 +5,7 @@
 FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule
 VAR
     // Sub module definitions here
-	RecipeBuilder	:FB_RecipeBuilderWings;
+	_RecipeBuilder	: POINTER TO FB_RecipeBuilderWings;
 
 	
 	// List of sub modules
@@ -1945,10 +1945,25 @@ END_VAR
 						OrchestratorStep := OrchestratorStep + 10;
 					END_IF
 					
-					E_RecipeID.eBorgoWings:
-					IF BuildSegments_BorgoWings() THEN
-						OrchestratorStep := OrchestratorStep + 10;
-					END_IF
+E_RecipeID.eBorgoWings:
+    // Sprawdzamy, czy maszyna "podpięła" nam buildera i czy wskaźnik nie jest pusty
+    IF _RecipeBuilder <> 0 THEN
+        // Wywołanie metody Build przez zmienną wewnętrzną wskaźnika
+        IF _RecipeBuilder^.Build(
+            PanelWidth           := _PanelFrontWidth, 
+            PanelLength          := 0, // Przykładowa wartość
+            PanelHeight          := _PanelHeight, 
+            CuttingOverpass      := _CuttingOverpass, 
+            RailHeightCorrection := _RailHeightCorrection
+        ) THEN
+            OrchestratorStep := 10;
+        END_IF
+    ELSE
+        // Zgłoś alarm maszynowy braku przypisania Buildera, żeby PLC nie stanął
+        // OrchestratorStep := 999;
+		ChangeState(E_PMLCommand.ePMLCommand_Abort);
+    END_IF
+
 					
 					E_RecipeID.eArona:
 					IF BuildSegments_Arona() THEN
@@ -2101,6 +2116,25 @@ END_IF]]></ST>
         <Implementation>
           <ST><![CDATA[_RapidSpeedZ := RapidSpeedZ;
 ]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RecipeBuilder" Id="{7e3c2008-dd15-410b-92f3-2adf472e0386}">
+      <Declaration><![CDATA[PROPERTY RecipeBuilder : POINTER TO FB_RecipeBuilderWings]]></Declaration>
+      <Get Name="Get" Id="{646b66c6-cab8-496a-a121-e2412f446155}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RecipeBuilder := _RecipeBuilder;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{c356b1c0-c208-4ab6-be6c-2b4118aa8dde}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_RecipeBuilder := RecipeBuilder; ]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -2837,8 +2871,10 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.MachiningOrchestrator">
-      <LineId Id="2896" Count="14" />
-      <LineId Id="2912" Count="9" />
+      <LineId Id="2896" Count="13" />
+      <LineId Id="2968" Count="16" />
+      <LineId Id="2967" Count="0" />
+      <LineId Id="2914" Count="7" />
       <LineId Id="2924" Count="11" />
       <LineId Id="2945" Count="0" />
       <LineId Id="2947" Count="2" />
@@ -2894,6 +2930,12 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RapidSpeedZ.Set">
       <LineId Id="8" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RecipeBuilder.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RecipeBuilder.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ResetSafety">
