@@ -22,29 +22,25 @@ VAR
     // Alarms for this module
     GantryAlarms : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
 	
-    // Properties
-    _HomingStepX :			INT;
-    _HomingStepY :			INT;
-    _HomingStepZ :			INT;
 
 	_ProgramIdRequested :   E_RecipeID;
-	_CurrentSpeed: 			LREAL;
+
 	
-	//Segments
-	SegmentGrooves       : ARRAY[1..32] OF ST_CutSegment;
-    SegmentsToGroove     : INT;          // Ile odcinków
-    iSegmentsToGroove    : INT;          // Indeks aktualnego odcinka
+//	//Segments
+//	SegmentGrooves       : ARRAY[1..32] OF ST_CutSegment;
+//    SegmentsToGroove     : INT;          // Ile odcinków
+//    iSegmentsToGroove    : INT;          // Indeks aktualnego odcinka
     
     
-	//Segments Cut Y
-	SegmentCutY      	 : ARRAY[1..32] OF ST_CutSegment;
-    SegmentsToCutY       : INT;          // Ile odcinków
-    iSegmentsToCutY      : INT;          // Indeks aktualnego odcinka
+//	//Segments Cut Y
+//	SegmentCutY      	 : ARRAY[1..32] OF ST_CutSegment;
+//    SegmentsToCutY       : INT;          // Ile odcinków
+//    iSegmentsToCutY      : INT;          // Indeks aktualnego odcinka
 	
-	//Segments Cut X
-	SegmentCutX      	 : ARRAY[1..32] OF ST_CutSegment;
-    SegmentsToCutX       : INT;          // Ile odcinków
-    iSegmentsToCutX      : INT;          // Indeks aktualnego odcinka
+//	//Segments Cut X
+//	SegmentCutX      	 : ARRAY[1..32] OF ST_CutSegment;
+//    SegmentsToCutX       : INT;          // Ile odcinków
+//    iSegmentsToCutX      : INT;          // Indeks aktualnego odcinka
 
 	//Sequencers
 	OrchestratorStep :			INT := 0;
@@ -183,51 +179,51 @@ END_CASE
 
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//  Start → Stop, Milling Segments
-SegmentsToGroove := 4;
+        <ST><![CDATA[////  Start → Stop, Milling Segments
+//SegmentsToGroove := 4;
 
-SegmentGrooves[1].Start.X := 500;
-SegmentGrooves[1].Start.Y := 500;
-SegmentGrooves[1].Stop.X  := 0;
-SegmentGrooves[1].Stop.Y  := 500;
+//SegmentGrooves[1].Start.X := 500;
+//SegmentGrooves[1].Start.Y := 500;
+//SegmentGrooves[1].Stop.X  := 0;
+//SegmentGrooves[1].Stop.Y  := 500;
 
-SegmentGrooves[2].Start.X := 500;
-SegmentGrooves[2].Start.Y := 0;
-SegmentGrooves[2].Stop.X  := 0; 
-SegmentGrooves[2].Stop.Y  := 0;
+//SegmentGrooves[2].Start.X := 500;
+//SegmentGrooves[2].Start.Y := 0;
+//SegmentGrooves[2].Stop.X  := 0; 
+//SegmentGrooves[2].Stop.Y  := 0;
 
-SegmentGrooves[3].Start.X := 500;
-SegmentGrooves[3].Start.Y := 500;
-SegmentGrooves[3].Stop.X  := 500;
-SegmentGrooves[3].Stop.Y  := 0;
+//SegmentGrooves[3].Start.X := 500;
+//SegmentGrooves[3].Start.Y := 500;
+//SegmentGrooves[3].Stop.X  := 500;
+//SegmentGrooves[3].Stop.Y  := 0;
 
-SegmentGrooves[4].Start.X := 0;
-SegmentGrooves[4].Start.Y := 500;
-SegmentGrooves[4].Stop.X  := 0;
-SegmentGrooves[4].Stop.Y  := 0;
+//SegmentGrooves[4].Start.X := 0;
+//SegmentGrooves[4].Start.Y := 500;
+//SegmentGrooves[4].Stop.X  := 0;
+//SegmentGrooves[4].Stop.Y  := 0;
 
-//  Start → Stop, CutY Segments
-SegmentsToCutY := 2;
+////  Start → Stop, CutY Segments
+//SegmentsToCutY := 2;
 
-SegmentCutY[1].Start.X := 0; 
-SegmentCutY[1].Start.Y := 500;  
-SegmentCutY[1].Stop.X  := 0; 
-SegmentCutY[1].Stop.Y  := 0;
-SegmentCutY[2].Start.X := 500; 
-SegmentCutY[2].Start.Y := 500;  
-SegmentCutY[2].Stop.X  := 500; 
-SegmentCutY[2].Stop.Y  := 0;
+//SegmentCutY[1].Start.X := 0; 
+//SegmentCutY[1].Start.Y := 500;  
+//SegmentCutY[1].Stop.X  := 0; 
+//SegmentCutY[1].Stop.Y  := 0;
+//SegmentCutY[2].Start.X := 500; 
+//SegmentCutY[2].Start.Y := 500;  
+//SegmentCutY[2].Stop.X  := 500; 
+//SegmentCutY[2].Stop.Y  := 0;
 
-SegmentsToCutX := 2;
+//SegmentsToCutX := 2;
 
-SegmentCutX[1].Start.X := 500; 
-SegmentCutX[1].Start.Y := 500;  
-SegmentCutX[1].Stop.X  := 500; 
-SegmentCutX[1].Stop.Y  := 0;
-SegmentCutX[2].Start.X := 0; 
-SegmentCutX[2].Start.Y := 500;  
-SegmentCutX[2].Stop.X  := 0; 
-SegmentCutX[2].Stop.Y  := 0;
+//SegmentCutX[1].Start.X := 500; 
+//SegmentCutX[1].Start.Y := 500;  
+//SegmentCutX[1].Stop.X  := 500; 
+//SegmentCutX[1].Stop.Y  := 0;
+//SegmentCutX[2].Start.X := 0; 
+//SegmentCutX[2].Start.Y := 500;  
+//SegmentCutX[2].Stop.X  := 0; 
+//SegmentCutX[2].Stop.Y  := 0;
 
 
 Trace('Build Arona');
@@ -243,51 +239,51 @@ VAR_INST
 	ShorterX  	:REAL;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//Natural language parameters;
-//TotalY := PanelFrontLength + 2 * _PanelHeight;
-TotalX := PanelFrontWidth + 2 * _PanelHeight;
-ShorterY := TotalY - _PanelHeight;
-ShorterX := TotalX - _PanelHeight;
+        <ST><![CDATA[////Natural language parameters;
+////TotalY := PanelFrontLength + 2 * _PanelHeight;
+////TotalX := PanelFrontWidth + 2 * _PanelHeight;
+////ShorterY := TotalY - _PanelHeight;
+////ShorterX := TotalX - _PanelHeight;
 
 
-SegmentsToGroove := 4;
+//SegmentsToGroove := 4;
 
-///////////////
-SegmentGrooves[1].Start.X := TotalX;
-SegmentGrooves[1].Stop.X := 0;
+/////////////////
+//SegmentGrooves[1].Start.X := TotalX;
+//SegmentGrooves[1].Stop.X := 0;
 
-SegmentGrooves[1].Start.Y := ShorterY;
-SegmentGrooves[1].Stop.Y := ShorterY;
-
-/////////////
-SegmentGrooves[2].Start.Y := TotalY;
-SegmentGrooves[2].Stop.Y := 0;
-
-SegmentGrooves[2].Start.X := _PanelHeight;
-SegmentGrooves[2].Stop.X := _PanelHeight;
+//SegmentGrooves[1].Start.Y := ShorterY;
+//SegmentGrooves[1].Stop.Y := ShorterY;
 
 ///////////////
-SegmentGrooves[3].Start.X := 0;
-SegmentGrooves[3].Stop.X :=  TotalX; 
+//SegmentGrooves[2].Start.Y := TotalY;
+//SegmentGrooves[2].Stop.Y := 0;
 
-SegmentGrooves[3].Start.Y := _PanelHeight;
-SegmentGrooves[3].Stop.Y :=  _PanelHeight;
+//SegmentGrooves[2].Start.X := _PanelHeight;
+//SegmentGrooves[2].Stop.X := _PanelHeight;
 
-//////////////
-SegmentGrooves[4].Start.X := ShorterX;
-SegmentGrooves[4].Stop.X := ShorterX;
+/////////////////
+//SegmentGrooves[3].Start.X := 0;
+//SegmentGrooves[3].Stop.X :=  TotalX; 
 
-SegmentGrooves[4].Start.Y := 0;
-SegmentGrooves[4].Stop.Y := TotalY;
+//SegmentGrooves[3].Start.Y := _PanelHeight;
+//SegmentGrooves[3].Stop.Y :=  _PanelHeight;
+
+////////////////
+//SegmentGrooves[4].Start.X := ShorterX;
+//SegmentGrooves[4].Stop.X := ShorterX;
+
+//SegmentGrooves[4].Start.Y := 0;
+//SegmentGrooves[4].Stop.Y := TotalY;
 
 
 
 
 
-//  Start → Stop, CutY Segments
-SegmentsToCutY := 0;
+////  Start → Stop, CutY Segments
+//SegmentsToCutY := 0;
 
-SegmentsToCutX := 0;
+//SegmentsToCutX := 0;
 Trace('Build Flaps');
 BuildSegments_BorgoFlaps := TRUE;]]></ST>
       </Implementation>
@@ -304,208 +300,147 @@ END_VAR
 //We cut here BorgoWings it means, panel will be installed on wings
 // It means we have to make flaps shorter]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//Natural language parameters;
-//TotalY := PanelFrontLength + 2 * _PanelHeight;
-TotalX := PanelFrontWidth + 2 * _PanelHeight;
-ShorterY := TotalY - _PanelHeight;
-ShorterX := TotalX - _PanelHeight;
+        <ST><![CDATA[////Natural language parameters;
+////TotalY := PanelFrontLength + 2 * _PanelHeight;
+////TotalX := PanelFrontWidth + 2 * _PanelHeight;
+////ShorterY := TotalY - _PanelHeight;
+////ShorterX := TotalX - _PanelHeight;
 
 
 
-//  Start → Stop, Milling Segments
-SegmentsToGroove := 4;
+////  Start → Stop, Milling Segments
+//SegmentsToGroove := 4;
+
+/////////////////
+//SegmentGrooves[1].Start.X := TotalX;
+//SegmentGrooves[1].Stop.X := 0;
+
+//SegmentGrooves[1].Start.Y := ShorterY;
+//SegmentGrooves[1].Stop.Y := ShorterY;
+
+/////////////////
+//SegmentGrooves[2].Start.X := TotalX;
+//SegmentGrooves[2].Stop.X :=  0; 
+
+//SegmentGrooves[2].Start.Y := _PanelHeight;
+//SegmentGrooves[2].Stop.Y :=  _PanelHeight;
+
+////////////////
+//SegmentGrooves[3].Start.X := ShorterX;
+//SegmentGrooves[3].Stop.X := ShorterX;
+
+//SegmentGrooves[3].Start.Y := TotalY;
+//SegmentGrooves[3].Stop.Y := 0;
 
 ///////////////
-SegmentGrooves[1].Start.X := TotalX;
-SegmentGrooves[1].Stop.X := 0;
+//SegmentGrooves[4].Start.Y := TotalY;
+//SegmentGrooves[4].Stop.Y := 0;
 
-SegmentGrooves[1].Start.Y := ShorterY;
-SegmentGrooves[1].Stop.Y := ShorterY;
+//SegmentGrooves[4].Start.X := _PanelHeight;
+//SegmentGrooves[4].Stop.X := _PanelHeight;
 
-///////////////
-SegmentGrooves[2].Start.X := TotalX;
-SegmentGrooves[2].Stop.X :=  0; 
-
-SegmentGrooves[2].Start.Y := _PanelHeight;
-SegmentGrooves[2].Stop.Y :=  _PanelHeight;
 
 //////////////
-SegmentGrooves[3].Start.X := ShorterX;
-SegmentGrooves[3].Stop.X := ShorterX;
-
-SegmentGrooves[3].Start.Y := TotalY;
-SegmentGrooves[3].Stop.Y := 0;
-
+//// Cut X //
 /////////////
-SegmentGrooves[4].Start.Y := TotalY;
-SegmentGrooves[4].Stop.Y := 0;
+//SegmentsToCutX := 6;
 
-SegmentGrooves[4].Start.X := _PanelHeight;
-SegmentGrooves[4].Stop.X := _PanelHeight;
+////Short Box Segments
+//SegmentCutX[1].Start.X := TotalX + _CuttingOverpass;
+//SegmentCutX[1].Stop.X  := ShorterX;
 
+//SegmentCutX[1].Start.Y := ShorterY;
+//SegmentCutX[1].Stop.Y  := ShorterY;
 
-////////////
-// Cut X //
-///////////
-SegmentsToCutX := 6;
+/////////////////
+//SegmentCutX[2].Start.X := _PanelHeight;
+//SegmentCutX[2].Stop.X  := -_CuttingOverpass;
 
-//Short Box Segments
-SegmentCutX[1].Start.X := TotalX + _CuttingOverpass;
-SegmentCutX[1].Stop.X  := ShorterX;
+//SegmentCutX[2].Start.Y := ShorterY;
+//SegmentCutX[2].Stop.Y  := ShorterY;
 
-SegmentCutX[1].Start.Y := ShorterY;
-SegmentCutX[1].Stop.Y  := ShorterY;
+/////////////////
+//SegmentCutX[3].Start.X := TotalX + _CuttingOverpass;
+//SegmentCutX[3].Stop.X := ShorterX;
 
-///////////////
-SegmentCutX[2].Start.X := _PanelHeight;
-SegmentCutX[2].Stop.X  := -_CuttingOverpass;
+//SegmentCutX[3].Start.Y := _PanelHeight;
+//SegmentCutX[3].Stop.Y := _PanelHeight;
 
-SegmentCutX[2].Start.Y := ShorterY;
-SegmentCutX[2].Stop.Y  := ShorterY;
+/////////////////
+//SegmentCutX[4].Start.X := _PanelHeight;
+//SegmentCutX[4].Stop.X :=  -_CuttingOverpass;
 
-///////////////
-SegmentCutX[3].Start.X := TotalX + _CuttingOverpass;
-SegmentCutX[3].Stop.X := ShorterX;
+//SegmentCutX[4].Start.Y := _PanelHeight;
+//SegmentCutX[4].Stop.Y := _PanelHeight;
 
-SegmentCutX[3].Start.Y := _PanelHeight;
-SegmentCutX[3].Stop.Y := _PanelHeight;
-
-///////////////
-SegmentCutX[4].Start.X := _PanelHeight;
-SegmentCutX[4].Stop.X :=  -_CuttingOverpass;
-
-SegmentCutX[4].Start.Y := _PanelHeight;
-SegmentCutX[4].Stop.Y := _PanelHeight;
-
-//Panel Dimensions Shorter Flaps
+////Panel Dimensions Shorter Flaps
 
 
-SegmentCutX[5].Start.X := TotalX + _CuttingOverpass;
-SegmentCutX[5].Stop.X  := - _CuttingOverpass;
+//SegmentCutX[5].Start.X := TotalX + _CuttingOverpass;
+//SegmentCutX[5].Stop.X  := - _CuttingOverpass;
 
-SegmentCutX[5].Start.Y := TotalY - _RailHeightCorrection;
-SegmentCutX[5].Stop.Y  := TotalY - _RailHeightCorrection;
+//SegmentCutX[5].Start.Y := TotalY - _RailHeightCorrection;
+//SegmentCutX[5].Stop.Y  := TotalY - _RailHeightCorrection;
 
-///////////////
-SegmentCutX[6].Start.X := TotalX + _CuttingOverpass;
-SegmentCutX[6].Stop.X  := - _CuttingOverpass;
+/////////////////
+//SegmentCutX[6].Start.X := TotalX + _CuttingOverpass;
+//SegmentCutX[6].Stop.X  := - _CuttingOverpass;
 
-SegmentCutX[6].Start.Y := _RailHeightCorrection;
-SegmentCutX[6].Stop.Y  := _RailHeightCorrection;
+//SegmentCutX[6].Start.Y := _RailHeightCorrection;
+//SegmentCutX[6].Stop.Y  := _RailHeightCorrection;
 
 
-////////////
-// Cut Y //
-///////////
+//////////////
+//// Cut Y //
+/////////////
 
-SegmentsToCutY := 6;
+//SegmentsToCutY := 6;
 
-//Short Box Segments
-SegmentCutY[1].Start.X := ShorterX;
-SegmentCutY[1].Stop.X  := ShorterX;
+////Short Box Segments
+//SegmentCutY[1].Start.X := ShorterX;
+//SegmentCutY[1].Stop.X  := ShorterX;
 
-SegmentCutY[1].Start.Y := TotalY + _CuttingOverpass;
-SegmentCutY[1].Stop.Y  := ShorterY;
+//SegmentCutY[1].Start.Y := TotalY + _CuttingOverpass;
+//SegmentCutY[1].Stop.Y  := ShorterY;
 
-///////////////
-SegmentCutY[2].Start.X := _PanelHeight;
-SegmentCutY[2].Stop.X  := _PanelHeight;
+/////////////////
+//SegmentCutY[2].Start.X := _PanelHeight;
+//SegmentCutY[2].Stop.X  := _PanelHeight;
 
-SegmentCutY[2].Start.Y := TotalY + _CuttingOverpass;
-SegmentCutY[2].Stop.Y  := ShorterY;
+//SegmentCutY[2].Start.Y := TotalY + _CuttingOverpass;
+//SegmentCutY[2].Stop.Y  := ShorterY;
 
-///////////////
-SegmentCutY[3].Start.X := ShorterX;
-SegmentCutY[3].Stop.X  := ShorterX;
+/////////////////
+//SegmentCutY[3].Start.X := ShorterX;
+//SegmentCutY[3].Stop.X  := ShorterX;
 
-SegmentCutY[3].Start.Y := _PanelHeight;
-SegmentCutY[3].Stop.Y  := -_CuttingOverpass;
+//SegmentCutY[3].Start.Y := _PanelHeight;
+//SegmentCutY[3].Stop.Y  := -_CuttingOverpass;
 
-///////////////
-SegmentCutY[4].Start.X := _PanelHeight;
-SegmentCutY[4].Stop.X  := _PanelHeight;
+/////////////////
+//SegmentCutY[4].Start.X := _PanelHeight;
+//SegmentCutY[4].Stop.X  := _PanelHeight;
 
-SegmentCutY[4].Start.Y := _PanelHeight;
-SegmentCutY[4].Stop.Y  := -_CuttingOverpass;
+//SegmentCutY[4].Start.Y := _PanelHeight;
+//SegmentCutY[4].Stop.Y  := -_CuttingOverpass;
 
-//Panel Dimensions
-SegmentCutY[5].Start.X := TotalX;
-SegmentCutY[5].Stop.X  := TotalX;
+////Panel Dimensions
+//SegmentCutY[5].Start.X := TotalX;
+//SegmentCutY[5].Stop.X  := TotalX;
 
-SegmentCutY[5].Start.Y := TotalY + _CuttingOverpass;
-SegmentCutY[5].Stop.Y  := -_CuttingOverpass;
-///////////////
-SegmentCutY[6].Start.X := 0;
-SegmentCutY[6].Stop.X  := 0;
+//SegmentCutY[5].Start.Y := TotalY + _CuttingOverpass;
+//SegmentCutY[5].Stop.Y  := -_CuttingOverpass;
+/////////////////
+//SegmentCutY[6].Start.X := 0;
+//SegmentCutY[6].Stop.X  := 0;
 
-SegmentCutY[6].Start.Y := TotalY + _CuttingOverpass;
-SegmentCutY[6].Stop.Y  := - _CuttingOverpass;
+//SegmentCutY[6].Start.Y := TotalY + _CuttingOverpass;
+//SegmentCutY[6].Stop.Y  := - _CuttingOverpass;
 
 
 Trace('Build Wings');
 BuildSegments_BorgoWings := TRUE;
 ]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="BuildSegments_Calibration" Id="{0bc1bcc0-1e48-4916-b44b-21d9143ba598}" FolderPath="MyMethods\Segments\">
-      <Declaration><![CDATA[METHOD BuildSegments_Calibration : BOOL
-VAR_INST
-	TotalLength :REAL;
-	TotalWidth  :REAL;
-	WingHeight  :REAL;
-	FlapHeight  :REAL;
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[//  Start → Stop, Milling Segments
-SegmentsToGroove := 4;
-
-SegmentGrooves[1].Start.X := 300;
-SegmentGrooves[1].Start.Y := 300;
-SegmentGrooves[1].Stop.X  := 50;
-SegmentGrooves[1].Stop.Y  := 300;
-
-SegmentGrooves[2].Start.X := 300;
-SegmentGrooves[2].Start.Y := 50;
-SegmentGrooves[2].Stop.X  := 50; 
-SegmentGrooves[2].Stop.Y  := 50;
-
-SegmentGrooves[3].Start.X := 300;
-SegmentGrooves[3].Start.Y := 300;
-SegmentGrooves[3].Stop.X  := 300;
-SegmentGrooves[3].Stop.Y  := 50;
-
-SegmentGrooves[4].Start.X := 50;
-SegmentGrooves[4].Start.Y := 300;
-SegmentGrooves[4].Stop.X  := 50;
-SegmentGrooves[4].Stop.Y  := 50;
-
-//  Start → Stop, CutY Segments
-SegmentsToCutY := 2;
-
-SegmentCutY[1].Start.X := 300; 
-SegmentCutY[1].Start.Y := 300;  
-SegmentCutY[1].Stop.X  := 300; 
-SegmentCutY[1].Stop.Y  := 50;
-
-SegmentCutY[2].Start.X := 50; 
-SegmentCutY[2].Start.Y := 300;  
-SegmentCutY[2].Stop.X  := 50; 
-SegmentCutY[2].Stop.Y  := 50;
-
-SegmentsToCutX := 2;
-
-SegmentCutX[1].Start.X := 300;
-SegmentCutX[1].Start.Y := 300; 
-SegmentCutX[1].Stop.X  := 50;
-SegmentCutX[1].Stop.Y  := 300;
-                               
-SegmentCutX[2].Start.X := 300;
-SegmentCutX[2].Start.Y := 50; 
-SegmentCutX[2].Stop.X  := 50; 
-SegmentCutX[2].Stop.Y  := 50;
-
-BuildSegments_Calibration := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
@@ -636,152 +571,6 @@ F_CreateAllEventsInClass(Alarms     := GantryAlarms,
 SUPER^.CreateEvents();]]></ST>
       </Implementation>
     </Method>
-    <Property Name="CurrentSpeed" Id="{357ae8db-7056-4092-8dce-8465b738ac10}" FolderPath="Properties\Status\">
-      <Declaration><![CDATA[PROPERTY CurrentSpeed : LREAL]]></Declaration>
-      <Get Name="Get" Id="{c2cd3b04-3efb-4ba6-9575-51c55bf7cfdf}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CurrentSpeed := _CurrentSpeed;]]></ST>
-        </Implementation>
-      </Get>
-    </Property>
-    <Property Name="CutterXOffsetX" Id="{ec876c40-72b1-49ef-b4a8-dafc4e3faf39}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CutterXOffsetX : REAL]]></Declaration>
-      <Get Name="Get" Id="{84da6823-a94d-424f-a88e-9f4900452f7f}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CutterXOffsetX := _CutterXOffsetX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{415034c5-edcb-4d81-8764-a7aa31c1615f}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CutterXOffsetX := CutterXOffsetX;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="CutterXOffsetY" Id="{195bbbbb-15a8-436d-866c-ecc00711e6f4}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CutterXOffsetY : REAL]]></Declaration>
-      <Get Name="Get" Id="{c99ef4e3-05c1-488d-a09a-ef00fdd76f8d}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CutterXOffsetY := _CutterXOffsetY;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{dfc0ea26-14ea-4173-aef3-e2791575f96a}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CutterXOffsetY := CutterXOffsetY;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="CutterYOffsetX" Id="{2d729998-2abb-43f8-849d-8b6a18e55ff7}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CutterYOffsetX : REAL]]></Declaration>
-      <Get Name="Get" Id="{dd957d56-9ca4-4d71-901a-4eee0dcc7dcb}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CutterYOffsetX := _CutterYOffsetX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{8614b2fc-b567-4793-b660-6be46ebcc9c1}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CutterYOffsetX := CutterYOffsetX;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="CutterYOffsetY" Id="{f510443c-1bf0-4520-86a8-c58e1e7a4692}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CutterYOffsetY : REAL]]></Declaration>
-      <Get Name="Get" Id="{0ec517ed-6f75-4191-aed5-4585f3f07608}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CutterYOffsetY := _CutterYOffsetY;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{a114f71c-22b7-478b-aa78-245d801668e5}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CutterYOffsetY := CutterYOffsetY;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="CuttingIdleTime" Id="{61054465-d4b7-49c6-8b84-c09fde09dffb}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CuttingIdleTime : REAL]]></Declaration>
-      <Get Name="Get" Id="{fd9fc4d0-2df8-4834-aea2-4450714f930b}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CuttingIdleTime := _CuttingIdleTime;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{b29e1f37-0d7e-428c-a22d-0afaabad6d2b}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CuttingIdleTime := CuttingIdleTime;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="CuttingOverpass" Id="{b1a537b6-c123-47df-9f6b-c4bd2f95e73a}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CuttingOverpass : REAL]]></Declaration>
-      <Get Name="Get" Id="{257c3c0a-0042-41f3-b22c-f718e636d2ad}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CuttingOverpass := _CuttingOverpass;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{93b54848-7c11-4e5b-9e28-1fa78fa03fbc}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CuttingOverpass := CuttingOverpass;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="CuttingSpeedX" Id="{12a88485-b295-4495-a76e-0eceef2a24df}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CuttingSpeedX : REAL]]></Declaration>
-      <Get Name="Get" Id="{e7a4474f-22fa-456b-9710-abf007c43654}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CuttingSpeedX := _CuttingSpeedX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{41d1285e-069d-4d01-b574-3be12c525491}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CuttingSpeedX := CuttingSpeedX;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="CuttingSpeedY" Id="{9e82d40a-2e51-4b4a-b71e-9294ce0c8388}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC CuttingSpeedY : REAL]]></Declaration>
-      <Get Name="Get" Id="{bfc37d4f-4d55-4a0f-beca-3b432877e9ac}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[CuttingSpeedY := _CuttingSpeedY;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{58519851-d00e-4316-b0a9-8db16980a7cd}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_CuttingSpeedY := CuttingSpeedY;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <Method Name="CyclicLogic" Id="{0cfbfa67-40d6-05d6-0515-ef1c50353a78}">
       <Declaration><![CDATA[METHOD CyclicLogic
 VAR_INPUT
@@ -800,7 +589,6 @@ END_IF
 //	 );
 	 
 	 
-_CurrentSpeed := SQRT( AxisX.SetVelocity*AxisX.SetVelocity + AxisY.SetVelocity*AxisY.SetVelocity + AxisZ.SetVelocity*AxisZ.SetVelocity );
 
 
 SUPER^.CyclicLogic();
@@ -1308,125 +1096,6 @@ ExecuteSegmentsGroove := TRUE;
 Trace('Groove');]]></ST>
       </Implementation>
     </Method>
-    <Property Name="GlobalOffset" Id="{c8ddd37c-b19a-4d4e-a71b-b97d8605e766}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC GlobalOffset : INT]]></Declaration>
-      <Get Name="Get" Id="{688e3d94-1410-4383-b142-64e21d43f1a6}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[GlobalOffset := _GlobalOffset;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{5f121375-3c35-4dc4-9401-8a845e0cf0c0}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_GlobalOffset := GlobalOffset;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="GrooveDepthZ" Id="{4c86fbb5-f7fe-4ab0-abb5-4601fd04a1c4}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC GrooveDepthZ : REAL]]></Declaration>
-      <Get Name="Get" Id="{a83b65c4-5ea3-488c-967b-3ee17e2e67f9}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[GrooveDepthZ := _GrooveDepthZ;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{3fde4dcd-fcc8-4a85-8a9a-5adb0df55581}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_GrooveDepthZ := GrooveDepthZ;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="GroovingIdleTime" Id="{dfb103a6-b180-49ba-a124-4e96d3059088}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC GroovingIdleTime : REAL]]></Declaration>
-      <Get Name="Get" Id="{d6ada8f0-07b8-4d16-9743-4e216d422b6a}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[GroovingIdleTime := _GroovingIdleTime;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{e8df0304-5562-4c08-bd77-ccab9fffa15b}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_GroovingIdleTime := GroovingIdleTime;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="GroovingOverpass" Id="{812d4990-d277-4bfc-8e06-a4ff70191e9b}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC GroovingOverpass : REAL]]></Declaration>
-      <Get Name="Get" Id="{b0c9f572-3145-4e3a-b91c-cd20c9ba4da8}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[GroovingOverpass := _GroovingOverpass;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{826fd5bf-1fa9-4f64-9665-346b4d89d6bf}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_GroovingOverpass := GroovingOverpass;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="GroovingSpeedX" Id="{ab870480-cf07-40c0-bfcb-dd69cb432ee7}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC GroovingSpeedX : REAL]]></Declaration>
-      <Get Name="Get" Id="{6314d467-3274-40d3-b79c-da2e9e92d14f}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[GroovingSpeedX := _GroovingSpeedX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{187fbc7b-15d7-49b2-9b45-3a42d4ac6f21}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_GroovingSpeedX := GroovingSpeedX;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="GroovingSpeedY" Id="{dbf5c766-18d1-470a-99da-17fb86de0bc4}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC GroovingSpeedY : REAL]]></Declaration>
-      <Get Name="Get" Id="{857e501f-f2f5-4e77-9eae-4cbc8957979e}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[GroovingSpeedY := _GroovingSpeedY;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{e1f697d5-7820-41ea-a263-d25f9b120395}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_GroovingSpeedY := GroovingSpeedY;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="GroovingSpeedZ" Id="{1df46c0c-e665-451c-ba3a-e7e742b71643}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC GroovingSpeedZ : REAL]]></Declaration>
-      <Get Name="Get" Id="{bacd8e8f-7f73-4606-b74b-5e23e6d6dcf2}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[GroovingSpeedZ := _GroovingSpeedZ;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{dea83ede-69cc-4213-8244-a1bc2a541f42}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_GroovingSpeedZ := GroovingSpeedZ;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <Method Name="HMICommunication" Id="{0dce72f4-da14-4dd2-b6a3-5db9db3404e0}">
       <Declaration><![CDATA[// Provides interlocks for HMI control and updates HMI status information for this module
 //Only in this place HMI input can overwrite internal data 
@@ -1616,40 +1285,6 @@ END_VAR
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="PanelFrontWidth" Id="{f3e0dbc8-c3fa-460e-86ce-eb87111125e9}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC PanelFrontWidth : REAL]]></Declaration>
-      <Get Name="Get" Id="{337b7ccf-7529-41b1-81a1-e9c0f98de875}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[PanelFrontWidth := _PanelFrontWidth;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{6f7f0fd9-fb5c-4077-ab43-02d47a14a15f}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_PanelFrontWidth := PanelFrontWidth;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="PanelHeight" Id="{0920acc0-257a-43b2-a196-f22fc89e42ed}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC PanelHeight : REAL]]></Declaration>
-      <Get Name="Get" Id="{20b3fa55-de19-44e2-ad7b-52463e1bf19b}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[PanelHeight := _PanelHeight;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{91d58d60-235c-48ff-9b62-1155794955c4}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_PanelHeight := PanelHeight;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <Property Name="ProgramIdRequested" Id="{3b163a54-6fcd-4be2-bb98-ad529d342348}" FolderPath="Properties\Comand\">
       <Declaration><![CDATA[PROPERTY ProgramIdRequested : E_RecipeID]]></Declaration>
       <Get Name="Get" Id="{21210547-61ea-4bd8-a78a-96552b4742ab}">
@@ -1664,77 +1299,6 @@ END_CASE]]></ST>
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[_ProgramIdRequested := ProgramIdRequested;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="RailHeightCorrection" Id="{465e1c57-83b8-4b2a-a3fe-16819241fd4f}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC RailHeightCorrection : REAL]]></Declaration>
-      <Get Name="Get" Id="{8547e8a4-2368-4b1c-bac1-a9f1330a50a7}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[RailHeightCorrection := _RailHeightCorrection;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{77d9b924-4d53-4d00-8d3d-e32bf531a5d3}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[ IF RailHeightCorrection > 15 THEN
-	_RailHeightCorrection := 15;  // It can't go higher, you will kill yourself
-	ELSE
-	_RailHeightCorrection := RailHeightCorrection;
-END_IF]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="RapidSpeedX" Id="{8c9f4f21-3743-48de-8aa6-1e7f68956f80}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC RapidSpeedX : REAL]]></Declaration>
-      <Get Name="Get" Id="{80bdcbb9-4e80-4343-9582-3dba51122fa5}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[RapidSpeedX := _RapidSpeedX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{5ccad6ef-816c-4c49-afb6-3e5204fc4fb5}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_RapidSpeedX := RapidSpeedX;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="RapidSpeedY" Id="{5dfea665-2261-44a4-b000-9743b481b2b9}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC RapidSpeedY : REAL]]></Declaration>
-      <Get Name="Get" Id="{59b145df-2cff-4ecc-847b-f8d110514f0e}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[RapidSpeedY := _RapidSpeedY;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{4f8d9cc9-05ef-4eb8-8eb1-49992a2bb0d6}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_RapidSpeedY := RapidSpeedY;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="RapidSpeedZ" Id="{cebf8cd2-acc1-4736-8c92-219e5578dd1a}" FolderPath="Properties\Config\">
-      <Declaration><![CDATA[PROPERTY PUBLIC RapidSpeedZ : REAL]]></Declaration>
-      <Get Name="Get" Id="{11b4159d-524a-4e2d-b881-810c4516a42c}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[RapidSpeedZ := _RapidSpeedZ;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{e54cbdaf-56e9-49ed-85a4-52a0db9e7c8e}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_RapidSpeedZ := RapidSpeedZ;
-]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -2132,15 +1696,6 @@ END_IF]]></ST>
       <LineId Id="1072" Count="4" />
       <LineId Id="27" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.BuildSegments_Calibration">
-      <LineId Id="306" Count="29" />
-      <LineId Id="354" Count="0" />
-      <LineId Id="336" Count="10" />
-      <LineId Id="355" Count="0" />
-      <LineId Id="347" Count="3" />
-      <LineId Id="353" Count="0" />
-      <LineId Id="27" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
       <LineId Id="28" Count="5" />
       <LineId Id="78" Count="0" />
@@ -2184,70 +1739,11 @@ END_IF]]></ST>
       <LineId Id="3" Count="6" />
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.CurrentSpeed.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterXOffsetX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterXOffsetX.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterXOffsetY.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterXOffsetY.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterYOffsetX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterYOffsetX.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterYOffsetY.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CutterYOffsetY.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingIdleTime.Get">
-      <LineId Id="4" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingIdleTime.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingOverpass.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingOverpass.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingSpeedX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingSpeedX.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingSpeedY.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.CuttingSpeedY.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ.CyclicLogic">
       <LineId Id="3" Count="3" />
       <LineId Id="20" Count="5" />
       <LineId Id="19" Count="0" />
-      <LineId Id="26" Count="2" />
+      <LineId Id="26" Count="1" />
       <LineId Id="31" Count="0" />
       <LineId Id="7" Count="1" />
       <LineId Id="41" Count="2" />
@@ -2319,55 +1815,6 @@ END_IF]]></ST>
       <LineId Id="5" Count="0" />
       <LineId Id="1076" Count="1" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.GlobalOffset.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GlobalOffset.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GrooveDepthZ.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GrooveDepthZ.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GroovingIdleTime.Get">
-      <LineId Id="4" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GroovingIdleTime.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GroovingOverpass.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GroovingOverpass.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GroovingSpeedX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GroovingSpeedX.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GroovingSpeedY.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GroovingSpeedY.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GroovingSpeedZ.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.GroovingSpeedZ.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ.HMICommunication">
       <LineId Id="6" Count="0" />
       <LineId Id="105" Count="3" />
@@ -2428,52 +1875,10 @@ END_IF]]></ST>
       <LineId Id="2938" Count="2" />
       <LineId Id="19" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.PanelFrontWidth.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.PanelFrontWidth.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.PanelHeight.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.PanelHeight.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Set">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.RailHeightCorrection.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.RailHeightCorrection.Set">
-      <LineId Id="5" Count="3" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.RapidSpeedX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.RapidSpeedX.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.RapidSpeedY.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.RapidSpeedY.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.RapidSpeedZ.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.RapidSpeedZ.Set">
-      <LineId Id="8" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RecipeBuilder.Get">
