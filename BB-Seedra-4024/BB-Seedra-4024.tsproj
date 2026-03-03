@@ -1987,7 +1987,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{0E63985C-C213-6250-4D11-4ECD73DE92EC}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{4D2807A4-AA20-53D1-ABCA-09A48A8B6EA7}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2037,12 +2037,12 @@ External Setpoint Generation:
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderSensorCutY</Name>
-							<Comment><![CDATA[Output]]></Comment>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderSensorCutX</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderSensorCutX</Name>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderSensorCutY</Name>
+							<Comment><![CDATA[Output]]></Comment>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -2081,11 +2081,11 @@ External Setpoint Generation:
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderValveCutY</Name>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderValveCutX</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderValveCutX</Name>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderValveCutY</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>

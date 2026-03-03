@@ -9,6 +9,8 @@ VAR
     // =========================================================
     _RecipeBuilder      : POINTER TO FB_RecipeBuilderWings;
     ipSubModules_Init   : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
+	ExecutorCutX   : FB_ExecutorCutX;
+
 
     // =========================================================
     //  HMI & COMMANDS
@@ -1189,6 +1191,14 @@ CASE DescendantSequenceState OF
 		AxisY.HomeMethod := fbHomeStratY;
 		AxisZ.HomeMethod := fbHomeStratZ;
 		
+		// Wstrzykiwanie zależności do Executora Cut X
+		ExecutorCutX.AxisX         := AxisX;          // Podanie interfejsów osi
+		ExecutorCutX.AxisY         := AxisY;
+		ExecutorCutX.AxisZ         := AxisZ;
+		ExecutorCutX.Cylinder      := CylinderCuttingX; // Implementuje I_Cylinder
+		ExecutorCutX.Config        REF= GantryXYZ_HMI.Config; // Referencja do aktualnej konfiguracji
+		ExecutorCutX.RecipeBuilder := _RecipeBuilder^;  // Interfejs z wynikami obliczeń
+		
 		
         DescendantSequenceState := DescendantSequenceState + 10;
 		//initialize persistent
@@ -1261,9 +1271,9 @@ END_VAR
         END_IF
 		
 	30: 
-	 	IF ExecuteSegmentsCutX() THEN
+		IF ExecutorCutX.Cut() THEN
             OrchestratorStep := 40;
-        END_IF	
+        END_IF
 
     40:	
 		//TEMPORARY COMMENT DISABLE FOR TESTING 
@@ -1835,6 +1845,9 @@ END_IF]]></ST>
       <LineId Id="100" Count="0" />
       <LineId Id="106" Count="7" />
       <LineId Id="102" Count="0" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="125" Count="5" />
+      <LineId Id="124" Count="0" />
       <LineId Id="105" Count="0" />
       <LineId Id="101" Count="0" />
       <LineId Id="41" Count="0" />
@@ -1854,7 +1867,8 @@ END_IF]]></ST>
       <LineId Id="2914" Count="7" />
       <LineId Id="2924" Count="11" />
       <LineId Id="2945" Count="0" />
-      <LineId Id="2947" Count="2" />
+      <LineId Id="2947" Count="0" />
+      <LineId Id="3002" Count="1" />
       <LineId Id="2946" Count="0" />
       <LineId Id="2936" Count="1" />
       <LineId Id="2954" Count="0" />

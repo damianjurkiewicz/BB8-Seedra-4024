@@ -58,6 +58,12 @@
     <Compile Include="POUs\Components\ST_Cylinder_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Executor\FB_ExecutorCutX.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Executor\I_MachiningExecutor.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\GantryXYZ\E_RecipeID.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -94,22 +100,22 @@
     <Compile Include="POUs\SAFETY.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Segments\FB_RecipeBuilder\FB_RecipeBuilderWings.TcPOU">
+    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\FB_RecipeBuilderWings.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Segments\FB_RecipeBuilder\ST_RecipeBuilder_Config.TcDUT">
+    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\ST_RecipeBuilder_Config.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Segments\FB_RecipeBuilder\ST_RecipeBuilder_HMI.TcDUT">
+    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\ST_RecipeBuilder_HMI.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Segments\I_RecipeBuilder.TcIO">
+    <Compile Include="POUs\SegmentBuilder\I_RecipeBuilder.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Segments\ST_CutSegment.TcDUT">
+    <Compile Include="POUs\SegmentBuilder\ST_CutSegment.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Segments\ST_PointXY.TcDUT">
+    <Compile Include="POUs\SegmentBuilder\ST_PointXY.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SafetyTask.TcTTO">
@@ -163,8 +169,9 @@
     <Folder Include="GVLs" />
     <Folder Include="POUs\Components" />
     <Folder Include="POUs\GantryXYZ" />
-    <Folder Include="POUs\Segments" />
-    <Folder Include="POUs\Segments\FB_RecipeBuilder" />
+    <Folder Include="POUs\Executor" />
+    <Folder Include="POUs\SegmentBuilder" />
+    <Folder Include="POUs\SegmentBuilder\FB_RecipeBuilder" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
     <Folder Include="VISUs\Modes" />

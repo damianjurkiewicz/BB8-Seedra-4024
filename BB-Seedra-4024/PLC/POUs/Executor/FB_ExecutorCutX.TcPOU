@@ -1,0 +1,333 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_ExecutorCutX" Id="{91737efa-f775-4890-9334-f282750ffd75}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCutX EXTENDS FB_PackML_BaseModule IMPLEMENTS I_MachiningExecutor
+VAR
+    // Wstrzyknięte zależnosci (Properties)
+    _AxisX          : SPT_Motion_Control.I_BasicAxis;
+    _AxisY          : SPT_Motion_Control.I_BasicAxis;
+    _AxisZ          : SPT_Motion_Control.I_BasicAxis;
+    _Cylinder       : I_Cylinder;                     
+    _RecipeBuilder  : I_RecipeBuilder;                
+    _Config         : REFERENCE TO ST_GantryXYZ_Config; 
+
+    // Zmienne wewnętrzne Executora
+    nStep           : INT;
+    iCurrentSegment : INT;
+    StepTimer       : TON; // Wbudowany timer do czekania
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Abort" Id="{a92d6948-93b7-4c84-bd93-0d359b7b572e}">
+      <Declaration><![CDATA[{warning 'add method implementation '}
+METHOD Abort
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="AxisX" Id="{bf7bf1e8-4628-46ee-9a7f-8b243677db34}">
+      <Declaration><![CDATA[PROPERTY AxisX : I_BasicAxis]]></Declaration>
+      <Get Name="Get" Id="{d93144b5-dd29-483a-8b76-9038e49c9a6d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{7ab3348b-b4bb-4d6b-bd39-8185e257a35e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="AxisY" Id="{d6d2cedb-0eda-4e75-a191-4d8ce3a9bbf4}">
+      <Declaration><![CDATA[PROPERTY AxisY : I_BasicAxis]]></Declaration>
+      <Get Name="Get" Id="{3b91612c-9793-4f68-8ba4-cfcfaf6d0685}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{cefe518b-6ed4-4e66-9928-cc421068c6b9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="AxisZ" Id="{411509dc-9082-4584-89ca-2ff1afd18787}">
+      <Declaration><![CDATA[PROPERTY AxisZ : I_BasicAxis]]></Declaration>
+      <Get Name="Get" Id="{3ef8d70c-0902-4da9-8ae9-200f5cfec13c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{fbb69cdf-dc2f-457b-88ac-db5f43779a82}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Config" Id="{d4eaeb02-3324-4dfb-bb21-b43618bd8a51}">
+      <Declaration><![CDATA[PROPERTY Config : REFERENCE TO ST_GantryXYZ_Config]]></Declaration>
+      <Get Name="Get" Id="{b1b19422-708f-4729-8a80-0ec5c4e56462}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{855da8aa-c381-42d4-945c-30bcec476610}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="Cut" Id="{a3f08854-92be-45c8-88f8-7f8ca2ffac3c}">
+      <Declaration><![CDATA[{warning 'add method implementation '}
+METHOD Cut : BOOL
+VAR
+    // Lokalne zmienne pomocnicze na czas trwania cyklu
+    localSegmentsCutX : ARRAY[1..32] OF ST_CutSegment;
+    currentSeg        : ST_CutSegment;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Domyślnie zwracaj FALSE. TRUE zwracamy dopiero, gdy skończymy proces (krok 1000).
+Cut := FALSE;
+
+// Zabezpieczenie na wypadek braku wstrzykniętych referencji!
+IF _RecipeBuilder = 0 OR NOT __ISVALIDREF(_Config) THEN
+    Trace('Brak referencji w ExecutorCutX!');
+    RETURN;
+END_IF
+
+// 1. Zrzut całej tablicy z Właściwości (Property) do zmiennej lokalnej
+localSegmentsCutX := _RecipeBuilder.SegmentsCutX;
+
+// 2. Wyciągnięcie konkretnego segmentu dla aktualnego kroku
+// (Bezpieczny odczyt z lokalnej pamięci)
+currentSeg := localSegmentsCutX[iCurrentSegment];
+
+CASE nStep OF
+
+    // -------- Inicjalizacja --------
+    0:
+        IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
+            
+            Trace('SegmentExecutionX Started');
+            IF _RecipeBuilder.SegmentsToCutX <= 0 THEN
+                nStep := 1000; // Nie ma czego ciąć, zakończ natychmiast
+                RETURN;
+            END_IF;
+
+            // Jednorazowe nastawy dynamiki z wstrzykniętej konfiguracji
+            _AxisX.Acceleration := 500;   _AxisX.Deceleration := 8000;
+            _AxisY.Acceleration := 500;   _AxisY.Deceleration := 8000;
+            _AxisZ.Acceleration := 500;   _AxisZ.Deceleration := 8000;
+            
+            _AxisX.Velocity := _Config.RapidSpeedX;
+            _AxisY.Velocity := _Config.RapidSpeedY;
+            _AxisZ.Velocity := _Config.RapidSpeedZ;
+
+            iCurrentSegment := 1;
+            
+            IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN
+                nStep := 10;
+            END_IF     
+        END_IF
+
+    // -------- Dojazd do początku cięcia --------
+    10:
+        _AxisX.MoveAbsolute(
+            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Start.X + _Config.CutterXOffsetX + _Config.GlobalOffset, 
+            0);
+        _AxisY.MoveAbsolute(
+            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Start.Y + _Config.CutterXOffsetY + _Config.GlobalOffset, 
+            0);
+        nStep := 20;
+
+    20: // Czekamy na pozycję XY
+        IF _AxisX.InPosition AND _AxisY.InPosition THEN 
+            nStep := 30;
+        END_IF
+
+    // -------- Wysunięcie siłownika (Ostrze w dół) --------
+    30:
+        _Cylinder.Extend();
+        nStep := 40;
+
+    40: 
+        IF _Cylinder.Extended THEN
+            // Zmiana prędkości na roboczą z konfiguracji
+            _AxisX.Velocity := _Config.CuttingSpeedX;
+            _AxisY.Velocity := _Config.CuttingSpeedY;
+            nStep := 50;
+        END_IF
+            
+    50: // Czekanie (Cutting Idle Time)
+        StepTimer(IN := TRUE, PT := REAL_TO_TIME(_Config.CuttingIdleTime * 1000.0));
+        IF StepTimer.Q THEN
+            StepTimer(IN := FALSE); // Reset timera na przyszłość
+            nStep := 60;
+        END_IF
+
+    // -------- Cięcie XY do końca odcinka --------
+    60:
+        _AxisX.MoveAbsolute(
+            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Stop.X + _Config.CutterXOffsetX + _Config.GlobalOffset, 
+            0);
+        _AxisY.MoveAbsolute(
+            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Stop.Y + _Config.CutterXOffsetY + _Config.GlobalOffset, 
+            0);
+        nStep := 70;
+
+    70: // Czekamy na koniec cięcia
+        IF _AxisX.InPosition AND _AxisY.InPosition THEN
+            nStep := 80;
+        END_IF
+
+    // -------- Chowanie ostrza i przygotowanie następnego --------
+    80:
+        _Cylinder.Retract();
+        nStep := 85;
+
+    85: 
+        IF _Cylinder.Retracted THEN
+             iCurrentSegment := iCurrentSegment + 1; 
+             nStep := 90;
+        END_IF    
+
+    90: // Drugi Idle Time
+        StepTimer(IN := TRUE, PT := REAL_TO_TIME(_Config.CuttingIdleTime * 1000.0));
+        IF StepTimer.Q THEN
+            StepTimer(IN := FALSE);
+            
+            // Powrót do prędkości dojazdowej
+            _AxisX.Velocity := _Config.RapidSpeedX;
+            _AxisY.Velocity := _Config.RapidSpeedY;
+            
+            IF iCurrentSegment > _RecipeBuilder.SegmentsToCutX THEN
+                nStep := 1000; // Koniec wszystkich segmentów
+            ELSE
+                nStep := 10;   // Skok do następnego odcinka
+            END_IF
+        END_IF
+
+    // -------- Zakończenie pracy Executora --------
+    1000:
+        Trace('SegmentExecutionX-FINISHED');
+        nStep := 0;      // Reset kroku, żeby Executor był gotowy na ponowne uruchomienie
+        Cut   := TRUE;   // Zgłoszenie Orchestratorowi, że skończyliśmy!
+        
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Cylinder" Id="{0546bd86-401b-41c0-a683-bbe302146fdd}">
+      <Declaration><![CDATA[PROPERTY Cylinder : I_Cylinder]]></Declaration>
+      <Get Name="Get" Id="{622de191-a52d-4efd-af87-b0787b5827c2}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{f831b18a-1816-415a-82f6-5aeacd4161b5}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RecipeBuilder" Id="{cbbaad3b-7e73-402c-b55d-1c46460bfd77}">
+      <Declaration><![CDATA[PROPERTY RecipeBuilder : I_RecipeBuilder]]></Declaration>
+      <Get Name="Get" Id="{ee8216eb-1e0d-45e3-8dfd-22bbcbfa2526}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{1d93da46-a542-4ef2-b525-3599ad0c4f6e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_ExecutorCutX">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.Abort">
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.AxisX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.AxisX.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.AxisY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.AxisY.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.AxisZ.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.AxisZ.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.Config.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.Config.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.Cut">
+      <LineId Id="10" Count="7" />
+      <LineId Id="132" Count="5" />
+      <LineId Id="131" Count="0" />
+      <LineId Id="18" Count="111" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.Cylinder.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.Cylinder.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.RecipeBuilder.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX.RecipeBuilder.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
