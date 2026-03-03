@@ -1,32 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_ExecutorCutX" Id="{91737efa-f775-4890-9334-f282750ffd75}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCutX EXTENDS FB_PackML_BaseModule IMPLEMENTS I_MachiningExecutor
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCutX EXTENDS FB_ExecutorBase
 VAR
-    // Wstrzyknięte zależnosci (Properties)
+    // Zostawiasz tu TYLKO to, co dotyczy bezpośrednio osi X!
     _AxisX          : SPT_Motion_Control.I_BasicAxis;
     _AxisY          : SPT_Motion_Control.I_BasicAxis;
     _AxisZ          : SPT_Motion_Control.I_BasicAxis;
     _Cylinder       : I_Cylinder;                     
-    _RecipeBuilder  : I_RecipeBuilder;                
-    _Config         : REFERENCE TO ST_GantryXYZ_Config; 
-
-    // Zmienne wewnętrzne Executora
-    nStep           : INT;
-    iCurrentSegment : INT;
-    StepTimer       : TON; // Wbudowany timer do czekania
+    _RecipeBuilder  : I_RecipeBuilder;
+    _Config         : REFERENCE TO ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="Abort" Id="{a92d6948-93b7-4c84-bd93-0d359b7b572e}">
-      <Declaration><![CDATA[{warning 'add method implementation '}
-METHOD Abort
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[]]></ST>
-      </Implementation>
-    </Method>
     <Property Name="AxisX" Id="{bf7bf1e8-4628-46ee-9a7f-8b243677db34}">
       <Declaration><![CDATA[PROPERTY AxisX : I_BasicAxis]]></Declaration>
       <Get Name="Get" Id="{d93144b5-dd29-483a-8b76-9038e49c9a6d}">
@@ -286,9 +273,6 @@ END_VAR
     </Property>
     <LineIds Name="FB_ExecutorCutX">
       <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutX.Abort">
-      <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCutX.AxisX.Get">
       <LineId Id="2" Count="0" />

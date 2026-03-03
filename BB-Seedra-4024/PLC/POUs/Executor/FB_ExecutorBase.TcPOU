@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_ExecutorBase" Id="{0a75ad93-3cad-4d00-8a45-f0f0f5037274}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorBase EXTENDS FB_PackML_BaseModule IMPLEMENTS I_MachiningExecutor
+VAR
+    nStep           : INT;
+    iCurrentSegment : INT;
+    StepTimer       : TON;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Aborting" Id="{04adb557-9a72-4015-bb7a-c91ef9cb5111}">
+      <Declaration><![CDATA[METHOD PROTECTED Aborting]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+CASE SequenceState OF
+    0:
+        NoStateTasksToComplete := FALSE;
+        SequenceState := SequenceState + 10;
+        
+    10:
+        // CZYSTSZENIE WSPÓLNE DLA KAŻDEGO EXECUTORA!
+        nStep := 0;
+        iCurrentSegment := 1;
+        StepTimer(IN := FALSE);
+        
+        SequenceState := SequenceState + 10;
+        
+    20:
+        StateTasksComplete := TRUE;
+        SUPER^.Aborting(); // Puszczamy sygnał do rdzenia PackML
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Cut" Id="{b6dc84f5-0e92-4634-8f17-ea93df9ead67}">
+      <Declaration><![CDATA[{warning 'add method implementation '}
+METHOD Cut : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_ExecutorBase">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorBase.Aborting">
+      <LineId Id="6" Count="16" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorBase.Cut">
+      <LineId Id="4" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

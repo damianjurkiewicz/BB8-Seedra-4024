@@ -85,7 +85,6 @@ END_VAR]]></Declaration>
     </Implementation>
     <Folder Name="Builder (obsolete)" Id="{e23a5ea6-ed0f-420e-b287-513d81c1eb35}" />
     <Folder Name="Executor (to refactor)" Id="{4c5992cb-9a20-4f64-97ec-fbd74ffea4f3}" />
-    <Folder Name="MyMethods" Id="{d166ca9d-f57a-4d88-ac90-142e5eb5d488}" />
     <Folder Name="Properties" Id="{b05cc7e1-dc37-4910-986a-f085b4a0163d}" />
     <Folder Name="States" Id="{8df42c9b-c051-49f1-9767-900503632339}" />
     <Method Name="Aborting" Id="{5476dfef-6652-4e6b-8928-3724a50553de}" FolderPath="States\">
@@ -1175,6 +1174,7 @@ CASE DescendantSequenceState OF
 		RegisterComponent(AxisZ);	
 		RegisterComponent(CylinderCuttingY);
 		RegisterComponent(CylinderCuttingX);
+		RegisterSubmodule(ExecutorCutX);
         _LogModeChanges         := FALSE;
         _LogStateChanges        := FALSE;
         DescendantSequenceState := DescendantSequenceState + 10;
@@ -1840,6 +1840,7 @@ END_IF]]></ST>
       <LineId Id="68" Count="0" />
       <LineId Id="8" Count="0" />
       <LineId Id="90" Count="0" />
+      <LineId Id="140" Count="0" />
       <LineId Id="10" Count="3" />
       <LineId Id="80" Count="0" />
       <LineId Id="100" Count="0" />

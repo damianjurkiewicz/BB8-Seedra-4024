@@ -3,12 +3,6 @@
   <Itf Name="I_MachiningExecutor" Id="{5c743b52-4b22-4c04-8775-ad733b78e5a4}">
     <Declaration><![CDATA[INTERFACE I_MachiningExecutor
 ]]></Declaration>
-    <Method Name="Abort" Id="{9ecb442e-3513-4dd8-8ec2-740274fbeb17}">
-      <Declaration><![CDATA[METHOD Abort
-VAR_INPUT
-END_VAR
-]]></Declaration>
-    </Method>
     <Method Name="Cut" Id="{c3dc2c55-7d23-4aed-9215-6c671f3e34d6}">
       <Declaration><![CDATA[METHOD Cut : BOOL
 VAR_INPUT
