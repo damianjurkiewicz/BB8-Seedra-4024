@@ -128,9 +128,7 @@ CASE SequenceState OF
 		CylinderCuttingX.Retract();
 		CylinderCuttingY.Retract();
 
-		THIS^.HomingStepX := 0;
-		THIS^.HomingStepY := 0;
-		THIS^.HomingStepZ := 0;
+
 		OrchestratorStep := 0;
 		ExecutorStep := 0;
 		
@@ -164,9 +162,8 @@ END_CASE
 		
 		IO.CoolingEnable := FALSE;
 		IO.SpindleEnable := FALSE;
-		THIS^.HomingStepX := 0;
-		THIS^.HomingStepY := 0;
-		THIS^.HomingStepZ := 0;
+
+
 		OrchestratorStep := 0;
 		SequenceState := SequenceState + 10;
 	
@@ -534,9 +531,7 @@ END_VAR]]></Declaration>
 //		GantryAlarms[E_Gantry.InitReferenceEvent].Clear(0,0);
 //		GantryAlarms[E_Gantry.StartTimeout].Clear(0,0);
 //		GantryAlarms[E_Gantry.WarnMessage].Clear(0,0);
-		THIS^.HomingStepX := 0;
-		THIS^.HomingStepY := 0;
-		THIS^.HomingStepZ := 0;
+
 		AxisX.Reset();
 		AxisY.Reset();
 		AxisZ.Reset();
@@ -1501,391 +1496,6 @@ CASE _CurrentMode OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="HomingStepX" Id="{bb0ed88a-091c-4bab-9e01-a967ca1fc9bb}" FolderPath="Properties\">
-      <Declaration><![CDATA[PROPERTY PUBLIC HomingStepX : INT]]></Declaration>
-      <Get Name="Get" Id="{190b2c1a-84a4-4b9a-b82b-d034c6e97b13}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[HomingStepX := _HomingStepX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{9c9687a4-cd61-4104-a02f-3fe4715cd2fa}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_HomingStepX := HomingStepX;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="HomingStepY" Id="{b85ccf6c-14f7-4091-9161-3a64d81c6f71}" FolderPath="Properties\">
-      <Declaration><![CDATA[PROPERTY PUBLIC HomingStepY : INT]]></Declaration>
-      <Get Name="Get" Id="{c9fc6e3e-e251-4188-a708-1d897bfbe015}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[HomingStepY := _HomingStepY;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{51c79bd9-40f7-4370-9e3f-edffa2a24928}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_HomingStepY := HomingStepY;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="HomingStepZ" Id="{0b9a390e-db9e-4739-bffa-5ca069d437ef}" FolderPath="Properties\">
-      <Declaration><![CDATA[PROPERTY PUBLIC HomingStepZ : INT]]></Declaration>
-      <Get Name="Get" Id="{403aef28-5a6c-4ea4-b639-a6922b7be29b}">
-        <Declaration><![CDATA[
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[HomingStepZ := _HomingStepZ;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{5b912885-4f7d-414a-b1af-1074244e821d}">
-        <Declaration><![CDATA[]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_HomingStepZ := HomingStepX;
-]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Method Name="HomingX" Id="{3a7dd60d-4e3b-4739-b0ec-f4ab527c9236}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD HomingX : BOOL
-
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE _HomingStepX OF
-		
-	0:
-		HomingX := FALSE;
-		
-		
-		IF AxisX.Enable() THEN
-			
-			//Trace('Enable Axis X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-		
-	10:
-		IF AxisX.Enabled THEN
-			AxisX.Acceleration := 100;
-			AxisX.Deceleration := 15000;
-			//Trace('Enabled Axis X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-
-	20:
-		IF IO.ProximitySensorX THEN
-			IF AxisX.Stop() THEN
-				IF NOT AxisX.Busy THEN
-				AxisX.Home();
-				////Trace('Start na krańcówce X');
-				_HomingStepX := 80;
-				END_IF
-			END_IF
-		ELSE		
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-		
-	30:
-		IF AxisX.MoveVelocity(-100, FALSE) THEN
-			////Trace('Szybki ruch, szukam krancowki X');
-            _HomingStepX := _HomingStepX + 10;
-        END_IF
-		
-	
-	40: 
-		IF IO.ProximitySensorX THEN
-			
-		IF AxisX.Stop() THEN
-			IF NOT AxisX.Busy THEN
-				//Trace('Spotkałem krańcówkę X');
-				_HomingStepX := _HomingStepX + 10;
-			END_IF
-		END_IF
-		
-		END_IF
-
-	50:
-		IF AxisX.MoveRelative(30,FALSE) THEN
-			//Trace('Odsunięcie od krańcówki, po szybkim X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-		
-	60: 
-		IF AxisX.MoveVelocity(-10,FALSE) THEN
-			//Trace('Spokojny powrot X');		
-			_HomingStepX := _HomingStepX + 10;
-		END_IF	
-		
-	70:
-		IF IO.ProximitySensorX THEN
-			IF AxisX.Stop() THEN
-				//Trace('Stop do precyzyjnego X');
-				_HomingStepX := _HomingStepX + 10; // Przechodzimy do czekania na zatrzymanie
-			END_IF
-		END_IF
-
-	80:
-		IF NOT AxisX.Busy THEN
-			IF AxisX.Home() THEN
-				_HomingStepX := _HomingStepX + 10;
-				//Trace('Precyzyjny Home wykonany X');
-			END_IF
-		END_IF
-
-
-	90:	
-		IF AxisX.MoveRelative(2.0, FALSE) THEN
-			//Trace('Odsunięcie od krańcówki o 2mm X');
-			_HomingStepX := _HomingStepX + 10;
-		END_IF
-	
-	100:
-		IF NOT AxisX.Busy THEN
-		
-			IF AxisX.Home() THEN
-				//Trace('Ustawienie nowego zera po odsunięciu X');
-				_HomingStepX := _HomingStepX + 10;
-			END_IF
-		END_IF
-	
-	110:
-		HomingX := TRUE;
-		//Trace('Homing zakończony pomyślnie X');
-		
-			
-	END_CASE
-	
-
-]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="HomingY" Id="{7cf726af-0fa2-4719-9f55-f55ebcdc06af}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD HomingY : BOOL
-
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE _HomingStepY OF
-		
-	0:
-		HomingY := FALSE;
-			
-		IF AxisY.Enable() THEN
-			
-			//Trace('Enable Axis Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-		
-	10:
-		IF AxisY.Enabled THEN
-			AxisY.Acceleration := 100;
-			AxisY.Deceleration := 15000;
-			//Trace('Enabled Axis Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-
-	20:
-		IF IO.ProximitySensorY THEN
-			IF AxisY.Stop() THEN
-				IF NOT AxisY.Busy THEN
-				AxisY.Home();
-				//Trace('Start na krańcówce Y');
-				_HomingStepY := 80;
-				END_IF
-			END_IF
-		ELSE		
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-		
-	30:
-		IF AxisY.MoveVelocity(-80, FALSE) THEN
-			//Trace('Szybki ruch, szukam krancowki Y');
-            _HomingStepY := _HomingStepY + 10;
-        END_IF
-		
-	
-	40: 
-		IF IO.ProximitySensorY THEN
-			
-		IF AxisY.Stop() THEN
-			IF NOT AxisY.Busy THEN
-				//Trace('Spotkałem krańcówkę Y');
-				_HomingStepY := _HomingStepY + 10;
-			END_IF
-		END_IF
-		
-		END_IF
-
-	50:
-		IF AxisY.MoveRelative(30,FALSE) THEN
-			//Trace('Odsunięcie od krańcówki, po szybkim Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-		
-	60: 
-		IF AxisY.MoveVelocity(-10,FALSE) THEN
-			//Trace('Spokojny powrot Y');		
-			_HomingStepY := _HomingStepY + 10;
-		END_IF	
-		
-	70:
-		IF IO.ProximitySensorY THEN
-			IF AxisY.Stop() THEN
-				//Trace('Stop do precyzyjnego Y');
-				_HomingStepY := _HomingStepY + 10; // Przechodzimy do czekania na zatrzymanie
-			END_IF
-		END_IF
-
-	80:
-		IF NOT AxisY.Busy THEN
-			IF AxisY.Home() THEN
-				_HomingStepY := _HomingStepY + 10;
-				//Trace('Precyzyjny Home wykonany Y');
-			END_IF
-		END_IF
-
-
-	90:	
-		IF AxisY.MoveRelative(2.0, FALSE) THEN
-			//Trace('Odsunięcie od krańcówki o 2mm Y');
-			_HomingStepY := _HomingStepY + 10;
-		END_IF
-	
-	100:
-		IF NOT AxisY.Busy THEN
-		
-			IF AxisY.Home() THEN
-				//Trace('Ustawienie nowego zera po odsunięciu Y');
-				_HomingStepY := _HomingStepY + 10;
-			END_IF
-		END_IF
-	
-	110:
-		HomingY := TRUE;
-		//Trace('Homing zakończony pomyślnie Y');
-		
-			
-	END_CASE
-	
-
-]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="HomingZ" Id="{59c5c153-dee1-4d97-aac8-e655f142ebf1}" FolderPath="MyMethods\">
-      <Declaration><![CDATA[METHOD HomingZ : BOOL
-
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE _HomingStepZ OF
-		
-	0:
-		HomingZ := FALSE;	
-		
-		IF AxisZ.Enable() THEN
-			
-			//Trace('Enable Axis Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-		
-	10:
-		IF AxisZ.Enabled THEN
-			AxisZ.Acceleration := 100;
-			AxisZ.Deceleration := 15000;
-			//Trace('Enabled Axis Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-
-	20:
-		IF IO.ProximitySensorZ THEN
-			IF AxisZ.Stop() THEN
-				IF NOT AxisZ.Busy THEN
-				AxisZ.Home();
-				//Trace('Start na krańcówce Z');
-				_HomingStepZ := 80;
-				END_IF
-			END_IF
-		ELSE		
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-		
-	30:
-		IF AxisZ.MoveVelocity(-100, FALSE) THEN
-			//Trace('Szybki ruch, szukam krancowki Z');
-            _HomingStepZ := _HomingStepZ + 10;
-        END_IF
-		
-	
-	40: 
-		IF IO.ProximitySensorZ THEN
-			
-		IF AxisZ.Stop() THEN
-			IF NOT AxisZ.Busy THEN
-				//Trace('Spotkałem krańcówkę Z');
-				_HomingStepZ := _HomingStepZ + 10;
-			END_IF
-		END_IF
-		
-		END_IF
-
-	50:
-		IF AxisZ.MoveRelative(5,FALSE) THEN
-			//Trace('Odsunięcie od krańcówki, po szybkim Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-		
-	60: 
-		IF AxisZ.MoveVelocity(-10,FALSE) THEN
-			//Trace('Spokojny powrot Z');		
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF	
-		
-	70:
-		IF IO.ProximitySensorZ THEN
-			IF AxisZ.Stop() THEN
-				//Trace('Stop do precyzyjnego Z');
-				_HomingStepZ := _HomingStepZ + 10; // Przechodzimy do czekania na zatrzymanie
-			END_IF
-		END_IF
-
-	80:
-		IF NOT AxisZ.Busy THEN
-			IF AxisZ.Home() THEN
-				_HomingStepZ := _HomingStepZ + 10;
-				//Trace('Precyzyjny Home wykonany Z');
-			END_IF
-		END_IF
-
-
-	90:	
-		IF AxisZ.MoveRelative(2.0, FALSE) THEN
-			//Trace('Odsunięcie od krańcówki o 2mm Z');
-			_HomingStepZ := _HomingStepZ + 10;
-		END_IF
-	
-	100:
-		IF NOT AxisZ.Busy THEN		
-		
-			IF AxisZ.Home() THEN
-				//Trace('Ustawienie nowego zera po odsunięciu Z');
-				_HomingStepZ := _HomingStepZ + 10;
-			END_IF
-		END_IF
-	
-	110:
-		HomingZ := TRUE;
-		//Trace('Homing zakończony pomyślnie Z');
-		
-			
-	END_CASE
-	
-
-]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="Initialize" Id="{ba85f303-ffbe-03ad-229b-3741bd93e6e2}">
       <Declaration><![CDATA[//! @summary Basic module initialization logic
 METHOD PROTECTED Initialize : BOOL;
@@ -2304,9 +1914,7 @@ END_VAR
 				flagZ :=0;
 				OrchestratorStep := 0;
 				ExecutorStep := 0;
-				THIS^.HomingStepX := 0;
-				THIS^.HomingStepY := 0;
-				THIS^.HomingStepZ := 0;
+
 				SequenceState := 40;
 //			END_IF			
 			END_IF		
@@ -2433,7 +2041,6 @@ END_IF]]></ST>
       <LineId Id="257" Count="0" />
       <LineId Id="259" Count="0" />
       <LineId Id="230" Count="0" />
-      <LineId Id="112" Count="1" />
       <LineId Id="121" Count="1" />
       <LineId Id="246" Count="0" />
       <LineId Id="269" Count="1" />
@@ -2454,7 +2061,8 @@ END_IF]]></ST>
       <LineId Id="205" Count="3" />
       <LineId Id="238" Count="0" />
       <LineId Id="209" Count="0" />
-      <LineId Id="211" Count="5" />
+      <LineId Id="282" Count="0" />
+      <LineId Id="213" Count="3" />
       <LineId Id="220" Count="0" />
       <LineId Id="218" Count="1" />
       <LineId Id="190" Count="0" />
@@ -2537,7 +2145,6 @@ END_IF]]></ST>
       <LineId Id="28" Count="5" />
       <LineId Id="78" Count="0" />
       <LineId Id="83" Count="3" />
-      <LineId Id="156" Count="1" />
       <LineId Id="155" Count="0" />
       <LineId Id="75" Count="2" />
       <LineId Id="130" Count="0" />
@@ -2785,52 +2392,6 @@ END_IF]]></ST>
       <LineId Id="6" Count="24" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingStepX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingStepX.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingStepY.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingStepY.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingStepZ.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingStepZ.Set">
-      <LineId Id="8" Count="0" />
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingX">
-      <LineId Id="888" Count="3" />
-      <LineId Id="995" Count="0" />
-      <LineId Id="997" Count="0" />
-      <LineId Id="892" Count="82" />
-      <LineId Id="993" Count="0" />
-      <LineId Id="975" Count="13" />
-      <LineId Id="314" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingY">
-      <LineId Id="793" Count="3" />
-      <LineId Id="901" Count="0" />
-      <LineId Id="797" Count="82" />
-      <LineId Id="899" Count="0" />
-      <LineId Id="880" Count="13" />
-      <LineId Id="314" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.HomingZ">
-      <LineId Id="988" Count="3" />
-      <LineId Id="1097" Count="0" />
-      <LineId Id="992" Count="82" />
-      <LineId Id="1093" Count="0" />
-      <LineId Id="1075" Count="13" />
-      <LineId Id="314" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
       <LineId Id="3" Count="4" />
       <LineId Id="68" Count="0" />
@@ -2950,7 +2511,7 @@ END_IF]]></ST>
       <LineId Id="237" Count="2" />
       <LineId Id="225" Count="0" />
       <LineId Id="508" Count="0" />
-      <LineId Id="211" Count="2" />
+      <LineId Id="213" Count="0" />
       <LineId Id="186" Count="0" />
       <LineId Id="183" Count="0" />
       <LineId Id="125" Count="0" />
