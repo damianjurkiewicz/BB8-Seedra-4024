@@ -34,7 +34,7 @@ METHOD Abort
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[AxisX := _AxisX;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{7ab3348b-b4bb-4d6b-bd39-8185e257a35e}">
@@ -42,7 +42,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[_AxisX := AxisX;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -53,7 +53,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[AxisY := _AxisY;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{cefe518b-6ed4-4e66-9928-cc421068c6b9}">
@@ -61,7 +61,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[_AxisY := AxisY;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -72,7 +72,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[AxisZ := _AxisZ;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{fbb69cdf-dc2f-457b-88ac-db5f43779a82}">
@@ -80,7 +80,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[_AxisZ := AxisZ;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -91,7 +91,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[Config REF= _Config;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{855da8aa-c381-42d4-945c-30bcec476610}">
@@ -99,7 +99,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[_Config REF= Config;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -114,6 +114,7 @@ END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Domyślnie zwracaj FALSE. TRUE zwracamy dopiero, gdy skończymy proces (krok 1000).
 Cut := FALSE;
+StepTimer();
 
 // Zabezpieczenie na wypadek braku wstrzykniętych referencji!
 IF _RecipeBuilder = 0 OR NOT __ISVALIDREF(_Config) THEN
@@ -123,6 +124,9 @@ END_IF
 
 // 1. Zrzut całej tablicy z Właściwości (Property) do zmiennej lokalnej
 localSegmentsCutX := _RecipeBuilder.SegmentsCutX;
+
+IF iCurrentSegment < 1 THEN iCurrentSegment := 1; END_IF
+IF iCurrentSegment > 32 THEN iCurrentSegment := 32; END_IF
 
 // 2. Wyciągnięcie konkretnego segmentu dla aktualnego kroku
 // (Bezpieczny odczyt z lokalnej pamięci)
@@ -249,7 +253,7 @@ END_CASE]]></ST>
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[Cylinder := _Cylinder;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{f831b18a-1816-415a-82f6-5aeacd4161b5}">
@@ -257,7 +261,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[_Cylinder := Cylinder;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -268,7 +272,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[RecipeBuilder := _RecipeBuilder;]]></ST>
         </Implementation>
       </Get>
       <Set Name="Set" Id="{1d93da46-a542-4ef2-b525-3599ad0c4f6e}">
@@ -276,7 +280,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[]]></ST>
+          <ST><![CDATA[_RecipeBuilder := RecipeBuilder;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -311,8 +315,14 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCutX.Cut">
-      <LineId Id="10" Count="7" />
-      <LineId Id="132" Count="5" />
+      <LineId Id="10" Count="1" />
+      <LineId Id="145" Count="0" />
+      <LineId Id="12" Count="5" />
+      <LineId Id="132" Count="2" />
+      <LineId Id="142" Count="0" />
+      <LineId Id="144" Count="0" />
+      <LineId Id="143" Count="0" />
+      <LineId Id="135" Count="2" />
       <LineId Id="131" Count="0" />
       <LineId Id="18" Count="111" />
       <LineId Id="7" Count="0" />

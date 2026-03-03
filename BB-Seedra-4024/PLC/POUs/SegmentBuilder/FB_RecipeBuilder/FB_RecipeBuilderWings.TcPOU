@@ -25,136 +25,139 @@ END_VAR
     </Implementation>
     <Method Name="Build" Id="{c08ade7c-db75-4c50-8457-5bb392619adf}">
       <Declaration><![CDATA[METHOD Build : BOOL
-
 VAR
-    TotalY      : REAL;
-    TotalX      : REAL;
-    ShorterY    : REAL;
-    ShorterX    : REAL;
-END_VAR]]></Declaration>
+    TotalY          : REAL;
+    TotalX          : REAL;
+    ShorterY        : REAL;
+    ShorterX        : REAL;
+    
+    // Zmienna lokalna, dopóki nie dodasz jej do ST_RecipeBuilder_Config
+    CuttingOverpass : REAL := 20.0; 
+END_VAR
+]]></Declaration>
       <Implementation>
-        <ST><![CDATA[//// Wyliczenia gabarytów na podstawie parametrów wejściowych
-//TotalY   := PanelLength + 2 * PanelHeight; 
-//TotalX   := PanelWidth + 2 * PanelHeight;
-//ShorterY := TotalY - PanelHeight;
-//ShorterX := TotalX - PanelHeight;
+        <ST><![CDATA[
+// Wyliczenia gabarytów na podstawie parametrów wejściowych (ze struktury _Config)
+TotalY   := _Config.PanelFrontLength + 2 * _Config.PanelHeight;
+TotalX   := _Config.PanelFrontWidht  + 2 * _Config.PanelHeight; // Uwaga na literówkę 'Widht' w strukturze!
+ShorterY := TotalY - _Config.PanelHeight;
+ShorterX := TotalX - _Config.PanelHeight;
 
-//// --- TRACE DLA WERYFIKACJI ---
-//Trace(Message:= CONCAT('--- BUILD BORGO WINGS START ---', ''));
-//Trace(Message:= CONCAT('Input PanelWidth: ', TO_STRING(PanelWidth)));
-//Trace(Message:= CONCAT('Input PanelLength: ', TO_STRING(PanelLength)));
-//Trace(Message:= CONCAT('Input PanelHeight: ', TO_STRING(PanelHeight)));
-//Trace(Message:= CONCAT('Calc TotalX: ', TO_STRING(TotalX)));
-//Trace(Message:= CONCAT('Calc TotalY: ', TO_STRING(TotalY)));
-//Trace(Message:= CONCAT('Calc ShorterX: ', TO_STRING(ShorterX)));
-//Trace(Message:= CONCAT('Calc ShorterY: ', TO_STRING(ShorterY)));
+// --- TRACE DLA WERYFIKACJI ---
+Trace(Message:= CONCAT('--- BUILD BORGO WINGS START ---', ''));
+Trace(Message:= CONCAT('Input PanelWidth: ', TO_STRING(_Config.PanelFrontWidht)));
+Trace(Message:= CONCAT('Input PanelLength: ', TO_STRING(_Config.PanelFrontLength)));
+Trace(Message:= CONCAT('Input PanelHeight: ', TO_STRING(_Config.PanelHeight)));
+Trace(Message:= CONCAT('Calc TotalX: ', TO_STRING(TotalX)));
+Trace(Message:= CONCAT('Calc TotalY: ', TO_STRING(TotalY)));
+Trace(Message:= CONCAT('Calc ShorterX: ', TO_STRING(ShorterX)));
+Trace(Message:= CONCAT('Calc ShorterY: ', TO_STRING(ShorterY)));
 
-//// ------------------------------------
-//// 1. Segregracja frezowania (Grooving)
-//// ------------------------------------
-//_SegmentsToGroove := 4;
+// ------------------------------------
+// 1. Segregracja frezowania (Grooving)
+// ------------------------------------
+_SegmentsToGroove := 4;
 
-//_SegmentsGroove[1].Start.X := TotalX;
-//_SegmentsGroove[1].Stop.X  := 0;
-//_SegmentsGroove[1].Start.Y := ShorterY;
-//_SegmentsGroove[1].Stop.Y  := ShorterY;
+_SegmentsGroove[1].Start.X := TotalX;
+_SegmentsGroove[1].Stop.X  := 0;
+_SegmentsGroove[1].Start.Y := ShorterY;
+_SegmentsGroove[1].Stop.Y  := ShorterY;
 
+_SegmentsGroove[2].Start.X := TotalX;
+_SegmentsGroove[2].Stop.X  := 0; 
+_SegmentsGroove[2].Start.Y := _Config.PanelHeight;
+_SegmentsGroove[2].Stop.Y  := _Config.PanelHeight;
 
-//_SegmentsGroove[2].Start.X := TotalX;
-//_SegmentsGroove[2].Stop.X  := 0; 
-//_SegmentsGroove[2].Start.Y := PanelHeight;
-//_SegmentsGroove[2].Stop.Y  := PanelHeight;
+_SegmentsGroove[3].Start.X := ShorterX;
+_SegmentsGroove[3].Stop.X  := ShorterX;
+_SegmentsGroove[3].Start.Y := TotalY;
+_SegmentsGroove[3].Stop.Y  := 0;
 
-//_SegmentsGroove[3].Start.X := ShorterX;
-//_SegmentsGroove[3].Stop.X  := ShorterX;
-//_SegmentsGroove[3].Start.Y := TotalY;
-//_SegmentsGroove[3].Stop.Y  := 0;
+_SegmentsGroove[4].Start.Y := TotalY;
+_SegmentsGroove[4].Stop.Y  := 0;
+_SegmentsGroove[4].Start.X := _Config.PanelHeight;
+_SegmentsGroove[4].Stop.X  := _Config.PanelHeight;
 
-//_SegmentsGroove[4].Start.Y := TotalY;
-//_SegmentsGroove[4].Stop.Y  := 0;
-//_SegmentsGroove[4].Start.X := PanelHeight;
-//_SegmentsGroove[4].Stop.X  := PanelHeight;
+// ------------------------------------
+// 2. Cięcie w osi X (Cut X)
+// ------------------------------------
+_SegmentsToCutX := 6;
 
-//// ------------------------------------
-//// 2. Cięcie w osi X (Cut X)
-//// ------------------------------------
-//_SegmentsToCutX := 6;
+// Short Box Segments
+_SegmentsCutX[1].Start.X := TotalX + CuttingOverpass;
+_SegmentsCutX[1].Stop.X  := ShorterX;
+_SegmentsCutX[1].Start.Y := ShorterY;
+_SegmentsCutX[1].Stop.Y  := ShorterY;
 
-//// Short Box Segments
-//_SegmentsCutX[1].Start.X := TotalX + CuttingOverpass;
-//_SegmentsCutX[1].Stop.X  := ShorterX;
-//_SegmentsCutX[1].Start.Y := ShorterY;
-//_SegmentsCutX[1].Stop.Y  := ShorterY;
+_SegmentsCutX[2].Start.X := _Config.PanelHeight;
+_SegmentsCutX[2].Stop.X  := -CuttingOverpass;
+_SegmentsCutX[2].Start.Y := ShorterY;
+_SegmentsCutX[2].Stop.Y  := ShorterY;
 
-//_SegmentsCutX[2].Start.X := PanelHeight;
-//_SegmentsCutX[2].Stop.X  := -CuttingOverpass;
-//_SegmentsCutX[2].Start.Y := ShorterY;
-//_SegmentsCutX[2].Stop.Y  := ShorterY;
+_SegmentsCutX[3].Start.X := TotalX + CuttingOverpass;
+_SegmentsCutX[3].Stop.X  := ShorterX;
+_SegmentsCutX[3].Start.Y := _Config.PanelHeight;
+_SegmentsCutX[3].Stop.Y  := _Config.PanelHeight;
 
-//_SegmentsCutX[3].Start.X := TotalX + CuttingOverpass;
-//_SegmentsCutX[3].Stop.X  := ShorterX;
-//_SegmentsCutX[3].Start.Y := PanelHeight;
-//_SegmentsCutX[3].Stop.Y  := PanelHeight;
+_SegmentsCutX[4].Start.X := _Config.PanelHeight;
+_SegmentsCutX[4].Stop.X  := -CuttingOverpass;
+_SegmentsCutX[4].Start.Y := _Config.PanelHeight;
+_SegmentsCutX[4].Stop.Y  := _Config.PanelHeight;
 
-//_SegmentsCutX[4].Start.X := PanelHeight;
-//_SegmentsCutX[4].Stop.X  := -CuttingOverpass;
-//_SegmentsCutX[4].Start.Y := PanelHeight;
-//_SegmentsCutX[4].Stop.Y  := PanelHeight;
+// Panel Dimensions Shorter Flaps
+_SegmentsCutX[5].Start.X := TotalX + CuttingOverpass;
+_SegmentsCutX[5].Stop.X  := -CuttingOverpass;
+_SegmentsCutX[5].Start.Y := TotalY - _Config.RailHeightCorrection;
+_SegmentsCutX[5].Stop.Y  := TotalY - _Config.RailHeightCorrection;
 
-//// Panel Dimensions Shorter Flaps
-//_SegmentsCutX[5].Start.X := TotalX + CuttingOverpass;
-//_SegmentsCutX[5].Stop.X  := -CuttingOverpass;
-//_SegmentsCutX[5].Start.Y := TotalY - RailHeightCorrection;
-//_SegmentsCutX[5].Stop.Y  := TotalY - RailHeightCorrection;
+_SegmentsCutX[6].Start.X := TotalX + CuttingOverpass;
+_SegmentsCutX[6].Stop.X  := -CuttingOverpass;
+_SegmentsCutX[6].Start.Y := _Config.RailHeightCorrection;
+_SegmentsCutX[6].Stop.Y  := _Config.RailHeightCorrection;
 
-//_SegmentsCutX[6].Start.X := TotalX + CuttingOverpass;
-//_SegmentsCutX[6].Stop.X  := -CuttingOverpass;
-//_SegmentsCutX[6].Start.Y := RailHeightCorrection;
-//_SegmentsCutX[6].Stop.Y  := RailHeightCorrection;
+// ------------------------------------
+// 3. Cięcie w osi Y (Cut Y)
+// ------------------------------------
+_SegmentsToCutY := 6;
 
-//// ------------------------------------
-//// 3. Cięcie w osi Y (Cut Y)
-//// ------------------------------------
-//_SegmentsToCutY := 6;
+// Short Box Segments
+_SegmentsCutY[1].Start.X := ShorterX;
+_SegmentsCutY[1].Stop.X  := ShorterX;
+_SegmentsCutY[1].Start.Y := TotalY + CuttingOverpass;
+_SegmentsCutY[1].Stop.Y  := ShorterY;
 
-//// Short Box Segments
-//_SegmentsCutY[1].Start.X := ShorterX;
-//_SegmentsCutY[1].Stop.X  := ShorterX;
-//_SegmentsCutY[1].Start.Y := TotalY + CuttingOverpass;
-//_SegmentsCutY[1].Stop.Y  := ShorterY;
+_SegmentsCutY[2].Start.X := _Config.PanelHeight;
+_SegmentsCutY[2].Stop.X  := _Config.PanelHeight;
+_SegmentsCutY[2].Start.Y := TotalY + CuttingOverpass;
+_SegmentsCutY[2].Stop.Y  := ShorterY;
 
-//_SegmentsCutY[2].Start.X := PanelHeight;
-//_SegmentsCutY[2].Stop.X  := PanelHeight;
-//_SegmentsCutY[2].Start.Y := TotalY + CuttingOverpass;
-//_SegmentsCutY[2].Stop.Y  := ShorterY;
+_SegmentsCutY[3].Start.X := ShorterX;
+_SegmentsCutY[3].Stop.X  := ShorterX;
+_SegmentsCutY[3].Start.Y := _Config.PanelHeight;
+_SegmentsCutY[3].Stop.Y  := -CuttingOverpass;
 
-//_SegmentsCutY[3].Start.X := ShorterX;
-//_SegmentsCutY[3].Stop.X  := ShorterX;
-//_SegmentsCutY[3].Start.Y := PanelHeight;
-//_SegmentsCutY[3].Stop.Y  := -CuttingOverpass;
+_SegmentsCutY[4].Start.X := _Config.PanelHeight;
+_SegmentsCutY[4].Stop.X  := _Config.PanelHeight;
+_SegmentsCutY[4].Start.Y := _Config.PanelHeight;
+_SegmentsCutY[4].Stop.Y  := -CuttingOverpass;
 
-//_SegmentsCutY[4].Start.X := PanelHeight;
-//_SegmentsCutY[4].Stop.X  := PanelHeight;
-//_SegmentsCutY[4].Start.Y := PanelHeight;
-//_SegmentsCutY[4].Stop.Y  := -CuttingOverpass;
+// Panel Dimensions
+_SegmentsCutY[5].Start.X := TotalX;
+_SegmentsCutY[5].Stop.X  := TotalX;
+_SegmentsCutY[5].Start.Y := TotalY + CuttingOverpass;
+_SegmentsCutY[5].Stop.Y  := -CuttingOverpass;
 
-//// Panel Dimensions
-//_SegmentsCutY[5].Start.X := TotalX;
-//_SegmentsCutY[5].Stop.X  := TotalX;
-//_SegmentsCutY[5].Start.Y := TotalY + CuttingOverpass;
-//_SegmentsCutY[5].Stop.Y  := -CuttingOverpass;
+_SegmentsCutY[6].Start.X := 0;
+_SegmentsCutY[6].Stop.X  := 0;
+_SegmentsCutY[6].Start.Y := TotalY + CuttingOverpass;
+_SegmentsCutY[6].Stop.Y  := -CuttingOverpass;
 
-//_SegmentsCutY[6].Start.X := 0;
-//_SegmentsCutY[6].Stop.X  := 0;
-//_SegmentsCutY[6].Start.Y := TotalY + CuttingOverpass;
-//_SegmentsCutY[6].Stop.Y  := -CuttingOverpass;
+// Log podsumowujący ile odcinków wygenerowano
+Trace(Message:= CONCAT('Segments Groove Count: ', TO_STRING(_SegmentsToGroove)));
+Trace(Message:= CONCAT('Segments CutX Count: ', TO_STRING(_SegmentsToCutX)));
+Trace(Message:= CONCAT('Segments CutY Count: ', TO_STRING(_SegmentsToCutY)));
 
-//// Log podsumowujący ile odcinków wygenerowano
-//Trace(Message:= CONCAT('Segments Groove Count: ', TO_STRING(_SegmentsToGroove)));
-//Trace(Message:= CONCAT('Segments CutX Count: ', TO_STRING(_SegmentsToCutX)));
-//Trace(Message:= CONCAT('Segments CutY Count: ', TO_STRING(_SegmentsToCutY)));
-
-// Zwracamy TRUE gdy budowanie się zakończyło
+//Zwracamy TRUE gdy budowanie się zakończyło
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -192,39 +195,35 @@ _RailHeightCorrection := RecipeBuilder_HMI.Config.RailHeightCorrection;
       </Implementation>
     </Method>
     <Property Name="SegmentsCutX" Id="{9152e646-9866-44c9-b9e6-5a764990d7d4}">
-      <Declaration><![CDATA[PROPERTY SegmentsCutX : ARRAY [1..32] OF ST_CutSegment
-]]></Declaration>
+      <Declaration><![CDATA[PROPERTY SegmentsCutX : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
       <Get Name="Get" Id="{8272f94b-fbfa-4156-a332-efb73ed5cf2e}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[SegmentsCutX := _SegmentsCutX;]]></ST>
+          <ST><![CDATA[SegmentsCutX REF= _SegmentsCutX;]]></ST>
         </Implementation>
       </Get>
     </Property>
     <Property Name="SegmentsCutY" Id="{255ca92b-c547-401c-9784-b32df54e5e2a}">
-      <Declaration><![CDATA[PROPERTY SegmentsCutY : ARRAY [1..32] OF ST_CutSegment
-]]></Declaration>
+      <Declaration><![CDATA[PROPERTY SegmentsCutY : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
       <Get Name="Get" Id="{4b559848-f1de-4c18-834d-4d2909a2699d}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[SegmentsCutY := _SegmentsCutY;]]></ST>
+          <ST><![CDATA[SegmentsCutY REF= _SegmentsCutY;]]></ST>
         </Implementation>
       </Get>
     </Property>
     <Property Name="SegmentsGroove" Id="{a6cc8c84-07e4-4531-824b-69c46a3f14a3}">
-      <Declaration><![CDATA[
-PROPERTY SegmentsGroove : ARRAY [1..32] OF ST_CutSegment
-]]></Declaration>
+      <Declaration><![CDATA[PROPERTY SegmentsGroove : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
       <Get Name="Get" Id="{7a846cca-77b5-4d85-b851-6d33d3df4235}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[SegmentsGroove := _SegmentsGroove;]]></ST>
+          <ST><![CDATA[SegmentsGroove REF= _SegmentsGroove;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -271,9 +270,7 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderWings.Build">
-      <LineId Id="149" Count="24" />
-      <LineId Id="271" Count="0" />
-      <LineId Id="174" Count="95" />
+      <LineId Id="431" Count="121" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderWings.Config.Get">
