@@ -4,96 +4,87 @@
     <Declaration><![CDATA[{attribute 'conditionalshow'}
 FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule
 VAR
-    // Sub module definitions here
-	_RecipeBuilder	: POINTER TO FB_RecipeBuilderWings;
+    // =========================================================
+    //  DEPENDENCIES & SUB-MODULES
+    // =========================================================
+    _RecipeBuilder      : POINTER TO FB_RecipeBuilderWings;
+    ipSubModules_Init   : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
 
-	
-	// List of sub modules
-    ipSubModules_Init : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
+    // =========================================================
+    //  HMI & COMMANDS
+    // =========================================================
+    GantryXYZ_HMI       : ST_GantryXYZ_HMI;
+    _ProgramIdRequested : E_RecipeID;
 
-    // Component definitions here
-    AxisX : FB_Component_BasicAxis := (Name := 'AxisX');
-    AxisY : FB_Component_BasicAxis := (Name := 'AxisY');
-    AxisZ : FB_Component_BasicAxis := (Name := 'AxisZ');
-    CylinderCuttingY : FB_CylinderCutY := (Name := 'Cylinder Y');
-	CylinderCuttingX : FB_CylinderCutX := (Name := 'Cylinder X');
-	
+    // =========================================================
+    //  COMPONENTS (AXES & CYLINDERS)
+    // =========================================================
+    AxisX               : FB_Component_BasicAxis := (Name := 'AxisX');
+    AxisY               : FB_Component_BasicAxis := (Name := 'AxisY');
+    AxisZ               : FB_Component_BasicAxis := (Name := 'AxisZ');
+    CylinderCuttingX    : FB_CylinderCutX        := (Name := 'Cylinder X');
+    CylinderCuttingY    : FB_CylinderCutY        := (Name := 'Cylinder Y');
 
-    // Alarms for this module
-    GantryAlarms : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
-	
+    // =========================================================
+    //  HOMING STRATEGIES
+    // =========================================================
+    fbHomeStratX        : FB_Homing_StandardNC;
+    fbHomeStratY        : FB_Homing_StandardNC;
+    fbHomeStratZ        : FB_Homing_StandardNC;
 
-	_ProgramIdRequested :   E_RecipeID;
+    // =========================================================
+    //  SEQUENCERS & INTERNAL LOGIC
+    // =========================================================
+    OrchestratorStep    : INT := 0;
+    ExecutorStep        : INT := 0;
 
-	
-//	//Segments
-//	SegmentGrooves       : ARRAY[1..32] OF ST_CutSegment;
-//    SegmentsToGroove     : INT;          // Ile odcinków
-//    iSegmentsToGroove    : INT;          // Indeks aktualnego odcinka
+    // =========================================================
+    //  ALARMS
+    // =========================================================
+    GantryAlarms        : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
+
+    // =========================================================
+    //  MACHINE SETTINGS (LOCAL COPIES FROM HMI)
+    // =========================================================
+    // Speeds (Rapid)
+    _RapidSpeedX        : REAL;
+    _RapidSpeedY        : REAL;
+    _RapidSpeedZ        : REAL;
     
+    // Cutting
+    _CuttingSpeedX      : REAL;
+    _CuttingSpeedY      : REAL;
+    _CuttingIdleTime    : REAL;
+    _CuttingOverpass    : REAL;
     
-//	//Segments Cut Y
-//	SegmentCutY      	 : ARRAY[1..32] OF ST_CutSegment;
-//    SegmentsToCutY       : INT;          // Ile odcinków
-//    iSegmentsToCutY      : INT;          // Indeks aktualnego odcinka
-	
-//	//Segments Cut X
-//	SegmentCutX      	 : ARRAY[1..32] OF ST_CutSegment;
-//    SegmentsToCutX       : INT;          // Ile odcinków
-//    iSegmentsToCutX      : INT;          // Indeks aktualnego odcinka
+    // Grooving
+    _GroovingSpeedX     : REAL;
+    _GroovingSpeedY     : REAL;
+    _GroovingSpeedZ     : REAL;
+    _GroovingIdleTime   : REAL;
+    _GroovingOverpass   : REAL;
+    _GrooveDepthZ       : REAL;
 
-	//Sequencers
-	OrchestratorStep :			INT := 0;
-	ExecutorStep :				INT := 0;
-	
-	GantryXYZ_HMI : ST_GantryXYZ_HMI;
-	
-	//Test
-	fbHomeStratX : FB_Homing_StandardNC;
-    fbHomeStratY : FB_Homing_StandardNC;
-    fbHomeStratZ : FB_Homing_StandardNC;
-	
-	//old persistent
-	_CuttingSpeedX			:REAL;
-	_CuttingSpeedY			:REAL;
-	_CuttingIdleTime		:REAL;
-	_CuttingOverpass		:REAL;
-	_CutterXOffsetX			:REAL;
-	_CutterXOffsetY			:REAL;
-	_CutterYOffsetX			:REAL;
-	_CutterYOffsetY			:REAL;	
-    _GrooveDepthZ 			:REAL;
-	_GroovingSpeedX 		:REAL;
-	_GroovingSpeedY 		:REAL;
-	_GroovingSpeedZ 		:REAL;
-	_GroovingIdleTime 		:REAL;
-    _GroovingOverpass 		:REAL;
-    _PanelFrontWidth 		:REAL;
-	_PanelFrontLength		:REAL;
-    _PanelHeight 			:REAL;
-    _RailHeightCorrection	:REAL;
-    _RapidSpeedX 			:REAL;
-    _RapidSpeedY 			:REAL;
-    _RapidSpeedZ 			:REAL;
-	_GlobalOffset 			:INT;
-	
+    // Offsets
+    _CutterXOffsetX     : REAL;
+    _CutterXOffsetY     : REAL;
+    _CutterYOffsetX     : REAL;
+    _CutterYOffsetY     : REAL;	
+    _GlobalOffset       : INT;
+
 END_VAR
 
 VAR CONSTANT
-    GANTRY_ALARM_COUNT : 	INT := 5;
+    GANTRY_ALARM_COUNT  : INT := 5;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[
 ]]></ST>
     </Implementation>
-    <Folder Name="MyMethods" Id="{d166ca9d-f57a-4d88-ac90-142e5eb5d488}">
-      <Folder Name="Segments" Id="{b8033ee7-c5f7-43d2-a584-12e2969c60b8}" />
-    </Folder>
-    <Folder Name="Properties" Id="{b05cc7e1-dc37-4910-986a-f085b4a0163d}">
-      <Folder Name="Comand" Id="{afdb6df3-76c4-47c1-997d-636ee1fa8ab3}" />
-      <Folder Name="Config" Id="{d432f26c-f18e-459c-b74b-59233683f472}" />
-      <Folder Name="Status" Id="{76f95e74-5bed-4ec3-be3e-2b7b97f61740}" />
-    </Folder>
+    <Folder Name="Builder (obsolete)" Id="{e23a5ea6-ed0f-420e-b287-513d81c1eb35}" />
+    <Folder Name="Executor (to refactor)" Id="{4c5992cb-9a20-4f64-97ec-fbd74ffea4f3}" />
+    <Folder Name="MyMethods" Id="{d166ca9d-f57a-4d88-ac90-142e5eb5d488}" />
+    <Folder Name="Properties" Id="{b05cc7e1-dc37-4910-986a-f085b4a0163d}" />
     <Folder Name="States" Id="{8df42c9b-c051-49f1-9767-900503632339}" />
     <Method Name="Aborting" Id="{5476dfef-6652-4e6b-8928-3724a50553de}" FolderPath="States\">
       <Declaration><![CDATA[
@@ -174,7 +165,7 @@ END_CASE
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="BuildSegments_Arona" Id="{e84aaa35-d3d2-459f-b6b9-b01f1c51048b}" FolderPath="MyMethods\Segments\">
+    <Method Name="BuildSegments_Arona" Id="{e84aaa35-d3d2-459f-b6b9-b01f1c51048b}" FolderPath="Builder (obsolete)\">
       <Declaration><![CDATA[METHOD BuildSegments_Arona : BOOL
 
 ]]></Declaration>
@@ -230,7 +221,7 @@ Trace('Build Arona');
 BuildSegments_Arona := TRUE;]]></ST>
       </Implementation>
     </Method>
-    <Method Name="BuildSegments_BorgoFlaps" Id="{30aff943-63a2-49df-9f71-8b8f78deda49}" FolderPath="MyMethods\Segments\">
+    <Method Name="BuildSegments_BorgoFlaps" Id="{30aff943-63a2-49df-9f71-8b8f78deda49}" FolderPath="Builder (obsolete)\">
       <Declaration><![CDATA[METHOD BuildSegments_BorgoFlaps : BOOL
 VAR_INST
 	TotalY 		:REAL;
@@ -288,7 +279,7 @@ Trace('Build Flaps');
 BuildSegments_BorgoFlaps := TRUE;]]></ST>
       </Implementation>
     </Method>
-    <Method Name="BuildSegments_BorgoWings" Id="{0600b631-5666-4473-9115-8ec263b291bb}" FolderPath="MyMethods\Segments\">
+    <Method Name="BuildSegments_BorgoWings" Id="{0600b631-5666-4473-9115-8ec263b291bb}" FolderPath="Builder (obsolete)\">
       <Declaration><![CDATA[METHOD BuildSegments_BorgoWings : BOOL
 VAR_INST
 	TotalY 		:REAL;
@@ -669,7 +660,7 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Method Name="ExecuteSegmentsCutX" Id="{94347c53-d843-4c0f-8fa0-b761cd0d80e2}" FolderPath="MyMethods\Segments\">
+    <Method Name="ExecuteSegmentsCutX" Id="{94347c53-d843-4c0f-8fa0-b761cd0d80e2}" FolderPath="Executor (to refactor)\">
       <Declaration><![CDATA[METHOD ExecuteSegmentsCutX : BOOL
 ]]></Declaration>
       <Implementation>
@@ -779,7 +770,7 @@ ExecuteSegmentsCutX := TRUE;
 Trace('CutX');]]></ST>
       </Implementation>
     </Method>
-    <Method Name="ExecuteSegmentsCutY" Id="{dc7ba1fd-c66f-4871-a334-3c135aa8a2cb}" FolderPath="MyMethods\Segments\">
+    <Method Name="ExecuteSegmentsCutY" Id="{dc7ba1fd-c66f-4871-a334-3c135aa8a2cb}" FolderPath="Executor (to refactor)\">
       <Declaration><![CDATA[METHOD ExecuteSegmentsCutY : BOOL
 ]]></Declaration>
       <Implementation>
@@ -891,7 +882,7 @@ Trace('CutX');]]></ST>
  Trace('CutY');]]></ST>
       </Implementation>
     </Method>
-    <Method Name="ExecuteSegmentsGroove" Id="{3ee66abc-6845-49e5-b2ff-149134d7252b}" FolderPath="MyMethods\Segments\">
+    <Method Name="ExecuteSegmentsGroove" Id="{3ee66abc-6845-49e5-b2ff-149134d7252b}" FolderPath="Executor (to refactor)\">
       <Declaration><![CDATA[METHOD ExecuteSegmentsGroove : BOOL
 VAR_INST
 iPass : INT;
@@ -1124,10 +1115,7 @@ _GroovingIdleTime     := GantryXYZ_HMI.Config.GroovingIdleTime;
 _GroovingOverpass     := GantryXYZ_HMI.Config.GroovingOverpass;
 _GlobalOffset		  := GantryXYZ_HMI.Config.GlobalOffset;
 
-_PanelFrontWidth      := GantryXYZ_HMI.Config.PanelFrontWidht;
 
-_PanelHeight          := GantryXYZ_HMI.Config.PanelHeight;
-_RailHeightCorrection := GantryXYZ_HMI.Config.RailHeightCorrection;
 
 ]]></ST>
       </Implementation>
@@ -1222,7 +1210,7 @@ CASE DescendantSequenceState OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Method Name="MachiningOrchestrator" Id="{4a6c8d9d-4b5c-46da-8179-e7275fa91b7f}" FolderPath="MyMethods\">
+    <Method Name="MachiningOrchestrator" Id="{4a6c8d9d-4b5c-46da-8179-e7275fa91b7f}">
       <Declaration><![CDATA[METHOD MachiningOrchestrator : BOOL
 VAR_INST
 		Timer			:TON;
@@ -1285,7 +1273,7 @@ END_VAR
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="ProgramIdRequested" Id="{3b163a54-6fcd-4be2-bb98-ad529d342348}" FolderPath="Properties\Comand\">
+    <Property Name="ProgramIdRequested" Id="{3b163a54-6fcd-4be2-bb98-ad529d342348}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY ProgramIdRequested : E_RecipeID]]></Declaration>
       <Get Name="Get" Id="{21210547-61ea-4bd8-a78a-96552b4742ab}">
         <Declaration><![CDATA[
@@ -1321,7 +1309,7 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Method Name="ResetSafety" Id="{6bac4035-16f4-4bf2-95a7-9f0b204a82b7}" FolderPath="MyMethods\">
+    <Method Name="ResetSafety" Id="{6bac4035-16f4-4bf2-95a7-9f0b204a82b7}">
       <Declaration><![CDATA[METHOD ResetSafety : BOOL
 VAR_INST
 	Step : INT ;	
@@ -1570,7 +1558,7 @@ END_VAR
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="SequenceTimerSeconds" Id="{2e721ea1-cfa0-448e-b2fb-baa077a6b9b3}" FolderPath="MyMethods\">
+    <Method Name="SequenceTimerSeconds" Id="{2e721ea1-cfa0-448e-b2fb-baa077a6b9b3}">
       <Declaration><![CDATA[METHOD SequenceTimerSeconds : BOOL
 VAR_INPUT
 	WaitingTime :REAL;
@@ -1829,8 +1817,6 @@ END_IF]]></ST>
       <LineId Id="88" Count="0" />
       <LineId Id="27" Count="0" />
       <LineId Id="113" Count="1" />
-      <LineId Id="119" Count="1" />
-      <LineId Id="115" Count="0" />
       <LineId Id="38" Count="0" />
       <LineId Id="41" Count="0" />
       <LineId Id="37" Count="0" />

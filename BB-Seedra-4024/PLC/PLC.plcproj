@@ -19,21 +19,6 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\E_RecipeID.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Status.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Config.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_HMI.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Command.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="DUTs\MoveState_t.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -73,7 +58,22 @@
     <Compile Include="POUs\Components\ST_Cylinder_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\FB_GantryXYZ.TcPOU">
+    <Compile Include="POUs\GantryXYZ\E_RecipeID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\FB_GantryXYZ.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_Command.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_Config.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_HMI.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\FB_Homing_StandardNC.TcPOU">
@@ -160,10 +160,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DUTs" />
-    <Folder Include="DUTs\FB_GantryXYZ" />
-    <Folder Include="DUTs\FB_GantryXYZ\FB_GantryXYZ" />
     <Folder Include="GVLs" />
     <Folder Include="POUs\Components" />
+    <Folder Include="POUs\GantryXYZ" />
     <Folder Include="POUs\Segments" />
     <Folder Include="POUs\Segments\FB_RecipeBuilder" />
     <Folder Include="VISUs" />

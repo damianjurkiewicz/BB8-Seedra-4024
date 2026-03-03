@@ -12,7 +12,6 @@ VAR
 	//Alarms for this module
 	MachineAlarms : ARRAY[1..MACHINE_ALARM_COUNT] OF FB_TcAlarm;
 	
-	_zProgramToCut : INT;
 	
 	ConfigManager :FB_PersistentDataManager;
 	RecipeBuilderWings : FB_RecipeBuilderWings := (Name := 'BuilderWings');
