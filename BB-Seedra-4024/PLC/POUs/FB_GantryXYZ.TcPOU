@@ -57,9 +57,7 @@ VAR
     fbHomeStratY : FB_Homing_StandardNC;
     fbHomeStratZ : FB_Homing_StandardNC;
 	
-END_VAR
-
-VAR PERSISTENT
+	//old persistent
 	_CuttingSpeedX			:REAL;
 	_CuttingSpeedY			:REAL;
 	_CuttingIdleTime		:REAL;
@@ -82,6 +80,7 @@ VAR PERSISTENT
     _RapidSpeedY 			:REAL;
     _RapidSpeedZ 			:REAL;
 	_GlobalOffset 			:INT;
+	
 END_VAR
 
 VAR CONSTANT
@@ -608,6 +607,25 @@ END_VAR
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Property Name="Config" Id="{ca63134f-ae96-41d5-9585-0ef3c006e9b8}">
+      <Declaration><![CDATA[PROPERTY Config : ST_GantryXYZ_Config]]></Declaration>
+      <Get Name="Get" Id="{076a1a2b-8400-4320-936d-862f5092941b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Config := GantryXYZ_HMI.Config;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{f4f87703-cd5d-4c7f-91bc-6d612ff58e00}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GantryXYZ_HMI.Config := Config;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="CreateEvents" Id="{40e5a283-7f33-033f-0879-cc11ecabc43d}">
       <Declaration><![CDATA[METHOD PROTECTED CreateEvents
 VAR_INPUT
@@ -1892,7 +1910,7 @@ CASE DescendantSequenceState OF
         _LogStateChanges        := FALSE;
         DescendantSequenceState := DescendantSequenceState + 10;
     10:
-		IF RestorePersistentData() THEN
+
 		
 		// Przypisanie osi do strategii
 		fbHomeStratX.Axis := AxisX;
@@ -1907,7 +1925,7 @@ CASE DescendantSequenceState OF
 		
         DescendantSequenceState := DescendantSequenceState + 10;
 		//initialize persistent
-		END_IF
+
     20:
         //Copy Mode names
         FOR i := 1 TO 3 DO
@@ -2380,40 +2398,6 @@ END_VAR
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="RestorePersistentData" Id="{9e1193e7-d277-4fd9-ac0c-81f097451afd}">
-      <Declaration><![CDATA[METHOD RestorePersistentData : BOOL
-//Only _Variables are PERSISTENT, This method is executed during the initialization
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[
-GantryXYZ_HMI.Config.CutterXOffsetX       := _CutterXOffsetX;
-GantryXYZ_HMI.Config.CutterXOffsetY       := _CutterXOffsetY;
-GantryXYZ_HMI.Config.CutterYOffsetX       := _CutterYOffsetX;
-GantryXYZ_HMI.Config.CutterYOffsetY       := _CutterYOffsetY;
-GantryXYZ_HMI.Config.CuttingSpeedX        := _CuttingSpeedX;
-GantryXYZ_HMI.Config.CuttingSpeedY        := _CuttingSpeedY;
-GantryXYZ_HMI.Config.CuttingIdleTime      := _CuttingIdleTime;
-GantryXYZ_HMI.Config.CuttingOverpass      := _CuttingOverpass;
-GantryXYZ_HMI.Config.GrooveDepthZ         := _GrooveDepthZ;
-GantryXYZ_HMI.Config.GroovingSpeedX       := _GroovingSpeedX;
-GantryXYZ_HMI.Config.GroovingSpeedY       := _GroovingSpeedY;
-GantryXYZ_HMI.Config.GroovingSpeedZ       := _GroovingSpeedZ;
-GantryXYZ_HMI.Config.GroovingIdleTime     := _GroovingIdleTime;
-GantryXYZ_HMI.Config.GroovingOverpass     := _GroovingOverpass;
-GantryXYZ_HMI.Config.RapidSpeedX          := _RapidSpeedX;
-GantryXYZ_HMI.Config.RapidSpeedY          := _RapidSpeedY;
-GantryXYZ_HMI.Config.RapidSpeedZ          := _RapidSpeedZ;
-GantryXYZ_HMI.Config.GlobalOffset		  := _GlobalOffset;
-
-//GantryXYZ_HMI.Config.PanelFrontLength     := _PanelFrontLength;
-GantryXYZ_HMI.Config.PanelFrontWidht      := _PanelFrontWidth;
-GantryXYZ_HMI.Config.PanelHeight          := _PanelHeight;
-GantryXYZ_HMI.Config.RailHeightCorrection := _RailHeightCorrection;
-
-
-RestorePersistentData := TRUE;]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="SequenceTimerSeconds" Id="{2e721ea1-cfa0-448e-b2fb-baa077a6b9b3}" FolderPath="MyMethods\">
       <Declaration><![CDATA[METHOD SequenceTimerSeconds : BOOL
 VAR_INPUT
@@ -2582,6 +2566,12 @@ END_IF]]></ST>
       <LineId Id="30" Count="1" />
       <LineId Id="33" Count="9" />
       <LineId Id="10" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Config.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Config.Set">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CreateEvents">
       <LineId Id="3" Count="6" />
@@ -2988,23 +2978,6 @@ END_IF]]></ST>
       <LineId Id="256" Count="1" />
       <LineId Id="101" Count="2" />
       <LineId Id="27" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.RestorePersistentData">
-      <LineId Id="51" Count="0" />
-      <LineId Id="53" Count="3" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="44" Count="2" />
-      <LineId Id="27" Count="3" />
-      <LineId Id="48" Count="0" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="35" Count="2" />
-      <LineId Id="59" Count="0" />
-      <LineId Id="66" Count="0" />
-      <LineId Id="63" Count="2" />
-      <LineId Id="60" Count="0" />
-      <LineId Id="68" Count="0" />
-      <LineId Id="9" Count="0" />
-      <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.SequenceTimerSeconds">
       <LineId Id="23" Count="3" />

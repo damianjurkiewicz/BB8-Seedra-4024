@@ -3,8 +3,9 @@
   <POU Name="FB_PersistentDataManager" Id="{4ed47747-e9e7-4807-96fb-1abdb1959994}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_PersistentDataManager
 VAR PERSISTENT
-	_PanelFrontLength :REAL;
-	_Config : ST_REcipeBuilder_Config;
+    _PanelFrontLength : REAL;
+    _Config           : ST_RecipeBuilder_Config;
+    _GantryConfig     : ST_GantryXYZ_Config; 
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -28,6 +29,25 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <Property Name="GantryConfig" Id="{94b2adc8-df4b-49c8-b6d5-478bf602fa4a}">
+      <Declaration><![CDATA[PROPERTY GantryConfig : ST_GantryXYZ_Config]]></Declaration>
+      <Get Name="Get" Id="{29f79859-4371-4222-88cc-78612130e959}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GantryConfig := _GantryConfig;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{8ab71232-b490-4947-8d5e-0094c8f735e8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_GantryConfig := GantryConfig;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <LineIds Name="FB_PersistentDataManager">
       <LineId Id="9" Count="0" />
     </LineIds>
@@ -35,6 +55,12 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_PersistentDataManager.Config.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PersistentDataManager.GantryConfig.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_PersistentDataManager.GantryConfig.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
