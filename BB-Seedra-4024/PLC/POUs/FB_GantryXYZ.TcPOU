@@ -1946,24 +1946,14 @@ END_VAR
 						OrchestratorStep := OrchestratorStep + 10;
 					END_IF
 					
-E_RecipeID.eBorgoWings:
-    // Sprawdzamy, czy maszyna "podpięła" nam buildera i czy wskaźnik nie jest pusty
-    IF _RecipeBuilder <> 0 THEN
-        // Wywołanie metody Build przez zmienną wewnętrzną wskaźnika// TUTAJ NIE SĄ PODPIETE ZMIENNE Z NOWEGO RECIPEBUILDERA
-        IF _RecipeBuilder^.Build(
-            PanelWidth           := _PanelFrontWidth, 
-            PanelLength          := 0, // Przykładowa wartość
-            PanelHeight          := _PanelHeight, 
-            CuttingOverpass      := _CuttingOverpass, 
-            RailHeightCorrection := _RailHeightCorrection
-        ) THEN
-            OrchestratorStep := 10;
-        END_IF
-    ELSE
-        // Zgłoś alarm maszynowy braku przypisania Buildera, żeby PLC nie stanął
-        // OrchestratorStep := 999;
-		ChangeState(E_PMLCommand.ePMLCommand_Abort);
-    END_IF
+					E_RecipeID.eBorgoWings:
+						IF _RecipeBuilder <> 0 THEN
+							IF _RecipeBuilder^.Build() THEN
+								OrchestratorStep := 10;
+							END_IF
+						ELSE
+							ChangeState(E_PMLCommand.ePMLCommand_Abort);
+						END_IF
 
 					
 					E_RecipeID.eArona:
@@ -2873,7 +2863,9 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.MachiningOrchestrator">
       <LineId Id="2896" Count="13" />
-      <LineId Id="2968" Count="16" />
+      <LineId Id="2989" Count="0" />
+      <LineId Id="2991" Count="0" />
+      <LineId Id="2993" Count="4" />
       <LineId Id="2967" Count="0" />
       <LineId Id="2914" Count="7" />
       <LineId Id="2924" Count="11" />

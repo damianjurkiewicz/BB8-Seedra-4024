@@ -4,13 +4,7 @@
     <Declaration><![CDATA[INTERFACE I_RecipeBuilder]]></Declaration>
     <Method Name="Build" Id="{b2c3d4e5-2222-4333-c444-d5e6f7a8b9c0}">
       <Declaration><![CDATA[METHOD Build : BOOL
-VAR_INPUT
-	PanelWidth	: REAL;
-	PanelLength	: REAL;
-	PanelHeight	: REAL;
-	CuttingOverpass	: REAL;
-	RailHeightCorrection	: REAL;
-END_VAR]]></Declaration>
+]]></Declaration>
     </Method>
     <Property Name="Config" Id="{41a1f94d-1ba6-473a-8fd2-d71e6a5c7ac8}">
       <Declaration><![CDATA[PROPERTY Config : ST_RecipeBuilder_Config]]></Declaration>
