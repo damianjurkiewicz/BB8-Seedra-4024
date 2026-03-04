@@ -90,18 +90,18 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Method Name="Cut" Id="{a3f08854-92be-45c8-88f8-7f8ca2ffac3c}">
-      <Declaration><![CDATA[{warning 'add method implementation '}
-METHOD Cut : BOOL
-VAR
+    <Method Name="CyclicLogic" Id="{49e00514-3bc2-4f55-9abc-aaedafe38071}">
+      <Declaration><![CDATA[METHOD PUBLIC  CyclicLogic
+VAR_INST
     // Lokalne zmienne pomocnicze na czas trwania cyklu
     localSegmentsCutX : ARRAY[1..32] OF ST_CutSegment;
     currentSeg        : ST_CutSegment;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Domyślnie zwracaj FALSE. TRUE zwracamy dopiero, gdy skończymy proces (krok 1000).
-Cut := FALSE;
+        <ST><![CDATA[
 StepTimer();
+
+Trace('Wejde tu?');
 
 // Zabezpieczenie na wypadek braku wstrzykniętych referencji!
 IF _RecipeBuilder = 0 OR NOT __ISVALIDREF(_Config) THEN
@@ -120,9 +120,11 @@ IF iCurrentSegment > 32 THEN iCurrentSegment := 32; END_IF
 currentSeg := localSegmentsCutX[iCurrentSegment];
 
 CASE nStep OF
+	
+	0: // IDLE - maszyna czeka na wywołanie Execute()
 
     // -------- Inicjalizacja --------
-    0:
+    5:
         IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
             
             Trace('SegmentExecutionX Started');
@@ -225,10 +227,12 @@ CASE nStep OF
         END_IF
 
     // -------- Zakończenie pracy Executora --------
-    1000:
+1000:
         Trace('SegmentExecutionX-FINISHED');
-        nStep := 0;      // Reset kroku, żeby Executor był gotowy na ponowne uruchomienie
-        Cut   := TRUE;   // Zgłoszenie Orchestratorowi, że skończyliśmy!
+        _bBusy := FALSE; // Wyłączamy flagę pracy
+        _bDone := TRUE;  // Dajemy sygnał Orchestratorowi, że skończyliśmy!
+        nStep := 0;      // Wracamy do stanu IDLE
+
         
 END_CASE]]></ST>
       </Implementation>
@@ -298,18 +302,16 @@ END_VAR
     <LineIds Name="FB_ExecutorCutX.Config.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorCutX.Cut">
-      <LineId Id="10" Count="1" />
-      <LineId Id="145" Count="0" />
-      <LineId Id="12" Count="5" />
-      <LineId Id="132" Count="2" />
-      <LineId Id="142" Count="0" />
-      <LineId Id="144" Count="0" />
-      <LineId Id="143" Count="0" />
-      <LineId Id="135" Count="2" />
-      <LineId Id="131" Count="0" />
-      <LineId Id="18" Count="111" />
-      <LineId Id="7" Count="0" />
+    <LineIds Name="FB_ExecutorCutX.CyclicLogic">
+      <LineId Id="9" Count="0" />
+      <LineId Id="11" Count="0" />
+      <LineId Id="146" Count="1" />
+      <LineId Id="12" Count="17" />
+      <LineId Id="140" Count="1" />
+      <LineId Id="30" Count="104" />
+      <LineId Id="142" Count="3" />
+      <LineId Id="137" Count="2" />
+      <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCutX.Cylinder.Get">
       <LineId Id="2" Count="0" />

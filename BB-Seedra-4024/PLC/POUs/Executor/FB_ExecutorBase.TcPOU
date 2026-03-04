@@ -1,55 +1,129 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_ExecutorBase" Id="{0a75ad93-3cad-4d00-8a45-f0f0f5037274}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorBase EXTENDS FB_PackML_BaseModule IMPLEMENTS I_MachiningExecutor
+  <POU Name="FB_ExecutorBase" Id="{0cbe7356-7a09-405e-9aff-39065bb1c2f0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorBase EXTENDS FB_CyclicFB IMPLEMENTS I_MachiningExecutor
 VAR
+    // Zmienne sekwencyjne
     nStep           : INT;
     iCurrentSegment : INT;
     StepTimer       : TON;
-END_VAR
-]]></Declaration>
+    
+    // Zmienne dla Properties
+    _bBusy          : BOOL;
+    _bDone          : BOOL;
+    _bError         : BOOL;
+    _uErrorID       : UDINT;
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="Aborting" Id="{04adb557-9a72-4015-bb7a-c91ef9cb5111}">
-      <Declaration><![CDATA[METHOD PROTECTED Aborting]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[
-CASE SequenceState OF
-    0:
-        NoStateTasksToComplete := FALSE;
-        SequenceState := SequenceState + 10;
-        
-    10:
-        // CZYSTSZENIE WSPÓLNE DLA KAŻDEGO EXECUTORA!
-        nStep := 0;
-        iCurrentSegment := 1;
-        StepTimer(IN := FALSE);
-        
-        SequenceState := SequenceState + 10;
-        
-    20:
-        StateTasksComplete := TRUE;
-        SUPER^.Aborting(); // Puszczamy sygnał do rdzenia PackML
-END_CASE]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="Cut" Id="{b6dc84f5-0e92-4634-8f17-ea93df9ead67}">
+    <Method Name="Abort" Id="{6635fc89-ad71-4ff9-bc14-3af14ce8aecc}">
       <Declaration><![CDATA[{warning 'add method implementation '}
-METHOD Cut : BOOL
+METHOD Abort
 ]]></Declaration>
       <Implementation>
+        <ST><![CDATA[_bBusy := FALSE;
+_bDone := FALSE;
+nStep := 0;
+iCurrentSegment := 1;
+StepTimer(IN := FALSE);]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Busy" Id="{59913f19-c467-40c0-a679-c67212e49f90}">
+      <Declaration><![CDATA[PROPERTY Busy : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{5507dde5-0c97-489e-a157-38e3094c1db6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Busy := _bBusy;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="CyclicLogic" Id="{668c6d27-30c6-490b-b139-36714103a9b4}">
+      <Declaration><![CDATA[METHOD PUBLIC  CyclicLogic
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
         <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Done" Id="{2d95981e-5455-46ef-8af6-2891542aa2dc}">
+      <Declaration><![CDATA[PROPERTY Done : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{d1a57449-624d-4917-966a-8665e0388821}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Done := _bDone;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Error" Id="{8c239f0b-1fc4-4c24-a95e-da15dbc5c2fc}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{9b4d655e-598b-457a-88d2-81afba639fe2}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := _bError;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ErrorID" Id="{dbbab504-dbb1-4393-938e-b24e98188e14}">
+      <Declaration><![CDATA[
+PROPERTY ErrorID : UDINT
+]]></Declaration>
+      <Get Name="Get" Id="{83105c2a-ef7b-4470-ad8e-857d462980fa}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ErrorID := _uErrorID;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{c37f539b-c1c9-4761-b6a7-a09dc0c33fb5}">
+      <Declaration><![CDATA[{warning 'add method implementation '}
+METHOD Execute : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _bBusy THEN RETURN; END_IF
+
+_bBusy    := TRUE;
+_bDone    := FALSE;
+_bError   := FALSE;
+_uErrorID := 0;
+nStep     := 5; 
+Execute   := TRUE;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_ExecutorBase">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorBase.Aborting">
-      <LineId Id="6" Count="16" />
-      <LineId Id="5" Count="0" />
+    <LineIds Name="FB_ExecutorBase.Abort">
+      <LineId Id="6" Count="3" />
+      <LineId Id="4" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorBase.Cut">
+    <LineIds Name="FB_ExecutorBase.Busy.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorBase.CyclicLogic">
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorBase.Done.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorBase.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorBase.ErrorID.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorBase.Execute">
+      <LineId Id="6" Count="6" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>

@@ -3,8 +3,38 @@
   <Itf Name="I_MachiningExecutor" Id="{5c743b52-4b22-4c04-8775-ad733b78e5a4}">
     <Declaration><![CDATA[INTERFACE I_MachiningExecutor
 ]]></Declaration>
-    <Method Name="Cut" Id="{c3dc2c55-7d23-4aed-9215-6c671f3e34d6}">
-      <Declaration><![CDATA[METHOD Cut : BOOL
+    <Method Name="Abort" Id="{21640305-90fb-40a8-9fa4-675e9a875812}">
+      <Declaration><![CDATA[METHOD Abort
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Property Name="Busy" Id="{acba1e1c-8eeb-46cc-89c2-4e9c098c53e2}">
+      <Declaration><![CDATA[PROPERTY Busy : BOOL]]></Declaration>
+      <Get Name="Get" Id="{0454df02-f219-4838-93d7-84edb612c046}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="Done" Id="{6a19729a-dd40-4291-8863-4445469a4472}">
+      <Declaration><![CDATA[PROPERTY Done : BOOL]]></Declaration>
+      <Get Name="Get" Id="{cbcf412b-07ee-4636-897f-76aa76d67693}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="Error" Id="{663a4edc-2c42-4f65-a14b-4a6081319b3a}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{7a925b2c-c7e6-4959-a708-2b27f3822c0e}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="ErrorID" Id="{0345e46d-dd68-4f63-9243-5314ca13c2e5}">
+      <Declaration><![CDATA[PROPERTY ErrorID : UDINT]]></Declaration>
+      <Get Name="Get" Id="{54beebcb-f22c-49ca-bd3d-4693796d87e4}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="Execute" Id="{c3dc2c55-7d23-4aed-9215-6c671f3e34d6}">
+      <Declaration><![CDATA[METHOD Execute : BOOL
 VAR_INPUT
 END_VAR
 ]]></Declaration>
