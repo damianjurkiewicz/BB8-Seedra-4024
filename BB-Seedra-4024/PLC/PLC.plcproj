@@ -58,10 +58,16 @@
     <Compile Include="POUs\Components\ST_Cylinder_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Executor\I_BB8Specification.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Executor\FB_ExecutorBase.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Executor\FB_ExecutorCutX.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Executor\FB_ExecutorCutY.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Executor\I_MachiningExecutor.TcIO">
