@@ -19,9 +19,6 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DUTs\MoveState_t.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="GVLs\GVL_HMI.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
