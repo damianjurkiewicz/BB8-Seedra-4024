@@ -36,22 +36,11 @@ VAR_INST
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-// Wyliczenia gabarytów na podstawie parametrów wejściowych (ze struktury _Config)
-TotalY   := _Config.PanelFrontLength + 2 * _Config.PanelHeight;
+        <ST><![CDATA[TotalY   := _Config.PanelFrontLength + 2 * _Config.PanelHeight;
 TotalX   := _Config.PanelFrontWidht  + 2 * _Config.PanelHeight; // Uwaga na literówkę 'Widht' w strukturze!
 ShorterY := TotalY - _Config.PanelHeight;
 ShorterX := TotalX - _Config.PanelHeight;
 
-// --- TRACE DLA WERYFIKACJI ---
-Trace(Message:= CONCAT('--- BUILD BORGO WINGS START ---', ''));
-Trace(Message:= CONCAT('Input PanelWidth: ', TO_STRING(_Config.PanelFrontWidht)));
-Trace(Message:= CONCAT('Input PanelLength: ', TO_STRING(_Config.PanelFrontLength)));
-Trace(Message:= CONCAT('Input PanelHeight: ', TO_STRING(_Config.PanelHeight)));
-Trace(Message:= CONCAT('Calc TotalX: ', TO_STRING(TotalX)));
-Trace(Message:= CONCAT('Calc TotalY: ', TO_STRING(TotalY)));
-Trace(Message:= CONCAT('Calc ShorterX: ', TO_STRING(ShorterX)));
-Trace(Message:= CONCAT('Calc ShorterY: ', TO_STRING(ShorterY)));
 
 // ------------------------------------
 // 1. Segregracja frezowania (Grooving)
@@ -152,12 +141,7 @@ _SegmentsCutY[6].Stop.X  := 0;
 _SegmentsCutY[6].Start.Y := TotalY + CuttingOverpass;
 _SegmentsCutY[6].Stop.Y  := -CuttingOverpass;
 
-// Log podsumowujący ile odcinków wygenerowano
-Trace(Message:= CONCAT('Segments Groove Count: ', TO_STRING(_SegmentsToGroove)));
-Trace(Message:= CONCAT('Segments CutX Count: ', TO_STRING(_SegmentsToCutX)));
-Trace(Message:= CONCAT('Segments CutY Count: ', TO_STRING(_SegmentsToCutY)));
 
-//Zwracamy TRUE gdy budowanie się zakończyło
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -276,7 +260,9 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderWings.Build">
-      <LineId Id="431" Count="121" />
+      <LineId Id="433" Count="3" />
+      <LineId Id="446" Count="100" />
+      <LineId Id="552" Count="0" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderWings.Config.Get">

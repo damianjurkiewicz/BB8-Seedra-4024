@@ -101,7 +101,6 @@ END_VAR]]></Declaration>
         <ST><![CDATA[
 StepTimer();
 
-Trace('Wejde tu?');
 
 // Zabezpieczenie na wypadek braku wstrzykniętych referencji!
 IF _RecipeBuilder = 0 OR NOT __ISVALIDREF(_Config) THEN
@@ -305,7 +304,7 @@ END_VAR
     <LineIds Name="FB_ExecutorCutX.CyclicLogic">
       <LineId Id="9" Count="0" />
       <LineId Id="11" Count="0" />
-      <LineId Id="146" Count="1" />
+      <LineId Id="146" Count="0" />
       <LineId Id="12" Count="17" />
       <LineId Id="140" Count="1" />
       <LineId Id="30" Count="104" />
