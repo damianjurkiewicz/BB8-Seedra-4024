@@ -18,8 +18,7 @@ END_VAR]]></Declaration>
       <ST><![CDATA[]]></ST>
     </Implementation>
     <Method Name="Abort" Id="{6635fc89-ad71-4ff9-bc14-3af14ce8aecc}">
-      <Declaration><![CDATA[{warning 'add method implementation '}
-METHOD Abort
+      <Declaration><![CDATA[METHOD Abort
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[_bBusy := FALSE;
@@ -86,8 +85,7 @@ PROPERTY ErrorID : UDINT
       </Get>
     </Property>
     <Method Name="Execute" Id="{c37f539b-c1c9-4761-b6a7-a09dc0c33fb5}">
-      <Declaration><![CDATA[{warning 'add method implementation '}
-METHOD Execute : BOOL
+      <Declaration><![CDATA[METHOD Execute : BOOL
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[IF _bBusy THEN RETURN; END_IF
