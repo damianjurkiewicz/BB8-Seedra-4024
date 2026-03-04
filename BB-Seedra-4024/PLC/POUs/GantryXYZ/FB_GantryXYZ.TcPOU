@@ -121,6 +121,7 @@ CASE SequenceState OF
         fbHomeStratZ.Abort();
 		
 		ExecutorCutX.Abort();
+		ExecutorCutY.Abort();
 		
 		SequenceState := SequenceState + 10;
 		
@@ -1569,6 +1570,7 @@ END_IF]]></ST>
       <LineId Id="273" Count="1" />
       <LineId Id="272" Count="0" />
       <LineId Id="290" Count="1" />
+      <LineId Id="299" Count="0" />
       <LineId Id="271" Count="0" />
       <LineId Id="114" Count="0" />
       <LineId Id="267" Count="1" />
