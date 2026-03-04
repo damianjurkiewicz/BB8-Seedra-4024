@@ -34,11 +34,6 @@ VAR
     fbHomeStratY        : FB_Homing_StandardNC;
     fbHomeStratZ        : FB_Homing_StandardNC;
 
-    // =========================================================
-    //  SEQUENCERS & INTERNAL LOGIC
-    // =========================================================
-    OrchestratorStep    : INT := 0;
-    ExecutorStep        : INT := 0;
 
     // =========================================================
     //  ALARMS
@@ -117,8 +112,7 @@ CASE SequenceState OF
 		CylinderCuttingY.Retract();
 
 
-		OrchestratorStep := 0;
-		ExecutorStep := 0;
+
 		
 		//test
 		fbHomeStratX.Abort();
@@ -154,7 +148,7 @@ END_CASE
 		IO.SpindleEnable := FALSE;
 
 
-		OrchestratorStep := 0;
+
 		SequenceState := SequenceState + 10;
 	
 	20:
@@ -610,58 +604,70 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
       <Implementation>
         <ST><![CDATA[CASE _CurrentMode OF
 
-	//=================================PRODUCTION MODE==================================
-	E_PMLUnitMode.ePMLUnitMode_Production:
-		CASE SequenceState OF
-			0:
-				NoStateTasksToComplete := FALSE;
-				SequenceState := SequenceState + 5;
-			5:
-				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -20);	 
-				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1200);
-		
-				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -20);	 
-				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
-		
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -20);	 
-				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);	
-				SequenceState := SequenceState + 5;
-			10:
-					
-				IF MachiningOrchestrator() THEN
-					SequenceState := SequenceState + 10;
-				END_IF
-				
-			
-			
-//				CASE GVL_HMI.ProgramToCut OF
-					
-//					0:
-//					IF CutBorgoFlaps() THEN
-//						SequenceState := SequenceState + 10;
-//					END_IF
-					
-//					1:
-//					IF CutBorgoWings() THEN
-//						SequenceState := SequenceState + 10;
-//					END_IF
-					
-//					2:
-//					IF CutOrchestrator() THEN
-//						SequenceState := SequenceState + 10;
-//					END_IF
-					
-//				END_CASE
-			
-								
-			20:		
-				StateTasksComplete := TRUE;
-				StateComplete();
-			END_CASE
+    //=================================PRODUCTION MODE==================================
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        CASE SequenceState OF
+            0:
+                NoStateTasksToComplete := FALSE;
+                SequenceState := 10;
+                
+            10: // --- Ustawienie Soft Limitów ---
+                AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -20);     
+                AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1200);
+                // ... reszta limitów ...
+                SequenceState := 20;
 
-	//=================================MAINTENANCE & MANUAL MODE==================================
-	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
-		;
+            20: // --- Zbuduj odcinki dla tego programu ---
+                CASE _ProgramIdRequested OF
+                    E_RecipeID.eBorgoFlaps:
+                        IF BuildSegments_BorgoFlaps() THEN
+                            SequenceState := 30;
+                        END_IF
+                    
+                    E_RecipeID.eBorgoWings:
+                        IF _RecipeBuilder <> 0 THEN
+                            IF _RecipeBuilder^.Build() THEN
+                                SequenceState := 30;
+                            END_IF
+                        ELSE
+                            ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                        END_IF
+
+                    E_RecipeID.eArona:
+                        IF BuildSegments_Arona() THEN
+                            SequenceState := 30;
+                        END_IF
+                END_CASE        
+
+            30: // --- Execute Groove ---
+                IF ExecuteSegmentsGroove() THEN
+                   SequenceState := 40;
+                END_IF
+        
+            40: // --- Execute Cut Y ---
+                IF ExecuteSegmentsCutY() THEN
+                    SequenceState := 50;
+                END_IF
+        
+            50: // --- Wyślij komendę Execute do osi X ---
+                IF ExecutorCutX.Execute() THEN
+                    SequenceState := 60;
+                END_IF
+
+            60: // --- Czekaj aż oś X skończy ---
+                IF ExecutorCutX.Done THEN
+                    SequenceState := 100;
+                END_IF
+
+            100: // --- ZAKOŃCZENIE ---
+                StateTasksComplete := TRUE;
+                StateComplete();
+
+        END_CASE
+
+    //=================================MAINTENANCE & MANUAL MODE==================================
+    E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+        ;
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -1223,68 +1229,6 @@ CASE DescendantSequenceState OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Method Name="MachiningOrchestrator" Id="{4a6c8d9d-4b5c-46da-8179-e7275fa91b7f}">
-      <Declaration><![CDATA[METHOD MachiningOrchestrator : BOOL
-VAR_INST
-		Timer			:TON;
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[CASE OrchestratorStep OF
-    0: // Enable osi
-        
-        OrchestratorStep := 5;
-      
-
-    5: // Zbuduj odcinki dla tego programu
-				CASE _ProgramIdRequested OF
-					
-					E_RecipeID.eBorgoFlaps:
-					IF BuildSegments_BorgoFlaps() THEN
-						OrchestratorStep := OrchestratorStep + 10;
-					END_IF
-					
-					E_RecipeID.eBorgoWings:
-						IF _RecipeBuilder <> 0 THEN
-							IF _RecipeBuilder^.Build() THEN
-								OrchestratorStep := 10;
-							END_IF
-						ELSE
-							ChangeState(E_PMLCommand.ePMLCommand_Abort);
-						END_IF
-
-					
-					E_RecipeID.eArona:
-					IF BuildSegments_Arona() THEN
-						OrchestratorStep := OrchestratorStep + 10;
-					END_IF
-					
-				END_CASE        
-
-        OrchestratorStep := 10;
-
-    10: 
-        IF ExecuteSegmentsGroove() THEN
-           OrchestratorStep := 20;
-        END_IF
-		
-	20: 
-	 	IF ExecuteSegmentsCutY() THEN
-            OrchestratorStep := 30;
-        END_IF
-		
-	30: 
-        IF ExecutorCutX.Execute() THEN
-            OrchestratorStep := 40;
-        END_IF
-
-    40:	
-        IF ExecutorCutX.Done THEN
-            MachiningOrchestrator := TRUE;
-        END_IF
-END_CASE]]></ST>
-      </Implementation>
-    </Method>
     <Property Name="ProgramIdRequested" Id="{3b163a54-6fcd-4be2-bb98-ad529d342348}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY ProgramIdRequested : E_RecipeID]]></Declaration>
       <Get Name="Get" Id="{21210547-61ea-4bd8-a78a-96552b4742ab}">
@@ -1476,8 +1420,7 @@ END_VAR
 				flagX :=0; 
 				flagY :=0; 
 				flagZ :=0;
-				OrchestratorStep := 0;
-				ExecutorStep := 0;
+
 
 				SequenceState := 40;
 //			END_IF			
@@ -1605,7 +1548,7 @@ END_IF]]></ST>
       <LineId Id="257" Count="0" />
       <LineId Id="259" Count="0" />
       <LineId Id="230" Count="0" />
-      <LineId Id="121" Count="1" />
+      <LineId Id="121" Count="0" />
       <LineId Id="246" Count="0" />
       <LineId Id="269" Count="1" />
       <LineId Id="273" Count="1" />
@@ -1757,28 +1700,9 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
-      <LineId Id="24" Count="6" />
-      <LineId Id="102" Count="0" />
-      <LineId Id="60" Count="0" />
-      <LineId Id="106" Count="6" />
-      <LineId Id="104" Count="0" />
-      <LineId Id="113" Count="0" />
-      <LineId Id="105" Count="0" />
-      <LineId Id="79" Count="0" />
-      <LineId Id="119" Count="1" />
-      <LineId Id="115" Count="3" />
-      <LineId Id="81" Count="1" />
-      <LineId Id="84" Count="2" />
-      <LineId Id="88" Count="4" />
-      <LineId Id="94" Count="4" />
-      <LineId Id="100" Count="1" />
-      <LineId Id="77" Count="0" />
-      <LineId Id="66" Count="0" />
-      <LineId Id="54" Count="0" />
-      <LineId Id="38" Count="1" />
-      <LineId Id="52" Count="0" />
-      <LineId Id="40" Count="0" />
-      <LineId Id="42" Count="3" />
+      <LineId Id="122" Count="36" />
+      <LineId Id="188" Count="7" />
+      <LineId Id="167" Count="20" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ExecuteSegmentsCutX">
@@ -1863,21 +1787,6 @@ END_IF]]></ST>
       <LineId Id="51" Count="7" />
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ.MachiningOrchestrator">
-      <LineId Id="2896" Count="13" />
-      <LineId Id="2989" Count="0" />
-      <LineId Id="2991" Count="0" />
-      <LineId Id="2993" Count="4" />
-      <LineId Id="2967" Count="0" />
-      <LineId Id="2914" Count="7" />
-      <LineId Id="2924" Count="11" />
-      <LineId Id="2945" Count="0" />
-      <LineId Id="3008" Count="0" />
-      <LineId Id="3010" Count="4" />
-      <LineId Id="3016" Count="1" />
-      <LineId Id="2940" Count="0" />
-      <LineId Id="19" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -1917,7 +1826,6 @@ END_IF]]></ST>
       <LineId Id="568" Count="0" />
       <LineId Id="185" Count="0" />
       <LineId Id="237" Count="2" />
-      <LineId Id="225" Count="0" />
       <LineId Id="508" Count="0" />
       <LineId Id="213" Count="0" />
       <LineId Id="186" Count="0" />
