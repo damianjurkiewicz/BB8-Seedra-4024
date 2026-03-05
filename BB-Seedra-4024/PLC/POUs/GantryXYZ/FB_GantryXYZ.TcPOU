@@ -7,7 +7,7 @@ VAR
     // =========================================================
     //  DEPENDENCIES & SUB-MODULES
     // =========================================================
-    _RecipeBuilder      : POINTER TO FB_RecipeBuilderWings;
+    _RecipeBuilder      : I_RecipeBuilder;
     ipSubModules_Init   : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
 	ExecutorCutX		: FB_ExecutorCutX;
 	ExecutorCutY		: FB_ExecutorCutY;
@@ -629,14 +629,14 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
                             SequenceState := 30;
                         END_IF
                     
-                    E_RecipeID.eBorgoWings:
-                        IF _RecipeBuilder <> 0 THEN
-                            IF _RecipeBuilder^.Build() THEN
-                                SequenceState := 30;
-                            END_IF
-                        ELSE
-                            ChangeState(E_PMLCommand.ePMLCommand_Abort);
-                        END_IF
+					E_RecipeID.eBorgoWings: 
+						IF _RecipeBuilder <> 0 THEN
+							IF _RecipeBuilder.Build() THEN // Bez znaczka '^'!
+								SequenceState := 30;
+							END_IF
+						ELSE
+							ChangeState(E_PMLCommand.ePMLCommand_Abort);
+						END_IF
 
                     E_RecipeID.eArona:
                         IF BuildSegments_Arona() THEN
@@ -794,7 +794,7 @@ CASE DescendantSequenceState OF
 		ExecutorCutX.AxisZ         := AxisZ;
 		ExecutorCutX.Cylinder      := CylinderCuttingX; // Implementuje I_Cylinder
 		ExecutorCutX.Config        REF= GantryXYZ_HMI.Config; // Referencja do aktualnej konfiguracji
-		ExecutorCutX.RecipeBuilder := _RecipeBuilder^;  // Interfejs z wynikami obliczeń
+
 		
 		// Wstrzykiwanie zależności do Executora Cut Y 
 		ExecutorCutY.AxisX         := AxisX;
@@ -802,14 +802,14 @@ CASE DescendantSequenceState OF
 		ExecutorCutY.AxisZ         := AxisZ;
 		ExecutorCutY.Cylinder      := CylinderCuttingY;
 		ExecutorCutY.Config        REF= GantryXYZ_HMI.Config;
-		ExecutorCutY.RecipeBuilder := _RecipeBuilder^;
+
 		
 		// Wstrzykiwanie zależności do Executora Groove XY
 		ExecutorGrooveXY.AxisX         := AxisX;
 		ExecutorGrooveXY.AxisY         := AxisY;
 		ExecutorGrooveXY.AxisZ         := AxisZ;
 		ExecutorGrooveXY.Config        REF= GantryXYZ_HMI.Config;
-		ExecutorGrooveXY.RecipeBuilder := _RecipeBuilder^;
+
 		
 		
         DescendantSequenceState := DescendantSequenceState + 10;
@@ -850,7 +850,7 @@ END_CASE]]></ST>
       </Set>
     </Property>
     <Property Name="RecipeBuilder" Id="{7e3c2008-dd15-410b-92f3-2adf472e0386}">
-      <Declaration><![CDATA[PROPERTY RecipeBuilder : POINTER TO FB_RecipeBuilderWings]]></Declaration>
+      <Declaration><![CDATA[PROPERTY RecipeBuilder : I_RecipeBuilder]]></Declaration>
       <Get Name="Get" Id="{646b66c6-cab8-496a-a121-e2412f446155}">
         <Declaration><![CDATA[VAR
 END_VAR
@@ -864,7 +864,11 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[_RecipeBuilder := RecipeBuilder; ]]></ST>
+          <ST><![CDATA[_RecipeBuilder := RecipeBuilder;
+
+ExecutorCutX.RecipeBuilder := _RecipeBuilder;
+ExecutorCutY.RecipeBuilder := _RecipeBuilder;
+ExecutorGrooveXY.RecipeBuilder := _RecipeBuilder;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -1306,7 +1310,9 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
-      <LineId Id="122" Count="36" />
+      <LineId Id="122" Count="21" />
+      <LineId Id="230" Count="6" />
+      <LineId Id="151" Count="7" />
       <LineId Id="196" Count="3" />
       <LineId Id="222" Count="0" />
       <LineId Id="224" Count="0" />
@@ -1381,6 +1387,8 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RecipeBuilder.Set">
       <LineId Id="2" Count="0" />
+      <LineId Id="6" Count="2" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ResetSafety">
       <LineId Id="258" Count="62" />
