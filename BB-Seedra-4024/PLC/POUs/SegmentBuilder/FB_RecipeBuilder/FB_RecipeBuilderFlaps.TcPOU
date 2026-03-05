@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_RecipeBuilderWings" Id="{3f83a514-1f2f-4e3d-921c-ca7c0b60e17f}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderWings EXTENDS FB_RecipeBase
+  <POU Name="FB_RecipeBuilderFlaps" Id="{1389b747-8c88-4122-8f76-112cbf46c424}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderFlaps EXTENDS FB_RecipeBase
 
 
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="Build" Id="{c08ade7c-db75-4c50-8457-5bb392619adf}">
+    <Method Name="Build" Id="{a7636aac-6540-4877-9111-d7366342a8fe}">
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR_INST
     TotalY          : REAL;
@@ -130,10 +130,10 @@ _SegmentsCutY[6].Stop.Y  := -CuttingOverpass;
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_RecipeBuilderWings">
+    <LineIds Name="FB_RecipeBuilderFlaps">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderWings.Build">
+    <LineIds Name="FB_RecipeBuilderFlaps.Build">
       <LineId Id="433" Count="3" />
       <LineId Id="446" Count="100" />
       <LineId Id="552" Count="0" />

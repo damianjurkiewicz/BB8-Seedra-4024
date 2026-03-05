@@ -112,7 +112,16 @@
     <Compile Include="POUs\SAFETY.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\FB_RecipeBuilderArona.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\FB_RecipeBuilderWings.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\FB_RecipeBase.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\FB_RecipeBuilderFlaps.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\ST_RecipeBuilder_Config.TcDUT">

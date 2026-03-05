@@ -622,61 +622,50 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 
                 SequenceState := 20;
 
-            20: // --- Zbuduj odcinki dla tego programu ---
-                CASE _ProgramIdRequested OF
-                    E_RecipeID.eBorgoFlaps:
-                        IF BuildSegments_BorgoFlaps() THEN
-                            SequenceState := 30;
-                        END_IF
-                    
-					E_RecipeID.eBorgoWings: 
-						IF _RecipeBuilder <> 0 THEN
-							IF _RecipeBuilder.Build() THEN // Bez znaczka '^'!
-								SequenceState := 30;
-							END_IF
-						ELSE
-							ChangeState(E_PMLCommand.ePMLCommand_Abort);
-						END_IF
+			20: // --- Zbuduj odcinki dla wstrzykniętego programu ---
+                // GantryXYZ nie wie co buduje, wie tylko że ma interfejs I_RecipeBuilder
+                IF _RecipeBuilder <> 0 THEN
+                    IF _RecipeBuilder.Build() THEN // Wykonuje kod z przypisanej klasy
+                        SequenceState := 30;
+                    END_IF
+                ELSE
+                    // Zabezpieczenie na wypadek, gdyby FB_Machine nie wstrzyknął buildera
+                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                END_IF     
 
-                    E_RecipeID.eArona:
-                        IF BuildSegments_Arona() THEN
-                            SequenceState := 30;
-                        END_IF
-                END_CASE        
-
-        30: // --- Execute Groove ---
-			IF ExecutorGrooveXY.Execute() THEN 
-			   SequenceState := 32;
-			END_IF
+			30: // --- Execute Groove ---
+				IF ExecutorGrooveXY.Execute() THEN 
+				   SequenceState := 32;
+				END_IF
+				
+			32: // --- Execute Groove ---
+				IF ExecutorGrooveXY.Done THEN 
+				   SequenceState := 40;
+				END_IF
 			
-		32: // --- Execute Groove ---
-			IF ExecutorGrooveXY.Done THEN 
-			   SequenceState := 40;
-			END_IF
-		
-		40: // --- Execute Cut Y ---
-			IF ExecutorCutY.Execute() THEN
-				SequenceState := 41;
-			END_IF
-		
-		41: // --- Wait for Cut Y ---
-			IF ExecutorCutY.Done THEN
-				SequenceState := 50;
-			END_IF
-		
-		50: // --- Wyślij komendę Execute do osi X ---
-			IF ExecutorCutX.Execute() THEN
-				SequenceState := 60;
-			END_IF
-		
-		60: // --- Czekaj aż oś X skończy ---
-			IF ExecutorCutX.Done THEN
-				SequenceState := 100;
-			END_IF
-
-            100: // --- ZAKOŃCZENIE ---
-                StateTasksComplete := TRUE;
-                StateComplete();
+			40: // --- Execute Cut Y ---
+				IF ExecutorCutY.Execute() THEN
+					SequenceState := 41;
+				END_IF
+			
+			41: // --- Wait for Cut Y ---
+				IF ExecutorCutY.Done THEN
+					SequenceState := 50;
+				END_IF
+			
+			50: // --- Wyślij komendę Execute do osi X ---
+				IF ExecutorCutX.Execute() THEN
+					SequenceState := 60;
+				END_IF
+			
+			60: // --- Czekaj aż oś X skończy ---
+				IF ExecutorCutX.Done THEN
+					SequenceState := 100;
+				END_IF
+	
+				100: // --- ZAKOŃCZENIE ---
+					StateTasksComplete := TRUE;
+					StateComplete();
 
         END_CASE
 
@@ -1310,9 +1299,9 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
-      <LineId Id="122" Count="21" />
-      <LineId Id="230" Count="6" />
-      <LineId Id="151" Count="7" />
+      <LineId Id="122" Count="14" />
+      <LineId Id="238" Count="8" />
+      <LineId Id="157" Count="1" />
       <LineId Id="196" Count="3" />
       <LineId Id="222" Count="0" />
       <LineId Id="224" Count="0" />
