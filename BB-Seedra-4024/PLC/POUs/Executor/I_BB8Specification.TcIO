@@ -30,12 +30,12 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
-    <Property Name="Config" Id="{7be275eb-23e5-4f01-bf6e-fc071cbe44f0}">
-      <Declaration><![CDATA[PROPERTY Config : REFERENCE TO ST_GantryXYZ_Config]]></Declaration>
-      <Get Name="Get" Id="{94c8a7c5-e0c9-491d-85a6-bcea02add430}">
+    <Property Name="ConfigProvider" Id="{65c69a1c-b48b-463b-98a2-1efe2073505b}">
+      <Declaration><![CDATA[PROPERTY ConfigProvider : I_GantryConfigProvider]]></Declaration>
+      <Get Name="Get" Id="{36ad60b3-99f4-465e-909a-240245647842}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
-      <Set Name="Set" Id="{7663ee97-65ec-4af7-bc01-7a8bf3fa2b13}">
+      <Set Name="Set" Id="{dbce6e8c-f430-47ce-8997-f86f727c8736}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>

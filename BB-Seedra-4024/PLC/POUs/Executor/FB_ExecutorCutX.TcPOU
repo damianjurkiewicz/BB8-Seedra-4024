@@ -12,6 +12,7 @@ VAR_INST
     // Lokalne zmienne pomocnicze na czas trwania cyklu
     localSegmentsCutX : ARRAY[1..32] OF ST_CutSegment;
     currentSeg        : ST_CutSegment;
+	localConfig       : ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -19,9 +20,12 @@ StepTimer();
 
 
 // Zabezpieczenie na wypadek braku wstrzykniętych referencji!
-IF _RecipeBuilder = 0 OR NOT __ISVALIDREF(_Config) THEN
-    RETURN; 
+IF _RecipeBuilder = 0 OR _ConfigProvider = 0 THEN
+    RETURN;
 END_IF
+
+// DODAJ TĘ LINIJKĘ - pobieramy konfigurację do pamięci podręcznej (tylko 1 wywołanie interfejsu!)
+localConfig := _ConfigProvider.Config;
 
 // 1. Zrzut całej tablicy z Właściwości (Property) do zmiennej lokalnej
 localSegmentsCutX := _RecipeBuilder.SegmentsCutX;
@@ -52,9 +56,9 @@ CASE nStep OF
             _AxisY.Acceleration := 500;   _AxisY.Deceleration := 8000;
             _AxisZ.Acceleration := 500;   _AxisZ.Deceleration := 8000;
             
-            _AxisX.Velocity := _Config.RapidSpeedX;
-            _AxisY.Velocity := _Config.RapidSpeedY;
-            _AxisZ.Velocity := _Config.RapidSpeedZ;
+            _AxisX.Velocity := localConfig.RapidSpeedX;
+            _AxisY.Velocity := localConfig.RapidSpeedY;
+            _AxisZ.Velocity := localConfig.RapidSpeedZ;
 
             iCurrentSegment := 1;
             
@@ -66,10 +70,10 @@ CASE nStep OF
     // -------- Dojazd do początku cięcia --------
     10:
         _AxisX.MoveAbsolute(
-            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Start.X + _Config.CutterXOffsetX + _Config.GlobalOffset, 
+            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Start.X + localConfig.CutterXOffsetX + localConfig.GlobalOffset, 
             0);
         _AxisY.MoveAbsolute(
-            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Start.Y + _Config.CutterXOffsetY + _Config.GlobalOffset, 
+            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Start.Y + localConfig.CutterXOffsetY + localConfig.GlobalOffset, 
             0);
         nStep := 20;
 
@@ -86,13 +90,13 @@ CASE nStep OF
     40: 
         IF _Cylinder.Extended THEN
             // Zmiana prędkości na roboczą z konfiguracji
-            _AxisX.Velocity := _Config.CuttingSpeedX;
-            _AxisY.Velocity := _Config.CuttingSpeedY;
+            _AxisX.Velocity := localConfig.CuttingSpeedX;
+            _AxisY.Velocity := localConfig.CuttingSpeedY;
             nStep := 50;
         END_IF
             
     50: // Czekanie (Cutting Idle Time)
-        StepTimer(IN := TRUE, PT := REAL_TO_TIME(_Config.CuttingIdleTime * 1000.0));
+        StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.CuttingIdleTime * 1000.0));
         IF StepTimer.Q THEN
             StepTimer(IN := FALSE); // Reset timera na przyszłość
             nStep := 60;
@@ -101,10 +105,10 @@ CASE nStep OF
     // -------- Cięcie XY do końca odcinka --------
     60:
         _AxisX.MoveAbsolute(
-            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Stop.X + _Config.CutterXOffsetX + _Config.GlobalOffset, 
+            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Stop.X + localConfig.CutterXOffsetX + localConfig.GlobalOffset, 
             0);
         _AxisY.MoveAbsolute(
-            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Stop.Y + _Config.CutterXOffsetY + _Config.GlobalOffset, 
+            _RecipeBuilder.SegmentsCutX[iCurrentSegment].Stop.Y + localConfig.CutterXOffsetY + localConfig.GlobalOffset, 
             0);
         nStep := 70;
 
@@ -125,13 +129,13 @@ CASE nStep OF
         END_IF    
 
     90: // Drugi Idle Time
-        StepTimer(IN := TRUE, PT := REAL_TO_TIME(_Config.CuttingIdleTime * 1000.0));
+        StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.CuttingIdleTime * 1000.0));
         IF StepTimer.Q THEN
             StepTimer(IN := FALSE);
             
             // Powrót do prędkości dojazdowej
-            _AxisX.Velocity := _Config.RapidSpeedX;
-            _AxisY.Velocity := _Config.RapidSpeedY;
+            _AxisX.Velocity := localConfig.RapidSpeedX;
+            _AxisY.Velocity := localConfig.RapidSpeedY;
             
             IF iCurrentSegment > _RecipeBuilder.SegmentsToCutX THEN
                 nStep := 1000; // Koniec wszystkich segmentów
@@ -159,8 +163,11 @@ END_CASE]]></ST>
       <LineId Id="11" Count="0" />
       <LineId Id="146" Count="0" />
       <LineId Id="12" Count="1" />
-      <LineId Id="152" Count="1" />
-      <LineId Id="17" Count="12" />
+      <LineId Id="154" Count="1" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="158" Count="1" />
+      <LineId Id="157" Count="0" />
+      <LineId Id="18" Count="11" />
       <LineId Id="140" Count="1" />
       <LineId Id="30" Count="104" />
       <LineId Id="142" Count="3" />

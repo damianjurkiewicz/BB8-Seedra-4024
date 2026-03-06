@@ -12,6 +12,7 @@ VAR_INST
     // Lokalna kopia segmentów dla zachowania spójności danych w cyklu
     localSegmentsCutY : ARRAY[1..32] OF ST_CutSegment;
     currentSeg        : ST_CutSegment;
+	localConfig       : ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -20,9 +21,12 @@ END_VAR]]></Declaration>
 StepTimer();
 
 // 1. Zabezpieczenie przed brakiem referencji (Dependency Injection)
-IF _RecipeBuilder = 0 OR NOT __ISVALIDREF(_Config) THEN
+IF _RecipeBuilder = 0 OR _ConfigProvider = 0 THEN
     RETURN;
 END_IF
+
+// DODAJ TĘ LINIJKĘ - pobieramy konfigurację do pamięci podręcznej (tylko 1 wywołanie interfejsu!)
+localConfig := _ConfigProvider.Config;
 
 // 2. Kopiowanie danych przepisu do pamięci lokalnej
 localSegmentsCutY := _RecipeBuilder.SegmentsCutY;
@@ -54,9 +58,9 @@ CASE nStep OF
             _AxisZ.Acceleration := 500;  _AxisZ.Deceleration := 8000;
             
             // Prędkość dojazdowa (Rapid)
-            _AxisX.Velocity := _Config.RapidSpeedX;
-            _AxisY.Velocity := _Config.RapidSpeedY;
-            _AxisZ.Velocity := _Config.RapidSpeedZ;
+            _AxisX.Velocity := localConfig.RapidSpeedX;
+            _AxisY.Velocity := localConfig.RapidSpeedY;
+            _AxisZ.Velocity := localConfig.RapidSpeedZ;
 
             iCurrentSegment := 1;
             
@@ -68,10 +72,10 @@ CASE nStep OF
     // -------- Dojazd do punktu START segmentu --------
     10:
         _AxisX.MoveAbsolute(
-            currentSeg.Start.X + _Config.CutterYOffsetX + _Config.GlobalOffset, 
+            currentSeg.Start.X + localConfig.CutterYOffsetX + localConfig.GlobalOffset, 
             0);
         _AxisY.MoveAbsolute(
-            currentSeg.Start.Y + _Config.CutterYOffsetY + _Config.GlobalOffset, 
+            currentSeg.Start.Y + localConfig.CutterYOffsetY + localConfig.GlobalOffset, 
             0);
         nStep := 20;
 
@@ -88,13 +92,13 @@ CASE nStep OF
     40: 
         IF _Cylinder.Extended THEN
             // Zmiana prędkości na roboczą (Cutting Speed)
-            _AxisX.Velocity := _Config.CuttingSpeedX;
-            _AxisY.Velocity := _Config.CuttingSpeedY;
+            _AxisX.Velocity := localConfig.CuttingSpeedX;
+            _AxisY.Velocity := localConfig.CuttingSpeedY;
             nStep := 50;
         END_IF
             
     50: // Czas stabilizacji przed cięciem
-        StepTimer(IN := TRUE, PT := REAL_TO_TIME(_Config.CuttingIdleTime * 1000.0));
+        StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.CuttingIdleTime * 1000.0));
         IF StepTimer.Q THEN
             StepTimer(IN := FALSE);
             nStep := 60;
@@ -103,10 +107,10 @@ CASE nStep OF
     // -------- Ruch roboczy do punktu STOP segmentu --------
     60:
         _AxisX.MoveAbsolute(
-            currentSeg.Stop.X + _Config.CutterYOffsetX + _Config.GlobalOffset, 
+            currentSeg.Stop.X + localConfig.CutterYOffsetX + localConfig.GlobalOffset, 
             0);
         _AxisY.MoveAbsolute(
-            currentSeg.Stop.Y + _Config.CutterYOffsetY + _Config.GlobalOffset, 
+            currentSeg.Stop.Y + localConfig.CutterYOffsetY + localConfig.GlobalOffset, 
             0);
         nStep := 70;
 
@@ -127,13 +131,13 @@ CASE nStep OF
         END_IF    
 
     90: // Drugi Idle Time i decyzja o kontynuacji
-        StepTimer(IN := TRUE, PT := REAL_TO_TIME(_Config.CuttingIdleTime * 1000.0));
+        StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.CuttingIdleTime * 1000.0));
         IF StepTimer.Q THEN
             StepTimer(IN := FALSE);
             
             // Powrót do prędkości Rapid przed kolejnym dojazdem
-            _AxisX.Velocity := _Config.RapidSpeedX;
-            _AxisY.Velocity := _Config.RapidSpeedY;
+            _AxisX.Velocity := localConfig.RapidSpeedX;
+            _AxisY.Velocity := localConfig.RapidSpeedY;
             
             IF iCurrentSegment > _RecipeBuilder.SegmentsToCutY THEN
                 nStep := 1000; // Wszystkie segmenty wykonane
@@ -156,8 +160,13 @@ END_CASE]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCutY.CyclicLogic">
-      <LineId Id="10" Count="6" />
-      <LineId Id="18" Count="127" />
+      <LineId Id="10" Count="5" />
+      <LineId Id="151" Count="1" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="156" Count="1" />
+      <LineId Id="154" Count="0" />
+      <LineId Id="153" Count="0" />
+      <LineId Id="21" Count="124" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>

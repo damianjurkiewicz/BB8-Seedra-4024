@@ -2,7 +2,7 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_GantryXYZ" Id="{474e1990-f731-0ed9-052c-42626742a38f}" SpecialFunc="None">
     <Declaration><![CDATA[{attribute 'conditionalshow'}
-FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule
+FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule IMPLEMENTS I_GantryConfigProvider
 VAR
     // =========================================================
     //  DEPENDENCIES & SUB-MODULES
@@ -42,34 +42,7 @@ VAR
     // =========================================================
     GantryAlarms        : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
 
-    // =========================================================
-    //  MACHINE SETTINGS (LOCAL COPIES FROM HMI)
-    // =========================================================
-    // Speeds (Rapid)
-    _RapidSpeedX        : REAL;
-    _RapidSpeedY        : REAL;
-    _RapidSpeedZ        : REAL;
-    
-    // Cutting
-    _CuttingSpeedX      : REAL;
-    _CuttingSpeedY      : REAL;
-    _CuttingIdleTime    : REAL;
-    _CuttingOverpass    : REAL;
-    
-    // Grooving
-    _GroovingSpeedX     : REAL;
-    _GroovingSpeedY     : REAL;
-    _GroovingSpeedZ     : REAL;
-    _GroovingIdleTime   : REAL;
-    _GroovingOverpass   : REAL;
-    _GrooveDepthZ       : REAL;
 
-    // Offsets
-    _CutterXOffsetX     : REAL;
-    _CutterXOffsetY     : REAL;
-    _CutterYOffsetX     : REAL;
-    _CutterYOffsetY     : REAL;	
-    _GlobalOffset       : INT;
 
 END_VAR
 
@@ -413,25 +386,7 @@ METHOD PROTECTED HMICommunication
       <Implementation>
         <ST><![CDATA[SUPER^.HMICommunication();
 
-_CutterXOffsetX       := GantryXYZ_HMI.Config.CutterXOffsetX;
-_CutterXOffsetY       := GantryXYZ_HMI.Config.CutterXOffsetY;
-_CutterYOffsetX       := GantryXYZ_HMI.Config.CutterYOffsetX;
-_CutterYOffsetY       := GantryXYZ_HMI.Config.CutterYOffsetY;
-_CuttingSpeedX        := GantryXYZ_HMI.Config.CuttingSpeedX;
-_CuttingSpeedY        := GantryXYZ_HMI.Config.CuttingSpeedY;
-_CuttingIdleTime      := GantryXYZ_HMI.Config.CuttingIdleTime;
-_CuttingOverpass      := GantryXYZ_HMI.Config.CuttingOverpass;
-_GrooveDepthZ         := GantryXYZ_HMI.Config.GrooveDepthZ;
-_GroovingSpeedX       := GantryXYZ_HMI.Config.GroovingSpeedX;
-_GroovingSpeedY       := GantryXYZ_HMI.Config.GroovingSpeedY;
-_GroovingSpeedZ       := GantryXYZ_HMI.Config.GroovingSpeedZ;
 _ProgramIdRequested   := GantryXYZ_HMI.Command.ProgramIdRequested;
-_RapidSpeedX          := GantryXYZ_HMI.Config.RapidSpeedX;
-_RapidSpeedY          := GantryXYZ_HMI.Config.RapidSpeedY;
-_RapidSpeedZ          := GantryXYZ_HMI.Config.RapidSpeedZ;
-_GroovingIdleTime     := GantryXYZ_HMI.Config.GroovingIdleTime;
-_GroovingOverpass     := GantryXYZ_HMI.Config.GroovingOverpass;
-_GlobalOffset		  := GantryXYZ_HMI.Config.GlobalOffset;
 
 
 
@@ -512,7 +467,9 @@ CASE DescendantSequenceState OF
 		ExecutorCutX.AxisY         := AxisY;
 		ExecutorCutX.AxisZ         := AxisZ;
 		ExecutorCutX.Cylinder      := CylinderCuttingX; // Implementuje I_Cylinder
-		ExecutorCutX.Config        REF= GantryXYZ_HMI.Config; // Referencja do aktualnej konfiguracji
+		ExecutorCutX.ConfigProvider := THIS^;
+
+
 
 		
 		// Wstrzykiwanie zależności do Executora Cut Y 
@@ -520,14 +477,14 @@ CASE DescendantSequenceState OF
 		ExecutorCutY.AxisY         := AxisY;
 		ExecutorCutY.AxisZ         := AxisZ;
 		ExecutorCutY.Cylinder      := CylinderCuttingY;
-		ExecutorCutY.Config        REF= GantryXYZ_HMI.Config;
+		ExecutorCutY.ConfigProvider := THIS^;
 
 		
 		// Wstrzykiwanie zależności do Executora Groove XY
 		ExecutorGrooveXY.AxisX         := AxisX;
 		ExecutorGrooveXY.AxisY         := AxisY;
 		ExecutorGrooveXY.AxisZ         := AxisZ;
-		ExecutorGrooveXY.Config        REF= GantryXYZ_HMI.Config;
+		ExecutorGrooveXY.ConfigProvider := THIS^;
 
 		
 		
@@ -839,24 +796,6 @@ END_VAR
 ]]></ST>
       </Implementation>
     </Method>
-    <Method Name="SequenceTimerSeconds" Id="{2e721ea1-cfa0-448e-b2fb-baa077a6b9b3}">
-      <Declaration><![CDATA[METHOD SequenceTimerSeconds : BOOL
-VAR_INPUT
-	WaitingTime :REAL;
-END_VAR
-
-VAR_INST
-	 Timer :TON;
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[ Timer(IN := TRUE, PT := REAL_TO_TIME(WaitingTime * 1000.0));
- IF Timer.Q THEN
-	Timer(IN := FALSE);
-	SequenceTimerSeconds := TRUE;
-END_IF]]></ST>
-      </Implementation>
-    </Method>
     <LineIds Name="FB_GantryXYZ">
       <LineId Id="49" Count="0" />
       <LineId Id="45" Count="0" />
@@ -985,18 +924,9 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HMICommunication">
       <LineId Id="6" Count="0" />
-      <LineId Id="105" Count="3" />
-      <LineId Id="93" Count="0" />
-      <LineId Id="92" Count="0" />
-      <LineId Id="70" Count="0" />
-      <LineId Id="94" Count="1" />
-      <LineId Id="77" Count="3" />
+      <LineId Id="105" Count="0" />
       <LineId Id="109" Count="0" />
-      <LineId Id="85" Count="1" />
-      <LineId Id="104" Count="0" />
-      <LineId Id="88" Count="0" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="113" Count="1" />
+      <LineId Id="114" Count="0" />
       <LineId Id="38" Count="0" />
       <LineId Id="41" Count="0" />
       <LineId Id="37" Count="0" />
@@ -1016,7 +946,9 @@ END_IF]]></ST>
       <LineId Id="106" Count="7" />
       <LineId Id="102" Count="0" />
       <LineId Id="123" Count="0" />
-      <LineId Id="125" Count="5" />
+      <LineId Id="125" Count="4" />
+      <LineId Id="183" Count="1" />
+      <LineId Id="130" Count="0" />
       <LineId Id="124" Count="0" />
       <LineId Id="105" Count="0" />
       <LineId Id="152" Count="5" />
@@ -1105,10 +1037,6 @@ END_IF]]></ST>
       <LineId Id="256" Count="1" />
       <LineId Id="101" Count="2" />
       <LineId Id="27" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.SequenceTimerSeconds">
-      <LineId Id="23" Count="3" />
-      <LineId Id="7" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

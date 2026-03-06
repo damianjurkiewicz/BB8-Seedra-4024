@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <Itf Name="I_GantryConfigProvider" Id="{9e9211f9-23d5-4d2e-9d8e-11348c2e2fe3}">
+    <Declaration><![CDATA[INTERFACE I_GantryConfigProvider
+]]></Declaration>
+    <Property Name="Config" Id="{b6f02373-2c30-467f-8952-0a308543758d}">
+      <Declaration><![CDATA[PROPERTY Config : ST_GantryXYZ_Config]]></Declaration>
+      <Get Name="Get" Id="{4e10ac90-300e-4568-8d68-214ce6fdfbbc}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{caa34027-0b92-4790-8608-e089381308d6}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+  </Itf>
+</TcPlcObject>

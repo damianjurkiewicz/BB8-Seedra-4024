@@ -18,7 +18,7 @@ VAR
     _AxisZ          : SPT_Motion_Control.I_BasicAxis;
     _Cylinder       : I_Cylinder;                     
     _RecipeBuilder  : I_RecipeBuilder;
-    _Config         : REFERENCE TO ST_GantryXYZ_Config;
+	_ConfigProvider : I_GantryConfigProvider;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -103,22 +103,22 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
-    <Property Name="Config" Id="{d4eaeb02-3324-4dfb-bb21-b43618bd8a51}">
-      <Declaration><![CDATA[PROPERTY Config : REFERENCE TO ST_GantryXYZ_Config]]></Declaration>
-      <Get Name="Get" Id="{b1b19422-708f-4729-8a80-0ec5c4e56462}">
+    <Property Name="ConfigProvider" Id="{1a43b0fd-e883-40a4-b7a5-9f9af19b1257}">
+      <Declaration><![CDATA[PROPERTY ConfigProvider : I_GantryConfigProvider]]></Declaration>
+      <Get Name="Get" Id="{e6dfffde-f69c-48aa-b63e-ef4f0726f8df}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[Config REF= _Config;]]></ST>
+          <ST><![CDATA[ConfigProvider := _ConfigProvider;]]></ST>
         </Implementation>
       </Get>
-      <Set Name="Set" Id="{855da8aa-c381-42d4-945c-30bcec476610}">
+      <Set Name="Set" Id="{58c59d13-003d-4e1b-94d8-818bc347b19d}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[_Config REF= Config;]]></ST>
+          <ST><![CDATA[_ConfigProvider := ConfigProvider;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -246,10 +246,10 @@ END_VAR
     <LineIds Name="FB_ExecutorBase.Busy.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorBase.Config.Get">
+    <LineIds Name="FB_ExecutorBase.ConfigProvider.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorBase.Config.Set">
+    <LineIds Name="FB_ExecutorBase.ConfigProvider.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorBase.CyclicLogic">
