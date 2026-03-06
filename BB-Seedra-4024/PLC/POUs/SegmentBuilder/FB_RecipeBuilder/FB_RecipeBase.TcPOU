@@ -1,10 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_RecipeBase" Id="{da96ec31-8163-452f-a094-4558fa21ef5c}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBase EXTENDS FB_PackML_BaseModule IMPLEMENTS I_RecipeBuilder
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBase IMPLEMENTS I_RecipeBuilder
 
 VAR
-    RecipeBuilder_HMI		: ST_RecipeBuilder_HMI;
     _Config                 : ST_RecipeBuilder_Config;
     _PanelFrontLength       : REAL;  
     _PanelFrontWidth        : REAL;      
@@ -47,29 +46,10 @@ END_VAR
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[_Config := Config;
-RecipeBuilder_HMI.Config := Config;]]></ST>
+]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Method Name="HMICommunication" Id="{9b128247-8dae-407e-a375-ac93c0194d56}">
-      <Declaration><![CDATA[// Provides interlocks for HMI control and updates HMI status information for this module
-METHOD PROTECTED HMICommunication
-
-// This method is called cyclically by CyclicLogic()
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[// Zamiast przepisywać do rozbitych zmiennych (_PanelFrontWidth itp.),
-// zaktualizuj całą strukturę wewnętrzną:
-_Config := RecipeBuilder_HMI.Config;
-
-// Przypisania do rozbitych zmiennych możesz zachować, jeśli używasz ich gdzieś indziej,
-// ale _Config jest kluczowy dla metody Build().
-_PanelFrontWidth      := RecipeBuilder_HMI.Config.PanelFrontWidht;
-_PanelFrontLength     := RecipeBuilder_HMI.Config.PanelFrontLength;
-_PanelHeight          := RecipeBuilder_HMI.Config.PanelHeight;
-_RailHeightCorrection := RecipeBuilder_HMI.Config.RailHeightCorrection;]]></ST>
-      </Implementation>
-    </Method>
     <Property Name="SegmentsCutX" Id="{3184be54-f03a-4975-8cf1-db07c128d253}">
       <Declaration><![CDATA[PROPERTY SegmentsCutX : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
       <Get Name="Get" Id="{0f425160-36a8-4f28-99b9-e92bc5ef61d9}">
@@ -154,10 +134,6 @@ END_VAR
     <LineIds Name="FB_RecipeBase.Config.Set">
       <LineId Id="5" Count="0" />
       <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_RecipeBase.HMICommunication">
-      <LineId Id="14" Count="8" />
-      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.SegmentsCutX.Get">
       <LineId Id="2" Count="0" />

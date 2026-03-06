@@ -14,12 +14,11 @@ VAR
 	
 	
 	ConfigManager :FB_PersistentDataManager;
-	RecipeBuilderWings : FB_RecipeBuilderWings := (Name := 'BuilderWings');
-	RecipeBuilderFlaps : FB_RecipeBuilderFlaps := (Name := 'BuilderFlaps'); 
-	RecipeBuilderArona : FB_RecipeBuilderArona := (Name := 'BuilderArona'); 
 	RecipeFactory : FB_RecipeFactory;
+    RecipeConfig_HMI : ST_RecipeBuilder_HMI; 
 
-	RecipeConfig_HMI : ST_RecipeBuilder_Config;
+	
+
 
 END_VAR
 
@@ -97,11 +96,10 @@ SUPER^.CyclicLogic();
 ConfigManager.GantryConfig := GantryXYZ.Config;
 
 // 2. Zapis aktualnych wymiarów z uniwersalnego HMI do persistentów
-ConfigManager.Config := RecipeConfig_HMI;
+ConfigManager.Config := RecipeConfig_HMI.Config;
 
 // 3. Rozesłanie aktualnej konfiguracji z HMI do wszystkich builderów w Fabryce
-// (Dzięki temu, gdy operator kliknie START, każdy builder będzie miał świeże wymiary)
-RecipeFactory.UpdateConfig(RecipeConfig_HMI);
+RecipeFactory.UpdateConfig(RecipeConfig_HMI.Config);
   
 IF GVL_Safety.eStopHMI OR NOT GVL_Safety.eStopButton AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
 	THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
@@ -126,38 +124,30 @@ END_IF
 
 	//=================================PRODUCTION MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Production:
-		CASE SequenceState OF
+	CASE SequenceState OF
 			0:
-			
 				NoStateTasksToComplete := FALSE;
-				
 				// FABRYKA DAJE NAM ODPOWIEDNI INTERFEJS NA BAZIE WYBORU Z HMI
 				GantryXYZ.RecipeBuilder := RecipeFactory.GetBuilder(GantryXYZ.ProgramIdRequested);
 				
 				IF GantryXYZ.RecipeBuilder <> 0 THEN
 					GantryXYZ.ChangeState(E_PMLCommand.ePMLCommand_Start);
-					SequenceState := SequenceState + 10;
+					SequenceState := 10; // Ręczne przypisanie konkretnego kroku (bezpieczniejsze)
 				ELSE
 					// Brak buildera = zły numer programu
 					ChangeState(E_PMLCommand.ePMLCommand_Abort);
 				END_IF
 				
-				
-				
-				GantryXYZ.ChangeState(E_PMLCommand.ePMLCommand_Start);
-				
-				SequenceState := SequenceState + 10;
-			
 			10: 
+                // Czekamy, aż moduł Gantry zamelduje zakończenie obróbki
 				IF GantryXYZ.CurrentState = E_PMLState.ePMLState_Complete THEN
-					SequenceState := SequenceState + 10;
+					SequenceState := 20;
 				END_IF	
 					
 			20:
 				StateTasksComplete := TRUE;
 				StateComplete();
 				
-			
 		END_CASE
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
@@ -269,7 +259,7 @@ CASE DescendantSequenceState OF
 		GantryXYZ.Config := ConfigManager.GantryConfig;
 	
 		// Przekazanie konfiguracji z Persistenta do HMI (żeby po restarcie na ekranie były dobre wartości)
-		RecipeConfig_HMI := ConfigManager.Config;
+		RecipeConfig_HMI.Config := ConfigManager.Config;
 	
 		// Przekazanie konfiguracji z Persistenta do Fabryki (Fabryka rozda to builderom)
 		RecipeFactory.UpdateConfig(ConfigManager.Config);
@@ -412,7 +402,8 @@ END_IF]]></ST>
       <LineId Id="18" Count="0" />
       <LineId Id="3" Count="4" />
       <LineId Id="61" Count="2" />
-      <LineId Id="74" Count="8" />
+      <LineId Id="74" Count="3" />
+      <LineId Id="85" Count="3" />
       <LineId Id="36" Count="0" />
       <LineId Id="40" Count="0" />
       <LineId Id="20" Count="0" />
@@ -428,13 +419,9 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Execute">
-      <LineId Id="24" Count="5" />
-      <LineId Id="84" Count="11" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="61" Count="2" />
-      <LineId Id="33" Count="2" />
-      <LineId Id="49" Count="4" />
-      <LineId Id="36" Count="10" />
+      <LineId Id="24" Count="3" />
+      <LineId Id="98" Count="23" />
+      <LineId Id="42" Count="4" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.HMICommunication">
@@ -492,7 +479,9 @@ END_IF]]></ST>
       <LineId Id="50" Count="1" />
       <LineId Id="75" Count="0" />
       <LineId Id="77" Count="0" />
-      <LineId Id="106" Count="9" />
+      <LineId Id="106" Count="3" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="111" Count="4" />
       <LineId Id="78" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="52" Count="4" />

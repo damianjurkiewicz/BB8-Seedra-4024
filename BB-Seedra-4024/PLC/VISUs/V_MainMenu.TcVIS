@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"18"</v>
+          <v n="UniqueIdGenerator">"20"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -1536,7 +1536,7 @@
                           </o>
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"MAIN.Seedra.RecipeBuilderWings.RecipeBuilder_HMI"</v>
+                            <v n="BasicTypeNodeValue">"MAIN.Seedra.RecipeConfig_HMI"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
                             <a n="BasicTypeNodeEnumValues" et="String" />
@@ -1833,35 +1833,6 @@
                             <n n="DescriptionTextID" />
                             <v n="DescriptionUseParent">false</v>
                           </o>
-                          <o>
-                            <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"MAIN.Seedra.RecipeBuilderWings.RecipeBuilder_HMI"</v>
-                            <v n="BasicTypeNodeAcceptsExpression">true</v>
-                            <n n="BasicTypeNodeFastAccess" />
-                            <a n="BasicTypeNodeEnumValues" et="String" />
-                            <n n="EnumValueDisplayTextIds" />
-                            <n n="EnumValueVisibilityAttributeValues" />
-                            <n n="EnumValueLibraryId" />
-                            <n n="DynamicEnumMemberVisibilityCheckerTypeGuid" />
-                            <l n="TypeNodeChildren" t="ArrayList" />
-                            <o n="TypeNodeType" t="TypeNodeType">
-                              <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"ST_RecipeBuilder_HMI"</v>
-                              <v n="Name">"ST_RecipeBuilder_HMI"</v>
-                            </o>
-                            <v n="TypeNodeName">"HMI_Recipe"</v>
-                            <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
-                              <v n="AttrFlags">0UL</v>
-                              <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
-                              <v n="ConvDone">true</v>
-                            </o>
-                            <v n="TypeNodeId" t="Int16">257</v>
-                            <v n="TypeNodeIdLong">2303236885L</v>
-                            <n n="LibraryId" />
-                            <n n="DisplayTextId" />
-                            <n n="DescriptionTextID" />
-                            <v n="DescriptionUseParent">false</v>
-                          </o>
                         </l>
                         <o n="TypeNodeType" t="TypeNodeType">
                           <v n="TypeClass" t="TypeClass">Userdef</v>
@@ -1899,7 +1870,7 @@
                     </o>
                     <o>
                       <v n="Id">3910413918L</v>
-                      <v n="Value">"MAIN.Seedra.RecipeBuilderWings.RecipeBuilder_HMI"</v>
+                      <v n="Value">"MAIN.Seedra.RecipeConfig_HMI"</v>
                     </o>
                     <o>
                       <v n="Id">3637978940L</v>
@@ -1908,10 +1879,6 @@
                     <o>
                       <v n="Id">1375453578L</v>
                       <v n="Value">"MAIN.Seedra.GantryXYZ.GantryXYZ_HMI"</v>
-                    </o>
-                    <o>
-                      <v n="Id">2303236885L</v>
-                      <v n="Value">"MAIN.Seedra.RecipeBuilderWings.RecipeBuilder_HMI"</v>
                     </o>
                   </l>
                 </o>
@@ -2220,6 +2187,11 @@
                 <v n="Id">17L</v>
                 <n n="Tag" />
                 <v n="Text">"	HMIAxeX : ST_AxisBase_HMI;"</v>
+              </o>
+              <o>
+                <v n="Id">20L</v>
+                <n n="Tag" />
+                <v n="Text">"	HMI_Recipe : ST_RecipeBuilder_HMI;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>
