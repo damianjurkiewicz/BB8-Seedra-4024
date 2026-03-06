@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_RecipeFactory" Id="{eb67f754-8d88-44c2-acf6-733dd105dd46}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeFactory
+VAR
+    BuilderWings : FB_RecipeBuilderWings;
+    BuilderFlaps : FB_RecipeBuilderFlaps;
+    BuilderArona : FB_RecipeBuilderArona;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="GetBuilder" Id="{4ef94639-3187-4b95-bdcd-c7a9da21c9f0}">
+      <Declaration><![CDATA[METHOD GetBuilder : I_RecipeBuilder
+VAR_INPUT
+    RequestedRecipe : E_RecipeID;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE RequestedRecipe OF
+    E_RecipeID.eBorgoWings:
+        GetBuilder := BuilderWings; 
+        
+    E_RecipeID.eBorgoFlaps:
+        GetBuilder := BuilderFlaps;
+        
+    E_RecipeID.eArona:
+        GetBuilder := BuilderArona;
+        
+ELSE
+    // Jeśli ktoś poda złe ID, zwracamy "nic" (0)
+    GetBuilder := 0; 
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="InitializeFactory" Id="{d617016c-6308-411a-9cc3-c9f77798a181}">
+      <Declaration><![CDATA[METHOD InitializeFactory
+VAR_INPUT
+    Config : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[BuilderWings.Config := Config;
+BuilderFlaps.Config := Config;
+BuilderArona.Config := Config;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="UpdateConfig" Id="{addb126c-7b31-4fe1-bab5-a92c30ad08f7}">
+      <Declaration><![CDATA[METHOD UpdateConfig
+VAR_INPUT
+    Config : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Fabryka rozsyła nową konfigurację do wszystkich swoich "dzieci"
+BuilderWings.Config := Config;
+BuilderFlaps.Config := Config;
+BuilderArona.Config := Config;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_RecipeFactory">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeFactory.GetBuilder">
+      <LineId Id="9" Count="12" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeFactory.InitializeFactory">
+      <LineId Id="9" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeFactory.UpdateConfig">
+      <LineId Id="6" Count="2" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

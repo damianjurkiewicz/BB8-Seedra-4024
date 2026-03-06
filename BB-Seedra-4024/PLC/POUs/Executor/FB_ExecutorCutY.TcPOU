@@ -110,7 +110,6 @@ StepTimer();
 
 // 1. Zabezpieczenie przed brakiem referencji (Dependency Injection)
 IF _RecipeBuilder = 0 OR NOT __ISVALIDREF(_Config) THEN
-    Trace('Brak referencji w ExecutorCutY!');
     RETURN;
 END_IF
 
@@ -309,7 +308,8 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCutY.CyclicLogic">
-      <LineId Id="10" Count="135" />
+      <LineId Id="10" Count="6" />
+      <LineId Id="18" Count="127" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCutY.Cylinder.Get">

@@ -110,7 +110,6 @@ StepTimer();
 
 // Zabezpieczenie na wypadek braku wstrzykniętych referencji!
 IF _RecipeBuilder = 0 OR NOT __ISVALIDREF(_Config) THEN
-    Trace('Brak referencji w FB_ExecutorGrooveXY!');
     RETURN;
 END_IF
 
@@ -365,7 +364,8 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorGrooveXY.CyclicLogic">
-      <LineId Id="163" Count="191" />
+      <LineId Id="163" Count="5" />
+      <LineId Id="170" Count="184" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorGrooveXY.Cylinder.Get">

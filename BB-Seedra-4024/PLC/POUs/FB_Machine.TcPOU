@@ -17,8 +17,9 @@ VAR
 	RecipeBuilderWings : FB_RecipeBuilderWings := (Name := 'BuilderWings');
 	RecipeBuilderFlaps : FB_RecipeBuilderFlaps := (Name := 'BuilderFlaps'); 
 	RecipeBuilderArona : FB_RecipeBuilderArona := (Name := 'BuilderArona'); 
+	RecipeFactory : FB_RecipeFactory;
 
-	
+	RecipeConfig_HMI : ST_RecipeBuilder_Config;
 
 END_VAR
 
@@ -30,7 +31,6 @@ END_VAR
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Folder Name="Properties" Id="{396a6016-c13c-4364-b739-7894bb49f371}" />
     <Folder Name="States" Id="{70644f5e-d79a-440d-8d18-4948c059f975}" />
     <Method Name="Clearing" Id="{309e3014-c1be-40c6-8306-4211d554a87f}" FolderPath="States\">
       <Declaration><![CDATA[
@@ -92,16 +92,16 @@ END_IF
 SUPER^.CyclicLogic();
 
 
-// Przpisanie Wartości z HMI do persistent
-ConfigManager.Config := RecipeBuilderWings.RecipeBuilder_HMI.Config;
+
+// 1. Zapis konfiguracji Gantry do persistentów (bez zmian)
 ConfigManager.GantryConfig := GantryXYZ.Config;
 
-// W CyclicLogic maszyny czytasz to, co operator wpisał w stare pole Gantry:
-//ConfigManager.PanelFrontLength := GantryXYZ.GantryXYZ_HMI.Config.PanelFrontLength;
+// 2. Zapis aktualnych wymiarów z uniwersalnego HMI do persistentów
+ConfigManager.Config := RecipeConfig_HMI;
 
-//Here the alarms will raise and clear on its own if the input changes
-
-//NOT SafetyGlobalVariableList.eStopButton -> We Decouple physical button to Activate
+// 3. Rozesłanie aktualnej konfiguracji z HMI do wszystkich builderów w Fabryce
+// (Dzięki temu, gdy operator kliknie START, każdy builder będzie miał świeże wymiary)
+RecipeFactory.UpdateConfig(RecipeConfig_HMI);
   
 IF GVL_Safety.eStopHMI OR NOT GVL_Safety.eStopButton AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
 	THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
@@ -128,22 +128,19 @@ END_IF
 	E_PMLUnitMode.ePMLUnitMode_Production:
 		CASE SequenceState OF
 			0:
+			
 				NoStateTasksToComplete := FALSE;
-
-				CASE GantryXYZ.ProgramIdRequested OF
-                    E_RecipeID.eBorgoWings:
-                        GantryXYZ.RecipeBuilder := RecipeBuilderWings;
-                        
-                    E_RecipeID.eBorgoFlaps:
-                        GantryXYZ.RecipeBuilder := RecipeBuilderFlaps;
-                        
-                    E_RecipeID.eArona:
-                        GantryXYZ.RecipeBuilder := RecipeBuilderArona;
-                ELSE
-                    // Zabezpieczenie: Jeśli enum jest poza zakresem (np. eUnknown)
-                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
-                    RETURN; // Przerwij krok, nie wysyłaj komendy Start
-                END_CASE
+				
+				// FABRYKA DAJE NAM ODPOWIEDNI INTERFEJS NA BAZIE WYBORU Z HMI
+				GantryXYZ.RecipeBuilder := RecipeFactory.GetBuilder(GantryXYZ.ProgramIdRequested);
+				
+				IF GantryXYZ.RecipeBuilder <> 0 THEN
+					GantryXYZ.ChangeState(E_PMLCommand.ePMLCommand_Start);
+					SequenceState := SequenceState + 10;
+				ELSE
+					// Brak buildera = zły numer programu
+					ChangeState(E_PMLCommand.ePMLCommand_Abort);
+				END_IF
 				
 				
 				
@@ -267,19 +264,17 @@ CASE DescendantSequenceState OF
         DescendantSequenceState := DescendantSequenceState + 10;
 	
 	40: 
-		// WSTRZYKNIĘCIE ZALEŻNOŚCI (Property Injection)
-        // Bierzemy zapisaną wartość z ConfigManagera i wstrzykujemy do Buildera
+
+		// Przekazanie konfiguracji do Gantry
 		GantryXYZ.Config := ConfigManager.GantryConfig;
-
-		RecipeBuilderWings.Config := ConfigManager.Config;
-		RecipeBuilderFlaps.Config := ConfigManager.Config; 
-		RecipeBuilderArona.Config := ConfigManager.Config; 
-		
-		// Wstrzykujemy DOMYŚLNY program na start (zgodnie z E_RecipeID = 0)
-		GantryXYZ.RecipeBuilder := RecipeBuilderFlaps;
-
-		
-        DescendantSequenceState := DescendantSequenceState + 10;	
+	
+		// Przekazanie konfiguracji z Persistenta do HMI (żeby po restarcie na ekranie były dobre wartości)
+		RecipeConfig_HMI := ConfigManager.Config;
+	
+		// Przekazanie konfiguracji z Persistenta do Fabryki (Fabryka rozda to builderom)
+		RecipeFactory.UpdateConfig(ConfigManager.Config);
+	
+		DescendantSequenceState := DescendantSequenceState + 10;
 		
     50:
         //Call the Super
@@ -415,17 +410,9 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_Machine.CyclicLogic">
       <LineId Id="18" Count="0" />
-      <LineId Id="3" Count="5" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="50" Count="0" />
-      <LineId Id="52" Count="1" />
-      <LineId Id="58" Count="0" />
-      <LineId Id="57" Count="0" />
-      <LineId Id="54" Count="0" />
-      <LineId Id="51" Count="0" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="39" Count="0" />
+      <LineId Id="3" Count="4" />
+      <LineId Id="61" Count="2" />
+      <LineId Id="74" Count="8" />
       <LineId Id="36" Count="0" />
       <LineId Id="40" Count="0" />
       <LineId Id="20" Count="0" />
@@ -441,8 +428,8 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Execute">
-      <LineId Id="24" Count="7" />
-      <LineId Id="69" Count="12" />
+      <LineId Id="24" Count="5" />
+      <LineId Id="84" Count="11" />
       <LineId Id="32" Count="0" />
       <LineId Id="61" Count="2" />
       <LineId Id="33" Count="2" />
@@ -505,14 +492,7 @@ END_IF]]></ST>
       <LineId Id="50" Count="1" />
       <LineId Id="75" Count="0" />
       <LineId Id="77" Count="0" />
-      <LineId Id="79" Count="1" />
-      <LineId Id="90" Count="0" />
-      <LineId Id="95" Count="2" />
-      <LineId Id="82" Count="0" />
-      <LineId Id="94" Count="0" />
-      <LineId Id="102" Count="0" />
-      <LineId Id="86" Count="0" />
-      <LineId Id="99" Count="1" />
+      <LineId Id="106" Count="9" />
       <LineId Id="78" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="52" Count="4" />

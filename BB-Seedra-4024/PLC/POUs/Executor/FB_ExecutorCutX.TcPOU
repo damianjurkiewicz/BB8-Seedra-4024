@@ -104,8 +104,7 @@ StepTimer();
 
 // Zabezpieczenie na wypadek braku wstrzykniętych referencji!
 IF _RecipeBuilder = 0 OR NOT __ISVALIDREF(_Config) THEN
-    Trace('Brak referencji w ExecutorCutX!');
-    RETURN;
+    RETURN; 
 END_IF
 
 // 1. Zrzut całej tablicy z Właściwości (Property) do zmiennej lokalnej
@@ -305,7 +304,9 @@ END_VAR
       <LineId Id="9" Count="0" />
       <LineId Id="11" Count="0" />
       <LineId Id="146" Count="0" />
-      <LineId Id="12" Count="17" />
+      <LineId Id="12" Count="1" />
+      <LineId Id="152" Count="1" />
+      <LineId Id="17" Count="12" />
       <LineId Id="140" Count="1" />
       <LineId Id="30" Count="104" />
       <LineId Id="142" Count="3" />
