@@ -26,6 +26,10 @@ VAR
     AxisX               : FB_Component_BasicAxis := (Name := 'AxisX');
     AxisY               : FB_Component_BasicAxis := (Name := 'AxisY');
     AxisZ               : FB_Component_BasicAxis := (Name := 'AxisZ');
+	// Flagi określające typ napędu dla konkretnej osi (TRUE = SoE/AX5000, FALSE = CoE)
+    AxisX_IsSoE : BOOL := FALSE;
+    AxisY_IsSoE : BOOL := FALSE;
+    AxisZ_IsSoE : BOOL := FALSE; 
     CylinderCuttingX    : FB_CylinderCutX        := (Name := 'Cylinder X');
     CylinderCuttingY    : FB_CylinderCutY        := (Name := 'Cylinder Y');
 
@@ -41,8 +45,12 @@ VAR
     //  ALARMS
     // =========================================================
     GantryAlarms        : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
+	
 
 
+	ResetStratX : FB_ResetRoutine_SoEDrive;
+	ResetStratY : FB_ResetRoutine_SoEDrive;
+	ResetStratZ : FB_ResetRoutine_SoEDrive;
 
 END_VAR
 
@@ -154,7 +162,8 @@ END_VAR]]></Declaration>
         NoStateTasksToComplete := FALSE;
         SequenceState          := SequenceState + 10;
     10:
-		//Reset any alarms that get latched
+
+//Reset any alarms that get latched
 //		GantryAlarms[E_Gantry.AlarmMessage].Clear(0,0);		
 //		GantryAlarms[E_Gantry.InfoMessage].Clear(0,0);
 //		GantryAlarms[E_Gantry.InitReferenceEvent].Clear(0,0);
@@ -166,29 +175,9 @@ END_VAR]]></Declaration>
 		AxisZ.Reset();
 
 		SequenceState := SequenceState + 10;
-	20:
-	
-		SequenceState := SequenceState + 10;
-	30: 
 
-		IF ResetSafety() THEN
-			SequenceState := SequenceState + 10;		
-		END_IF	
-    40:
-
-        // Enable here
-		// AxisX.Enable();
-		// AxisY.Enable();
-		// AxisZ.Enable();
-
-        // Check enabled here
-		// IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
-			// SequenceState := SequenceState + 10;
-		// END_IF
 		
-		SequenceState := SequenceState + 10;
-		
-    50:
+    20:
         StateTasksComplete := TRUE;
 		
 END_CASE
@@ -469,8 +458,21 @@ CASE DescendantSequenceState OF
 		ExecutorCutX.Cylinder      := CylinderCuttingX; // Implementuje I_Cylinder
 		ExecutorCutX.ConfigProvider := THIS^;
 
-
-
+		// Wstrzyknięcie strategii resetu sprzętowego
+		// Oś X
+		IF AxisX_IsSoE THEN
+			AxisX.ResetMethod := ResetStratX;
+		END_IF
+		
+		// Oś Y
+		IF AxisY_IsSoE THEN
+			AxisY.ResetMethod := ResetStratY;
+		END_IF
+		
+		// Oś Z
+		IF AxisZ_IsSoE THEN
+			AxisZ.ResetMethod := ResetStratZ;
+		END_IF
 		
 		// Wstrzykiwanie zależności do Executora Cut Y 
 		ExecutorCutY.AxisX         := AxisX;
@@ -478,16 +480,13 @@ CASE DescendantSequenceState OF
 		ExecutorCutY.AxisZ         := AxisZ;
 		ExecutorCutY.Cylinder      := CylinderCuttingY;
 		ExecutorCutY.ConfigProvider := THIS^;
-
-		
+	
 		// Wstrzykiwanie zależności do Executora Groove XY
 		ExecutorGrooveXY.AxisX         := AxisX;
 		ExecutorGrooveXY.AxisY         := AxisY;
 		ExecutorGrooveXY.AxisZ         := AxisZ;
 		ExecutorGrooveXY.ConfigProvider := THIS^;
-
-		
-		
+	
         DescendantSequenceState := DescendantSequenceState + 10;
 		//initialize persistent
 
@@ -548,81 +547,6 @@ ExecutorGrooveXY.RecipeBuilder := _RecipeBuilder;]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Method Name="ResetSafety" Id="{6bac4035-16f4-4bf2-95a7-9f0b204a82b7}">
-      <Declaration><![CDATA[METHOD ResetSafety : BOOL
-VAR_INST
-	Step : INT ;	
-	SafetyTimer :TON;
-	SafetyTimerTrigger :R_TRIG;
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[//auto resetting timer, a start condition is an end condition
-SafetyTimer(IN:= Step > 0 AND NOT SafetyTimer.Q, PT:= T#500MS);
-
-CASE Step OF
-		
-		0:  // Reset group or waits
-			ResetSafety:= FALSE;
-			Trace('Timer Initialize');
-			Step := Step + 10;
-			
-		10: //If necessary reset group
-		
-			GVL_Safety.ErrorAck := (GVL_Safety.ComError OR GVL_Safety.FBError); 
-		
-			IF GVL_Safety.ErrorAck OR SafetyTimer.Q THEN 
-				Step := Step + 10;
-			END_IF
-
-		20: //Wait for the signal propagation
-			IF SafetyTimer.Q THEN
-				GVL_Safety.ErrorAck := FALSE;
-				Step := Step + 10;
-			END_IF
-		
-		30: //Check FB errors
-			IF GVL_Safety.FBError OR (NOT GVL_Safety.SafetyPermission) THEN
-				GVL_Safety.RestartFBs := TRUE;
-			END_IF
-			
-			Step := Step + 10;
-			
-		40: //Wait for the signal propagation
-		
-			IF SafetyTimer.Q THEN
-				GVL_Safety.RestartFBs := FALSE;
-				Step := Step + 10;
-			END_IF	
-			
-		50: //Wait for the signal propagation
-			
-			
-		IF SafetyTimer.Q THEN
-				
-			
-				IF GVL_Safety.SafetyPermission AND 
-					NOT (GVL_Safety.ComError OR GVL_Safety.FBError OR GVL_Safety.SafeError) 
-				
-					THEN
-						Step := 0;
-						ResetSafety := TRUE;
-					ELSE
-						Step := 0;
-						ResetSafety := FALSE;
-				END_IF
-			
-			END_IF
-		
-		ELSE
-		
-		Step := 0;	
-
-END_CASE
-
-]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="Resetting" Id="{e7a01217-de28-430f-aeef-f83d9f1b6f0d}" FolderPath="States\">
       <Declaration><![CDATA[METHOD PROTECTED Resetting
 VAR
@@ -847,25 +771,15 @@ END_VAR
       <LineId Id="29" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
-      <LineId Id="28" Count="5" />
+      <LineId Id="28" Count="4" />
+      <LineId Id="165" Count="0" />
+      <LineId Id="33" Count="0" />
       <LineId Id="78" Count="0" />
       <LineId Id="83" Count="3" />
       <LineId Id="155" Count="0" />
       <LineId Id="75" Count="2" />
       <LineId Id="130" Count="0" />
       <LineId Id="99" Count="0" />
-      <LineId Id="121" Count="0" />
-      <LineId Id="123" Count="0" />
-      <LineId Id="62" Count="0" />
-      <LineId Id="142" Count="3" />
-      <LineId Id="65" Count="0" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="95" Count="0" />
-      <LineId Id="37" Count="0" />
-      <LineId Id="80" Count="1" />
-      <LineId Id="49" Count="0" />
-      <LineId Id="40" Count="4" />
-      <LineId Id="66" Count="0" />
       <LineId Id="82" Count="0" />
       <LineId Id="67" Count="0" />
       <LineId Id="45" Count="1" />
@@ -947,18 +861,17 @@ END_VAR
       <LineId Id="102" Count="0" />
       <LineId Id="123" Count="0" />
       <LineId Id="125" Count="4" />
-      <LineId Id="183" Count="1" />
+      <LineId Id="183" Count="0" />
       <LineId Id="130" Count="0" />
+      <LineId Id="194" Count="0" />
+      <LineId Id="197" Count="12" />
       <LineId Id="124" Count="0" />
       <LineId Id="105" Count="0" />
       <LineId Id="152" Count="5" />
-      <LineId Id="150" Count="0" />
       <LineId Id="167" Count="0" />
       <LineId Id="173" Count="0" />
       <LineId Id="169" Count="3" />
-      <LineId Id="168" Count="0" />
       <LineId Id="151" Count="0" />
-      <LineId Id="101" Count="0" />
       <LineId Id="41" Count="0" />
       <LineId Id="79" Count="0" />
       <LineId Id="78" Count="0" />
@@ -980,10 +893,6 @@ END_VAR
       <LineId Id="2" Count="0" />
       <LineId Id="6" Count="2" />
       <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ.ResetSafety">
-      <LineId Id="258" Count="62" />
-      <LineId Id="111" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
       <LineId Id="82" Count="5" />

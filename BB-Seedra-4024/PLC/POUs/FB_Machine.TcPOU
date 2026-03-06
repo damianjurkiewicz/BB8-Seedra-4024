@@ -50,12 +50,11 @@ END_VAR
 		MachineAlarms[E_Seedra.EmergencyStop].Clear(0, 0);
         SequenceState := SequenceState + 10;
     20:
+		IF ResetSafety() THEN
+			SequenceState := SequenceState + 10;		
+		END_IF	
 
-		SequenceState := SequenceState + 10;
-	30: 
-	
-		SequenceState := SequenceState + 10;
-	40:
+	30:
 		StateTasksComplete := TRUE; 
 			 
 END_CASE
@@ -287,6 +286,81 @@ END_VAR]]></Declaration>
 //ChangeState(E_PMLCommand.ePMLCommand_Abort);]]></ST>
       </Implementation>
     </Method>
+    <Method Name="ResetSafety" Id="{6bac4035-16f4-4bf2-95a7-9f0b204a82b7}">
+      <Declaration><![CDATA[METHOD ResetSafety : BOOL
+VAR_INST
+	Step : INT ;	
+	SafetyTimer :TON;
+	SafetyTimerTrigger :R_TRIG;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//auto resetting timer, a start condition is an end condition
+SafetyTimer(IN:= Step > 0 AND NOT SafetyTimer.Q, PT:= T#500MS);
+
+CASE Step OF
+		
+		0:  // Reset group or waits
+			ResetSafety:= FALSE;
+			Trace('Timer Initialize');
+			Step := Step + 10;
+			
+		10: //If necessary reset group
+		
+			GVL_Safety.ErrorAck := (GVL_Safety.ComError OR GVL_Safety.FBError); 
+		
+			IF GVL_Safety.ErrorAck OR SafetyTimer.Q THEN 
+				Step := Step + 10;
+			END_IF
+
+		20: //Wait for the signal propagation
+			IF SafetyTimer.Q THEN
+				GVL_Safety.ErrorAck := FALSE;
+				Step := Step + 10;
+			END_IF
+		
+		30: //Check FB errors
+			IF GVL_Safety.FBError OR (NOT GVL_Safety.SafetyPermission) THEN
+				GVL_Safety.RestartFBs := TRUE;
+			END_IF
+			
+			Step := Step + 10;
+			
+		40: //Wait for the signal propagation
+		
+			IF SafetyTimer.Q THEN
+				GVL_Safety.RestartFBs := FALSE;
+				Step := Step + 10;
+			END_IF	
+			
+		50: //Wait for the signal propagation
+			
+			
+		IF SafetyTimer.Q THEN
+				
+			
+				IF GVL_Safety.SafetyPermission AND 
+					NOT (GVL_Safety.ComError OR GVL_Safety.FBError OR GVL_Safety.SafeError) 
+				
+					THEN
+						Step := 0;
+						ResetSafety := TRUE;
+					ELSE
+						Step := 0;
+						ResetSafety := FALSE;
+				END_IF
+			
+			END_IF
+		
+		ELSE
+		
+		Step := 0;	
+
+END_CASE
+
+]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Resetting" Id="{e510dc83-237a-4a59-97e9-db4b9408b4b7}" FolderPath="States\">
       <Declaration><![CDATA[METHOD PROTECTED Resetting
 VAR
@@ -383,9 +457,8 @@ END_IF]]></ST>
       <LineId Id="34" Count="0" />
       <LineId Id="72" Count="0" />
       <LineId Id="35" Count="1" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="57" Count="1" />
-      <LineId Id="61" Count="0" />
+      <LineId Id="80" Count="1" />
+      <LineId Id="57" Count="0" />
       <LineId Id="64" Count="0" />
       <LineId Id="62" Count="0" />
       <LineId Id="60" Count="0" />
@@ -492,6 +565,10 @@ END_IF]]></ST>
     <LineIds Name="FB_Machine.ModeChanged">
       <LineId Id="6" Count="0" />
       <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.ResetSafety">
+      <LineId Id="258" Count="62" />
+      <LineId Id="111" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Resetting">
       <LineId Id="28" Count="6" />
