@@ -1,100 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_ExecutorCutY" Id="{dd6d66cd-f173-4abb-82a1-2cfe699de1cb}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCutY EXTENDS FB_ExecutorBase IMPLEMENTS I_BB8Specification
-VAR
-    
-    _AxisX          : SPT_Motion_Control.I_BasicAxis; 
-    _AxisY          : SPT_Motion_Control.I_BasicAxis; 
-    _AxisZ          : SPT_Motion_Control.I_BasicAxis; 
-    _Cylinder       : I_Cylinder;                     
-    _RecipeBuilder  : I_RecipeBuilder;              
-    _Config         : REFERENCE TO ST_GantryXYZ_Config; 
-    
-END_VAR]]></Declaration>
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCutY EXTENDS FB_ExecutorBase 
+]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Property Name="AxisX" Id="{43831d80-0149-4e33-b8dd-31947b10af6b}">
-      <Declaration><![CDATA[PROPERTY AxisX : SPT_Motion_Control.I_BasicAxis
-]]></Declaration>
-      <Get Name="Get" Id="{2d1ba754-4524-400c-b4dd-c5364fb9adb1}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AxisX := _AxisX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{5b008054-2264-4577-80d8-41ed09b668b5}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_AxisX := AxisX;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="AxisY" Id="{bf75069e-59c9-4583-a233-7c2ca0219d93}">
-      <Declaration><![CDATA[PROPERTY AxisY : SPT_Motion_Control.I_BasicAxis
-]]></Declaration>
-      <Get Name="Get" Id="{e30288bf-5f79-4d78-a538-b8da28aa90b7}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AxisY := _AxisY;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{c0385a81-96b7-4a76-8b4b-2036485b7171}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_AxisY := AxisY;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="AxisZ" Id="{66eecb95-69f7-4704-aade-88422b54db1f}">
-      <Declaration><![CDATA[PROPERTY AxisZ : SPT_Motion_Control.I_BasicAxis
-]]></Declaration>
-      <Get Name="Get" Id="{90d6b7db-d661-4419-9102-6ee719cf94d0}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AxisZ := _AxisZ;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{3d093599-3b76-44d2-a907-b5d1876c3a00}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_AxisZ := AxisZ;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="Config" Id="{13326e0b-48de-4a9c-82e5-e1a099732cc1}">
-      <Declaration><![CDATA[PROPERTY Config : REFERENCE TO ST_GantryXYZ_Config
-]]></Declaration>
-      <Get Name="Get" Id="{ff241873-8b81-4ce1-adf5-b705821279c3}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[Config REF= _Config;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{1d24648c-f4d7-4393-ace1-9965537b6578}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_Config REF= Config;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <Method Name="CyclicLogic" Id="{bcb376a0-0151-4d63-8ae8-dc8bbce88220}">
       <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
 VAR_INST
@@ -241,88 +152,13 @@ CASE nStep OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="Cylinder" Id="{b20dd937-bc2a-499d-95ac-3c48741c0a36}">
-      <Declaration><![CDATA[PROPERTY Cylinder : I_Cylinder]]></Declaration>
-      <Get Name="Get" Id="{974cea1f-616f-48ab-bf0f-f68ee97ceba1}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[Cylinder := _Cylinder;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{403ecd4c-2818-4373-891f-14309b049c24}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_Cylinder := Cylinder;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="RecipeBuilder" Id="{17b17e3d-c98e-4a47-a84f-f82348453b6c}">
-      <Declaration><![CDATA[PROPERTY RecipeBuilder : I_RecipeBuilder
-]]></Declaration>
-      <Get Name="Get" Id="{a3518c00-49b9-41b2-87e6-2c81730ce24f}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[RecipeBuilder := _RecipeBuilder;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{a8d4ca35-3487-4295-a05f-939f2a0fa785}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_RecipeBuilder := RecipeBuilder;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <LineIds Name="FB_ExecutorCutY">
       <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.AxisX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.AxisX.Set">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.AxisY.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.AxisY.Set">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.AxisZ.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.AxisZ.Set">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.Config.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.Config.Set">
-      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCutY.CyclicLogic">
       <LineId Id="10" Count="6" />
       <LineId Id="18" Count="127" />
       <LineId Id="4" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.Cylinder.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.Cylinder.Set">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.RecipeBuilder.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCutY.RecipeBuilder.Set">
-      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

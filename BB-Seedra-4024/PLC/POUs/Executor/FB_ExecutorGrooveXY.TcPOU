@@ -2,94 +2,10 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_ExecutorGrooveXY" Id="{ba81cf30-ba63-41e2-ba37-7eadadaf4217}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorGrooveXY EXTENDS FB_ExecutorBase
-VAR
-    // Zostawiasz tu TYLKO to, co dotyczy bezpośrednio osi X!
-    _AxisX          : SPT_Motion_Control.I_BasicAxis;
-    _AxisY          : SPT_Motion_Control.I_BasicAxis;
-    _AxisZ          : SPT_Motion_Control.I_BasicAxis;
-    _Cylinder       : I_Cylinder;                     
-    _RecipeBuilder  : I_RecipeBuilder;
-    _Config         : REFERENCE TO ST_GantryXYZ_Config;
-END_VAR]]></Declaration>
+]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Property Name="AxisX" Id="{e1ebaa38-78e2-4748-8d4a-f567579768da}">
-      <Declaration><![CDATA[PROPERTY AxisX : I_BasicAxis]]></Declaration>
-      <Get Name="Get" Id="{96c2ee5a-f98d-4213-becf-756bf2675ca2}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AxisX := _AxisX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{9d868bde-2d0a-46c5-9d53-258532f08d82}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_AxisX := AxisX;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="AxisY" Id="{60f1e8aa-9062-41fc-8a25-d714318bdf95}">
-      <Declaration><![CDATA[PROPERTY AxisY : I_BasicAxis]]></Declaration>
-      <Get Name="Get" Id="{23d98b65-3da5-43a7-a0c2-6a1fc503353a}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AxisY := _AxisY;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{0b33adcd-9aa8-4d50-b086-18cbfdae85fe}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_AxisY := AxisY;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="AxisZ" Id="{49f297cd-f639-4f8a-821e-40126e06c259}">
-      <Declaration><![CDATA[PROPERTY AxisZ : I_BasicAxis]]></Declaration>
-      <Get Name="Get" Id="{4a7475e6-ec21-4da3-be72-e4ae93f8a260}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[AxisZ := _AxisZ;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{95226356-58f6-44a4-8ce2-293787aa87f4}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_AxisZ := AxisZ;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="Config" Id="{527fd9ce-133e-4f87-93c0-0e681d77081d}">
-      <Declaration><![CDATA[PROPERTY Config : REFERENCE TO ST_GantryXYZ_Config]]></Declaration>
-      <Get Name="Get" Id="{d6fbcfb5-e952-47c0-b55d-c9edf72d4b7a}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[Config REF= _Config;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{8ae54147-16d3-4491-a90b-75874fd3957f}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_Config REF= Config;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <Method Name="CyclicLogic" Id="{acb188e5-a61c-470f-8c24-c8ec7ab1f0a2}">
       <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
 VAR_INST
@@ -129,7 +45,7 @@ CASE nStep OF
     5:
         // Konfiguracja głębokości (g) i mnożników prędkości (v)
         g1 := 3.5;  g2 := 3.5;  g3 := 1.5;  g4 := 0.0;  g5 := 0.0;
-        v1 := 1.0;  v2 := 1.0;  v3 := 1.0;  v4 := 0.4;  v5 := 0.4;
+        v1 := 1.0;  v2 := 1.0;  v3 := 1.0;  v4 := 1.0;  v5 := 1.0;
 
         IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
             
@@ -152,7 +68,7 @@ CASE nStep OF
 
             iCurrentSegment := 1;
             // Zgodnie ze stara logika: zacznij od poziomu, ostroznie
-            iPass := 4; 
+            iPass := 5; 
             
             IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN
                 nStep := 10;
@@ -298,87 +214,13 @@ CASE nStep OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="Cylinder" Id="{a631342b-2328-4d81-86d3-faa74da6b7af}">
-      <Declaration><![CDATA[PROPERTY Cylinder : I_Cylinder]]></Declaration>
-      <Get Name="Get" Id="{ce9b1a95-9af0-4eaa-9648-998f1a93b777}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[Cylinder := _Cylinder;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{1211e671-0fda-4ab7-bd91-d794d9314119}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_Cylinder := Cylinder;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
-    <Property Name="RecipeBuilder" Id="{4a2e62f8-78c9-4679-ac8d-0301d9cee4c0}">
-      <Declaration><![CDATA[PROPERTY RecipeBuilder : I_RecipeBuilder]]></Declaration>
-      <Get Name="Get" Id="{51fdd854-ce1b-4bfc-862b-5872ce94dbc2}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[RecipeBuilder := _RecipeBuilder;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{54a5f2bf-88ad-48b0-98fc-5bd064959c99}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_RecipeBuilder := RecipeBuilder;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <LineIds Name="FB_ExecutorGrooveXY">
       <LineId Id="9" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.AxisX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.AxisX.Set">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.AxisY.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.AxisY.Set">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.AxisZ.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.AxisZ.Set">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.Config.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.Config.Set">
-      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorGrooveXY.CyclicLogic">
       <LineId Id="163" Count="5" />
       <LineId Id="170" Count="184" />
       <LineId Id="4" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.Cylinder.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.Cylinder.Set">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.RecipeBuilder.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.RecipeBuilder.Set">
-      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
