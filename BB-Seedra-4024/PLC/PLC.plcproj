@@ -19,22 +19,13 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\E_RecipeID.TcDUT">
+    <Compile Include="DUTs\E_PMLStateForHMI.TcTLEO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Status.TcDUT">
+    <Compile Include="DUTs\ST_Machine_HMI.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Config.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_HMI.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\FB_GantryXYZ\FB_GantryXYZ\ST_GantryXYZ_Command.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\MoveState_t.TcDUT">
+    <Compile Include="DUTs\ST_Machine_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GVLs\GVL_HMI.TcGVL">
@@ -73,13 +64,52 @@
     <Compile Include="POUs\Components\ST_Cylinder_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\FB_GantryXYZ.TcPOU">
+    <Compile Include="POUs\Executor\FB_ExecutorGrooveXY.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\FB_Homing_StandardNC.TcPOU">
+    <Compile Include="POUs\Executor\I_BB8Specification.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Executor\FB_ExecutorBase.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Executor\FB_ExecutorCutX.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Executor\FB_ExecutorCutY.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Executor\I_MachiningExecutor.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\E_RecipeID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\FB_GantryXYZ.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\FB_Homing_StandardNC.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\I_GantryConfigProvider.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_Command.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_Config.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_HMI.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\FB_Machine.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\FB_PersistentDataManager.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GlobalTextList.TcGTLO">
@@ -88,16 +118,37 @@
     <Compile Include="POUs\MAIN.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\POU.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="POUs\SAFETY.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Segments\ST_CutSegment.TcDUT">
+    <Compile Include="POUs\Builder\FB_RecipeBase.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Segments\ST_PointXY.TcDUT">
+    <Compile Include="POUs\Builder\FB_RecipeBuilderArona.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\FB_RecipeBuilderFlaps.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\FB_RecipeBuilderWings.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\FB_RecipeFactory.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\I_RecipeBuilder.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\ST_CutSegment.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\ST_PointXY.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\ST_RecipeBuilder_Config.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\ST_RecipeBuilder_HMI.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SafetyTask.TcTTO">
@@ -105,6 +156,10 @@
     </Compile>
     <Compile Include="Visualization Manager.TcVMO">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionArona.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
     <Compile Include="VISUs\Modes\ProductionMode\V_ProductionBorgoFlaps.TcVIS">
       <SubType>Code</SubType>
@@ -114,7 +169,7 @@
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
-    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionArona.TcVIS">
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionWelcome.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
@@ -148,11 +203,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DUTs" />
-    <Folder Include="DUTs\FB_GantryXYZ" />
-    <Folder Include="DUTs\FB_GantryXYZ\FB_GantryXYZ" />
     <Folder Include="GVLs" />
     <Folder Include="POUs\Components" />
-    <Folder Include="POUs\Segments" />
+    <Folder Include="POUs\GantryXYZ" />
+    <Folder Include="POUs\Executor" />
+    <Folder Include="POUs\Builder" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
     <Folder Include="VISUs\Modes" />

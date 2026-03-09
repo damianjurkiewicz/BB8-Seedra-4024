@@ -1,0 +1,234 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_ExecutorGrooveXY" Id="{ba81cf30-ba63-41e2-ba37-7eadadaf4217}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorGrooveXY EXTENDS FB_ExecutorBase
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="CyclicLogic" Id="{acb188e5-a61c-470f-8c24-c8ec7ab1f0a2}">
+      <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
+VAR_INST
+    // Lokalne zmienne pomocnicze na czas trwania cyklu
+    localSegmentsGroove : ARRAY[1..32] OF ST_CutSegment;
+    currentSeg          : ST_CutSegment;
+	localConfig       : ST_GantryXYZ_Config;
+    
+    // Zmienne sekwencyjne dla logiki frezowania
+    iPass               : INT;
+    currentDepth        : LREAL;
+    g1, g2, g3, g4, g5  : LREAL;
+    v1, v2, v3, v4, v5  : LREAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+StepTimer();
+
+// Zabezpieczenie na wypadek braku wstrzykniętych referencji!
+IF _RecipeBuilder = 0 OR _ConfigProvider = 0 THEN
+    RETURN;
+END_IF
+
+// DODAJ TĘ LINIJKĘ - pobieramy konfigurację do pamięci podręcznej (tylko 1 wywołanie interfejsu!)
+localConfig := _ConfigProvider.Config;
+
+// 1. Zrzut tablicy z Właściwości (Property) do zmiennej lokalnej
+localSegmentsGroove := _RecipeBuilder.SegmentsGroove;
+IF iCurrentSegment < 1 THEN iCurrentSegment := 1; END_IF
+IF iCurrentSegment > 32 THEN iCurrentSegment := 32; END_IF
+
+// 2. Wyciągnięcie konkretnego segmentu dla aktualnego kroku
+currentSeg := localSegmentsGroove[iCurrentSegment];
+
+CASE nStep OF
+    
+    0: // IDLE - maszyna czeka na wywołanie Execute()
+
+    // -------- Inicjalizacja procesu --------
+    5:
+        // Konfiguracja głębokości (g) i mnożników prędkości (v)
+        g1 := 3.5;  g2 := 3.5;  g3 := 1.5;  g4 := 0.0;  g5 := 0.0;
+        v1 := 1.0;  v2 := 1.0;  v3 := 1.0;  v4 := 1.0;  v5 := 1.0;
+
+        IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
+            
+            //Trace('SegmentGrooving Started (5 Passes Mode)');
+            
+            IF _RecipeBuilder.SegmentsToGroove <= 0 THEN
+                //Trace('Brak segmentow, zakonczenie');
+                nStep := 1000;
+                RETURN;
+            END_IF;
+
+            // Jednorazowe nastawy dynamiki
+            _AxisX.Acceleration := 500;   _AxisX.Deceleration := 8000;
+            _AxisY.Acceleration := 500;   _AxisY.Deceleration := 8000;
+            _AxisZ.Acceleration := 500;   _AxisZ.Deceleration := 8000;
+            
+            _AxisX.Velocity := localConfig.RapidSpeedX;
+            _AxisY.Velocity := localConfig.RapidSpeedY;
+            _AxisZ.Velocity := localConfig.RapidSpeedZ;
+
+            iCurrentSegment := 1;
+            // Zgodnie ze stara logika: zacznij od poziomu, ostroznie
+            iPass := 5; 
+            
+            IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN
+                nStep := 10;
+            END_IF     
+        END_IF
+
+    // -------- Dojazd XY do poczatku (Start) --------
+    10:
+        //Trace(CONCAT('Step 10: Rapid to Start XY. Pass: ', TO_STRING(iPass)));
+        _AxisX.MoveAbsolute(currentSeg.Start.X + localConfig.GlobalOffset, 0);
+        _AxisY.MoveAbsolute(currentSeg.Start.Y + localConfig.GlobalOffset, 0);
+        nStep := 20;
+
+    20: // Czekamy na pozycje XY
+        IF _AxisX.InPosition AND _AxisY.InPosition THEN 
+            // UWAGA: Tu w oryginale bylo IO.SpindleEnable := TRUE i IO.CoolingEnable := TRUE;
+            // Nalezy zarzadzac zewnetrznym wrzecionem przez wyjscia maszyny/narzedzia
+            _AxisZ.Velocity := localConfig.GroovingSpeedZ;
+            nStep := 30;
+        END_IF
+
+    // -------- Wybor glebokosci dla 5 przejsc --------
+    30:
+        CASE iPass OF
+            1: currentDepth := localConfig.GrooveDepthZ - g1;
+            2: currentDepth := localConfig.GrooveDepthZ - g2;
+            3: currentDepth := localConfig.GrooveDepthZ - g3;
+            4: currentDepth := localConfig.GrooveDepthZ - g4;
+            5: currentDepth := localConfig.GrooveDepthZ - g5;
+        ELSE
+            currentDepth := localConfig.GrooveDepthZ;
+        END_CASE;
+
+        //Trace(CONCAT('Step 30: Pass ', CONCAT(TO_STRING(iPass), CONCAT(' Moving Z to: ', TO_STRING(currentDepth)))));
+        _AxisZ.MoveAbsolute(currentDepth, 0);
+        nStep := 40;
+
+    40: // Czekamy az os Z zjedzie
+        IF _AxisZ.InPosition THEN
+            // Wybor predkosci posuwu roboczego w zaleznosci od przejscia
+            CASE iPass OF
+                1: _AxisX.Velocity := localConfig.GroovingSpeedX * v1; _AxisY.Velocity := localConfig.GroovingSpeedY * v1;
+                2: _AxisX.Velocity := localConfig.GroovingSpeedX * v2; _AxisY.Velocity := localConfig.GroovingSpeedY * v2;
+                3: _AxisX.Velocity := localConfig.GroovingSpeedX * v3; _AxisY.Velocity := localConfig.GroovingSpeedY * v3;
+                4: _AxisX.Velocity := localConfig.GroovingSpeedX * v4; _AxisY.Velocity := localConfig.GroovingSpeedY * v4;
+                5: _AxisX.Velocity := localConfig.GroovingSpeedX * v5; _AxisY.Velocity := localConfig.GroovingSpeedY * v5;
+            END_CASE;
+            
+            nStep := 50;
+        END_IF
+            
+    50: // Czekanie przed ruchem
+        StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.GroovingIdleTime * 1000.0));
+        IF StepTimer.Q THEN
+            StepTimer(IN := FALSE);
+            nStep := 60;
+        END_IF
+
+    // -------- Frezowanie do punktu koncowego --------
+    60:
+        //Trace('Step 60: Cutting Move to Stop XY');
+        _AxisX.MoveAbsolute(currentSeg.Stop.X + localConfig.GlobalOffset, 0);
+        _AxisY.MoveAbsolute(currentSeg.Stop.Y + localConfig.GlobalOffset, 0);
+        nStep := 70;
+
+    70: // Czekamy na koniec cięcia
+        IF _AxisX.InPosition AND _AxisY.InPosition AND _AxisZ.InPosition THEN
+            IF iPass = 5 THEN
+                //Trace('Step 70: Pass 5 (Final) -> Going to Return Path');
+                nStep := 74;
+            ELSE
+                //Trace('Step 70: Intermediate Pass -> Lifting Z');
+                _AxisZ.Velocity := localConfig.RapidSpeedZ;
+                nStep := 80;
+            END_IF
+        END_IF
+
+    // -------- Procedura czyszcząca na koniec 5-go przejazdu --------
+    74:
+        StepTimer(IN := TRUE, PT := T#500MS);
+        IF StepTimer.Q THEN
+            StepTimer(IN := FALSE);
+            nStep := 75;
+        END_IF
+
+    75: 
+        //Trace('Step 75: Cleaning Return (Z stays down)');
+        _AxisX.MoveAbsolute(currentSeg.Start.X + localConfig.GlobalOffset, 0);
+        _AxisY.MoveAbsolute(currentSeg.Start.Y + localConfig.GlobalOffset, 0);
+        nStep := 76;
+        
+    76: 
+        IF _AxisX.InPosition AND _AxisY.InPosition THEN
+            _AxisZ.Velocity := localConfig.RapidSpeedZ;
+            nStep := 80;
+        END_IF
+
+    // -------- Podnoszenie osi Z na pozycję bezpieczną --------
+    80:
+        //Trace('Step 80: Lifting Z to Safe 0');
+        _AxisZ.MoveAbsolute(0, 0);
+        nStep := 90;
+
+    90: 
+        IF _AxisZ.InPosition THEN
+            nStep := 100;
+        END_IF    
+
+    100: // Czas stabilizacji po przejsciu
+        StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.GroovingIdleTime * 1000.0));
+        IF StepTimer.Q THEN
+            StepTimer(IN := FALSE);
+            
+            // Powrot predkosci X/Y na rapid
+            _AxisX.Velocity := localConfig.RapidSpeedX;
+            _AxisY.Velocity := localConfig.RapidSpeedY;
+            iCurrentSegment := iCurrentSegment + 1;
+            
+            // Logika zmiany przejazdu / zakonczenia
+            IF iCurrentSegment > _RecipeBuilder.SegmentsToGroove THEN
+                IF iPass < 5 THEN
+                    //Trace(CONCAT('Step 100: Pass ', CONCAT(TO_STRING(iPass), ' finished. Moving to next pass.')));
+                    iPass := iPass + 1;
+                    iCurrentSegment := 1;
+                    nStep := 10;
+                ELSE
+                    //Trace('Step 100: ALL 5 PASSES DONE. Finishing.');
+                    // UWAGA: Tu w oryginale wylaczano SpindleEnable i CoolingEnable
+                    nStep := 1000;
+                END_IF
+            ELSE
+                nStep := 10;
+            END_IF
+        END_IF
+
+    // -------- Zakończenie pracy Executora --------
+    1000:
+        //Trace('Step 1000: FINISH');
+        _bBusy := FALSE; // Zwolnienie flagi pracy
+        _bDone := TRUE;  // Sygnal dla Orchestratora (GantryXYZ)
+        nStep := 0;      // Powrot do IDLE
+        
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_ExecutorGrooveXY">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorGrooveXY.CyclicLogic">
+      <LineId Id="163" Count="4" />
+      <LineId Id="366" Count="1" />
+      <LineId Id="171" Count="0" />
+      <LineId Id="370" Count="1" />
+      <LineId Id="369" Count="0" />
+      <LineId Id="172" Count="182" />
+      <LineId Id="4" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

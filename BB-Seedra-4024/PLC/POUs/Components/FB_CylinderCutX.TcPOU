@@ -22,6 +22,12 @@ VAR
 
     //HMI 
     Cylinder_HMI : ST_Cylinder_HMI;
+	
+
+    MovementTimer : TON;
+    
+
+    CylinderAlarms : ARRAY[1..3] OF FB_TcAlarm;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -34,7 +40,18 @@ END_VAR]]></Declaration>
 VAR_INPUT
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[SUPER^.CreateEvents();]]></ST>
+        <ST><![CDATA[SUPER^.CreateEvents();
+
+// Powiązanie tablicy alarmów z klasą CylinderAlarms z TMC
+F_CreateAllEventsInClass(
+    Alarms     := CylinderAlarms,
+    ClassSize  := SIZEOF(TC_EVENTS.CylinderAlarms),
+    pInitEvent := ADR(TC_EVENTS.CylinderAlarms.InitReferenceEvent),
+    Prefix     := _Name
+);
+
+
+SUPER^.CreateEvents();]]></ST>
       </Implementation>
     </Method>
     <Method Name="CyclicLogic" Id="{9cd1ea00-8a5e-4fbd-a921-2bb3db34198f}" FolderPath="I_CyclicFB\">
@@ -47,19 +64,19 @@ Retract_RTRIG(CLK := _RetractRequestX);
 // Handle Extend
 IF Extend_RTRIG.Q THEN
     CylinderValveCutX := TRUE;
-    _ExtendingX      := TRUE;
-    _RetractingX     := FALSE;
-    _RetractedX      := FALSE;
-    _RetractRequestX := FALSE;
+    _ExtendingX       := TRUE;
+    _RetractingX      := FALSE;
+    _RetractedX       := FALSE;
+    _RetractRequestX  := FALSE;
 END_IF
 
 // Handle Retract
 IF Retract_RTRIG.Q THEN
     CylinderValveCutX := FALSE;
-    _ExtendingX      := FALSE;
-    _RetractingX     := TRUE;
-    _ExtendedX       := FALSE;
-    _ExtendRequestX  := FALSE;
+    _ExtendingX       := FALSE;
+    _RetractingX      := TRUE;
+    _ExtendedX        := FALSE;
+    _ExtendRequestX   := FALSE;
 END_IF
 
 // Aktualizacja stanu wyłącznie z czujnika
@@ -70,8 +87,17 @@ _RetractedX := NOT CylinderSensorCutX;
 _ExtendingX  := _ExtendingX  AND NOT _ExtendedX;
 _RetractingX := _RetractingX AND NOT _RetractedX;
 
+// Odmierzanie czasu ruchu (używamy SEL żeby brać czas wysuwu lub chowania)
+MovementTimer(
+    IN := _ExtendingX OR _RetractingX,
+    PT := LREAL_TO_TIME(SEL(_ExtendingX, Cylinder_HMI.Config.RetractTimeX, Cylinder_HMI.Config.ExtendTimeX) * 1000.0) 
+);
+
+// Wywołanie logiki bazowej komponentu (Tylko raz!)
 SUPER^.CyclicLogic();
-]]></ST>
+
+// Aktualizacja najwyższego priorytetu błędu dla komponentu
+_CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := CylinderAlarms, CurrentSeverity := _CurrentAlarmSeverity);]]></ST>
       </Implementation>
     </Method>
     <Method Name="Extend" Id="{ddb1a4c0-2458-4226-b284-f5ac382d347c}" FolderPath="I_Cylinder\">
@@ -143,9 +169,22 @@ Initialize := SUPER^.Initialize();]]></ST>
 VAR_INPUT
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Busy    := _ExtendingX OR _RetractingX;
-_Error   := FALSE;
-_ErrorID := 0;
+        <ST><![CDATA[_Busy := _ExtendingX OR _RetractingX;
+
+// Jeśli czas minął, zgłoś odpowiedni błąd
+IF MovementTimer.Q THEN
+    _Error   := TRUE;
+    _ErrorID := 1; 
+
+
+    IF _ExtendingX AND NOT CylinderAlarms[E_CylinderAlarms.ExtendTimeout].bRaised THEN
+        RaiseAlarmWithStrings(CylinderAlarms[E_CylinderAlarms.ExtendTimeout], '', '');
+    
+    ELSIF _RetractingX AND NOT CylinderAlarms[E_CylinderAlarms.RetractTimeout].bRaised THEN
+        RaiseAlarmWithStrings(CylinderAlarms[E_CylinderAlarms.RetractTimeout], '', '');
+    END_IF
+END_IF
+
 SUPER^.Monitoring();]]></ST>
       </Implementation>
     </Method>
@@ -170,10 +209,14 @@ END_VAR]]></Declaration>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderCutX.CreateEvents">
+      <LineId Id="8" Count="7" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="6" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderCutX.CyclicLogic">
-      <LineId Id="39" Count="30" />
+      <LineId Id="91" Count="39" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderCutX.Extend">
@@ -194,7 +237,7 @@ END_VAR]]></Declaration>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderCutX.Monitoring">
-      <LineId Id="3" Count="2" />
+      <LineId Id="40" Count="15" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderCutX.Retract">

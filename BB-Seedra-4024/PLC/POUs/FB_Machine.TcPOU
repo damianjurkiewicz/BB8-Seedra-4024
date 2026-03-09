@@ -4,7 +4,7 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_Machine EXTENDS FB_PackML_BaseModule // IMPLEMENTS I_ControlsProductionRate
 VAR
     // Sub Modules
-    GantryXYZ   : FB_GantryXYZ  := (Name := 'Gantry', LogStateChanges := TRUE);
+    GantryXYZ   : FB_GantryXYZ  := (Name := 'Gantry', LogStateChanges := FALSE);
 
     //Initial List of Components
     ipComponents_Init : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_COMPONENTS] OF I_ComponentBase := [];
@@ -12,8 +12,13 @@ VAR
 	//Alarms for this module
 	MachineAlarms : ARRAY[1..MACHINE_ALARM_COUNT] OF FB_TcAlarm;
 	
-	_zProgramToCut : INT;
 	
+	ConfigManager :FB_PersistentDataManager;
+	RecipeFactory : FB_RecipeFactory;
+    RecipeConfig_HMI : ST_RecipeBuilder_HMI; 
+
+	Machine_HMI : ST_Machine_HMI;
+
 
 END_VAR
 
@@ -25,7 +30,6 @@ END_VAR
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Folder Name="Properties" Id="{396a6016-c13c-4364-b739-7894bb49f371}" />
     <Folder Name="States" Id="{70644f5e-d79a-440d-8d18-4948c059f975}" />
     <Method Name="Clearing" Id="{309e3014-c1be-40c6-8306-4211d554a87f}" FolderPath="States\">
       <Declaration><![CDATA[
@@ -46,12 +50,11 @@ END_VAR
 		MachineAlarms[E_Seedra.EmergencyStop].Clear(0, 0);
         SequenceState := SequenceState + 10;
     20:
+		IF ResetSafety() THEN
+			SequenceState := SequenceState + 10;		
+		END_IF	
 
-		SequenceState := SequenceState + 10;
-	30: 
-	
-		SequenceState := SequenceState + 10;
-	40:
+	30:
 		StateTasksComplete := TRUE; 
 			 
 END_CASE
@@ -87,11 +90,17 @@ END_IF
 SUPER^.CyclicLogic();
 
 
-//Here the alarms will raise and clear on its own if the input changes
 
-//NOT SafetyGlobalVariableList.eStopButton -> We Decouple physical button to Activate
+// 1. Zapis konfiguracji Gantry do persistentów (bez zmian)
+ConfigManager.GantryConfig := GantryXYZ.Config;
+
+// 2. Zapis aktualnych wymiarów z uniwersalnego HMI do persistentów
+ConfigManager.Config := RecipeConfig_HMI.Config;
+
+// 3. Rozesłanie aktualnej konfiguracji z HMI do wszystkich builderów w Fabryce
+RecipeFactory.UpdateConfig(RecipeConfig_HMI.Config);
   
-IF GVL_Safety.eStopHMI OR NOT GVL_Safety.eStopButton AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
+IF (GVL_Safety.eStopHMI OR NOT GVL_Safety.eStopButton) AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
 	THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
 	RaiseAlarmWithStrings(MachineAlarms[E_Seedra.EmergencyStop],'','');
 //	ELSIF NOT SafetyGlobalVariableList.eStop THEN
@@ -114,25 +123,30 @@ END_IF
 
 	//=================================PRODUCTION MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Production:
-		CASE SequenceState OF
+	CASE SequenceState OF
 			0:
 				NoStateTasksToComplete := FALSE;
-
-				//Advance Gantry start
-				GantryXYZ.ChangeState(E_PMLCommand.ePMLCommand_Start);
+				// FABRYKA DAJE NAM ODPOWIEDNI INTERFEJS NA BAZIE WYBORU Z HMI
+				GantryXYZ.RecipeBuilder := RecipeFactory.GetBuilder(GantryXYZ.ProgramIdRequested);
 				
-				SequenceState := SequenceState + 10;
-			
+				IF GantryXYZ.RecipeBuilder <> 0 THEN
+					GantryXYZ.ChangeState(E_PMLCommand.ePMLCommand_Start);
+					SequenceState := 10; // Ręczne przypisanie konkretnego kroku (bezpieczniejsze)
+				ELSE
+					// Brak buildera = zły numer programu
+					ChangeState(E_PMLCommand.ePMLCommand_Abort);
+				END_IF
+				
 			10: 
+                // Czekamy, aż moduł Gantry zamelduje zakończenie obróbki
 				IF GantryXYZ.CurrentState = E_PMLState.ePMLState_Complete THEN
-					SequenceState := SequenceState + 10;
+					SequenceState := 20;
 				END_IF	
 					
 			20:
 				StateTasksComplete := TRUE;
 				StateComplete();
 				
-			
 		END_CASE
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
@@ -153,6 +167,7 @@ IF GVL_Safety.eStopHMI THEN
 	THIS^._Error := TRUE;
 END_IF
 
+Machine_HMI.Status.PackMLState :=_CurrentState;
 
 
 SUPER^.HMICommunication();]]></ST>
@@ -236,13 +251,27 @@ CASE DescendantSequenceState OF
 			GVL_Safety.RunStop := TRUE;	
 		END_IF
         DescendantSequenceState := DescendantSequenceState + 10;
-    40:
+	
+	40: 
+
+		// Przekazanie konfiguracji do Gantry
+		GantryXYZ.Config := ConfigManager.GantryConfig;
+	
+		// Przekazanie konfiguracji z Persistenta do HMI (żeby po restarcie na ekranie były dobre wartości)
+		RecipeConfig_HMI.Config := ConfigManager.Config;
+	
+		// Przekazanie konfiguracji z Persistenta do Fabryki (Fabryka rozda to builderom)
+		RecipeFactory.UpdateConfig(ConfigManager.Config);
+	
+		DescendantSequenceState := DescendantSequenceState + 10;
+		
+    50:
         //Call the Super
         IF SUPER^.Initialize() THEN
             DescendantSequenceState := DescendantSequenceState + 10;
         END_IF
 
-    50:
+    60:
         Initialize := TRUE;
 END_CASE]]></ST>
       </Implementation>
@@ -253,8 +282,83 @@ METHOD PROTECTED ModeChanged
 VAR_INPUT
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[Trace('Mode was changed - ABORTING');
-ChangeState(E_PMLCommand.ePMLCommand_Abort);]]></ST>
+        <ST><![CDATA[//Trace('Mode was changed - ABORTING');
+//ChangeState(E_PMLCommand.ePMLCommand_Abort);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ResetSafety" Id="{6bac4035-16f4-4bf2-95a7-9f0b204a82b7}">
+      <Declaration><![CDATA[METHOD ResetSafety : BOOL
+VAR_INST
+	Step : INT ;	
+	SafetyTimer :TON;
+	SafetyTimerTrigger :R_TRIG;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//auto resetting timer, a start condition is an end condition
+SafetyTimer(IN:= Step > 0 AND NOT SafetyTimer.Q, PT:= T#500MS);
+
+CASE Step OF
+		
+		0:  // Reset group or waits
+			ResetSafety:= FALSE;
+			//Trace('Timer Initialize');
+			Step := Step + 10;
+			
+		10: //If necessary reset group
+		
+			GVL_Safety.ErrorAck := (GVL_Safety.ComError OR GVL_Safety.FBError); 
+		
+			IF GVL_Safety.ErrorAck OR SafetyTimer.Q THEN 
+				Step := Step + 10;
+			END_IF
+
+		20: //Wait for the signal propagation
+			IF SafetyTimer.Q THEN
+				GVL_Safety.ErrorAck := FALSE;
+				Step := Step + 10;
+			END_IF
+		
+		30: //Check FB errors
+			IF GVL_Safety.FBError OR (NOT GVL_Safety.SafetyPermission) THEN
+				GVL_Safety.RestartFBs := TRUE;
+			END_IF
+			
+			Step := Step + 10;
+			
+		40: //Wait for the signal propagation
+		
+			IF SafetyTimer.Q THEN
+				GVL_Safety.RestartFBs := FALSE;
+				Step := Step + 10;
+			END_IF	
+			
+		50: //Wait for the signal propagation
+			
+			
+		IF SafetyTimer.Q THEN
+				
+			
+				IF GVL_Safety.SafetyPermission AND 
+					NOT (GVL_Safety.ComError OR GVL_Safety.FBError OR GVL_Safety.SafeError) 
+				
+					THEN
+						Step := 0;
+						ResetSafety := TRUE;
+					ELSE
+						Step := 0;
+						ResetSafety := FALSE;
+				END_IF
+			
+			END_IF
+		
+		ELSE
+		
+		Step := 0;	
+
+END_CASE
+
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="Resetting" Id="{e510dc83-237a-4a59-97e9-db4b9408b4b7}" FolderPath="States\">
@@ -281,16 +385,15 @@ END_VAR
 					
 			10:
 				StateTasksComplete := TRUE;
-				SUPER^.Resetting();
 				
 			
 		END_CASE
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
-		SUPER^.Resetting();
+;
 END_CASE
-]]></ST>
+		SUPER^.Resetting();]]></ST>
       </Implementation>
     </Method>
     <Method Name="SubModuleMonitor" Id="{05824ff8-f244-497a-8a5d-923cd9a5fc87}">
@@ -316,7 +419,6 @@ IF _CurrentState <> E_PMLState.ePMLState_Aborted AND _CurrentState <> E_PMLState
     CASE AlarmResponses[CurrentAlarmSeverity] OF
         E_AlarmResponse.Abort_ImmediateError:
             AbortImmediateError(Name, TRUE);
-			AbortImmediateError(Name, FALSE);
         E_AlarmResponse.Abort_Immediate:
             AbortImmediate();
         E_AlarmResponse.Stop_Immediate:
@@ -353,9 +455,8 @@ END_IF]]></ST>
       <LineId Id="34" Count="0" />
       <LineId Id="72" Count="0" />
       <LineId Id="35" Count="1" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="57" Count="1" />
-      <LineId Id="61" Count="0" />
+      <LineId Id="80" Count="1" />
+      <LineId Id="57" Count="0" />
       <LineId Id="64" Count="0" />
       <LineId Id="62" Count="0" />
       <LineId Id="60" Count="0" />
@@ -370,11 +471,10 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_Machine.CyclicLogic">
       <LineId Id="18" Count="0" />
-      <LineId Id="3" Count="5" />
-      <LineId Id="45" Count="0" />
-      <LineId Id="47" Count="0" />
-      <LineId Id="19" Count="0" />
-      <LineId Id="39" Count="0" />
+      <LineId Id="3" Count="4" />
+      <LineId Id="61" Count="2" />
+      <LineId Id="74" Count="3" />
+      <LineId Id="85" Count="3" />
       <LineId Id="36" Count="0" />
       <LineId Id="40" Count="0" />
       <LineId Id="20" Count="0" />
@@ -390,9 +490,9 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Execute">
-      <LineId Id="24" Count="11" />
-      <LineId Id="49" Count="4" />
-      <LineId Id="36" Count="10" />
+      <LineId Id="24" Count="3" />
+      <LineId Id="98" Count="23" />
+      <LineId Id="42" Count="4" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.HMICommunication">
@@ -401,7 +501,8 @@ END_IF]]></ST>
       <LineId Id="13" Count="0" />
       <LineId Id="7" Count="0" />
       <LineId Id="12" Count="0" />
-      <LineId Id="11" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="22" Count="0" />
       <LineId Id="10" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -446,7 +547,15 @@ END_IF]]></ST>
       <LineId Id="12" Count="0" />
       <LineId Id="40" Count="9" />
       <LineId Id="70" Count="1" />
-      <LineId Id="50" Count="6" />
+      <LineId Id="50" Count="1" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="106" Count="3" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="111" Count="4" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="52" Count="4" />
       <LineId Id="68" Count="0" />
       <LineId Id="57" Count="1" />
       <LineId Id="2" Count="0" />
@@ -455,22 +564,24 @@ END_IF]]></ST>
       <LineId Id="6" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="FB_Machine.ResetSafety">
+      <LineId Id="258" Count="62" />
+      <LineId Id="111" Count="0" />
+    </LineIds>
     <LineIds Name="FB_Machine.Resetting">
       <LineId Id="28" Count="6" />
       <LineId Id="71" Count="0" />
       <LineId Id="35" Count="4" />
       <LineId Id="46" Count="0" />
       <LineId Id="57" Count="0" />
-      <LineId Id="63" Count="1" />
+      <LineId Id="64" Count="0" />
       <LineId Id="61" Count="0" />
       <LineId Id="52" Count="4" />
       <LineId Id="27" Count="0" />
       <LineId Id="62" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.SubModuleMonitor">
-      <LineId Id="10" Count="12" />
-      <LineId Id="55" Count="0" />
-      <LineId Id="23" Count="24" />
+      <LineId Id="10" Count="37" />
       <LineId Id="9" Count="0" />
     </LineIds>
   </POU>

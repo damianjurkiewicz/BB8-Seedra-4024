@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_RecipeBase" Id="{da96ec31-8163-452f-a094-4558fa21ef5c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBase IMPLEMENTS I_RecipeBuilder
+
+VAR
+    _Config                 : ST_RecipeBuilder_Config;
+    _PanelFrontLength       : REAL;  
+    _PanelFrontWidth        : REAL;      
+    _PanelHeight            : REAL;    
+    _RailHeightCorrection   : REAL;
+
+    // --- NOWE ZMIENNE DO PRZECHOWYWANIA SEGMENTÓW ---
+    _SegmentsCutX           : ARRAY [1..32] OF ST_CutSegment;
+    _SegmentsCutY           : ARRAY [1..32] OF ST_CutSegment;
+    _SegmentsGroove         : ARRAY [1..32] OF ST_CutSegment;
+    _SegmentsToCutX         : INT;
+    _SegmentsToCutY         : INT;
+    _SegmentsToGroove       : INT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{47409b61-265d-42e6-ab22-9bedebae5b88}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Build := FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Config" Id="{cc8b22ea-aed1-438f-8cdd-5e3e5f7b2e90}">
+      <Declaration><![CDATA[PROPERTY Config : ST_RecipeBuilder_Config]]></Declaration>
+      <Get Name="Get" Id="{51a4be92-27e0-4d30-897e-f466d704a9e2}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Config := _Config;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{ea17f2c2-4fb3-4cd4-85eb-6bcadc1e2873}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Config := Config;
+]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="SegmentsCutX" Id="{3184be54-f03a-4975-8cf1-db07c128d253}">
+      <Declaration><![CDATA[PROPERTY SegmentsCutX : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
+      <Get Name="Get" Id="{0f425160-36a8-4f28-99b9-e92bc5ef61d9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SegmentsCutX REF= _SegmentsCutX;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="SegmentsCutY" Id="{7e96d748-34eb-4d02-bea9-39c6162fca26}">
+      <Declaration><![CDATA[PROPERTY SegmentsCutY : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
+      <Get Name="Get" Id="{18ebbd77-7872-47d5-b7ea-e1c19856104e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SegmentsCutY REF= _SegmentsCutY;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="SegmentsGroove" Id="{ef32f872-b41e-411a-89df-3b90001a16fb}">
+      <Declaration><![CDATA[PROPERTY SegmentsGroove : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
+      <Get Name="Get" Id="{9f573555-28d1-42d5-8de5-c6e1c98b00d0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SegmentsGroove REF= _SegmentsGroove;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="SegmentsToCutX" Id="{7c141887-7a79-44a8-a421-fb9ee098c25b}">
+      <Declaration><![CDATA[
+PROPERTY SegmentsToCutX : INT
+]]></Declaration>
+      <Get Name="Get" Id="{549e99d8-5984-4542-b902-6ce577ebde0d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SegmentsToCutX := _SegmentsToCutX;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="SegmentsToCutY" Id="{2a1a5acb-e3ff-4cf0-ad15-d0b6b45a1d0e}">
+      <Declaration><![CDATA[
+PROPERTY SegmentsToCutY : INT
+]]></Declaration>
+      <Get Name="Get" Id="{4f78cbac-d000-4132-997b-ee432b29e987}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SegmentsToCutY := _SegmentsToCutY;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="SegmentsToGroove" Id="{c7b518f5-2d21-49fc-94c1-1f117859a4b1}">
+      <Declaration><![CDATA[
+PROPERTY SegmentsToGroove : INT
+]]></Declaration>
+      <Get Name="Get" Id="{8e366a6f-311d-4e3a-904c-a58ce6da4751}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[SegmentsToGroove := _SegmentsToGroove;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_RecipeBase">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.Build">
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.Config.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.Config.Set">
+      <LineId Id="5" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.SegmentsCutX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.SegmentsCutY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.SegmentsGroove.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.SegmentsToCutX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.SegmentsToCutY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.SegmentsToGroove.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

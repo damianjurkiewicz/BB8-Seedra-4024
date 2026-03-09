@@ -1,0 +1,952 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_GantryXYZ" Id="{474e1990-f731-0ed9-052c-42626742a38f}" SpecialFunc="None">
+    <Declaration><![CDATA[{attribute 'conditionalshow'}
+FUNCTION_BLOCK FB_GantryXYZ EXTENDS FB_PackML_BaseModule IMPLEMENTS I_GantryConfigProvider
+VAR
+    // =========================================================
+    //  DEPENDENCIES & SUB-MODULES
+    // =========================================================
+    _RecipeBuilder      : I_RecipeBuilder;
+    ipSubModules_Init   : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
+	ExecutorCutX		: FB_ExecutorCutX;
+	ExecutorCutY		: FB_ExecutorCutY;
+	ExecutorGrooveXY	: FB_ExecutorGrooveXY;
+
+
+    // =========================================================
+    //  HMI & COMMANDS
+    // =========================================================
+    GantryXYZ_HMI       : ST_GantryXYZ_HMI;
+    _ProgramIdRequested : E_RecipeID;
+
+    // =========================================================
+    //  COMPONENTS (AXES & CYLINDERS)
+    // =========================================================
+    AxisX               : FB_Component_BasicAxis := (Name := 'AxisX');
+    AxisY               : FB_Component_BasicAxis := (Name := 'AxisY');
+    AxisZ               : FB_Component_BasicAxis := (Name := 'AxisZ');
+	// Flagi określające typ napędu dla konkretnej osi (TRUE = SoE/AX5000, FALSE = CoE)
+    AxisX_IsSoE : BOOL := FALSE;
+    AxisY_IsSoE : BOOL := FALSE;
+    AxisZ_IsSoE : BOOL := FALSE; 
+    CylinderCuttingX    : FB_CylinderCutX        := (Name := 'Cylinder X');
+    CylinderCuttingY    : FB_CylinderCutY        := (Name := 'Cylinder Y');
+
+    // =========================================================
+    //  HOMING STRATEGIES
+    // =========================================================
+    fbHomeStratX        : FB_Homing_StandardNC;
+    fbHomeStratY        : FB_Homing_StandardNC;
+    fbHomeStratZ        : FB_Homing_StandardNC;
+
+
+    // =========================================================
+    //  ALARMS
+    // =========================================================
+    GantryAlarms        : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
+	
+
+
+	ResetStratX : FB_ResetRoutine_SoEDrive;
+	ResetStratY : FB_ResetRoutine_SoEDrive;
+	ResetStratZ : FB_ResetRoutine_SoEDrive;
+
+END_VAR
+
+VAR CONSTANT
+    GANTRY_ALARM_COUNT  : INT := 5;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+]]></ST>
+    </Implementation>
+    <Folder Name="Properties" Id="{b05cc7e1-dc37-4910-986a-f085b4a0163d}" />
+    <Folder Name="States" Id="{8df42c9b-c051-49f1-9767-900503632339}" />
+    <Method Name="Aborting" Id="{5476dfef-6652-4e6b-8928-3724a50553de}" FolderPath="States\">
+      <Declaration><![CDATA[
+METHOD PROTECTED Aborting
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+END_VAR
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+
+	//=================================PRODUCTION MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Production:
+CASE SequenceState OF
+    0:
+        NoStateTasksToComplete := FALSE;
+        SequenceState          := SequenceState + 10;
+    10:
+		AxisX.Disable();
+		AxisY.Disable();
+		AxisZ.Disable();
+
+		IO.SpindleEnable := FALSE;
+		IO.CoolingEnable := FALSE;
+		
+		CylinderCuttingX.Retract();
+		CylinderCuttingY.Retract();
+
+
+
+		
+		//test
+		fbHomeStratX.Abort();
+        fbHomeStratY.Abort();
+        fbHomeStratZ.Abort();
+		
+		ExecutorCutX.Abort();
+		ExecutorCutY.Abort();
+		ExecutorGrooveXY.Abort();
+		
+		SequenceState := SequenceState + 10;
+		
+		
+	20:
+
+		StateTasksComplete := TRUE;
+
+END_CASE
+
+	//=================================MAINTENANCE & MANUAL MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+
+	CASE SequenceState OF
+    
+	0:
+        NoStateTasksToComplete := FALSE;
+        SequenceState          := SequenceState + 10;
+    
+	10:
+		AxisX.Disable();
+		AxisY.Disable();
+		AxisZ.Disable();
+		
+		IO.CoolingEnable := FALSE;
+		IO.SpindleEnable := FALSE;
+
+
+
+		SequenceState := SequenceState + 10;
+	
+	20:
+		StateTasksComplete := TRUE;
+
+	END_CASE
+	
+
+	END_CASE
+
+		SUPER^.Aborting();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
+      <Declaration><![CDATA[METHOD PROTECTED Clearing
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+END_VAR
+
+VAR_INST
+	//SoEResetAxis1 : FB_SoEReset;
+	//ResetAxis1 :	MC_Reset;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE SequenceState OF
+    0:
+        NoStateTasksToComplete := FALSE;
+        SequenceState          := SequenceState + 10;
+    10:
+
+//Reset any alarms that get latched
+//		GantryAlarms[E_Gantry.AlarmMessage].Clear(0,0);		
+//		GantryAlarms[E_Gantry.InfoMessage].Clear(0,0);
+//		GantryAlarms[E_Gantry.InitReferenceEvent].Clear(0,0);
+//		GantryAlarms[E_Gantry.StartTimeout].Clear(0,0);
+//		GantryAlarms[E_Gantry.WarnMessage].Clear(0,0);
+
+		AxisX.Reset();
+		AxisY.Reset();
+		AxisZ.Reset();
+
+		SequenceState := SequenceState + 10;
+
+		
+    20:
+        StateTasksComplete := TRUE;
+		
+END_CASE
+
+SUPER^.Clearing();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Completing" Id="{6c861ff6-52ea-4daf-b956-f189ed9d190d}" FolderPath="States\">
+      <Declaration><![CDATA[// This method contains code which will execute when this PackML module is in the Completing state
+METHOD PROTECTED Completing
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+END_VAR
+
+// This method is called as required by <c>StateControl()</c>
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+
+	//=================================PRODUCTION MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Production:
+		CASE SequenceState OF
+		0:
+			NoStateTasksToComplete := FALSE;
+			SequenceState          := SequenceState + 10;
+		10:
+			SequenceState := SequenceState + 10;
+		20:
+			StateTasksComplete := TRUE;
+	END_CASE
+
+	//=================================MAINTENANCE & MANUAL MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+			;
+
+		
+
+END_CASE
+
+SUPER^.Completing();]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Config" Id="{ca63134f-ae96-41d5-9585-0ef3c006e9b8}">
+      <Declaration><![CDATA[PROPERTY Config : ST_GantryXYZ_Config]]></Declaration>
+      <Get Name="Get" Id="{076a1a2b-8400-4320-936d-862f5092941b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Config := GantryXYZ_HMI.Config;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{f4f87703-cd5d-4c7f-91bc-6d612ff58e00}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GantryXYZ_HMI.Config := Config;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="CreateEvents" Id="{40e5a283-7f33-033f-0879-cc11ecabc43d}">
+      <Declaration><![CDATA[METHOD PROTECTED CreateEvents
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Add your event creation here
+F_CreateAllEventsInClass(Alarms     := GantryAlarms,
+                         ClassSize  := SIZEOF(TC_EVENTS.Gantry),
+                         pInitEvent := ADR(TC_EVENTS.Gantry.InitReferenceEvent),
+                         Prefix     := _Name);
+
+// Super call to base
+SUPER^.CreateEvents();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic" Id="{0cfbfa67-40d6-05d6-0515-ef1c50353a78}">
+      <Declaration><![CDATA[METHOD CyclicLogic
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF NOT _InitComplete THEN
+    _InitComplete := Initialize();
+    RETURN;
+END_IF
+
+//aaa(
+//	Axis := AxisY.Axis , 
+//	Execute := TRUE , 
+//	ParameterNumber := MC_AxisParameter.AxisMinSoftPosLimit , 
+//	Value := -66, 
+//	 );
+	 
+	 
+
+
+SUPER^.CyclicLogic();
+
+fbHomeStratX.bSensorInput := IO.ProximitySensorX;
+fbHomeStratY.bSensorInput := IO.ProximitySensorY;
+fbHomeStratZ.bSensorInput := IO.ProximitySensorZ;
+
+fbHomeStratX.CyclicLogic();
+fbHomeStratY.CyclicLogic();
+fbHomeStratZ.CyclicLogic();
+
+ExecutorCutX.CyclicLogic();
+ExecutorCutY.CyclicLogic();
+ExecutorGrooveXY.CyclicLogic();
+
+//Set the current alarm severity for this module
+_CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentSeverity := _CurrentAlarmSeverity);
+
+//Simulate Alarm Messaging
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Execute" Id="{895d1ef9-5e85-47dd-a8bf-b32885837641}" FolderPath="States\">
+      <Declaration><![CDATA[METHOD PROTECTED Execute
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+
+    //=================================PRODUCTION MODE==================================
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        CASE SequenceState OF
+            0:
+                NoStateTasksToComplete := FALSE;
+                SequenceState := 10;
+                
+            10: // --- Ustawienie Soft Limitów ---
+                AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -20);     
+                AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1200);
+
+                SequenceState := 20;
+
+			20: // --- Zbuduj odcinki dla wstrzykniętego programu ---
+                // GantryXYZ nie wie co buduje, wie tylko że ma interfejs I_RecipeBuilder
+                IF _RecipeBuilder <> 0 THEN
+                    IF _RecipeBuilder.Build() THEN // Wykonuje kod z przypisanej klasy
+                        SequenceState := 30;
+                    END_IF
+                ELSE
+                    // Zabezpieczenie na wypadek, gdyby FB_Machine nie wstrzyknął buildera
+                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                END_IF     
+
+			30: // --- Execute Groove ---
+				IF ExecutorGrooveXY.Execute() THEN 
+				   SequenceState := 32;
+				END_IF
+				
+			32: // --- Execute Groove ---
+				IF ExecutorGrooveXY.Done THEN 
+				   SequenceState := 40;
+				END_IF
+			
+			40: // --- Execute Cut Y ---
+				IF ExecutorCutY.Execute() THEN
+					SequenceState := 41;
+				END_IF
+			
+			41: // --- Wait for Cut Y ---
+				IF ExecutorCutY.Done THEN
+					SequenceState := 50;
+				END_IF
+			
+			50: // --- Wyślij komendę Execute do osi X ---
+				IF ExecutorCutX.Execute() THEN
+					SequenceState := 60;
+				END_IF
+			
+			60: // --- Czekaj aż oś X skończy ---
+				IF ExecutorCutX.Done THEN
+					SequenceState := 100;
+				END_IF
+	
+				100: // --- ZAKOŃCZENIE ---
+					StateTasksComplete := TRUE;
+					StateComplete();
+
+        END_CASE
+
+    //=================================MAINTENANCE & MANUAL MODE==================================
+    E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+        ;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="HMICommunication" Id="{0dce72f4-da14-4dd2-b6a3-5db9db3404e0}">
+      <Declaration><![CDATA[// Provides interlocks for HMI control and updates HMI status information for this module
+//Only in this place HMI input can overwrite internal data 
+METHOD PROTECTED HMICommunication
+// This method is called cyclically by CyclicLogic()]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.HMICommunication();
+
+_ProgramIdRequested   := GantryXYZ_HMI.Command.ProgramIdRequested;
+
+
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="HMIPermissions" Id="{a7a517c4-9176-4ef6-9045-d889c05c8a21}">
+      <Declaration><![CDATA[METHOD PROTECTED HMIPermissions
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[//General Mode Based Monitoring and handling of HMI control
+CASE _CurrentMode OF
+   
+ E_PMLUnitMode.ePMLUnitMode_Production:
+        CASE _CurrentState OF
+            E_PMLState.ePMLState_Stopped:
+				AllowHMIControl(ThisModuleOnly := FALSE);
+            E_PMLState.ePMLState_Idle:
+				AllowHMIControl(ThisModuleOnly := FALSE);
+            E_PMLState.ePMLState_Suspended:
+         		AllowHMIControl(ThisModuleOnly := FALSE);
+            E_PMLState.ePMLState_Execute:
+            	AllowHMIControl(ThisModuleOnly := FALSE); 
+            E_PMLState.ePMLState_Aborted:
+                AllowHMIControl(ThisModuleOnly := FALSE); 
+            E_PMLState.ePMLState_Held:
+                AllowHMIControl(ThisModuleOnly := FALSE); 
+            E_PMLState.ePMLState_Complete:
+          		AllowHMIControl(ThisModuleOnly := FALSE); 
+        END_CASE
+		
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+        AllowHMIControl(ThisModuleOnly := FALSE); 
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:
+        AllowHMIControl(ThisModuleOnly := FALSE); 
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Initialize" Id="{ba85f303-ffbe-03ad-229b-3741bd93e6e2}">
+      <Declaration><![CDATA[//! @summary Basic module initialization logic
+METHOD PROTECTED Initialize : BOOL;
+VAR
+    i                        : UDINT;
+    varInfo                  : __SYSTEM.VAR_INFO;
+    AllSubUnitsInitialized   : BOOL := TRUE;
+    AllComponentsInitialized : BOOL := TRUE;
+END_VAR
+
+//! @description This method is called by <c>CyclicLogic()</c> as required]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Initialize := FALSE;
+CASE DescendantSequenceState OF
+    0:
+		RegisterComponent(AxisX);
+		RegisterComponent(AxisY);	
+		RegisterComponent(AxisZ);	
+		RegisterComponent(CylinderCuttingY);
+		RegisterComponent(CylinderCuttingX);
+        _LogModeChanges         := FALSE;
+        _LogStateChanges        := FALSE;
+        DescendantSequenceState := DescendantSequenceState + 10;
+    10:
+
+		
+		// Przypisanie osi do strategii
+		fbHomeStratX.Axis := AxisX;
+		fbHomeStratY.Axis := AxisY;
+		fbHomeStratZ.Axis := AxisZ;
+		
+		// Wstrzyknięcie strategii do osi (Dependency Injection)
+		AxisX.HomeMethod := fbHomeStratX;
+		AxisY.HomeMethod := fbHomeStratY;
+		AxisZ.HomeMethod := fbHomeStratZ;
+		
+		// Wstrzykiwanie zależności do Executora Cut X
+		ExecutorCutX.AxisX         := AxisX;          // Podanie interfejsów osi
+		ExecutorCutX.AxisY         := AxisY;
+		ExecutorCutX.AxisZ         := AxisZ;
+		ExecutorCutX.Cylinder      := CylinderCuttingX; // Implementuje I_Cylinder
+		ExecutorCutX.ConfigProvider := THIS^;
+
+		// Wstrzyknięcie strategii resetu sprzętowego
+		// Oś X
+		IF AxisX_IsSoE THEN
+			AxisX.ResetMethod := ResetStratX;
+		END_IF
+		
+		// Oś Y
+		IF AxisY_IsSoE THEN
+			AxisY.ResetMethod := ResetStratY;
+		END_IF
+		
+		// Oś Z
+		IF AxisZ_IsSoE THEN
+			AxisZ.ResetMethod := ResetStratZ;
+		END_IF
+		
+		// Wstrzykiwanie zależności do Executora Cut Y 
+		ExecutorCutY.AxisX         := AxisX;
+		ExecutorCutY.AxisY         := AxisY;
+		ExecutorCutY.AxisZ         := AxisZ;
+		ExecutorCutY.Cylinder      := CylinderCuttingY;
+		ExecutorCutY.ConfigProvider := THIS^;
+	
+		// Wstrzykiwanie zależności do Executora Groove XY
+		ExecutorGrooveXY.AxisX         := AxisX;
+		ExecutorGrooveXY.AxisY         := AxisY;
+		ExecutorGrooveXY.AxisZ         := AxisZ;
+		ExecutorGrooveXY.ConfigProvider := THIS^;
+	
+        DescendantSequenceState := DescendantSequenceState + 10;
+		//initialize persistent
+
+    20:
+        //Copy Mode names
+        FOR i := 1 TO 3 DO
+            ModeNames[i] := F_UnitModeToString(UDINT_TO_DINT(i));
+        END_FOR
+
+        DescendantSequenceState := DescendantSequenceState + 10;
+    30:
+        //Call the Super
+        IF SUPER^.Initialize() THEN
+            DescendantSequenceState := DescendantSequenceState + 10;
+        END_IF
+    40:
+        Initialize := TRUE;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ProgramIdRequested" Id="{3b163a54-6fcd-4be2-bb98-ad529d342348}" FolderPath="Properties\">
+      <Declaration><![CDATA[PROPERTY ProgramIdRequested : E_RecipeID]]></Declaration>
+      <Get Name="Get" Id="{21210547-61ea-4bd8-a78a-96552b4742ab}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ProgramIdRequested := _ProgramIdRequested;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{2bb8002c-0857-45bb-b53e-f611a5c233b9}">
+        <Declaration><![CDATA[
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_ProgramIdRequested := ProgramIdRequested;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RecipeBuilder" Id="{7e3c2008-dd15-410b-92f3-2adf472e0386}">
+      <Declaration><![CDATA[PROPERTY RecipeBuilder : I_RecipeBuilder]]></Declaration>
+      <Get Name="Get" Id="{646b66c6-cab8-496a-a121-e2412f446155}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RecipeBuilder := _RecipeBuilder;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{c356b1c0-c208-4ab6-be6c-2b4118aa8dde}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_RecipeBuilder := RecipeBuilder;
+
+ExecutorCutX.RecipeBuilder := _RecipeBuilder;
+ExecutorCutY.RecipeBuilder := _RecipeBuilder;
+ExecutorGrooveXY.RecipeBuilder := _RecipeBuilder;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="Resetting" Id="{e7a01217-de28-430f-aeef-f83d9f1b6f0d}" FolderPath="States\">
+      <Declaration><![CDATA[METHOD PROTECTED Resetting
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+	
+
+	
+END_VAR
+
+VAR_INST
+	flagX :BOOL;
+	flagY :BOOL;
+	flagZ :BOOL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+
+	//=================================PRODUCTION MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Production:
+		CASE SequenceState OF
+			0:
+				NoStateTasksToComplete := FALSE;
+				SequenceState := SequenceState + 5;
+
+
+			5:
+
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+		
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);	
+				
+				SequenceState := SequenceState + 5;
+		
+			10: 
+      			
+			  AxisX.Enable();
+			  AxisY.Enable();
+			  AxisZ.Enable();
+	 
+			SequenceState := 12;
+		
+		12:
+        
+        // 2. Czekamy, aż napędy "wstaną" i zameldują gotowość
+        IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+            SequenceState := 15;
+        END_IF
+        
+15:
+        // 1. "Bombardujemy" osie komendami, dopóki każda z osobna nie odpowie TRUE
+        IF NOT flagX THEN flagX := AxisX.Home(); END_IF
+        IF NOT flagY THEN flagY := AxisY.Home(); END_IF
+        IF NOT flagZ THEN flagZ := AxisZ.Home(); END_IF
+
+        // 2. Kiedy cała trójka potwierdziła przyjęcie rozkazu:
+        IF flagX AND flagY AND flagZ THEN
+            // Czyścimy flagi przed następnym użyciem maszyny!
+            flagX := FALSE;
+            flagY := FALSE;
+            flagZ := FALSE;
+            
+            SequenceState := 20; // Idziemy czekać na koniec ruchu
+        END_IF
+					
+	20:			
+//			IF AxisX.Axis.Status.Homed AND AxisY.Axis.Status.Homed AND AxisZ.Axis.Status.Homed THEN
+			IF AxisX.Axis.Status.Homed AND AxisY.Axis.Status.Homed AND AxisZ.Axis.Status.Homed THEN
+//			IF flagX AND flagY AND flagZ THEN
+
+				//Trace('All Axes Homing completed');
+				flagX :=0; 
+				flagY :=0; 
+				flagZ :=0;
+
+
+				SequenceState := 40;
+//			END_IF			
+			END_IF		
+			40:		
+				StateTasksComplete := TRUE;
+		END_CASE
+
+	//=================================MAINTENANCE & MANUAL MODE==================================
+	E_PMLUnitMode.ePMLUnitMode_Maintenance:
+
+	CASE SequenceState OF
+			0:
+				NoStateTasksToComplete := FALSE;
+				SequenceState := SequenceState + 10;	
+		
+			10: 
+				AxisX.Enable();
+				AxisY.Enable();
+				AxisZ.Enable();	
+				
+				IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+					SequenceState := SequenceState + 10;
+				END_IF
+				
+			20:	
+
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+		
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
+			
+				SequenceState := SequenceState + 10;
+			30:
+	
+				SequenceState := SequenceState + 10;
+					
+			40:		
+				StateTasksComplete := TRUE;
+		END_CASE
+	
+ 	E_PMLUnitMode.ePMLUnitMode_Manual:
+			
+	CASE SequenceState OF
+			0:
+				NoStateTasksToComplete := FALSE;
+				SequenceState := SequenceState + 10;	
+		
+			10: 
+				AxisX.Enable();
+				AxisY.Enable();
+				AxisZ.Enable();	
+				
+				IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+					SequenceState := SequenceState + 10;
+				END_IF
+				
+			20:	
+
+				AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -1250);	 
+				AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 1250);
+		
+				AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -2300);	 
+				AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 2300);
+		
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, -100);	 
+				AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, 100);
+			
+				SequenceState := SequenceState + 10;
+			30:
+	
+				SequenceState := SequenceState + 10;
+					
+			40:		
+				StateTasksComplete := TRUE;
+
+		END_CASE
+		
+	
+	END_CASE
+		
+SUPER^.Resetting();]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_GantryXYZ">
+      <LineId Id="49" Count="0" />
+      <LineId Id="45" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Aborting">
+      <LineId Id="149" Count="2" />
+      <LineId Id="148" Count="0" />
+      <LineId Id="105" Count="5" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="132" Count="0" />
+      <LineId Id="124" Count="0" />
+      <LineId Id="140" Count="0" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="257" Count="0" />
+      <LineId Id="259" Count="0" />
+      <LineId Id="230" Count="0" />
+      <LineId Id="121" Count="0" />
+      <LineId Id="246" Count="0" />
+      <LineId Id="269" Count="1" />
+      <LineId Id="273" Count="1" />
+      <LineId Id="272" Count="0" />
+      <LineId Id="290" Count="1" />
+      <LineId Id="299" Count="1" />
+      <LineId Id="271" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="267" Count="1" />
+      <LineId Id="115" Count="2" />
+      <LineId Id="154" Count="0" />
+      <LineId Id="118" Count="0" />
+      <LineId Id="181" Count="2" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="200" Count="1" />
+      <LineId Id="222" Count="0" />
+      <LineId Id="202" Count="2" />
+      <LineId Id="221" Count="0" />
+      <LineId Id="205" Count="3" />
+      <LineId Id="238" Count="0" />
+      <LineId Id="209" Count="0" />
+      <LineId Id="282" Count="0" />
+      <LineId Id="213" Count="3" />
+      <LineId Id="220" Count="0" />
+      <LineId Id="218" Count="1" />
+      <LineId Id="190" Count="0" />
+      <LineId Id="199" Count="0" />
+      <LineId Id="153" Count="0" />
+      <LineId Id="152" Count="0" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="29" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Clearing">
+      <LineId Id="28" Count="4" />
+      <LineId Id="165" Count="0" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="83" Count="3" />
+      <LineId Id="155" Count="0" />
+      <LineId Id="75" Count="2" />
+      <LineId Id="130" Count="0" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="45" Count="1" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="47" Count="1" />
+      <LineId Id="27" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Completing">
+      <LineId Id="11" Count="8" />
+      <LineId Id="30" Count="1" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="35" Count="7" />
+      <LineId Id="10" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="51" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Config.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Config.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CreateEvents">
+      <LineId Id="3" Count="6" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.CyclicLogic">
+      <LineId Id="3" Count="3" />
+      <LineId Id="20" Count="5" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="26" Count="1" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="7" Count="1" />
+      <LineId Id="41" Count="2" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="35" Count="2" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="12" Count="4" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Execute">
+      <LineId Id="122" Count="14" />
+      <LineId Id="238" Count="8" />
+      <LineId Id="157" Count="1" />
+      <LineId Id="196" Count="3" />
+      <LineId Id="222" Count="0" />
+      <LineId Id="224" Count="0" />
+      <LineId Id="227" Count="1" />
+      <LineId Id="223" Count="0" />
+      <LineId Id="200" Count="1" />
+      <LineId Id="203" Count="4" />
+      <LineId Id="209" Count="11" />
+      <LineId Id="177" Count="10" />
+      <LineId Id="23" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.HMICommunication">
+      <LineId Id="6" Count="0" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="37" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.HMIPermissions">
+      <LineId Id="6" Count="24" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Initialize">
+      <LineId Id="3" Count="4" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="8" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="10" Count="3" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="100" Count="0" />
+      <LineId Id="106" Count="7" />
+      <LineId Id="102" Count="0" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="125" Count="4" />
+      <LineId Id="183" Count="0" />
+      <LineId Id="130" Count="0" />
+      <LineId Id="194" Count="0" />
+      <LineId Id="197" Count="12" />
+      <LineId Id="124" Count="0" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="152" Count="5" />
+      <LineId Id="167" Count="0" />
+      <LineId Id="173" Count="0" />
+      <LineId Id="169" Count="3" />
+      <LineId Id="151" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="42" Count="4" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="51" Count="7" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RecipeBuilder.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RecipeBuilder.Set">
+      <LineId Id="2" Count="0" />
+      <LineId Id="6" Count="2" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.Resetting">
+      <LineId Id="82" Count="5" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="434" Count="1" />
+      <LineId Id="433" Count="0" />
+      <LineId Id="437" Count="7" />
+      <LineId Id="436" Count="0" />
+      <LineId Id="445" Count="1" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="542" Count="4" />
+      <LineId Id="558" Count="3" />
+      <LineId Id="547" Count="5" />
+      <LineId Id="569" Count="13" />
+      <LineId Id="199" Count="0" />
+      <LineId Id="181" Count="0" />
+      <LineId Id="179" Count="0" />
+      <LineId Id="149" Count="0" />
+      <LineId Id="565" Count="0" />
+      <LineId Id="184" Count="0" />
+      <LineId Id="568" Count="0" />
+      <LineId Id="185" Count="0" />
+      <LineId Id="237" Count="2" />
+      <LineId Id="508" Count="0" />
+      <LineId Id="213" Count="0" />
+      <LineId Id="186" Count="0" />
+      <LineId Id="183" Count="0" />
+      <LineId Id="125" Count="0" />
+      <LineId Id="94" Count="1" />
+      <LineId Id="97" Count="2" />
+      <LineId Id="337" Count="0" />
+      <LineId Id="365" Count="0" />
+      <LineId Id="461" Count="31" />
+      <LineId Id="366" Count="1" />
+      <LineId Id="364" Count="0" />
+      <LineId Id="335" Count="0" />
+      <LineId Id="377" Count="5" />
+      <LineId Id="416" Count="1" />
+      <LineId Id="386" Count="0" />
+      <LineId Id="418" Count="3" />
+      <LineId Id="387" Count="1" />
+      <LineId Id="422" Count="0" />
+      <LineId Id="425" Count="6" />
+      <LineId Id="397" Count="0" />
+      <LineId Id="423" Count="1" />
+      <LineId Id="398" Count="0" />
+      <LineId Id="411" Count="0" />
+      <LineId Id="432" Count="0" />
+      <LineId Id="412" Count="3" />
+      <LineId Id="374" Count="1" />
+      <LineId Id="256" Count="1" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="27" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

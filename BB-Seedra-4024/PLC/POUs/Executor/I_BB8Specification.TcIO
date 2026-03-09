@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <Itf Name="I_BB8Specification" Id="{d7ebea93-19fd-4cf9-88f8-8809c3c592f9}">
+    <Declaration><![CDATA[INTERFACE I_BB8Specification
+]]></Declaration>
+    <Property Name="AxisX" Id="{4993a6b5-db25-4553-9cb2-07b51c88c577}">
+      <Declaration><![CDATA[PROPERTY AxisX : I_BasicAxis]]></Declaration>
+      <Get Name="Get" Id="{522ea5ee-87d4-4fe1-8a51-2790c354af23}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{b7ae17ba-0ac9-4c31-93ad-716bc1d77016}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="AxisY" Id="{6ad5d93f-a2fb-406c-9974-1fbca429a9b8}">
+      <Declaration><![CDATA[PROPERTY AxisY : I_BasicAxis]]></Declaration>
+      <Get Name="Get" Id="{ef97a060-0122-4ee5-8991-a29bf266be64}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{27ccb336-b0c6-4641-88d0-803685a48b22}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="AxisZ" Id="{e86eae85-b1a5-453c-a799-0308894c974d}">
+      <Declaration><![CDATA[PROPERTY AxisZ : I_BasicAxis]]></Declaration>
+      <Get Name="Get" Id="{12ea5ea7-23dd-48d0-8e28-7dae274226fd}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{1dc60ee3-7192-45d5-9156-19c0ae6cbb1e}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="ConfigProvider" Id="{65c69a1c-b48b-463b-98a2-1efe2073505b}">
+      <Declaration><![CDATA[PROPERTY ConfigProvider : I_GantryConfigProvider]]></Declaration>
+      <Get Name="Get" Id="{36ad60b3-99f4-465e-909a-240245647842}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{dbce6e8c-f430-47ce-8997-f86f727c8736}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="Cylinder" Id="{ce125a1d-93e3-4002-8fce-4da998080824}">
+      <Declaration><![CDATA[PROPERTY Cylinder : I_Cylinder]]></Declaration>
+      <Get Name="Get" Id="{60d560a9-9bf9-4d2f-acbd-4db7ed3c2b46}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{bbf8f8ee-2cf9-4528-8654-cf3c5c11d534}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="RecipeBuilder" Id="{872801d5-8338-4a69-a743-5f83b587ceb8}">
+      <Declaration><![CDATA[PROPERTY RecipeBuilder : I_RecipeBuilder]]></Declaration>
+      <Get Name="Get" Id="{9958ba85-26ba-4191-82c1-9d4bb5d42a94}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{b141b14f-8408-4c05-9e89-5c652b07b61a}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+  </Itf>
+</TcPlcObject>

@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <DUT Name="ST_RecipeBuilder_HMI" Id="{6eb6a18f-2a70-43f0-9365-d0b122d2f8c7}">
+    <Declaration><![CDATA[TYPE ST_RecipeBuilder_HMI :
+    STRUCT
+        Config  : ST_RecipeBuilder_Config;
+    END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>
