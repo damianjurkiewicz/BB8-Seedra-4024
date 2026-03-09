@@ -110,7 +110,7 @@ CASE SequenceState OF
 	20:
 
 		StateTasksComplete := TRUE;
-		SUPER^.Aborting();
+
 END_CASE
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
@@ -136,13 +136,13 @@ END_CASE
 	
 	20:
 		StateTasksComplete := TRUE;
-		SUPER^.Aborting();
+
 	END_CASE
 	
 
 	END_CASE
 
-]]></ST>
+		SUPER^.Aborting();]]></ST>
       </Implementation>
     </Method>
     <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
@@ -208,16 +208,17 @@ END_VAR
 			SequenceState := SequenceState + 10;
 		20:
 			StateTasksComplete := TRUE;
-			SUPER^.Completing();
 	END_CASE
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
-			
+			;
 
-		SUPER^.Completing();
+		
 
-END_CASE]]></ST>
+END_CASE
+
+SUPER^.Completing();]]></ST>
       </Implementation>
     </Method>
     <Property Name="Config" Id="{ca63134f-ae96-41d5-9585-0ef3c006e9b8}">
@@ -623,7 +624,7 @@ END_VAR
 			IF AxisX.Axis.Status.Homed AND AxisY.Axis.Status.Homed AND AxisZ.Axis.Status.Homed THEN
 //			IF flagX AND flagY AND flagZ THEN
 
-				Trace('All Axes Homing completed');
+				//Trace('All Axes Homing completed');
 				flagX :=0; 
 				flagY :=0; 
 				flagZ :=0;
@@ -634,7 +635,6 @@ END_VAR
 			END_IF		
 			40:		
 				StateTasksComplete := TRUE;
-				SUPER^.Resetting();
 		END_CASE
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
@@ -672,7 +672,6 @@ END_VAR
 					
 			40:		
 				StateTasksComplete := TRUE;
-				SUPER^.Resetting();
 		END_CASE
 	
  	E_PMLUnitMode.ePMLUnitMode_Manual:
@@ -709,15 +708,13 @@ END_VAR
 					
 			40:		
 				StateTasksComplete := TRUE;
-				SUPER^.Resetting();
+
 		END_CASE
 		
 	
 	END_CASE
 		
-
-
-]]></ST>
+SUPER^.Resetting();]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_GantryXYZ">
@@ -790,8 +787,11 @@ END_VAR
     <LineIds Name="FB_GantryXYZ.Completing">
       <LineId Id="11" Count="8" />
       <LineId Id="30" Count="1" />
-      <LineId Id="33" Count="9" />
+      <LineId Id="33" Count="0" />
+      <LineId Id="35" Count="7" />
       <LineId Id="10" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="51" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Config.Get">
       <LineId Id="2" Count="0" />
@@ -922,10 +922,11 @@ END_VAR
       <LineId Id="186" Count="0" />
       <LineId Id="183" Count="0" />
       <LineId Id="125" Count="0" />
-      <LineId Id="94" Count="5" />
+      <LineId Id="94" Count="1" />
+      <LineId Id="97" Count="2" />
       <LineId Id="337" Count="0" />
       <LineId Id="365" Count="0" />
-      <LineId Id="461" Count="32" />
+      <LineId Id="461" Count="31" />
       <LineId Id="366" Count="1" />
       <LineId Id="364" Count="0" />
       <LineId Id="335" Count="0" />
@@ -944,7 +945,7 @@ END_VAR
       <LineId Id="412" Count="3" />
       <LineId Id="374" Count="1" />
       <LineId Id="256" Count="1" />
-      <LineId Id="101" Count="2" />
+      <LineId Id="101" Count="0" />
       <LineId Id="27" Count="0" />
     </LineIds>
   </POU>

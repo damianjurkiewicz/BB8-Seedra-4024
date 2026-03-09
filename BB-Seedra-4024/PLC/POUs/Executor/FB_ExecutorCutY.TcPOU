@@ -44,7 +44,7 @@ CASE nStep OF
     // -------- Inicjalizacja procesu --------
     5:
         IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
-            Trace('SegmentExecutionY Started');
+            //Trace('SegmentExecutionY Started');
 
             IF _RecipeBuilder.SegmentsToCutY <= 0 THEN
                 // Brak danych do obróbki - natychmiastowe zakończenie
@@ -148,7 +148,7 @@ CASE nStep OF
 
     // -------- Finalizacja pracy --------
     1000:
-        Trace('SegmentExecutionY-FINISHED');
+        ////Trace('SegmentExecutionY-FINISHED');
         _bBusy := FALSE; // Zwolnienie flagi Busy z FB_ExecutorBase
         _bDone := TRUE;  // Ustawienie flagi Done dla Orchestratora
         nStep := 0;      // Powrót do IDLE

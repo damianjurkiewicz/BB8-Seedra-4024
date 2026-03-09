@@ -53,10 +53,10 @@ CASE nStep OF
 
         IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
             
-            Trace('SegmentGrooving Started (5 Passes Mode)');
+            //Trace('SegmentGrooving Started (5 Passes Mode)');
             
             IF _RecipeBuilder.SegmentsToGroove <= 0 THEN
-                Trace('Brak segmentow, zakonczenie');
+                //Trace('Brak segmentow, zakonczenie');
                 nStep := 1000;
                 RETURN;
             END_IF;
@@ -81,7 +81,7 @@ CASE nStep OF
 
     // -------- Dojazd XY do poczatku (Start) --------
     10:
-        Trace(CONCAT('Step 10: Rapid to Start XY. Pass: ', TO_STRING(iPass)));
+        //Trace(CONCAT('Step 10: Rapid to Start XY. Pass: ', TO_STRING(iPass)));
         _AxisX.MoveAbsolute(currentSeg.Start.X + localConfig.GlobalOffset, 0);
         _AxisY.MoveAbsolute(currentSeg.Start.Y + localConfig.GlobalOffset, 0);
         nStep := 20;
@@ -106,7 +106,7 @@ CASE nStep OF
             currentDepth := localConfig.GrooveDepthZ;
         END_CASE;
 
-        Trace(CONCAT('Step 30: Pass ', CONCAT(TO_STRING(iPass), CONCAT(' Moving Z to: ', TO_STRING(currentDepth)))));
+        //Trace(CONCAT('Step 30: Pass ', CONCAT(TO_STRING(iPass), CONCAT(' Moving Z to: ', TO_STRING(currentDepth)))));
         _AxisZ.MoveAbsolute(currentDepth, 0);
         nStep := 40;
 
@@ -133,7 +133,7 @@ CASE nStep OF
 
     // -------- Frezowanie do punktu koncowego --------
     60:
-        Trace('Step 60: Cutting Move to Stop XY');
+        //Trace('Step 60: Cutting Move to Stop XY');
         _AxisX.MoveAbsolute(currentSeg.Stop.X + localConfig.GlobalOffset, 0);
         _AxisY.MoveAbsolute(currentSeg.Stop.Y + localConfig.GlobalOffset, 0);
         nStep := 70;
@@ -141,10 +141,10 @@ CASE nStep OF
     70: // Czekamy na koniec cięcia
         IF _AxisX.InPosition AND _AxisY.InPosition AND _AxisZ.InPosition THEN
             IF iPass = 5 THEN
-                Trace('Step 70: Pass 5 (Final) -> Going to Return Path');
+                //Trace('Step 70: Pass 5 (Final) -> Going to Return Path');
                 nStep := 74;
             ELSE
-                Trace('Step 70: Intermediate Pass -> Lifting Z');
+                //Trace('Step 70: Intermediate Pass -> Lifting Z');
                 _AxisZ.Velocity := localConfig.RapidSpeedZ;
                 nStep := 80;
             END_IF
@@ -159,7 +159,7 @@ CASE nStep OF
         END_IF
 
     75: 
-        Trace('Step 75: Cleaning Return (Z stays down)');
+        //Trace('Step 75: Cleaning Return (Z stays down)');
         _AxisX.MoveAbsolute(currentSeg.Start.X + localConfig.GlobalOffset, 0);
         _AxisY.MoveAbsolute(currentSeg.Start.Y + localConfig.GlobalOffset, 0);
         nStep := 76;
@@ -172,7 +172,7 @@ CASE nStep OF
 
     // -------- Podnoszenie osi Z na pozycję bezpieczną --------
     80:
-        Trace('Step 80: Lifting Z to Safe 0');
+        //Trace('Step 80: Lifting Z to Safe 0');
         _AxisZ.MoveAbsolute(0, 0);
         nStep := 90;
 
@@ -194,12 +194,12 @@ CASE nStep OF
             // Logika zmiany przejazdu / zakonczenia
             IF iCurrentSegment > _RecipeBuilder.SegmentsToGroove THEN
                 IF iPass < 5 THEN
-                    Trace(CONCAT('Step 100: Pass ', CONCAT(TO_STRING(iPass), ' finished. Moving to next pass.')));
+                    //Trace(CONCAT('Step 100: Pass ', CONCAT(TO_STRING(iPass), ' finished. Moving to next pass.')));
                     iPass := iPass + 1;
                     iCurrentSegment := 1;
                     nStep := 10;
                 ELSE
-                    Trace('Step 100: ALL 5 PASSES DONE. Finishing.');
+                    //Trace('Step 100: ALL 5 PASSES DONE. Finishing.');
                     // UWAGA: Tu w oryginale wylaczano SpindleEnable i CoolingEnable
                     nStep := 1000;
                 END_IF
@@ -210,7 +210,7 @@ CASE nStep OF
 
     // -------- Zakończenie pracy Executora --------
     1000:
-        Trace('Step 1000: FINISH');
+        //Trace('Step 1000: FINISH');
         _bBusy := FALSE; // Zwolnienie flagi pracy
         _bDone := TRUE;  // Sygnal dla Orchestratora (GantryXYZ)
         nStep := 0;      // Powrot do IDLE

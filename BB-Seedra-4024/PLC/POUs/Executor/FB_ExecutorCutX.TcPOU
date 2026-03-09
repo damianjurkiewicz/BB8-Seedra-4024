@@ -45,7 +45,7 @@ CASE nStep OF
     5:
         IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
             
-            Trace('SegmentExecutionX Started');
+            //Trace('SegmentExecutionX Started');
             IF _RecipeBuilder.SegmentsToCutX <= 0 THEN
                 nStep := 1000; // Nie ma czego ciąć, zakończ natychmiast
                 RETURN;
@@ -146,7 +146,7 @@ CASE nStep OF
 
     // -------- Zakończenie pracy Executora --------
 1000:
-        Trace('SegmentExecutionX-FINISHED');
+        //Trace('SegmentExecutionX-FINISHED');
         _bBusy := FALSE; // Wyłączamy flagę pracy
         _bDone := TRUE;  // Dajemy sygnał Orchestratorowi, że skończyliśmy!
         nStep := 0;      // Wracamy do stanu IDLE
