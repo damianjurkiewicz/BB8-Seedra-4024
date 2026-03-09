@@ -17,7 +17,7 @@ VAR
 	RecipeFactory : FB_RecipeFactory;
     RecipeConfig_HMI : ST_RecipeBuilder_HMI; 
 
-	
+	Machine_HMI : ST_Machine_HMI;
 
 
 END_VAR
@@ -167,7 +167,7 @@ IF GVL_Safety.eStopHMI THEN
 	THIS^._Error := TRUE;
 END_IF
 
-
+Machine_HMI.Status.PackMLState :=_CurrentState;
 
 
 SUPER^.HMICommunication();]]></ST>
