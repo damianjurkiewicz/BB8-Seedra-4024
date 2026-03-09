@@ -19,9 +19,6 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DUTs\MoveState_t.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="GVLs\GVL_HMI.TcGVL">
       <SubType>Code</SubType>
       <LinkAlways>true</LinkAlways>
@@ -115,34 +112,34 @@
     <Compile Include="POUs\SAFETY.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\FB_RecipeBuilderArona.TcPOU">
+    <Compile Include="POUs\Builder\FB_RecipeBase.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\FB_RecipeBuilderWings.TcPOU">
+    <Compile Include="POUs\Builder\FB_RecipeBuilderArona.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\FB_RecipeBase.TcPOU">
+    <Compile Include="POUs\Builder\FB_RecipeBuilderFlaps.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\FB_RecipeBuilderFlaps.TcPOU">
+    <Compile Include="POUs\Builder\FB_RecipeBuilderWings.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\FB_RecipeFactory.TcPOU">
+    <Compile Include="POUs\Builder\FB_RecipeFactory.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\ST_RecipeBuilder_Config.TcDUT">
+    <Compile Include="POUs\Builder\I_RecipeBuilder.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\SegmentBuilder\FB_RecipeBuilder\ST_RecipeBuilder_HMI.TcDUT">
+    <Compile Include="POUs\Builder\ST_CutSegment.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\SegmentBuilder\I_RecipeBuilder.TcIO">
+    <Compile Include="POUs\Builder\ST_PointXY.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\SegmentBuilder\ST_CutSegment.TcDUT">
+    <Compile Include="POUs\Builder\ST_RecipeBuilder_Config.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\SegmentBuilder\ST_PointXY.TcDUT">
+    <Compile Include="POUs\Builder\ST_RecipeBuilder_HMI.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SafetyTask.TcTTO">
@@ -201,8 +198,7 @@
     <Folder Include="POUs\Components" />
     <Folder Include="POUs\GantryXYZ" />
     <Folder Include="POUs\Executor" />
-    <Folder Include="POUs\SegmentBuilder" />
-    <Folder Include="POUs\SegmentBuilder\FB_RecipeBuilder" />
+    <Folder Include="POUs\Builder" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
     <Folder Include="VISUs\Modes" />
