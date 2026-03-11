@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_MockAxis" Id="{f3603fea-aa28-47ef-b114-9fa5d52e454a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MockAxis EXTENDS SPT_Components.FB_Component_BasicAxis
+VAR
+    _MockInPosition : BOOL := TRUE;
+    _MockBusy       : BOOL := FALSE;
+	_Enabled		: BOOL := FALSE;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="Busy" Id="{25ee96b4-f935-48d1-85b2-42045a8b8f79}">
+      <Declaration><![CDATA[PROPERTY Busy : BOOL]]></Declaration>
+      <Get Name="Get" Id="{2073e439-15b7-4d8e-a4dd-8977881cdaca}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Busy := _MockBusy;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Enable" Id="{9481627a-d7cd-4736-ba69-511ff810e00c}">
+      <Declaration><![CDATA[METHOD Enable : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Enabled := TRUE;
+Enable := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Enabled" Id="{f38a9161-cb22-4c87-a85a-6e4ede124720}">
+      <Declaration><![CDATA[PROPERTY Enabled : BOOL]]></Declaration>
+      <Get Name="Get" Id="{8455ef28-d601-480d-94b2-053ea389c0b8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Enabled := _Enabled;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="InPosition" Id="{899ba792-f147-4840-9190-c11ac913d37c}">
+      <Declaration><![CDATA[PROPERTY InPosition : BOOL]]></Declaration>
+      <Get Name="Get" Id="{f5f86ed6-a8c0-44cb-80db-e88896583828}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[InPosition := _MockInPosition;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="MoveAbsolute" Id="{ce2fcb65-7db9-4fdb-91ae-b88cee0c9fe3}">
+      <Declaration><![CDATA[METHOD MoveAbsolute : BOOL
+VAR_INPUT
+	Position	  : LREAL;
+	AbortPrevious : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_MockBusy := FALSE;
+_MockInPosition := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_MockAxis">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Busy.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Enable">
+      <LineId Id="5" Count="0" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Enabled.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.InPosition.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.MoveAbsolute">
+      <LineId Id="8" Count="0" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

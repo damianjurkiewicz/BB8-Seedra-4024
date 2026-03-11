@@ -163,6 +163,12 @@
     <Compile Include="POUs\TESTS\FB_RecipeFactory_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\TESTS\Mocks\FB_MockAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\Mocks\FB_MockCylinder.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SafetyTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
@@ -221,6 +227,7 @@
     <Folder Include="POUs\Executor" />
     <Folder Include="POUs\Builder" />
     <Folder Include="POUs\TESTS" />
+    <Folder Include="POUs\TESTS\Mocks" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
     <Folder Include="VISUs\Modes" />
