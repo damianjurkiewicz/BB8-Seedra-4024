@@ -11,8 +11,8 @@ END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[//Test_Arona_Calculates_Segments();
 //Test_BorgoFlaps_Calculates_Segments();
-Test_BorgoWings_Calculates_Segments();
-Test_BorgoWings_Calculates_Coordinates();]]></ST>
+//Test_BorgoWings_Calculates_Segments();
+//Test_BorgoWings_Calculates_Coordinates();]]></ST>
     </Implementation>
     <Method Name="Test_Arona_Calculates_Segments" Id="{7a994464-7f61-40a8-a740-1b9398842f86}">
       <Declaration><![CDATA[METHOD Test_Arona_Calculates_Segments
@@ -96,7 +96,9 @@ VAR
     WasBuilt : BOOL;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[TEST('Test_BorgoWings_Calculates_Coordinates');
+        <ST><![CDATA[
+
+TEST('Test_BorgoWings_Calculates_Coordinates');
 
 // 1. Arrange - wprowadzamy dane
 Config.PanelFrontLength := 1000.0;
@@ -108,33 +110,60 @@ BuilderBorgoWings.Config := Config;
 // 2. Act - budujemy
 WasBuilt := BuilderBorgoWings.Build();
 
-// 3. Assert - Sprawdzamy współrzędne dla pierwszego cięcia X (SegmentsCutX[1])
-// Używamy AssertEquals_REAL, ponieważ współrzędne to liczby zmiennoprzecinkowe (REAL).
-// Delta := 0.01 oznacza dopuszczalny błąd zaokrąglenia.
+AssertTrue(WasBuilt, 'Builder zwrocil FALSE');
 
-// Sprawdzamy oś X
-AssertEquals_REAL(Expected := 720.0, 
-                  Actual := BuilderBorgoWings.SegmentsCutX[1].Start.X, 
-                  Delta := 0.01, 
-                  Message := 'Zly punkt Start.X dla pierwszego ciecia X');
-                  
+// ==========================================
+// 3. Assert - SEGMENT CUT X [1] (Zwykłe cięcie)
+// ==========================================
+AssertEquals_REAL(Expected := 720.0, // TotalX + 20
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Start.X, Delta := 0.01, Message := 'Zly punkt Start.X dla SegmentsCutX[1]');
+AssertEquals_REAL(Expected := 600.0, // ShorterX
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Stop.X,  Delta := 0.01, Message := 'Zly punkt Stop.X dla SegmentsCutX[1]');
+AssertEquals_REAL(Expected := 1100.0, // ShorterY
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Start.Y, Delta := 0.01, Message := 'Zly punkt Start.Y dla SegmentsCutX[1]');
+AssertEquals_REAL(Expected := 1100.0, // ShorterY
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Stop.Y,  Delta := 0.01, Message := 'Zly punkt Stop.Y dla SegmentsCutX[1]');
+
+// ==========================================
+// 4. Assert - SEGMENT CUT X [5] i [6] (Korekta o RailHeightCorrection = 13.0)
+// ==========================================
+// Start.Y dla segmentu 5 to (TotalY - RailHeightCorrection) -> 1200 - 13 = 1187.0
+AssertEquals_REAL(Expected := 1187.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutX[5].Start.Y, Delta := 0.01, Message := 'Zly punkt Start.Y dla SegmentsCutX[5] (Rail correction)');
+// Stop.X dla segmentu 5 to (-CuttingOverpass) -> -20.0
+AssertEquals_REAL(Expected := -20.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutX[5].Stop.X, Delta := 0.01, Message := 'Zly punkt Stop.X dla SegmentsCutX[5]');
+
+// Start.Y dla segmentu 6 to po prostu RailHeightCorrection -> 13.0
+AssertEquals_REAL(Expected := 13.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutX[6].Start.Y, Delta := 0.01, Message := 'Zly punkt Start.Y dla SegmentsCutX[6] (Rail correction)');
+
+// ==========================================
+// 5. Assert - SEGMENT CUT Y [1] i [5]
+// ==========================================
+// Segment 1 - Start.Y to (TotalY + CuttingOverpass) -> 1200 + 20 = 1220.0
+AssertEquals_REAL(Expected := 1220.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutY[1].Start.Y, Delta := 0.01, Message := 'Zly punkt Start.Y dla SegmentsCutY[1]');
+// Segment 1 - Start.X to ShorterX -> 600.0
 AssertEquals_REAL(Expected := 600.0, 
-                  Actual := BuilderBorgoWings.SegmentsCutX[1].Stop.X, 
-                  Delta := 0.01, 
-                  Message := 'Zly punkt Stop.X dla pierwszego ciecia X');
+                  Actual := BuilderBorgoWings.SegmentsCutY[1].Start.X, Delta := 0.01, Message := 'Zly punkt Start.X dla SegmentsCutY[1]');
 
-// Sprawdzamy oś Y
-AssertEquals_REAL(Expected := 1100.0, 
-                  Actual := BuilderBorgoWings.SegmentsCutX[1].Start.Y, 
-                  Delta := 0.01, 
-                  Message := 'Zly punkt Start.Y dla pierwszego ciecia X');
-                  
-AssertEquals_REAL(Expected := 1100.0, 
-                  Actual := BuilderBorgoWings.SegmentsCutX[1].Stop.Y, 
-                  Delta := 0.01, 
-                  Message := 'Zly punkt Stop.Y dla pierwszego ciecia X');
+// Segment 5 - Stop.Y to (-CuttingOverpass) -> -20.0
+AssertEquals_REAL(Expected := -20.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutY[5].Stop.Y, Delta := 0.01, Message := 'Zly punkt Stop.Y dla SegmentsCutY[5]');
+// Segment 5 - Start.X to TotalX -> 700.0
+AssertEquals_REAL(Expected := 700.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutY[5].Start.X, Delta := 0.01, Message := 'Zly punkt Start.X dla SegmentsCutY[5]');
 
-
+// ==========================================
+// 6. Assert - SEGMENT GROOVE [1]
+// ==========================================
+// Start.X to TotalX -> 700.0
+AssertEquals_REAL(Expected := 700.0, 
+                  Actual := BuilderBorgoWings.SegmentsGroove[1].Start.X, Delta := 0.01, Message := 'Zly punkt Start.X dla SegmentsGroove[1]');
+// Stop.X to 0
+AssertEquals_REAL(Expected := 0.0, 
+                  Actual := BuilderBorgoWings.SegmentsGroove[1].Stop.X, Delta := 0.01, Message := 'Zly punkt Stop.X dla SegmentsGroove[1]');
 
 TEST_FINISHED();]]></ST>
       </Implementation>
@@ -191,7 +220,7 @@ TEST_FINISHED();]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Coordinates">
-      <LineId Id="127" Count="39" />
+      <LineId Id="173" Count="68" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Segments">

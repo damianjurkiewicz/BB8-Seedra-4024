@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_RecipeFactory_Test" Id="{f26615a6-c66a-43dc-9573-a459ce1aeaeb}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeFactory_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+    Factory : FB_RecipeFactory;
+    Config  : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_ReturnsCorrectBuilder();
+Test_ReturnsZeroOnInvalidID();
+Test_UpdatesConfigForAllBuilders();]]></ST>
+    </Implementation>
+    <Method Name="Test_ReturnsCorrectBuilder" Id="{f4d0cc26-5c2a-4ddf-b356-c729fd5c6098}">
+      <Declaration><![CDATA[METHOD Test_ReturnsCorrectBuilder
+VAR
+    ReturnedBuilder : I_RecipeBuilder;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+TEST('Test_ReturnsCorrectBuilder');
+
+// Act - prosimy fabrykę o BorgoWings
+ReturnedBuilder := Factory.GetBuilder(E_RecipeID.eBorgoWings);
+
+// Assert - sprawdzamy, czy dostaliśmy jakikolwiek poprawny interfejs (nie 0)
+AssertTrue(Condition := (ReturnedBuilder <> 0), 
+           Message := 'Fabryka zwrocila pusty interfejs dla poprawnego ID!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_ReturnsZeroOnInvalidID" Id="{91b039b9-1372-48cc-8530-52ca18dfee07}">
+      <Declaration><![CDATA[METHOD Test_ReturnsZeroOnInvalidID
+VAR
+    ReturnedBuilder : I_RecipeBuilder;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+TEST('Test_ReturnsZeroOnInvalidID');
+
+// Act - prosimy o eNone (ekran powitalny, bez wybranego programu)
+ReturnedBuilder := Factory.GetBuilder(E_RecipeID.eNone);
+
+// Assert - fabryka musi zwrócić 0
+AssertTrue(Condition := (ReturnedBuilder = 0), 
+           Message := 'Fabryka zwrocila interfejs zamiast 0 dla eNone!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_UpdatesConfigForAllBuilders" Id="{4b2fa050-c8b8-4151-9cc7-69d180105cac}">
+      <Declaration><![CDATA[METHOD Test_UpdatesConfigForAllBuilders
+VAR
+    TestConfig : ST_RecipeBuilder_Config;
+    BuilderWings : I_RecipeBuilder;
+    BuilderArona : I_RecipeBuilder;
+    
+    // Zmienne pomocnicze, żeby obejść błąd kompilatora
+    ActualConfigWings : ST_RecipeBuilder_Config;
+    ActualConfigArona : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+TEST('Test_UpdatesConfigForAllBuilders');
+
+// 1. Arrange - tworzymy unikalną konfigurację
+TestConfig.PanelFrontLength := 999.0;
+TestConfig.PanelHeight := 111.0;
+
+// 2. Act - wrzucamy ją do fabryki
+Factory.UpdateConfig(TestConfig);
+
+// 3. Pobieramy buildery
+BuilderWings := Factory.GetBuilder(E_RecipeID.eBorgoWings);
+BuilderArona := Factory.GetBuilder(E_RecipeID.eArona);
+
+// Zgrywamy konfigurację z właściwości interfejsu do zmiennych lokalnych! (To usuwa błąd)
+ActualConfigWings := BuilderWings.Config;
+ActualConfigArona := BuilderArona.Config;
+
+// 4. Assert - Sprawdzamy lokalne kopie
+AssertEquals_REAL(Expected := 999.0, 
+                  Actual := ActualConfigWings.PanelFrontLength, 
+                  Delta := 0.01, 
+                  Message := 'BuilderWings nie dostal nowej konfiguracji!');
+                  
+AssertEquals_REAL(Expected := 111.0, 
+                  Actual := ActualConfigArona.PanelHeight, 
+                  Delta := 0.01, 
+                  Message := 'BuilderArona nie dostal nowej konfiguracji!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_RecipeFactory_Test">
+      <LineId Id="14" Count="1" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeFactory_Test.Test_ReturnsCorrectBuilder">
+      <LineId Id="9" Count="10" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeFactory_Test.Test_ReturnsZeroOnInvalidID">
+      <LineId Id="9" Count="10" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeFactory_Test.Test_UpdatesConfigForAllBuilders">
+      <LineId Id="50" Count="29" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
