@@ -3,13 +3,6 @@
   <POU Name="FB_CylinderCutY" Id="{8ada12fc-8440-0750-128a-e06d4a970561}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_CylinderCutY EXTENDS FB_ComponentBase IMPLEMENTS I_Cylinder
 VAR
-    //Output
-   
-
-	
-	CylinderSensorCutY 				AT%I*		:	BOOL;
-	CylinderValveCutY				AT%Q*		:	BOOL;
-
     // Internal variables
     _ExtendRequestY  : BOOL;
     _RetractRequestY : BOOL;
@@ -30,6 +23,14 @@ VAR
     
     // Alarmy
     CylinderAlarms : ARRAY[1..3] OF FB_TcAlarm;
+END_VAR
+
+VAR_INPUT
+   	CylinderSensorCutY 			AT%I*		:	BOOL;
+END_VAR
+
+VAR_OUTPUT
+	CylinderValveCutY			AT%Q*		:	BOOL;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -37,6 +38,25 @@ END_VAR]]></Declaration>
     <Folder Name="I_ComponentBase" Id="{e725d5a4-2c2c-07e9-2a68-0cf7a1a118b8}" />
     <Folder Name="I_CyclicFB" Id="{89d6c8b5-777b-05c8-0d3b-cb03ad048b76}" />
     <Folder Name="I_Cylinder" Id="{a88ec890-cbf6-05f6-1fe3-43518715a1a1}" />
+    <Property Name="Config" Id="{92518cf8-c680-4c31-a6cf-f7fe6fced64c}">
+      <Declaration><![CDATA[PROPERTY Config : ST_Cylinder_Config]]></Declaration>
+      <Get Name="Get" Id="{49570b44-2aca-4cfd-907b-bfeaaa94c4c0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Config := Cylinder_HMI.Config;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{b3e9847b-3673-4362-b839-1e77672cdcdf}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Cylinder_HMI.Config := Config;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="CreateEvents" Id="{307e5521-2f56-0737-2771-0304ac08c314}" FolderPath="I_ComponentBase\">
       <Declaration><![CDATA[METHOD PROTECTED CreateEvents
 VAR_INPUT
@@ -210,6 +230,12 @@ END_VAR]]></Declaration>
       </Get>
     </Property>
     <LineIds Name="FB_CylinderCutY">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutY.Config.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutY.Config.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderCutY.CreateEvents">

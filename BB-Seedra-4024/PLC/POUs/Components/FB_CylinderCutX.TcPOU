@@ -4,10 +4,6 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_CylinderCutX EXTENDS FB_ComponentBase IMPLEMENTS I_Cylinder
 VAR
     
-   	CylinderSensorCutX 			AT%I*		:	BOOL;
-	CylinderValveCutX			AT%Q*		:	BOOL;
-
-
     _ExtendRequestX  : BOOL;
     _RetractRequestX : BOOL;
     _ExtendedX       : BOOL;
@@ -28,6 +24,14 @@ VAR
     
 
     CylinderAlarms : ARRAY[1..3] OF FB_TcAlarm;
+END_VAR
+
+VAR_INPUT
+   	CylinderSensorCutX 			AT%I*		:	BOOL;
+END_VAR
+
+VAR_OUTPUT
+	CylinderValveCutX			AT%Q*		:	BOOL;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -35,6 +39,25 @@ END_VAR]]></Declaration>
     <Folder Name="I_ComponentBase" Id="{f559450c-ac92-42b8-948d-4319dcd66586}" />
     <Folder Name="I_CyclicFB" Id="{06d0f814-9e61-4022-8b49-954679eac850}" />
     <Folder Name="I_Cylinder" Id="{23231c33-e76f-4db7-9535-6a6ba8d8bb21}" />
+    <Property Name="Config" Id="{8e55ac5e-2dfd-4a5e-9f25-bccf0149b5ca}">
+      <Declaration><![CDATA[PROPERTY Config : ST_Cylinder_Config]]></Declaration>
+      <Get Name="Get" Id="{05aef8fe-7f7f-4070-82a6-dec38d6a2d49}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Config := Cylinder_HMI.Config;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{967226d9-3fe4-4d93-9507-0c4574cc811f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Cylinder_HMI.Config := Config;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="CreateEvents" Id="{b37c1c7a-2ee5-4bc0-bd63-7a1bd375f4f8}" FolderPath="I_ComponentBase\">
       <Declaration><![CDATA[METHOD PROTECTED CreateEvents
 VAR_INPUT
@@ -206,6 +229,12 @@ END_VAR]]></Declaration>
       </Get>
     </Property>
     <LineIds Name="FB_CylinderCutX">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.Config.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.Config.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderCutX.CreateEvents">

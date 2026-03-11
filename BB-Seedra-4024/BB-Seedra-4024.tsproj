@@ -1987,7 +1987,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{D1655F0B-6D01-0C19-9567-F87B6786AB2F}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{430A4BD8-83B1-FE2F-506C-45D5470AD597}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2010,7 +2010,6 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderSensorCutY</Name>
-							<Comment><![CDATA[Output]]></Comment>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
@@ -2128,11 +2127,27 @@ External Setpoint Generation:
 							<Name>IO.DI8</Name>
 							<Type>BOOL</Type>
 						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.CylinderSensorCutX</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.CylinderSensorCutX</Name>
+							<Type>BOOL</Type>
+						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
 						<Var>
 							<Name>GVL_Safety.SafetyPermissionQ</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.CylinderValveCutX</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.CylinderValveCutX</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
