@@ -273,10 +273,6 @@ END_IF
 //	 );
 	 
 
-AxisX.InSimulation := TRUE;
-AxisY.InSimulation := TRUE;
-
-
 SUPER^.CyclicLogic();
 
 fbHomeStratX.bSensorInput := IO.ProximitySensorX;
@@ -810,10 +806,6 @@ SUPER^.Resetting();]]></ST>
       <LineId Id="20" Count="5" />
       <LineId Id="19" Count="0" />
       <LineId Id="26" Count="0" />
-      <LineId Id="54" Count="0" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="55" Count="0" />
-      <LineId Id="31" Count="0" />
       <LineId Id="7" Count="1" />
       <LineId Id="41" Count="2" />
       <LineId Id="40" Count="0" />

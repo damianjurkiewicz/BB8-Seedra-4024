@@ -75,11 +75,9 @@ CASE nStep OF
             iPass := 5; 
             
             IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN
-				//fast exit
-				nStep := 1000;
-				//fast exit	
-			
-                //nStep := 10;
+
+				//set it to 1000 to ignore all steps
+                nStep := 10;
 				
 
             END_IF     
@@ -234,7 +232,6 @@ END_CASE]]></ST>
       <LineId Id="370" Count="1" />
       <LineId Id="369" Count="0" />
       <LineId Id="172" Count="42" />
-      <LineId Id="387" Count="1" />
       <LineId Id="386" Count="0" />
       <LineId Id="385" Count="0" />
       <LineId Id="215" Count="0" />
