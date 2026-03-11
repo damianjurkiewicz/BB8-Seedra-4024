@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_RecipeBuilder_Test" Id="{ede2b717-c9c9-439b-9f45-ba86089b083e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilder_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+    BuilderArona : FB_RecipeBuilderArona;
+	BuilderBorgoFlaps : FB_RecipeBuilderBorgoFlaps;
+	BuilderBorgoWings : FB_RecipeBuilderBorgoWings; 
+    Config  : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Test_Arona_Calculates_Segments();
+//Test_BorgoFlaps_Calculates_Segments();
+Test_BorgoWings_Calculates_Segments();
+Test_BorgoWings_Calculates_Coordinates();]]></ST>
+    </Implementation>
+    <Method Name="Test_Arona_Calculates_Segments" Id="{7a994464-7f61-40a8-a740-1b9398842f86}">
+      <Declaration><![CDATA[METHOD Test_Arona_Calculates_Segments
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Arona_Calculates_Segments');
+
+// 1. Arrange - podajemy przykładowe dane wejściowe
+Config.PanelFrontLength := 1000.0;
+Config.PanelHeight := 100.0;
+Config.PanelFrontWidht := 500.0;
+Config.RailHeightCorrection := 13.0;
+BuilderArona.Config := Config;
+
+// 2. Act - odpalamy wydmuszkę
+WasBuilt := BuilderArona.Build();
+
+// 3. Assert - Czy w ogóle przepuścił zabezpieczenie?
+AssertTrue(Condition := WasBuilt, 
+           Message := 'Przepis zwrocil FALSE - brak implementacji!');
+
+// 4. Assert - Sprawdzamy konkretne wartości dla Arony (po 2 z każdego)
+AssertEquals_INT(Expected := 2, 
+                 Actual := BuilderArona.SegmentsToCutX, 
+                 Message := 'Zla liczba ciec X dla profilu Arona');
+                 
+AssertEquals_INT(Expected := 2, 
+                 Actual := BuilderArona.SegmentsToCutY, 
+                 Message := 'Zla liczba ciec Y dla profilu Arona');
+                 
+AssertEquals_INT(Expected := 2, 
+                 Actual := BuilderArona.SegmentsToGroove, 
+                 Message := 'Zla liczba frezowan dla profilu Arona');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_BorgoFlaps_Calculates_Segments" Id="{3f507375-dcc0-4bda-9a42-3515b40b3a6c}">
+      <Declaration><![CDATA[METHOD Test_BorgoFlaps_Calculates_Segments
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BorgoFlaps_Calculates_Segments');
+
+// 1. Arrange - podajemy przykładowe dane wejściowe
+Config.PanelFrontLength := 1000.0;
+Config.PanelHeight := 100.0;
+Config.PanelFrontWidht := 500.0;
+Config.RailHeightCorrection := 13.0;
+BuilderBorgoFlaps.Config := Config;
+
+// 2. Act - odpalamy wydmuszkę
+WasBuilt := BuilderBorgoFlaps.Build();
+
+// 3. Assert - Czy w ogóle przepuścił zabezpieczenie?
+AssertTrue(Condition := WasBuilt, 
+           Message := 'Przepis zwrocil FALSE - brak implementacji!');
+
+// 4. Assert - Sprawdzamy konkretne wartości dla Arony (po 2 z każdego)
+AssertEquals_INT(Expected := 6, 
+                 Actual := BuilderBorgoFlaps.SegmentsToCutX, 
+                 Message := 'Zla liczba ciec X dla profilu Borgo Flaps');
+                 
+AssertEquals_INT(Expected := 6, 
+                 Actual := BuilderBorgoFlaps.SegmentsToCutY, 
+                 Message := 'Zla liczba ciec Y dla profilu Borgo Flaps');
+                 
+AssertEquals_INT(Expected := 4, 
+                 Actual := BuilderBorgoFlaps.SegmentsToGroove, 
+                 Message := 'Zla liczba frezowan dla profilu Borgo Flaps');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_BorgoWings_Calculates_Coordinates" Id="{f3f6458e-fd2a-4cc3-8897-e56c4b46d59b}">
+      <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_Coordinates
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BorgoWings_Calculates_Coordinates');
+
+// 1. Arrange - wprowadzamy dane
+Config.PanelFrontLength := 1000.0;
+Config.PanelHeight := 100.0;
+Config.PanelFrontWidht := 500.0;
+Config.RailHeightCorrection := 13.0;
+BuilderBorgoWings.Config := Config;
+
+// 2. Act - budujemy
+WasBuilt := BuilderBorgoWings.Build();
+
+// 3. Assert - Sprawdzamy współrzędne dla pierwszego cięcia X (SegmentsCutX[1])
+// Używamy AssertEquals_REAL, ponieważ współrzędne to liczby zmiennoprzecinkowe (REAL).
+// Delta := 0.01 oznacza dopuszczalny błąd zaokrąglenia.
+
+// Sprawdzamy oś X
+AssertEquals_REAL(Expected := 720.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Start.X, 
+                  Delta := 0.01, 
+                  Message := 'Zly punkt Start.X dla pierwszego ciecia X');
+                  
+AssertEquals_REAL(Expected := 600.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Stop.X, 
+                  Delta := 0.01, 
+                  Message := 'Zly punkt Stop.X dla pierwszego ciecia X');
+
+// Sprawdzamy oś Y
+AssertEquals_REAL(Expected := 1100.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Start.Y, 
+                  Delta := 0.01, 
+                  Message := 'Zly punkt Start.Y dla pierwszego ciecia X');
+                  
+AssertEquals_REAL(Expected := 1100.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Stop.Y, 
+                  Delta := 0.01, 
+                  Message := 'Zly punkt Stop.Y dla pierwszego ciecia X');
+
+
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_BorgoWings_Calculates_Segments" Id="{4f99f096-b258-4dd7-ae67-c8bae6dcb49d}">
+      <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_Segments
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BorgoWings_Calculates_Segments');
+
+// 1. Arrange - podajemy przykładowe dane wejściowe
+Config.PanelFrontLength := 1000.0;
+Config.PanelHeight := 100.0;
+Config.PanelFrontWidht := 500.0;
+Config.RailHeightCorrection := 13.0;
+BuilderBorgoWings.Config := Config;
+
+// 2. Act - odpalamy wydmuszkę
+WasBuilt := BuilderBorgoWings.Build();
+
+// 3. Assert - Czy w ogóle przepuścił zabezpieczenie?
+AssertTrue(Condition := WasBuilt, 
+           Message := 'Przepis zwrocil FALSE - brak implementacji!');
+
+// 4. Assert - Sprawdzamy konkretne wartości dla Arony (po 2 z każdego)
+AssertEquals_INT(Expected := 6, 
+                 Actual := BuilderBorgoWings.SegmentsToCutX, 
+                 Message := 'Zla liczba ciec X dla profilu Borgo Wings');
+                 
+AssertEquals_INT(Expected := 6, 
+                 Actual := BuilderBorgoWings.SegmentsToCutY, 
+                 Message := 'Zla liczba ciec Y dla profilu Borgo Wings');
+                 
+AssertEquals_INT(Expected := 4, 
+                 Actual := BuilderBorgoWings.SegmentsToGroove, 
+                 Message := 'Zla liczba frezowan dla profilu Borgo Wings');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_RecipeBuilder_Test">
+      <LineId Id="9" Count="0" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="39" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_Arona_Calculates_Segments">
+      <LineId Id="78" Count="28" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoFlaps_Calculates_Segments">
+      <LineId Id="78" Count="28" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Coordinates">
+      <LineId Id="127" Count="39" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Segments">
+      <LineId Id="78" Count="28" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

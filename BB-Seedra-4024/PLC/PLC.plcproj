@@ -127,10 +127,10 @@
     <Compile Include="POUs\Builder\FB_RecipeBuilderArona.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\FB_RecipeBuilderFlaps.TcPOU">
+    <Compile Include="POUs\Builder\FB_RecipeBuilderBorgoFlaps.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\FB_RecipeBuilderWings.TcPOU">
+    <Compile Include="POUs\Builder\FB_RecipeBuilderBorgoWings.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Builder\FB_RecipeFactory.TcPOU">
@@ -149,6 +149,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Builder\ST_RecipeBuilder_HMI.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\FB_RecipeBuilder_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SafetyTask.TcTTO">
@@ -208,6 +214,7 @@
     <Folder Include="POUs\GantryXYZ" />
     <Folder Include="POUs\Executor" />
     <Folder Include="POUs\Builder" />
+    <Folder Include="POUs\TESTS" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
     <Folder Include="VISUs\Modes" />
@@ -300,6 +307,7 @@
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Utilities">
       <DefaultResolution>Tc2_Utilities, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Utilities</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc3_EventLogger">
       <DefaultResolution>Tc3_EventLogger, * (Beckhoff Automation GmbH)</DefaultResolution>
@@ -312,6 +320,9 @@
     <PlaceholderReference Include="Tc3_PackML_V2">
       <DefaultResolution>Tc3_PackML_V2, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_PackML_V2</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="TcUnit">
+      <DefaultResolution>TcUnit, * (www.tcunit.org)</DefaultResolution>
     </PlaceholderReference>
     <PlaceholderReference Include="VisuDialogs">
       <DefaultResolution>VisuDialogs, * (System)</DefaultResolution>

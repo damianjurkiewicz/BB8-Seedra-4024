@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_RecipeBuilderWings" Id="{3f83a514-1f2f-4e3d-921c-ca7c0b60e17f}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderWings EXTENDS FB_RecipeBase
+  <POU Name="FB_RecipeBuilderBorgoWings" Id="{3f83a514-1f2f-4e3d-921c-ca7c0b60e17f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderBorgoWings EXTENDS FB_RecipeBase
 
 
 ]]></Declaration>
@@ -130,10 +130,10 @@ _SegmentsCutY[6].Stop.Y  := -CuttingOverpass;
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_RecipeBuilderWings">
+    <LineIds Name="FB_RecipeBuilderBorgoWings">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderWings.Build">
+    <LineIds Name="FB_RecipeBuilderBorgoWings.Build">
       <LineId Id="433" Count="3" />
       <LineId Id="446" Count="100" />
       <LineId Id="552" Count="0" />

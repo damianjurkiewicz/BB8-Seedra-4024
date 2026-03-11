@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_RecipeBuilderArona" Id="{a7865aba-34a9-4367-9b70-65119865d0af}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderArona EXTENDS FB_RecipeBase
+  <POU Name="FB_RecipeBuilderBorgoFlaps" Id="{1389b747-8c88-4122-8f76-112cbf46c424}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderBorgoFlaps EXTENDS FB_RecipeBase
 
 
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="Build" Id="{888409fe-0b8e-46d6-8abb-5ebdab25e661}">
+    <Method Name="Build" Id="{a7636aac-6540-4877-9111-d7366342a8fe}">
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR_INST
     // Zmienne zostaną dodane w trakcie cyklu TDD
@@ -33,11 +33,11 @@ _SegmentsToCutY   := 0;
 Build := FALSE;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_RecipeBuilderArona">
+    <LineIds Name="FB_RecipeBuilderBorgoFlaps">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderArona.Build">
-      <LineId Id="581" Count="15" />
+    <LineIds Name="FB_RecipeBuilderBorgoFlaps.Build">
+      <LineId Id="585" Count="15" />
       <LineId Id="11" Count="0" />
     </LineIds>
   </POU>

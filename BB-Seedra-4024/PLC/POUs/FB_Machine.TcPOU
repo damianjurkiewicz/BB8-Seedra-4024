@@ -159,7 +159,11 @@ END_CASE]]></ST>
       <Declaration><![CDATA[//! @summary Provides interlocks for HMI control and updates HMI status information for this module
 METHOD PROTECTED HMICommunication
 
-//! @description This method is called cyclically by <c>CyclicLogic()</c>]]></Declaration>
+//! @description This method is called cyclically by <c>CyclicLogic()</c>
+VAR
+// Just to get rid of annoing warring 
+CastingHelper : DINT; 
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 IF GVL_Safety.eStopHMI THEN
@@ -167,7 +171,8 @@ IF GVL_Safety.eStopHMI THEN
 	THIS^._Error := TRUE;
 END_IF
 
-Machine_HMI.Status.PackMLState :=_CurrentState;
+CastingHelper := _CurrentState;
+Machine_HMI.Status.PackMLState := CastingHelper;
 
 
 SUPER^.HMICommunication();]]></ST>
@@ -500,6 +505,7 @@ END_IF]]></ST>
       <LineId Id="6" Count="0" />
       <LineId Id="13" Count="0" />
       <LineId Id="7" Count="0" />
+      <LineId Id="29" Count="0" />
       <LineId Id="12" Count="0" />
       <LineId Id="17" Count="0" />
       <LineId Id="22" Count="0" />
