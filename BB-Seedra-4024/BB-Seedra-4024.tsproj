@@ -1987,7 +1987,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{92495C37-B54D-F206-61B3-767CF5B9A709}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{CF6739F1-80B2-D4BA-0926-CF3272343DBA}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2091,6 +2091,18 @@ External Setpoint Generation:
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>SafetyTask Inputs</Name>
 						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisX.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisY.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisZ.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
 							<Name>GVL_Safety.SafetyPermissionI</Name>
 							<Type>BOOL</Type>
 						</Var>
@@ -2127,27 +2139,23 @@ External Setpoint Generation:
 							<Name>IO.DI8</Name>
 							<Type>BOOL</Type>
 						</Var>
-						<Var>
-							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.Sensor</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.Sensor</Name>
-							<Type>BOOL</Type>
-						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
 						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisX.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisY.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisZ.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
 							<Name>GVL_Safety.SafetyPermissionQ</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.Valve</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.Valve</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>

@@ -61,6 +61,9 @@
     <Compile Include="POUs\Components\ST_Cylinder_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Executor\FB_ExecutorCut.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Executor\FB_ExecutorGrooveXY.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -154,7 +157,7 @@
     <Compile Include="POUs\TESTS\FB_CylinderCut_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\TESTS\FB_ExecutorCutX_Test.TcPOU">
+    <Compile Include="POUs\TESTS\FB_ExecutorCut_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TESTS\FB_RecipeBuilder_Test.TcPOU">

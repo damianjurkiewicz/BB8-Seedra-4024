@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_ExecutorCutX_Test" Id="{7df5cf70-cbe1-43ae-a8be-81dbfb352aaf}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCutX_Test EXTENDS TcUnit.FB_TestSuite IMPLEMENTS I_GantryConfigProvider
+  <POU Name="FB_ExecutorCut_Test" Id="{7df5cf70-cbe1-43ae-a8be-81dbfb352aaf}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCut_Test EXTENDS TcUnit.FB_TestSuite IMPLEMENTS I_GantryConfigProvider
 VAR
-    Executor : FB_ExecutorCutX;
-	Executor_Unhappy     : FB_ExecutorCutX;
+    Executor : FB_ExecutorCut;
+	Executor_Unhappy     : FB_ExecutorCut;
 
     MockCylinder : FB_MockCylinder;
 	MockCylinder_Unhappy : FB_MockCylinder;
@@ -183,17 +183,17 @@ CASE Step OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_ExecutorCutX_Test">
+    <LineIds Name="FB_ExecutorCut_Test">
       <LineId Id="9" Count="0" />
       <LineId Id="37" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorCutX_Test.Config.Get">
+    <LineIds Name="FB_ExecutorCut_Test.Config.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorCutX_Test.Config.Set">
+    <LineIds Name="FB_ExecutorCut_Test.Config.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorCutX_Test.Test_Sequence_AbortsOnCylinderError">
+    <LineIds Name="FB_ExecutorCut_Test.Test_Sequence_AbortsOnCylinderError">
       <LineId Id="10" Count="2" />
       <LineId Id="69" Count="1" />
       <LineId Id="13" Count="6" />
@@ -203,7 +203,7 @@ END_CASE]]></ST>
       <LineId Id="20" Count="44" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorCutX_Test.Test_Sequence_ExecutesCutsCorrectly">
+    <LineIds Name="FB_ExecutorCut_Test.Test_Sequence_ExecutesCutsCorrectly">
       <LineId Id="10" Count="12" />
       <LineId Id="67" Count="2" />
       <LineId Id="71" Count="1" />

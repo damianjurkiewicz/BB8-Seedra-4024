@@ -9,8 +9,10 @@ VAR
     // =========================================================
     _RecipeBuilder      : I_RecipeBuilder;
     ipSubModules_Init   : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
-	ExecutorCutX		: FB_ExecutorCutX;
-	ExecutorCutY		: FB_ExecutorCutY;
+
+	ExecutorCutX : FB_ExecutorCut;
+	ExecutorCutY : FB_ExecutorCut;	
+	
 	ExecutorGrooveXY	: FB_ExecutorGrooveXY;
 
 
@@ -452,11 +454,20 @@ CASE DescendantSequenceState OF
 		AxisZ.HomeMethod := fbHomeStratZ;
 		
 		// Wstrzykiwanie zależności do Executora Cut X
-		ExecutorCutX.AxisX         := AxisX;          // Podanie interfejsów osi
-		ExecutorCutX.AxisY         := AxisY;
-		ExecutorCutX.AxisZ         := AxisZ;
-		ExecutorCutX.Cylinder      := CylinderCuttingX; // Implementuje I_Cylinder
+		ExecutorCutX.IsAxisX        := TRUE;
+		ExecutorCutX.AxisX          := AxisX;
+		ExecutorCutX.AxisY          := AxisY;
+		ExecutorCutX.AxisZ          := AxisZ;
+		ExecutorCutX.Cylinder       := CylinderCuttingX; // Podpinamy siłownik X!
 		ExecutorCutX.ConfigProvider := THIS^;
+		
+		// Wstrzykiwanie zależności do Executora Cut Y 
+		ExecutorCutY.IsAxisX        := FALSE; // <--- Magia!
+		ExecutorCutY.AxisX          := AxisX;
+		ExecutorCutY.AxisY          := AxisY;
+		ExecutorCutY.AxisZ          := AxisZ;
+		ExecutorCutY.Cylinder       := CylinderCuttingY; // Podpinamy siłownik Y!
+		ExecutorCutY.ConfigProvider := THIS^;
 
 		// Wstrzyknięcie strategii resetu sprzętowego
 		// Oś X
@@ -474,12 +485,7 @@ CASE DescendantSequenceState OF
 			AxisZ.ResetMethod := ResetStratZ;
 		END_IF
 		
-		// Wstrzykiwanie zależności do Executora Cut Y 
-		ExecutorCutY.AxisX         := AxisX;
-		ExecutorCutY.AxisY         := AxisY;
-		ExecutorCutY.AxisZ         := AxisZ;
-		ExecutorCutY.Cylinder      := CylinderCuttingY;
-		ExecutorCutY.ConfigProvider := THIS^;
+
 	
 		// Wstrzykiwanie zależności do Executora Groove XY
 		ExecutorGrooveXY.AxisX         := AxisX;
@@ -858,14 +864,13 @@ SUPER^.Resetting();]]></ST>
       <LineId Id="106" Count="7" />
       <LineId Id="102" Count="0" />
       <LineId Id="123" Count="0" />
-      <LineId Id="125" Count="4" />
-      <LineId Id="183" Count="0" />
+      <LineId Id="247" Count="13" />
+      <LineId Id="235" Count="0" />
       <LineId Id="130" Count="0" />
-      <LineId Id="194" Count="0" />
-      <LineId Id="197" Count="12" />
+      <LineId Id="220" Count="13" />
       <LineId Id="124" Count="0" />
       <LineId Id="105" Count="0" />
-      <LineId Id="152" Count="5" />
+      <LineId Id="157" Count="0" />
       <LineId Id="167" Count="0" />
       <LineId Id="173" Count="0" />
       <LineId Id="169" Count="3" />

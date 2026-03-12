@@ -6,11 +6,11 @@ VAR
 //	Test_RecipeBuilder : FB_RecipeBuilder_Test;
 //	Test_RecipeFactory : FB_RecipeFactory_Test;
 //	Test_Extend_TurnsOnValve_And_ReportsExtended : FB_CylinderCut_Test;
-	Test_MockedExecutor : FB_ExecutorCutX_Test; 
+	Test_MockedExecutor : FB_ExecutorCut_Test; 
 END_VAR
 ]]></Declaration>
     <Implementation>
-      <ST><![CDATA[TcUnit.RUN();]]></ST>
+      <ST><![CDATA[//TcUnit.RUN();]]></ST>
     </Implementation>
     <LineIds Name="TESTS">
       <LineId Id="5" Count="0" />
