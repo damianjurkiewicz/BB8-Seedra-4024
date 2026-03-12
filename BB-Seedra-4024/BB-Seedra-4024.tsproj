@@ -1987,7 +1987,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{B9F3D508-D8EE-6B91-EC64-8B3545561D1C}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{2952F428-A0DA-F2F8-A4E1-F454F2F6B3BB}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2128,16 +2128,16 @@ External Setpoint Generation:
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_MockedExecutor.MockAxisX.BasicAxis._Axis.NcToPlc</Name>
-							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.Sensor</Name>
+							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_MockedExecutor.MockAxisY.BasicAxis._Axis.NcToPlc</Name>
-							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.Sensor</Name>
+							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_MockedExecutor.MockAxisZ.BasicAxis._Axis.NcToPlc</Name>
-							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Reset.Sensor</Name>
+							<Type>BOOL</Type>
 						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
@@ -2147,16 +2147,16 @@ External Setpoint Generation:
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_MockedExecutor.MockAxisX.BasicAxis._Axis.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.Valve</Name>
+							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_MockedExecutor.MockAxisY.BasicAxis._Axis.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.Valve</Name>
+							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_MockedExecutor.MockAxisZ.BasicAxis._Axis.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Reset.Valve</Name>
+							<Type>BOOL</Type>
 						</Var>
 					</Vars>
 					<UnrestoredVarLinks ImportTime="2026-01-27T16:22:49">

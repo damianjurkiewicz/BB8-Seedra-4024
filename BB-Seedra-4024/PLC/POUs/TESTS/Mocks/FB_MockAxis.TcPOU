@@ -10,6 +10,8 @@ VAR
 	_MockVelocity     : LREAL;
     _MockAcceleration : LREAL;
     _MockDeceleration : LREAL;
+	
+	_ForceError	:	BOOL;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -89,6 +91,25 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+    <Property Name="ForceError" Id="{f514eeb6-a551-4e27-aaab-28fe692ebd49}">
+      <Declaration><![CDATA[PROPERTY ForceError : BOOL]]></Declaration>
+      <Get Name="Get" Id="{fc5c6a10-59c0-4789-bf2a-b69856585819}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ForceError := _Error;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{7413eff3-becf-420b-af74-357405558ce4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Error := ForceError;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="InPosition" Id="{899ba792-f147-4840-9190-c11ac913d37c}">
       <Declaration><![CDATA[PROPERTY InPosition : BOOL]]></Declaration>
       <Get Name="Get" Id="{f5f86ed6-a8c0-44cb-80db-e88896583828}">
@@ -157,6 +178,12 @@ END_VAR
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_MockAxis.Enabled.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.ForceError.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.ForceError.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MockAxis.InPosition.Get">

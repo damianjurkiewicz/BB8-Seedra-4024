@@ -14,19 +14,27 @@ Test_UpdatesConfigForAllBuilders();]]></ST>
     <Method Name="Test_ReturnsCorrectBuilder" Id="{f4d0cc26-5c2a-4ddf-b356-c729fd5c6098}">
       <Declaration><![CDATA[METHOD Test_ReturnsCorrectBuilder
 VAR
-    ReturnedBuilder : I_RecipeBuilder;
+    BuilderWings : I_RecipeBuilder;
+    BuilderFlaps : I_RecipeBuilder;
+    BuilderArona : I_RecipeBuilder;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
+        <ST><![CDATA[TEST('Test_ReturnsCorrectBuilder');
 
-TEST('Test_ReturnsCorrectBuilder');
+// 1. ACT - Prosimy fabrykę o wszystkie wspierane przepisy
+BuilderWings := Factory.GetBuilder(E_RecipeID.eBorgoWings);
+BuilderFlaps := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
+BuilderArona := Factory.GetBuilder(E_RecipeID.eArona);
 
-// Act - prosimy fabrykę o BorgoWings
-ReturnedBuilder := Factory.GetBuilder(E_RecipeID.eBorgoWings);
-
-// Assert - sprawdzamy, czy dostaliśmy jakikolwiek poprawny interfejs (nie 0)
-AssertTrue(Condition := (ReturnedBuilder <> 0), 
-           Message := 'Fabryka zwrocila pusty interfejs dla poprawnego ID!');
+// 2. ASSERT - Sprawdzamy, czy żaden z nich nie jest pusty (0)
+AssertTrue(Condition := (BuilderWings <> 0), 
+           Message := 'Fabryka zwrocila 0 dla eBorgoWings!');
+           
+AssertTrue(Condition := (BuilderFlaps <> 0), 
+           Message := 'Fabryka zwrocila 0 dla eBorgoFlaps!');
+           
+AssertTrue(Condition := (BuilderArona <> 0), 
+           Message := 'Fabryka zwrocila 0 dla eArona!');
 
 TEST_FINISHED();]]></ST>
       </Implementation>
@@ -55,41 +63,49 @@ TEST_FINISHED();]]></ST>
       <Declaration><![CDATA[METHOD Test_UpdatesConfigForAllBuilders
 VAR
     TestConfig : ST_RecipeBuilder_Config;
+    
     BuilderWings : I_RecipeBuilder;
+    BuilderFlaps : I_RecipeBuilder;
     BuilderArona : I_RecipeBuilder;
     
-    // Zmienne pomocnicze, żeby obejść błąd kompilatora
+    // Zmienne pomocnicze, żeby obejść błąd kompilatora (odczyt właściwości)
     ActualConfigWings : ST_RecipeBuilder_Config;
+    ActualConfigFlaps : ST_RecipeBuilder_Config;
     ActualConfigArona : ST_RecipeBuilder_Config;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
+        <ST><![CDATA[TEST('Test_UpdatesConfigForAllBuilders');
 
-TEST('Test_UpdatesConfigForAllBuilders');
-
-// 1. Arrange - tworzymy unikalną konfigurację
+// 1. ARRANGE - Tworzymy unikalną, testową konfigurację
 TestConfig.PanelFrontLength := 999.0;
 TestConfig.PanelHeight := 111.0;
 
-// 2. Act - wrzucamy ją do fabryki
+// 2. ACT - Wrzucamy ją do fabryki, żeby rozesłała dalej
 Factory.UpdateConfig(TestConfig);
 
-// 3. Pobieramy buildery
+// 3. Wyciągamy instancje z fabryki
 BuilderWings := Factory.GetBuilder(E_RecipeID.eBorgoWings);
+BuilderFlaps := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
 BuilderArona := Factory.GetBuilder(E_RecipeID.eArona);
 
-// Zgrywamy konfigurację z właściwości interfejsu do zmiennych lokalnych! (To usuwa błąd)
+// Zgrywamy konfigurację z właściwości interfejsów do zmiennych lokalnych
 ActualConfigWings := BuilderWings.Config;
+ActualConfigFlaps := BuilderFlaps.Config;
 ActualConfigArona := BuilderArona.Config;
 
-// 4. Assert - Sprawdzamy lokalne kopie
+// 4. ASSERT - Sprawdzamy, czy wszyscy mają tę samą wartość
 AssertEquals_REAL(Expected := 999.0, 
                   Actual := ActualConfigWings.PanelFrontLength, 
                   Delta := 0.01, 
                   Message := 'BuilderWings nie dostal nowej konfiguracji!');
                   
-AssertEquals_REAL(Expected := 111.0, 
-                  Actual := ActualConfigArona.PanelHeight, 
+AssertEquals_REAL(Expected := 999.0, 
+                  Actual := ActualConfigFlaps.PanelFrontLength, 
+                  Delta := 0.01, 
+                  Message := 'BuilderFlaps nie dostal nowej konfiguracji!');
+                  
+AssertEquals_REAL(Expected := 999.0, 
+                  Actual := ActualConfigArona.PanelFrontLength, 
                   Delta := 0.01, 
                   Message := 'BuilderArona nie dostal nowej konfiguracji!');
 
@@ -101,7 +117,7 @@ TEST_FINISHED();]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory_Test.Test_ReturnsCorrectBuilder">
-      <LineId Id="9" Count="10" />
+      <LineId Id="28" Count="16" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory_Test.Test_ReturnsZeroOnInvalidID">
@@ -109,7 +125,7 @@ TEST_FINISHED();]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory_Test.Test_UpdatesConfigForAllBuilders">
-      <LineId Id="50" Count="29" />
+      <LineId Id="101" Count="34" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

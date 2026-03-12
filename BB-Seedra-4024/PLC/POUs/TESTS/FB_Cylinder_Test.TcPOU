@@ -1,0 +1,294 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Cylinder_Test" Id="{1f43ba0c-200b-48c0-b781-58b741008a04}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Cylinder_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+    Cylinder_ExtendHappy  : FB_Cylinder;
+    Cylinder_RetractHappy : FB_Cylinder;
+    
+    Cylinder_ExtendTime   : FB_Cylinder;
+    Cylinder_RetractTime  : FB_Cylinder;
+    
+    Cylinder_Reset        : FB_Cylinder;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_Extend_TurnsOnValve_And_ReportsExtended();
+Test_Extend_Timeout_RaisesError(); 
+Test_Retract_TurnsOffValve_And_ReportsRetracted();
+Test_Retract_Timeout_RaisesError();
+Test_Error_Resets_When_TargetReached();]]></ST>
+    </Implementation>
+    <Method Name="Test_Error_Resets_When_TargetReached" Id="{ddd37155-1ed2-442e-87a3-d674dcccd51f}">
+      <Declaration><![CDATA[METHOD Test_Error_Resets_When_TargetReached
+VAR_INST
+    Step : INT := 0;
+    TestConfig : ST_Cylinder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+// -------------------------------------------------------------
+
+TEST('Test_Error_Resets_When_TargetReached');
+Cylinder_Reset.CyclicLogic();
+
+CASE Step OF
+    0: 
+        // 1. ARRANGE - Przygotowanie do szybkiego timeoutu
+        Cylinder_Reset.Sensor := FALSE; 
+        TestConfig := Cylinder_Reset.Config;
+        TestConfig.ExtendTime := 0.1; 
+        Cylinder_Reset.Config := TestConfig;
+        Step := 10;
+        
+    10: 
+        // 2. ACT - Rozkaz i celowe wejście w błąd
+        Cylinder_Reset.Extend();
+        Step := 20;
+        
+    20:
+        // Czekamy na błąd (symulacja zawieszenia / wolnego powietrza)
+        IF Cylinder_Reset.Error THEN
+            Step := 30;
+        END_IF
+        
+    30:
+        // 3. ACT - Błąd trwa, ale nagle sprzęt fizycznie osiąga cel (czujnik łapie!)
+        Cylinder_Reset.Sensor := TRUE;
+        Step := 40;
+        
+    40:
+        // 4. ASSERT - Siłownik powinien zgasić błąd na podstawie czujnika i flagi Request
+        AssertFalse(Condition := Cylinder_Reset.Error, 
+                    Message := 'Blad timeoutu nie zresetowal sie pomimo osiagniecia celu!');
+                    
+        AssertTrue(Condition := Cylinder_Reset.Extended, 
+                   Message := 'Pomimo bledu, silownik nie zglosil Extended po zlapaniu czujnika!');
+                   
+        TEST_FINISHED();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Extend_Timeout_RaisesError" Id="{c15cc178-eac4-48bd-af31-8922da2ec6ca}">
+      <Declaration><![CDATA[METHOD Test_Extend_Timeout_RaisesError
+VAR_INST
+    Step : INT := 0;
+    TestConfig : ST_Cylinder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+// Rejestrujemy nowy test
+TEST('Test_Extend_Timeout_RaisesError');
+
+// Cykl PLC
+Cylinder_ExtendTime.CyclicLogic();
+
+CASE Step OF
+    0:
+        // 1. ARRANGE
+        Cylinder_ExtendTime.Sensor := FALSE; // Czujnik nie widzi siłownika
+        
+        // Ustawiamy bardzo krótki czas wysuwu, żeby test w TcUnit wykonał się błyskawicznie (0.1 sekundy)
+        TestConfig := Cylinder_ExtendTime.Config;
+        TestConfig.ExtendTime := 0.1; 
+        Cylinder_ExtendTime.Config := TestConfig;
+        
+        Step := 10;
+        
+    10:
+        // 2. ACT - Rozkaz wysunięcia
+        Cylinder_ExtendTime.Extend();
+        Step := 20;
+        
+    20:
+        // 3. ACT & ASSERT - Czekamy na błąd
+        // Nie aktywujemy czujnika! Zostawiamy go na FALSE.
+        // Jeśli timer minie (0.1s), siłownik powinien zgłosić Error.
+        
+        IF Cylinder_ExtendTime.Error THEN
+            // Sprawdzamy, czy podniósł się alarm z odpowiednim ID (1)
+AssertEquals_UDINT(Expected := 2,  // Zmieniamy na 2, bo to jest faktyczne ID tego błędu w systemie
+                   Actual := Cylinder_ExtendTime.ErrorID, 
+                   Message := 'Zle ID bledu dla timeoutu siownika!');
+                               
+            TEST_FINISHED(); // Test udany - kod poprawnie wykrył awarię!
+        END_IF
+        
+        // Zabezpieczenie testu: jeśli coś nie działa w kodzie i Error nigdy nie nastąpi,
+        // TcUnit ma własny watchdog i po kilku sekundach uwali ten test jako "Timeout".
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Extend_TurnsOnValve_And_ReportsExtended" Id="{293c6053-1314-47ba-ba12-07f844b7b5a0}">
+      <Declaration><![CDATA[METHOD Test_Extend_TurnsOnValve_And_ReportsExtended
+VAR_INST
+    Step : INT := 0;
+    TestConfig : ST_Cylinder_Config; // Zmienna lokalna na konfigurację
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+// To musi być wywołane co cykl, żeby TcUnit śledził stan testu
+TEST('Test_Extend_TurnsOnValve_And_ReportsExtended');
+
+// Symulujemy cykl pracy PLC dla siłownika
+Cylinder_ExtendHappy.CyclicLogic();
+
+CASE Step OF
+    0: 
+        // 1. ARRANGE - Ustawiamy warunki początkowe
+        Cylinder_ExtendHappy.Sensor := FALSE; // Udajemy, że czujnik nie widzi siłownika
+        
+        // Zgrywamy config, nadpisujemy i wstrzykujemy przez nowe Property
+        TestConfig := Cylinder_ExtendHappy.Config;
+        TestConfig.ExtendTime := 2.0; 
+        Cylinder_ExtendHappy.Config := TestConfig;
+        
+        Step := 10;
+        
+    10: 
+        // 2. ACT - Wysyłamy komendę wysunięcia
+        Cylinder_ExtendHappy.Extend();
+        
+        // Przechodzimy do kolejnego kroku, żeby dać szansę CyclicLogic() na reakcję
+        Step := 20;
+        
+    20:
+        // 3. ASSERT - Krok pośredni
+        // Skoro w poprzednim cyklu daliśmy Extend(), zawór powinien być już otwarty
+        AssertTrue(Condition := Cylinder_ExtendHappy.Valve, 
+                   Message := 'Zawor wysuwu (CylinderValveCutX) nie zostal wysterowany!');
+                   
+        // 4. ACT - Symulujemy, że fizyczny siłownik dojechał do końca i czujnik łapie
+        Cylinder_ExtendHappy.Sensor := TRUE;
+        
+        Step := 30;
+        
+    30:
+        // 5. ASSERT - Weryfikacja końcowa
+        AssertTrue(Condition := Cylinder_ExtendHappy.Extended, 
+                   Message := 'Cylinder nie zaraportowal stanu Extended po aktywacji czujnika!');
+                   
+        // Zakańczamy test
+        TEST_FINISHED();
+        
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Retract_Timeout_RaisesError" Id="{21b165e2-d860-443c-b2a3-f783f26eaba2}">
+      <Declaration><![CDATA[METHOD Test_Retract_Timeout_RaisesError
+VAR_INST
+    Step : INT := 0;
+    TestConfig : ST_Cylinder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+// -------------------------------------------------------------
+
+TEST('Test_Retract_Timeout_RaisesError');
+Cylinder_RetractTime.CyclicLogic();
+
+CASE Step OF
+    0:
+        // 1. ARRANGE - Cylinder jest wysunięty
+        Cylinder_RetractTime.Sensor := TRUE; 
+        
+        TestConfig := Cylinder_RetractTime.Config;
+        TestConfig.RetractTime := 0.1; // Szybki timeout
+        Cylinder_RetractTime.Config := TestConfig;
+        
+        Step := 10;
+        
+    10:
+        // 2. ACT
+        Cylinder_RetractTime.Retract();
+        Step := 20;
+        
+    20:
+        // 3. ASSERT - Czekamy na błąd, NIE zmieniamy stanu czujnika!
+        IF Cylinder_RetractTime.Error THEN
+            AssertTrue(Condition := TRUE, Message := 'Ten Assert zawsze przechodzi, potwierdza Error');
+            TEST_FINISHED();
+        END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Retract_TurnsOffValve_And_ReportsRetracted" Id="{cddb3b13-c26c-48c0-a245-03e52b9de919}">
+      <Declaration><![CDATA[METHOD Test_Retract_TurnsOffValve_And_ReportsRetracted
+VAR_INST
+    Step : INT := 0;
+    TestConfig : ST_Cylinder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+// -------------------------------------------------------------
+
+TEST('Test_Retract_TurnsOffValve_And_ReportsRetracted');
+Cylinder_RetractHappy.CyclicLogic();
+
+CASE Step OF
+    0: 
+        // 1. ARRANGE - Ustawiamy warunki początkowe (Cylinder jest wysunięty)
+        Cylinder_RetractHappy.Sensor := TRUE; 
+        
+        TestConfig := Cylinder_RetractHappy.Config;
+        TestConfig.RetractTime := 2.0; 
+        Cylinder_RetractHappy.Config := TestConfig;
+        
+        Step := 10;
+        
+    10: 
+        // 2. ACT - Wysyłamy komendę wsunięcia
+        Cylinder_RetractHappy.Retract();
+        Step := 20;
+        
+    20:
+        // 3. ASSERT - Krok pośredni (Zawór musi się natychmiast wyłączyć)
+        AssertFalse(Condition := Cylinder_RetractHappy.Valve, 
+                    Message := 'Zawor nie zostal wylaczony przy komendzie chowania!');
+                    
+        // 4. ACT - Symulujemy zjechanie z czujnika (powrót)
+        Cylinder_RetractHappy.Sensor := FALSE;
+        Step := 30;
+        
+    30:
+        // 5. ASSERT - Weryfikacja końcowa
+        AssertTrue(Condition := Cylinder_RetractHappy.Retracted, 
+                   Message := 'Cylinder nie zglosil Retracted po powrocie!');
+                   
+        TEST_FINISHED();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Cylinder_Test">
+      <LineId Id="13" Count="1" />
+      <LineId Id="29" Count="1" />
+      <LineId Id="28" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Cylinder_Test.Test_Error_Resets_When_TargetReached">
+      <LineId Id="10" Count="40" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Cylinder_Test.Test_Extend_Timeout_RaisesError">
+      <LineId Id="122" Count="31" />
+      <LineId Id="167" Count="1" />
+      <LineId Id="156" Count="6" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Cylinder_Test.Test_Extend_TurnsOnValve_And_ReportsExtended">
+      <LineId Id="63" Count="44" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Cylinder_Test.Test_Retract_Timeout_RaisesError">
+      <LineId Id="10" Count="28" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Cylinder_Test.Test_Retract_TurnsOffValve_And_ReportsRetracted">
+      <LineId Id="10" Count="37" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

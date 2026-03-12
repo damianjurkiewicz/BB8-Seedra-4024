@@ -229,6 +229,16 @@ IF MovementTimer.Q THEN
     END_IF
 END_IF
 
+// Resetowanie błędu i ALARMÓW, gdy cylinder w końcu dotrze do celu
+IF (_Extended AND _ExtendRequest) OR (_Retracted AND _RetractRequest) THEN
+    _Error   := FALSE;
+    _ErrorID := 0;
+    
+    // Musimy zdjąć alarmy, żeby system bazowy nie podniósł flagi błędu ponownie!
+    CylinderAlarms[E_CylinderAlarms.ExtendTimeout].Clear(0,0);
+    CylinderAlarms[E_CylinderAlarms.RetractTimeout].Clear(0,0);
+END_IF
+
 SUPER^.Monitoring();]]></ST>
       </Implementation>
     </Method>
@@ -293,7 +303,10 @@ END_VAR]]></Declaration>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Cylinder.Monitoring">
-      <LineId Id="40" Count="15" />
+      <LineId Id="40" Count="14" />
+      <LineId Id="59" Count="8" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="55" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Cylinder.Retract">
