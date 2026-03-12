@@ -119,6 +119,25 @@ SUPER^.CyclicLogic();
 _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := CylinderAlarms, CurrentSeverity := _CurrentAlarmSeverity);]]></ST>
       </Implementation>
     </Method>
+    <Property Name="Error" Id="{fa35be3d-1304-4f63-a352-60e04b585c4a}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{3d446071-592e-4490-ba75-42df150223c8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := _Error;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{875a67df-099d-4c1f-9198-4b57908183d0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Error := Error;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="Extend" Id="{f94e6f21-1340-0909-053a-ec233f6345e3}" FolderPath="I_Cylinder\">
       <Declaration><![CDATA[METHOD Extend]]></Declaration>
       <Implementation>
@@ -247,6 +266,12 @@ END_VAR]]></Declaration>
     </LineIds>
     <LineIds Name="FB_CylinderCutY.CyclicLogic">
       <LineId Id="76" Count="39" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutY.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutY.Error.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderCutY.Extend">

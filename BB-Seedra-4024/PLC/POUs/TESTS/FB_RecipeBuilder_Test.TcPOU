@@ -9,10 +9,10 @@ VAR
     Config  : ST_RecipeBuilder_Config;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[//Test_Arona_Calculates_Segments();
-//Test_BorgoFlaps_Calculates_Segments();
-//Test_BorgoWings_Calculates_Segments();
-//Test_BorgoWings_Calculates_Coordinates();]]></ST>
+      <ST><![CDATA[Test_Arona_Calculates_Segments();
+Test_BorgoFlaps_Calculates_Segments();
+Test_BorgoWings_Calculates_Segments();
+Test_BorgoWings_Calculates_Coordinates();]]></ST>
     </Implementation>
     <Method Name="Test_Arona_Calculates_Segments" Id="{7a994464-7f61-40a8-a740-1b9398842f86}">
       <Declaration><![CDATA[METHOD Test_Arona_Calculates_Segments

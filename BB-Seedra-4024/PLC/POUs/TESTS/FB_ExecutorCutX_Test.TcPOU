@@ -4,18 +4,20 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCutX_Test EXTENDS TcUnit.FB_TestSuite IMPLEMENTS I_GantryConfigProvider
 VAR
     Executor : FB_ExecutorCutX;
-    
-    // NASZE MOCKI
+	Executor_Unhappy     : FB_ExecutorCutX;
+
     MockCylinder : FB_MockCylinder;
+	MockCylinder_Unhappy : FB_MockCylinder;
     MockAxisX    : FB_MockAxis := (Name := 'MockX');
     MockAxisY    : FB_MockAxis := (Name := 'MockY');
     MockAxisZ    : FB_MockAxis := (Name := 'MockZ');
     
-    TestRecipe   : FB_RecipeBuilderArona;
+    TestRecipe   : FB_RecipeBuilderBorgoWings;
     _TestConfig  : ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[Test_Sequence_ExecutesCutsCorrectly();]]></ST>
+      <ST><![CDATA[Test_Sequence_ExecutesCutsCorrectly();
+Test_Sequence_AbortsOnCylinderError();]]></ST>
     </Implementation>
     <Property Name="Config" Id="{98ba9e04-c6dd-4bd0-953b-b00b87da8f4b}">
       <Declaration><![CDATA[PROPERTY Config : ST_GantryXYZ_Config]]></Declaration>
@@ -36,6 +38,81 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <Method Name="Test_Sequence_AbortsOnCylinderError" Id="{9a19ee42-2643-46ec-8532-5c6d8bc6c677}">
+      <Declaration><![CDATA[METHOD Test_Sequence_AbortsOnCylinderError
+VAR_INST
+    Step : INT := 0;
+    RecipeConfig : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+TEST('Test_Sequence_AbortsOnCylinderError');
+
+Executor_Unhappy.CyclicLogic();
+
+CASE Step OF
+    0:
+        // 1. ARRANGE - Przygotowanie receptury BorgoWings (6 cięć)
+        RecipeConfig.PanelFrontLength := 1000.0;
+        TestRecipe.Config := RecipeConfig;
+        TestRecipe.Build(); 
+		
+		_TestConfig.CuttingSpeedX := 10;
+		_TestConfig.GroovingSpeedX := 10;
+		_TestConfig.RapidSpeedX := 10;
+		_TestConfig.CuttingSpeedY := 10;
+		_TestConfig.GroovingSpeedY := 10;
+		_TestConfig.RapidSpeedY := 10;
+	
+        
+        _TestConfig.CuttingIdleTime := 0.0; 
+        
+        // ZMUSZAMY MOCK DO AWARII PRZY 3. PRÓBIE WYSUNIĘCIA
+        MockCylinder_Unhappy.FailOnExtendCount := 3;
+        
+        // Wstrzykujemy zależności do Executora "Unhappy"
+        Executor_Unhappy.RecipeBuilder  := TestRecipe;
+        Executor_Unhappy.ConfigProvider := THIS^; 
+        Executor_Unhappy.Cylinder       := MockCylinder_Unhappy;
+        Executor_Unhappy.AxisX          := MockAxisX;
+        Executor_Unhappy.AxisY          := MockAxisY;
+        Executor_Unhappy.AxisZ          := MockAxisZ;
+        
+        Step := 10;
+        
+    10:
+        // 2. ACT - Start maszyny
+        Executor_Unhappy.Execute();
+        Step := 20;
+        
+    20:
+        // 3. ASSERT - Oczekujemy BŁĘDU, a nie zakończenia sukcesem!
+        IF Executor_Unhappy.Error THEN
+            Step := 30; // Sukces testu - Executor wyrzucił błąd
+        ELSIF Executor_Unhappy.Done THEN
+            AssertTrue(FALSE, 'Cylinder zglosil blad, a Executor zignorowal to i zakonczyl sukcesem!');
+            TEST_FINISHED();
+        END_IF
+        
+    30:
+        // 4. ASSERT - Weryfikacja dokładnego zachowania podczas awarii
+        
+        // Oczekujemy, że wysunięcie zostało wywołane dokładnie 3 razy i ani razu więcej
+        AssertEquals_INT(Expected := 3, 
+                         Actual := MockCylinder_Unhappy.ExtendCallCount, 
+                         Message := 'Executor nie zatrzymal sie po bledzie na 3. cieciu!');
+                         
+        // Oczekujemy, że wsunięcie zostało wywołane tylko 2 razy 
+        // (bo przy trzecim wysunięciu był błąd, więc sekwencja spadła z rowerka przed chowaniem!)
+        AssertEquals_INT(Expected := 2, 
+                         Actual := MockCylinder_Unhappy.RetractCallCount, 
+                         Message := 'Bledna liczba wsuniec przed awaria!');
+                         
+        TEST_FINISHED();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Test_Sequence_ExecutesCutsCorrectly" Id="{c2729daa-46da-4e16-8826-64d5d470ee9f}">
       <Declaration><![CDATA[METHOD Test_Sequence_ExecutesCutsCorrectly
 VAR_INST
@@ -56,7 +133,14 @@ CASE Step OF
         RecipeConfig.PanelFrontLength := 1000.0;
         TestRecipe.Config := RecipeConfig;
         TestRecipe.Build(); 
-        
+		_TestConfig.CuttingSpeedX := 10;
+		_TestConfig.GroovingSpeedX := 10;
+		_TestConfig.RapidSpeedX := 10;
+		_TestConfig.CuttingSpeedY := 10;
+		_TestConfig.GroovingSpeedY := 10;
+		_TestConfig.RapidSpeedY := 10;
+	
+
         // Czas stabilizacji dla testu ucinamy do zera
         _TestConfig.CuttingIdleTime := 0.0; 
         
@@ -87,11 +171,11 @@ CASE Step OF
     30:
         // 5. ASSERT - Testujemy Logikę Executora szpiegując Siłownik
         // Arona ma 2 cięcia, więc siłownik musi zostać użyty 2 razy
-        AssertEquals_INT(Expected := 2, 
+        AssertEquals_INT(Expected := 6, 
                          Actual := MockCylinder.ExtendCallCount, 
                          Message := 'Bledna liczba wysuniec ostrza!');
                          
-        AssertEquals_INT(Expected := 2, 
+        AssertEquals_INT(Expected := 6, 
                          Actual := MockCylinder.RetractCallCount, 
                          Message := 'Bledna liczba wsuniec ostrza!');
                          
@@ -101,6 +185,7 @@ END_CASE]]></ST>
     </Method>
     <LineIds Name="FB_ExecutorCutX_Test">
       <LineId Id="9" Count="0" />
+      <LineId Id="37" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCutX_Test.Config.Get">
       <LineId Id="2" Count="0" />
@@ -108,8 +193,23 @@ END_CASE]]></ST>
     <LineIds Name="FB_ExecutorCutX_Test.Config.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_ExecutorCutX_Test.Test_Sequence_AbortsOnCylinderError">
+      <LineId Id="10" Count="2" />
+      <LineId Id="69" Count="1" />
+      <LineId Id="13" Count="6" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="73" Count="5" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="20" Count="44" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_ExecutorCutX_Test.Test_Sequence_ExecutesCutsCorrectly">
-      <LineId Id="10" Count="52" />
+      <LineId Id="10" Count="12" />
+      <LineId Id="67" Count="2" />
+      <LineId Id="71" Count="1" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="73" Count="0" />
+      <LineId Id="23" Count="39" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

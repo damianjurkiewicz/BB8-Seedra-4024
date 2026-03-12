@@ -2,6 +2,12 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <Itf Name="I_Cylinder" Id="{5eef6192-44e5-0f9f-3fe7-0d8e658e50b6}">
     <Declaration><![CDATA[INTERFACE I_Cylinder]]></Declaration>
+    <Property Name="Error" Id="{a26df717-6531-4ed0-8404-a70bf4cf7959}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{672106fb-a426-4319-ab1f-83b1f2c9b639}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Method Name="Extend" Id="{6199c781-0269-09a7-1ca0-96654d2c0840}">
       <Declaration><![CDATA[METHOD Extend
 VAR_INPUT

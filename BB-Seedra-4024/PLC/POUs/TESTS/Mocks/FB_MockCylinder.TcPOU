@@ -8,17 +8,42 @@ VAR
     
     ExtendCallCount  : INT := 0;
     RetractCallCount : INT := 0;
+	
+
+    _Error            : BOOL := FALSE;
+END_VAR
+
+VAR_INPUT
+	FailOnExtendCount : INT := 0; 
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Property Name="Error" Id="{aebed462-05fe-47fa-b552-ed6c86490bff}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{b2411117-a462-474d-9b73-dcc94739b54b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := _Error;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="Extend" Id="{98721f0e-fbdf-498b-aff3-c02e8b40e405}">
       <Declaration><![CDATA[METHOD Extend
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Extended := TRUE; 
-_Retracted := FALSE; 
-ExtendCallCount := ExtendCallCount + 1;]]></ST>
+        <ST><![CDATA[ExtendCallCount := ExtendCallCount + 1;
+
+// Symulacja awarii, jeśli dotarliśmy do wyznaczonego limitu
+IF FailOnExtendCount > 0 AND ExtendCallCount = FailOnExtendCount THEN
+    _Error := TRUE;
+    _Extended := FALSE;
+ELSE
+    _Extended := TRUE;
+    _Retracted := FALSE;
+END_IF]]></ST>
       </Implementation>
     </Method>
     <Property Name="Extended" Id="{9f1d5f9b-9529-4cf8-a7f5-73c380daae19}">
@@ -57,8 +82,12 @@ END_VAR
     <LineIds Name="FB_MockCylinder">
       <LineId Id="9" Count="0" />
     </LineIds>
+    <LineIds Name="FB_MockCylinder.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_MockCylinder.Extend">
-      <LineId Id="4" Count="2" />
+      <LineId Id="8" Count="8" />
+      <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_MockCylinder.Extended.Get">
       <LineId Id="2" Count="0" />

@@ -10,6 +10,8 @@ VAR
     _RetractedX      : BOOL;
     _ExtendingX      : BOOL;
     _RetractingX     : BOOL;
+	
+
 
 
 
@@ -123,6 +125,25 @@ SUPER^.CyclicLogic();
 _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := CylinderAlarms, CurrentSeverity := _CurrentAlarmSeverity);]]></ST>
       </Implementation>
     </Method>
+    <Property Name="Error" Id="{4b52a11a-b99a-4897-8ac1-f2337615a2fb}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{398673bb-dff0-47bd-ab7b-b29e5718d541}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := _Error;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{1d245d19-063a-4b5f-823e-b0c571aa60c0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Error := Error;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="Extend" Id="{ddb1a4c0-2458-4226-b284-f5ac382d347c}" FolderPath="I_Cylinder\">
       <Declaration><![CDATA[METHOD Extend]]></Declaration>
       <Implementation>
@@ -246,6 +267,12 @@ END_VAR]]></Declaration>
     </LineIds>
     <LineIds Name="FB_CylinderCutX.CyclicLogic">
       <LineId Id="91" Count="39" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_CylinderCutX.Error.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_CylinderCutX.Extend">

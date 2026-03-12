@@ -70,6 +70,7 @@ CASE nStep OF
         END_IF
 
     // -------- Dojazd do punktu START segmentu --------
+// -------- Dojazd do punktu START segmentu --------
     10:
         _AxisX.MoveAbsolute(
             currentSeg.Start.X + localConfig.CutterYOffsetX + localConfig.GlobalOffset, 
@@ -82,6 +83,9 @@ CASE nStep OF
     20: // Oczekiwanie na osiągnięcie pozycji XY
         IF _AxisX.InPosition AND _AxisY.InPosition THEN 
             nStep := 30;
+        // ZABEZPIECZENIE:
+        ELSIF _AxisX.Error OR _AxisY.Error THEN
+            nStep := 999;
         END_IF
 
     // -------- Aktywacja narzędzia (Ostrze Y w dół) --------
@@ -95,6 +99,9 @@ CASE nStep OF
             _AxisX.Velocity := localConfig.CuttingSpeedX;
             _AxisY.Velocity := localConfig.CuttingSpeedY;
             nStep := 50;
+        // ZABEZPIECZENIE:
+        ELSIF _Cylinder.Error THEN
+            nStep := 999;
         END_IF
             
     50: // Czas stabilizacji przed cięciem
@@ -117,6 +124,9 @@ CASE nStep OF
     70: // Oczekiwanie na zakończenie ruchu roboczego
         IF _AxisX.InPosition AND _AxisY.InPosition THEN
             nStep := 80;
+        // ZABEZPIECZENIE:
+        ELSIF _AxisX.Error OR _AxisY.Error THEN
+            nStep := 999;
         END_IF
 
     // -------- Dezaktywacja narzędzia i inkrementacja segmentu --------
@@ -128,6 +138,9 @@ CASE nStep OF
         IF _Cylinder.Retracted THEN
              iCurrentSegment := iCurrentSegment + 1;
              nStep := 90;
+        // ZABEZPIECZENIE:
+        ELSIF _Cylinder.Error THEN
+             nStep := 999;
         END_IF    
 
     90: // Drugi Idle Time i decyzja o kontynuacji
@@ -146,12 +159,20 @@ CASE nStep OF
             END_IF
         END_IF
 
+    // -------- Obsługa błędów Executora --------
+    999:
+        _bBusy := FALSE;  // Zatrzymujemy pracę
+        _bError := TRUE;  // Rzucamy błąd wyżej
+        _bDone := FALSE;
+        nStep := 0;       // Powrót do IDLE i czekanie na rozkaz z zewnątrz
+
     // -------- Finalizacja pracy --------
     1000:
         ////Trace('SegmentExecutionY-FINISHED');
         _bBusy := FALSE; // Zwolnienie flagi Busy z FB_ExecutorBase
         _bDone := TRUE;  // Ustawienie flagi Done dla Orchestratora
         nStep := 0;      // Powrót do IDLE
+        
         
 END_CASE]]></ST>
       </Implementation>
@@ -166,7 +187,9 @@ END_CASE]]></ST>
       <LineId Id="156" Count="1" />
       <LineId Id="154" Count="0" />
       <LineId Id="153" Count="0" />
-      <LineId Id="21" Count="124" />
+      <LineId Id="21" Count="41" />
+      <LineId Id="164" Count="102" />
+      <LineId Id="145" Count="0" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>

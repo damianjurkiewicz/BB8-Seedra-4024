@@ -7,9 +7,9 @@ VAR
     Config  : ST_RecipeBuilder_Config;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[//Test_ReturnsCorrectBuilder();
-//Test_ReturnsZeroOnInvalidID();
-//Test_UpdatesConfigForAllBuilders();]]></ST>
+      <ST><![CDATA[Test_ReturnsCorrectBuilder();
+Test_ReturnsZeroOnInvalidID();
+Test_UpdatesConfigForAllBuilders();]]></ST>
     </Implementation>
     <Method Name="Test_ReturnsCorrectBuilder" Id="{f4d0cc26-5c2a-4ddf-b356-c729fd5c6098}">
       <Declaration><![CDATA[METHOD Test_ReturnsCorrectBuilder

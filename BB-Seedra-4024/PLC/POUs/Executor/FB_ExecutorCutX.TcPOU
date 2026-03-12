@@ -67,7 +67,7 @@ CASE nStep OF
             END_IF     
         END_IF
 
-    // -------- Dojazd do początku cięcia --------
+// -------- Dojazd do początku cięcia --------
     10:
         _AxisX.MoveAbsolute(
             _RecipeBuilder.SegmentsCutX[iCurrentSegment].Start.X + localConfig.CutterXOffsetX + localConfig.GlobalOffset, 
@@ -80,6 +80,9 @@ CASE nStep OF
     20: // Czekamy na pozycję XY
         IF _AxisX.InPosition AND _AxisY.InPosition THEN 
             nStep := 30;
+        // ZABEZPIECZENIE:
+        ELSIF _AxisX.Error OR _AxisY.Error THEN
+            nStep := 999;
         END_IF
 
     // -------- Wysunięcie siłownika (Ostrze w dół) --------
@@ -93,6 +96,9 @@ CASE nStep OF
             _AxisX.Velocity := localConfig.CuttingSpeedX;
             _AxisY.Velocity := localConfig.CuttingSpeedY;
             nStep := 50;
+        // ZABEZPIECZENIE:
+        ELSIF _Cylinder.Error THEN
+            nStep := 999;
         END_IF
             
     50: // Czekanie (Cutting Idle Time)
@@ -115,6 +121,9 @@ CASE nStep OF
     70: // Czekamy na koniec cięcia
         IF _AxisX.InPosition AND _AxisY.InPosition THEN
             nStep := 80;
+        // ZABEZPIECZENIE:
+        ELSIF _AxisX.Error OR _AxisY.Error THEN
+            nStep := 999;
         END_IF
 
     // -------- Chowanie ostrza i przygotowanie następnego --------
@@ -124,16 +133,17 @@ CASE nStep OF
 
     85: 
         IF _Cylinder.Retracted THEN
-             iCurrentSegment := iCurrentSegment + 1; 
+             iCurrentSegment := iCurrentSegment + 1;
              nStep := 90;
+        // ZABEZPIECZENIE:
+        ELSIF _Cylinder.Error THEN
+             nStep := 999;
         END_IF    
 
     90: // Drugi Idle Time
         StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.CuttingIdleTime * 1000.0));
         IF StepTimer.Q THEN
-            StepTimer(IN := FALSE);
-            
-            // Powrót do prędkości dojazdowej
+            StepTimer(IN := FALSE); // Powrót do prędkości dojazdowej
             _AxisX.Velocity := localConfig.RapidSpeedX;
             _AxisY.Velocity := localConfig.RapidSpeedY;
             
@@ -144,8 +154,15 @@ CASE nStep OF
             END_IF
         END_IF
 
+    // -------- Obsługa błędów Executora --------
+    999:
+        _bBusy := FALSE;  // Zatrzymujemy pracę
+        _bError := TRUE;  // Rzucamy błąd (upewnij się, czy w FB_ExecutorBase to _bError czy _Error)
+        _bDone := FALSE;
+        nStep := 0;       // Powrót do IDLE (czeka na obsługę błędu z zewnątrz)
+
     // -------- Zakończenie pracy Executora --------
-1000:
+    1000:
         //Trace('SegmentExecutionX-FINISHED');
         _bBusy := FALSE; // Wyłączamy flagę pracy
         _bDone := TRUE;  // Dajemy sygnał Orchestratorowi, że skończyliśmy!
@@ -169,8 +186,8 @@ END_CASE]]></ST>
       <LineId Id="157" Count="0" />
       <LineId Id="18" Count="11" />
       <LineId Id="140" Count="1" />
-      <LineId Id="30" Count="104" />
-      <LineId Id="142" Count="3" />
+      <LineId Id="30" Count="26" />
+      <LineId Id="166" Count="98" />
       <LineId Id="137" Count="2" />
       <LineId Id="4" Count="0" />
     </LineIds>
