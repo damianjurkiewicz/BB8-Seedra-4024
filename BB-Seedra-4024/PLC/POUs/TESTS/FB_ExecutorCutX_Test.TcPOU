@@ -1,0 +1,116 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_ExecutorCutX_Test" Id="{7df5cf70-cbe1-43ae-a8be-81dbfb352aaf}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCutX_Test EXTENDS TcUnit.FB_TestSuite IMPLEMENTS I_GantryConfigProvider
+VAR
+    Executor : FB_ExecutorCutX;
+    
+    // NASZE MOCKI
+    MockCylinder : FB_MockCylinder;
+    MockAxisX    : FB_MockAxis := (Name := 'MockX');
+    MockAxisY    : FB_MockAxis := (Name := 'MockY');
+    MockAxisZ    : FB_MockAxis := (Name := 'MockZ');
+    
+    TestRecipe   : FB_RecipeBuilderArona;
+    _TestConfig  : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_Sequence_ExecutesCutsCorrectly();]]></ST>
+    </Implementation>
+    <Property Name="Config" Id="{98ba9e04-c6dd-4bd0-953b-b00b87da8f4b}">
+      <Declaration><![CDATA[PROPERTY Config : ST_GantryXYZ_Config]]></Declaration>
+      <Get Name="Get" Id="{a7ec6669-d8cc-485f-ad66-71b6c5dd4e2e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Config := _TestConfig;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{7aa55b37-d946-42cb-bdab-7d5120bef258}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_TestConfig := Config;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="Test_Sequence_ExecutesCutsCorrectly" Id="{c2729daa-46da-4e16-8826-64d5d470ee9f}">
+      <Declaration><![CDATA[METHOD Test_Sequence_ExecutesCutsCorrectly
+VAR_INST
+    Step : INT := 0;
+    RecipeConfig : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+TEST('Test_Sequence_ExecutesCutsCorrectly');
+
+// Wywołujemy CyclicLogic dla Executora (Mocki nie potrzebują, bo nic w nich w tle nie tyka)
+Executor.CyclicLogic();
+
+CASE Step OF
+    0:
+        // 1. ARRANGE - Przygotowanie receptury Arona (ma 2 cięcia X)
+        RecipeConfig.PanelFrontLength := 1000.0;
+        TestRecipe.Config := RecipeConfig;
+        TestRecipe.Build(); 
+        
+        // Czas stabilizacji dla testu ucinamy do zera
+        _TestConfig.CuttingIdleTime := 0.0; 
+        
+        // 2. DEPENDENCY INJECTION - Wstrzykujemy nasze Zaślepki!
+        Executor.RecipeBuilder  := TestRecipe;
+        Executor.ConfigProvider := THIS^; 
+        Executor.Cylinder       := MockCylinder;
+        Executor.AxisX          := MockAxisX;
+        Executor.AxisY          := MockAxisY;
+        Executor.AxisZ          := MockAxisZ;
+        
+        Step := 10;
+        
+    10:
+        // 3. ACT - Start maszyny
+        Executor.Execute();
+        Step := 20;
+        
+    20:
+        // 4. Czekamy na koniec sekwencji (dzięki mockom to potrwa ułamki sekund)
+        IF Executor.Done THEN
+            Step := 30;
+        ELSIF Executor.Error THEN
+            AssertTrue(FALSE, 'Executor zwrocil Error zamiast Done!');
+            TEST_FINISHED();
+        END_IF
+        
+    30:
+        // 5. ASSERT - Testujemy Logikę Executora szpiegując Siłownik
+        // Arona ma 2 cięcia, więc siłownik musi zostać użyty 2 razy
+        AssertEquals_INT(Expected := 2, 
+                         Actual := MockCylinder.ExtendCallCount, 
+                         Message := 'Bledna liczba wysuniec ostrza!');
+                         
+        AssertEquals_INT(Expected := 2, 
+                         Actual := MockCylinder.RetractCallCount, 
+                         Message := 'Bledna liczba wsuniec ostrza!');
+                         
+        TEST_FINISHED();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_ExecutorCutX_Test">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX_Test.Config.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX_Test.Config.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCutX_Test.Test_Sequence_ExecutesCutsCorrectly">
+      <LineId Id="10" Count="52" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

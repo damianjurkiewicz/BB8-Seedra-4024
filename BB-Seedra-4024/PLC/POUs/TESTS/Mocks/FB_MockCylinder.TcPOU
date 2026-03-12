@@ -22,8 +22,7 @@ ExtendCallCount := ExtendCallCount + 1;]]></ST>
       </Implementation>
     </Method>
     <Property Name="Extended" Id="{9f1d5f9b-9529-4cf8-a7f5-73c380daae19}">
-      <Declaration><![CDATA[{warning 'add property implementation'}
-PROPERTY Extended : BOOL
+      <Declaration><![CDATA[PROPERTY Extended : BOOL
 ]]></Declaration>
       <Get Name="Get" Id="{10bdb286-10e9-4dac-9a5d-643bc99f0abd}">
         <Declaration><![CDATA[VAR
@@ -44,8 +43,7 @@ RetractCallCount := RetractCallCount + 1;]]></ST>
       </Implementation>
     </Method>
     <Property Name="Retracted" Id="{791cb054-55f7-4508-83e6-e7878573b647}">
-      <Declaration><![CDATA[{warning 'add property implementation'}
-PROPERTY Retracted : BOOL
+      <Declaration><![CDATA[PROPERTY Retracted : BOOL
 ]]></Declaration>
       <Get Name="Get" Id="{dac08ce4-8457-48b3-91ba-217cf6badbfd}">
         <Declaration><![CDATA[VAR
