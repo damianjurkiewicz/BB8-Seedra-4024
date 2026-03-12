@@ -29,9 +29,10 @@ VAR
 	// Flagi określające typ napędu dla konkretnej osi (TRUE = SoE/AX5000, FALSE = CoE)
     AxisX_IsSoE : BOOL := FALSE;
     AxisY_IsSoE : BOOL := FALSE;
-    AxisZ_IsSoE : BOOL := FALSE; 
-    CylinderCuttingX    : FB_CylinderCutX        := (Name := 'Cylinder X');
-    CylinderCuttingY    : FB_CylinderCutY        := (Name := 'Cylinder Y');
+    AxisZ_IsSoE : BOOL := FALSE;
+ 
+	CylinderCuttingX : FB_Cylinder := (Name := 'Cylinder X');
+    CylinderCuttingY : FB_Cylinder := (Name := 'Cylinder Y');
 
     // =========================================================
     //  HOMING STRATEGIES

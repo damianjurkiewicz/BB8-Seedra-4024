@@ -3,10 +3,8 @@
   <DUT Name="ST_Cylinder_Command" Id="{da610787-8da4-0918-242c-6ff79d9b522a}">
     <Declaration><![CDATA[TYPE ST_Cylinder_Command :
     STRUCT
-        RetractExtendX  : BOOL;
-        RetractCylinderX : BOOL;
-		RetractExtendY  : BOOL;
-        RetractCylinderY : BOOL;
+        Extend  : BOOL;
+        Retract : BOOL;
     END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

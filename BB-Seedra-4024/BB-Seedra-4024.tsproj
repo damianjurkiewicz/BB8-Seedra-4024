@@ -1987,7 +1987,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{8D47D44F-4E62-CD5F-75AD-D144EB0F7DD0}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{92495C37-B54D-F206-61B3-767CF5B9A709}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2005,11 +2005,11 @@ External Setpoint Generation:
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderSensorCutX</Name>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.Sensor</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderSensorCutY</Name>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Sensor</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
@@ -2060,11 +2060,11 @@ External Setpoint Generation:
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderValveCutX</Name>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.Valve</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderValveCutY</Name>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Valve</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
@@ -2090,14 +2090,6 @@ External Setpoint Generation:
 					</Vars>
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>SafetyTask Inputs</Name>
-						<Var>
-							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.CylinderSensorCutX</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.CylinderSensorCutX</Name>
-							<Type>BOOL</Type>
-						</Var>
 						<Var>
 							<Name>GVL_Safety.SafetyPermissionI</Name>
 							<Type>BOOL</Type>
@@ -2135,19 +2127,27 @@ External Setpoint Generation:
 							<Name>IO.DI8</Name>
 							<Type>BOOL</Type>
 						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
 						<Var>
-							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.CylinderValveCutX</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.CylinderValveCutX</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
 							<Name>GVL_Safety.SafetyPermissionQ</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.Valve</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.Valve</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -2155,6 +2155,18 @@ External Setpoint Generation:
 						<OwnerA Name="OutputSrc" Prefix="TIPC^PLC^PLC Instance" Type="2">
 							<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 4 (EL2008)">
 								<Link VarA="MAIN.Seedra.GantryXYZ.CylinderCuttingY.PistonValveCutX" TypeA="BOOL" InOutA="1" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="Channel 6^Output" Size="1" RestoreInfo="ANotFound"/>
+							</OwnerB>
+						</OwnerA>
+					</UnrestoredVarLinks>
+					<UnrestoredVarLinks ImportTime="2026-03-12T13:32:57">
+						<OwnerA Name="InputDst" Prefix="TIPC^PLC^PLC Instance" Type="1">
+							<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 2 (EL1008)">
+								<Link VarA="MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderSensorCutY" TypeA="BOOL" InOutA="0" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="Channel 7^Input" Size="1" RestoreInfo="ANotFound"/>
+							</OwnerB>
+						</OwnerA>
+						<OwnerA Name="OutputSrc" Prefix="TIPC^PLC^PLC Instance" Type="2">
+							<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 4 (EL2008)">
+								<Link VarA="MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderValveCutY" TypeA="BOOL" InOutA="1" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="Channel 5^Output" Size="1" RestoreInfo="ANotFound"/>
 							</OwnerB>
 						</OwnerA>
 					</UnrestoredVarLinks>
@@ -6194,14 +6206,14 @@ Bit 8 - 15 : reserved]]></Comment>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorX" VarB="Channel 4^Input"/>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorY" VarB="Channel 5^Input"/>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorZ" VarB="Channel 6^Input"/>
-				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderSensorCutX" VarB="Channel 8^Input"/>
-				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderSensorCutY" VarB="Channel 7^Input"/>
+				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.CylinderCuttingX.Sensor" VarB="Channel 8^Input"/>
+				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.CylinderCuttingY.Sensor" VarB="Channel 7^Input"/>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 4 (EL2008)">
 				<Link VarA="PlcTask Outputs^IO.CoolingEnable" VarB="Channel 4^Output"/>
 				<Link VarA="PlcTask Outputs^IO.SpindleEnable" VarB="Channel 3^Output"/>
-				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderValveCutX" VarB="Channel 6^Output"/>
-				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderValveCutY" VarB="Channel 5^Output"/>
+				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.CylinderCuttingX.Valve" VarB="Channel 6^Output"/>
+				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.CylinderCuttingY.Valve" VarB="Channel 5^Output"/>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 8 (EL6900)">
 				<Link VarA="PlcTask Inputs^GVL_Safety.ComError" VarB="StandardInputs^TwinSafeGroup1.GVL_Safety.ComError_8"/>

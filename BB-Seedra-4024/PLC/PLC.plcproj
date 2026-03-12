@@ -43,10 +43,7 @@
     <Compile Include="PlcTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\FB_CylinderCutY.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\Components\FB_CylinderCutX.TcPOU">
+    <Compile Include="POUs\Components\FB_Cylinder.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Components\I_Cylinder.TcIO">
@@ -154,7 +151,7 @@
     <Compile Include="POUs\TESTS.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\TESTS\FB_CylinderCutX_Test.TcPOU">
+    <Compile Include="POUs\TESTS\FB_CylinderCut_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TESTS\FB_ExecutorCutX_Test.TcPOU">

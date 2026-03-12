@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_CylinderCutX_Test" Id="{1f43ba0c-200b-48c0-b781-58b741008a04}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_CylinderCutX_Test EXTENDS TcUnit.FB_TestSuite
+  <POU Name="FB_CylinderCut_Test" Id="{1f43ba0c-200b-48c0-b781-58b741008a04}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_CylinderCut_Test EXTENDS TcUnit.FB_TestSuite
 VAR
-    Cylinder_HappyPath : FB_CylinderCutX; // Siłownik dla testu poprawnego
-    Cylinder_Timeout   : FB_CylinderCutX; // Siłownik dla testu błędu
+    Cylinder_HappyPath : FB_Cylinder; // Siłownik dla testu poprawnego
+    Cylinder_Timeout   : FB_Cylinder; // Siłownik dla testu błędu
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[//Test_Extend_TurnsOnValve_And_ReportsExtended();
-//Test_Extend_Timeout_RaisesError(); ]]></ST>
+      <ST><![CDATA[Test_Extend_TurnsOnValve_And_ReportsExtended();
+Test_Extend_Timeout_RaisesError(); ]]></ST>
     </Implementation>
     <Method Name="Test_Extend_Timeout_RaisesError" Id="{c15cc178-eac4-48bd-af31-8922da2ec6ca}">
       <Declaration><![CDATA[METHOD Test_Extend_Timeout_RaisesError
@@ -28,11 +28,11 @@ Cylinder_Timeout.CyclicLogic();
 CASE Step OF
     0:
         // 1. ARRANGE
-        Cylinder_Timeout.CylinderSensorCutX := FALSE; // Czujnik nie widzi siłownika
+        Cylinder_Timeout.Sensor := FALSE; // Czujnik nie widzi siłownika
         
         // Ustawiamy bardzo krótki czas wysuwu, żeby test w TcUnit wykonał się błyskawicznie (0.1 sekundy)
         TestConfig := Cylinder_Timeout.Config;
-        TestConfig.ExtendTimeX := 0.1; 
+        TestConfig.ExtendTime := 0.1; 
         Cylinder_Timeout.Config := TestConfig;
         
         Step := 10;
@@ -79,11 +79,11 @@ Cylinder_HappyPath.CyclicLogic();
 CASE Step OF
     0: 
         // 1. ARRANGE - Ustawiamy warunki początkowe
-        Cylinder_HappyPath.CylinderSensorCutX := FALSE; // Udajemy, że czujnik nie widzi siłownika
+        Cylinder_HappyPath.Sensor := FALSE; // Udajemy, że czujnik nie widzi siłownika
         
         // Zgrywamy config, nadpisujemy i wstrzykujemy przez nowe Property
         TestConfig := Cylinder_HappyPath.Config;
-        TestConfig.ExtendTimeX := 2.0; 
+        TestConfig.ExtendTime := 2.0; 
         Cylinder_HappyPath.Config := TestConfig;
         
         Step := 10;
@@ -98,11 +98,11 @@ CASE Step OF
     20:
         // 3. ASSERT - Krok pośredni
         // Skoro w poprzednim cyklu daliśmy Extend(), zawór powinien być już otwarty
-        AssertTrue(Condition := Cylinder_HappyPath.CylinderValveCutX, 
+        AssertTrue(Condition := Cylinder_HappyPath.Valve, 
                    Message := 'Zawor wysuwu (CylinderValveCutX) nie zostal wysterowany!');
                    
         // 4. ACT - Symulujemy, że fizyczny siłownik dojechał do końca i czujnik łapie
-        Cylinder_HappyPath.CylinderSensorCutX := TRUE;
+        Cylinder_HappyPath.Sensor := TRUE;
         
         Step := 30;
         
@@ -117,16 +117,16 @@ CASE Step OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_CylinderCutX_Test">
+    <LineIds Name="FB_CylinderCut_Test">
       <LineId Id="13" Count="1" />
     </LineIds>
-    <LineIds Name="FB_CylinderCutX_Test.Test_Extend_Timeout_RaisesError">
+    <LineIds Name="FB_CylinderCut_Test.Test_Extend_Timeout_RaisesError">
       <LineId Id="122" Count="31" />
       <LineId Id="167" Count="1" />
       <LineId Id="156" Count="6" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_CylinderCutX_Test.Test_Extend_TurnsOnValve_And_ReportsExtended">
+    <LineIds Name="FB_CylinderCut_Test.Test_Extend_TurnsOnValve_And_ReportsExtended">
       <LineId Id="63" Count="44" />
       <LineId Id="5" Count="0" />
     </LineIds>

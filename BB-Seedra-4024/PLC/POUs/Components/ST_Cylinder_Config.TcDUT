@@ -3,10 +3,8 @@
   <DUT Name="ST_Cylinder_Config" Id="{982f8ba7-035b-0308-0ff1-2ac43301b0e7}">
     <Declaration><![CDATA[TYPE ST_Cylinder_Config :
     STRUCT
- 	ExtendTimeX : LREAL := 1;
-	RetractTimeX : LREAL := 1;
-	ExtendTimeY : LREAL := 1;
-	RetractTimeY : LREAL := 1;
+ 	ExtendTime : LREAL := 1;
+	RetractTime : LREAL := 1;
     END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>
