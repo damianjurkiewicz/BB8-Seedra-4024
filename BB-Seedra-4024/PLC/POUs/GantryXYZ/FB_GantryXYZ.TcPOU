@@ -454,7 +454,7 @@ CASE DescendantSequenceState OF
 		AxisZ.HomeMethod := fbHomeStratZ;
 		
 		// Wstrzykiwanie zależności do Executora Cut X
-		ExecutorCutX.IsAxisX        := TRUE;
+		ExecutorCutX.CutDirection   := E_CutDirection.eCutX;
 		ExecutorCutX.AxisX          := AxisX;
 		ExecutorCutX.AxisY          := AxisY;
 		ExecutorCutX.AxisZ          := AxisZ;
@@ -462,7 +462,7 @@ CASE DescendantSequenceState OF
 		ExecutorCutX.ConfigProvider := THIS^;
 		
 		// Wstrzykiwanie zależności do Executora Cut Y 
-		ExecutorCutY.IsAxisX        := FALSE; // <--- Magia!
+		ExecutorCutY.CutDirection   := E_CutDirection.eCutY;
 		ExecutorCutY.AxisX          := AxisX;
 		ExecutorCutY.AxisY          := AxisY;
 		ExecutorCutY.AxisZ          := AxisZ;
@@ -864,7 +864,11 @@ SUPER^.Resetting();]]></ST>
       <LineId Id="106" Count="7" />
       <LineId Id="102" Count="0" />
       <LineId Id="123" Count="0" />
-      <LineId Id="247" Count="13" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="261" Count="0" />
+      <LineId Id="249" Count="6" />
+      <LineId Id="262" Count="0" />
+      <LineId Id="257" Count="3" />
       <LineId Id="235" Count="0" />
       <LineId Id="130" Count="0" />
       <LineId Id="220" Count="13" />

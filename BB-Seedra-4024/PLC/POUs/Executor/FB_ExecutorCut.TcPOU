@@ -3,12 +3,31 @@
   <POU Name="FB_ExecutorCut" Id="{d112f497-12ba-4ef0-9a18-d5d0a0a5cb2a}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCut EXTENDS FB_ExecutorBase
 VAR
-    _IsAxisX : BOOL := TRUE; // TRUE = tniemy wzdłuż X (Arona/Wings), FALSE = tniemy wzdłuż Y
+	_CutDirection : E_CutDirection; //   0 - Cutter direction X, 1 - Cutter direction Y, you can add more in the Enum
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Property Name="CutDirection" Id="{2e5b2549-487e-4c71-8ab5-2707083adbce}">
+      <Declaration><![CDATA[PROPERTY CutDirection : E_CutDirection]]></Declaration>
+      <Get Name="Get" Id="{78fa6f30-8cfc-4c8f-b630-a087ae846ffd}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CutDirection := _CutDirection;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{a2853fb5-b406-4a3c-b3c2-cbf02554944c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CutDirection := CutDirection;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="CyclicLogic" Id="{0b527001-8b78-458c-8b6f-271e71aa0862}">
       <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
 VAR_INST
@@ -31,22 +50,26 @@ IF _RecipeBuilder = 0 OR _ConfigProvider = 0 THEN RETURN; END_IF
 localConfig := _ConfigProvider.Config;
 
 // ========================================================
-// MAGICZNY ROZDZIELACZ: Tniemy X czy Y?
+// MAGICZNY ROZDZIELACZ Z ENUMEM
 // ========================================================
-IF IsAxisX THEN
-    IF iCurrentSegment < 1 OR iCurrentSegment > 32 THEN iCurrentSegment := 1; END_IF
-    currentSeg    := _RecipeBuilder.SegmentsCutX[iCurrentSegment];
-    totalSegments := _RecipeBuilder.SegmentsToCutX;
-    offsetX       := localConfig.CutterXOffsetX;
-    offsetY       := localConfig.CutterXOffsetY;
-ELSE
-    IF iCurrentSegment < 1 OR iCurrentSegment > 32 THEN iCurrentSegment := 1; END_IF
-    currentSeg    := _RecipeBuilder.SegmentsCutY[iCurrentSegment];
-    totalSegments := _RecipeBuilder.SegmentsToCutY;
-    offsetX       := localConfig.CutterYOffsetX;
-    offsetY       := localConfig.CutterYOffsetY;
-END_IF
+CASE CutDirection OF
+    E_CutDirection.eCutX:
+        IF iCurrentSegment < 1 OR iCurrentSegment > 32 THEN iCurrentSegment := 1; END_IF
+        currentSeg    := _RecipeBuilder.SegmentsCutX[iCurrentSegment];
+        totalSegments := _RecipeBuilder.SegmentsToCutX;
+        offsetX       := localConfig.CutterXOffsetX;
+        offsetY       := localConfig.CutterXOffsetY;
+        
+    E_CutDirection.eCutY:
+        IF iCurrentSegment < 1 OR iCurrentSegment > 32 THEN iCurrentSegment := 1; END_IF
+        currentSeg    := _RecipeBuilder.SegmentsCutY[iCurrentSegment];
+        totalSegments := _RecipeBuilder.SegmentsToCutY;
+        offsetX       := localConfig.CutterYOffsetX;
+        offsetY       := localConfig.CutterYOffsetY;
+        
+END_CASE
 // ========================================================
+
 
 CASE nStep OF
     0: // IDLE
@@ -137,37 +160,20 @@ CASE nStep OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Property Name="IsAxisX" Id="{a08bbeff-ce5a-4715-a51a-b13bbbbcee05}">
-      <Declaration><![CDATA[PROPERTY IsAxisX : BOOL]]></Declaration>
-      <Get Name="Get" Id="{5d92670a-d574-46d8-971e-8aab8ece0839}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[IsAxisX := _IsAxisX;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{8437e23f-45bd-4d54-9df7-c7d8647eb7d5}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_IsAxisX := IsAxisX;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <LineIds Name="FB_ExecutorCut">
       <LineId Id="9" Count="0" />
     </LineIds>
+    <LineIds Name="FB_ExecutorCut.CutDirection.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCut.CutDirection.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_ExecutorCut.CyclicLogic">
-      <LineId Id="15" Count="111" />
+      <LineId Id="15" Count="7" />
+      <LineId Id="137" Count="18" />
+      <LineId Id="38" Count="88" />
       <LineId Id="4" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCut.IsAxisX.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCut.IsAxisX.Set">
-      <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
