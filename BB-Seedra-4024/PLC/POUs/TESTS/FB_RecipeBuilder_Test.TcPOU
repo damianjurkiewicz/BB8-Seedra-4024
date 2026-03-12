@@ -25,7 +25,7 @@ END_VAR]]></Declaration>
 // 1. Arrange - podajemy przykładowe dane wejściowe
 Config.PanelFrontLength := 1000.0;
 Config.PanelHeight := 100.0;
-Config.PanelFrontWidht := 500.0;
+Config.PanelFrontWidth := 500.0;
 Config.RailHeightCorrection := 13.0;
 BuilderArona.Config := Config;
 
@@ -63,7 +63,7 @@ END_VAR]]></Declaration>
 // 1. Arrange - podajemy przykładowe dane wejściowe
 Config.PanelFrontLength := 1000.0;
 Config.PanelHeight := 100.0;
-Config.PanelFrontWidht := 500.0;
+Config.PanelFrontWidth := 500.0;
 Config.RailHeightCorrection := 13.0;
 BuilderBorgoFlaps.Config := Config;
 
@@ -103,7 +103,7 @@ TEST('Test_BorgoWings_Calculates_Coordinates');
 // 1. Arrange - wprowadzamy dane
 Config.PanelFrontLength := 1000.0;
 Config.PanelHeight := 100.0;
-Config.PanelFrontWidht := 500.0;
+Config.PanelFrontWidth := 500.0;
 Config.RailHeightCorrection := 13.0;
 BuilderBorgoWings.Config := Config;
 
@@ -179,7 +179,7 @@ END_VAR]]></Declaration>
 // 1. Arrange - podajemy przykładowe dane wejściowe
 Config.PanelFrontLength := 1000.0;
 Config.PanelHeight := 100.0;
-Config.PanelFrontWidht := 500.0;
+Config.PanelFrontWidth := 500.0;
 Config.RailHeightCorrection := 13.0;
 BuilderBorgoWings.Config := Config;
 

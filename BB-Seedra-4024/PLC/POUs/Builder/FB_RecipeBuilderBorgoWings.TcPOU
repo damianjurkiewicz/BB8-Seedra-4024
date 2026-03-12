@@ -22,7 +22,7 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[TotalY   := _Config.PanelFrontLength + 2 * _Config.PanelHeight;
-TotalX   := _Config.PanelFrontWidht  + 2 * _Config.PanelHeight; // Uwaga na literówkę 'Widht' w strukturze!
+TotalX   := _Config.PanelFrontWidth  + 2 * _Config.PanelHeight; // Uwaga na literówkę 'Widht' w strukturze!
 ShorterY := TotalY - _Config.PanelHeight;
 ShorterX := TotalX - _Config.PanelHeight;
 
@@ -134,9 +134,7 @@ Build := TRUE;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoWings.Build">
-      <LineId Id="433" Count="3" />
-      <LineId Id="446" Count="100" />
-      <LineId Id="552" Count="0" />
+      <LineId Id="563" Count="105" />
       <LineId Id="11" Count="0" />
     </LineIds>
   </POU>
