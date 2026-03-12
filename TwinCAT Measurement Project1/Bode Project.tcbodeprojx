@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BodeProject AssemblyName="TwinCAT.Scope2.BodePlot">
+  <Comment />
+  <DisplayColor>Black</DisplayColor>
+  <FilePath>C:\Users\Damian\Documents\GitHub\BB8-Seedra-4024\TwinCAT Measurement Project1\Bode Project.tcbodeprojx</FilePath>
+  <Guid>6f8d3a64-276e-4b62-96c3-ae5a79456576</Guid>
+  <LayoutString>&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;Layout&gt;
+  &lt;Window Guid="183dd048-1310-4808-9fa3-886e589a0648" LastFocused="134177727526749469" DockedSize="200" PopupSize="0" FloatingLocation="-1, -1" FloatingSize="550, 400" LastOpenDockSituation="Document" LastFixedDockSituation="Document" LastFixedDockLocation="Right" LastFloatingWindowGuid="00000000-0000-0000-0000-000000000000" LastDockContainerCount="0" LastDockContainerIndex="0" DockedWorkingSize="250, 400" DockedWindowGroupGuid="00000000-0000-0000-0000-000000000000" DockedIndexInWindowGroup="0" DockedSplitPath="0" DocumentWorkingSize="250, 400" DocumentWindowGroupGuid="961cda45-e5d9-4537-86e9-7134c9bc318f" DocumentIndexInWindowGroup="0" DocumentSplitPath="0" FloatingWorkingSize="250, 400" FloatingWindowGroupGuid="00000000-0000-0000-0000-000000000000" FloatingIndexInWindowGroup="0" FloatingSplitPath="0" /&gt;
+  &lt;DocumentContainer Dock="5"&gt;
+    &lt;SplitLayoutSystem WorkingSize="250, 400" SplitMode="0"&gt;
+      &lt;ControlLayoutSystem WorkingSize="250, 400" Guid="961cda45-e5d9-4537-86e9-7134c9bc318f" Collapsed="0" SelectedControl="183dd048-1310-4808-9fa3-886e589a0648"&gt;
+        &lt;Controls&gt;
+          &lt;Control Guid="183dd048-1310-4808-9fa3-886e589a0648" /&gt;
+        &lt;/Controls&gt;
+      &lt;/ControlLayoutSystem&gt;
+    &lt;/SplitLayoutSystem&gt;
+  &lt;/DocumentContainer&gt;
+&lt;/Layout&gt;</LayoutString>
+  <Name>BodeProject</Name>
+  <SortPriority>100</SortPriority>
+  <SubMember>
+    <BodePlot AssemblyName="TwinCAT.Scope2.BodePlot">
+      <AdsTargetPort>501</AdsTargetPort>
+      <Autoscale>false</Autoscale>
+      <AxisId>83951664</AxisId>
+      <BaseAmplitudePosition>0</BaseAmplitudePosition>
+      <BaseAmplitudeVelocity>10</BaseAmplitudeVelocity>
+      <BaseFrequency>0.9765625</BaseFrequency>
+      <BodeObjectId>4294967295</BodeObjectId>
+      <CheckDriveLimitations>true</CheckDriveLimitations>
+      <Comment />
+      <CycleTime>2</CycleTime>
+      <DisplayColor>Black</DisplayColor>
+      <DynContainerId>50987024</DynContainerId>
+      <FrequencySteps>20</FrequencySteps>
+      <GainMax>30</GainMax>
+      <GainMin>-30</GainMin>
+      <Guid>183dd048-1310-4808-9fa3-886e589a0648</Guid>
+      <IntegralTime>0.012</IntegralTime>
+      <MaxFrequency>1000</MaxFrequency>
+      <MaxFrequencyPosition>500</MaxFrequencyPosition>
+      <MaxFrequencyTorque>2000</MaxFrequencyTorque>
+      <MaxFrequencyVelo>1000</MaxFrequencyVelo>
+      <MaxStepsPerResponse>1</MaxStepsPerResponse>
+      <MeasureSampleCount>16384</MeasureSampleCount>
+      <MeasureTime>2.048</MeasureTime>
+      <MinFrequency>10</MinFrequency>
+      <MinFrequencyPosition>1</MinFrequencyPosition>
+      <MinFrequencyTorque>20</MinFrequencyTorque>
+      <MinFrequencyVelo>10</MinFrequencyVelo>
+      <Mode>Velocity_1_DynContainer</Mode>
+      <Name>Bode Plot</Name>
+      <Oversampling>x16</Oversampling>
+      <PhaseMax>90</PhaseMax>
+      <PhaseMin>-270</PhaseMin>
+      <PositionAmplitudeScalingMode>reciprocal_f</PositionAmplitudeScalingMode>
+      <PositionMonitoringWindow>50</PositionMonitoringWindow>
+      <PositionUnitSymbol>NC/CNC pos. unit</PositionUnitSymbol>
+      <ProportionalGain>0</ProportionalGain>
+      <RequestedOversampling>Suggested</RequestedOversampling>
+      <SettingTime>1.024</SettingTime>
+      <ShowLegend>true</ShowLegend>
+      <ShowTitles>true</ShowTitles>
+      <SignalAmplitudePosition>10</SignalAmplitudePosition>
+      <SignalAmplitudeTorque>10</SignalAmplitudeTorque>
+      <SignalAmplitudeVelocity>20</SignalAmplitudeVelocity>
+      <SignalChartVisibility>Auto</SignalChartVisibility>
+      <SignalGenerator>Sinus</SignalGenerator>
+      <Smoothing>false</Smoothing>
+      <SmoothingDiameter>1</SmoothingDiameter>
+      <SortPriority>100</SortPriority>
+      <SubMember />
+      <SystemDeadTime>0</SystemDeadTime>
+      <TargetNetIdString>5.141.80.204.1.1</TargetNetIdString>
+      <Title>Bode Plot</Title>
+      <TorqueAmplitudeScalingMode>constant</TorqueAmplitudeScalingMode>
+      <TorqueOffset>0</TorqueOffset>
+      <TorqueUnitSymbol>%</TorqueUnitSymbol>
+      <TraceLevel>Warning</TraceLevel>
+      <UserDeadTime>0</UserDeadTime>
+      <VelocityAmplitudeScalingMode>reciprocal_10_at_1000Hz</VelocityAmplitudeScalingMode>
+      <VelocityUnitSymbol>NC/CNC vel. unit</VelocityUnitSymbol>
+      <ViewDetailLevel>Extended</ViewDetailLevel>
+    </BodePlot>
+  </SubMember>
+  <Title>BodeProject</Title>
+  <UseUserSettings>false</UseUserSettings>
+  <Version>1.0.16.0</Version>
+  <ViewDetailLevel>Extended</ViewDetailLevel>
+</BodeProject>

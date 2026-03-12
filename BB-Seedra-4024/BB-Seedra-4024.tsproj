@@ -1987,7 +1987,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{2A0AB86B-DB16-D341-35B0-AAA60826D5F2}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{C0200ED2-8C62-3DB6-FC6E-BC8695A50339}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2091,6 +2091,14 @@ External Setpoint Generation:
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>SafetyTask Inputs</Name>
 						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.CylinderSensorCutX</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.CylinderSensorCutX</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
 							<Name>GVL_Safety.SafetyPermissionI</Name>
 							<Type>BOOL</Type>
 						</Var>
@@ -2127,27 +2135,19 @@ External Setpoint Generation:
 							<Name>IO.DI8</Name>
 							<Type>BOOL</Type>
 						</Var>
-						<Var>
-							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.CylinderSensorCutX</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.CylinderSensorCutX</Name>
-							<Type>BOOL</Type>
-						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
-						<Var>
-							<Name>GVL_Safety.SafetyPermissionQ</Name>
-							<Type>BOOL</Type>
-						</Var>
 						<Var>
 							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_HappyPath.CylinderValveCutX</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
 							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Timeout.CylinderValveCutX</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.SafetyPermissionQ</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
