@@ -1,0 +1,170 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_ExecutorGrooveXY_Test" Id="{8cf8cf32-1234-4567-89ab-cdef01234567}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorGrooveXY_Test EXTENDS TcUnit.FB_TestSuite 
+VAR
+    // Instancje naszych obiektów testowanych (SUT - System Under Test)
+    Executor         : FB_ExecutorGrooveXY;
+    Executor_Zero    : FB_ExecutorGrooveXY;
+    Executor_Unhappy : FB_ExecutorGrooveXY;
+
+    // Zaślepka konfiguracji
+    MockConfigProvider : FB_MockConfigProvider;
+
+    // Zaślepki osi
+    MockAxisX     : FB_MockAxis := (Name := 'MockX');
+    MockAxisY     : FB_MockAxis := (Name := 'MockY');
+    MockAxisZ     : FB_MockAxis := (Name := 'MockZ');
+    MockAxisZ_Err : FB_MockAxis := (Name := 'MockZ_Err'); // Złośliwa oś Z
+    
+    // Budowniczowie receptur
+    TestRecipe   : FB_RecipeBuilderBorgoWings; // Posiada 4 frezowania
+    BuilderArona : FB_RecipeBuilderArona;      // Wydmuszka, posiada 0 frezowań
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_Sequence_ExecutesGroovesCorrectly();
+Test_ZeroSegments_FinishesImmediately();
+Test_AxisError_AbortsSequence();]]></ST>
+    </Implementation>
+    
+    <Method Name="Test_AxisError_AbortsSequence" Id="{9df8cf32-1234-4567-89ab-cdef01234567}">
+      <Declaration><![CDATA[METHOD Test_AxisError_AbortsSequence
+VAR_INST
+    i : INT;
+    RecipeConfig : ST_RecipeBuilder_Config;
+    TestConfig   : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_AxisError_AbortsSequence');
+
+// 1. ARRANGE - Używamy poprawnej receptury (BorgoWings - 4 frezowania)
+RecipeConfig.PanelFrontLength := 1000.0;  
+TestRecipe.Config := RecipeConfig;        
+TestRecipe.Build();                       
+
+MockConfigProvider.Config := TestConfig;
+
+Executor_Unhappy.RecipeBuilder  := TestRecipe;
+Executor_Unhappy.ConfigProvider := MockConfigProvider;
+Executor_Unhappy.AxisX          := MockAxisX;
+Executor_Unhappy.AxisY          := MockAxisY;
+Executor_Unhappy.AxisZ          := MockAxisZ_Err; // Podpinamy złośliwą oś Z
+
+// Zmuszamy oś Z do błędu!
+MockAxisZ_Err.ForceError := TRUE;
+
+// 2. ACT
+Executor_Unhappy.Execute();
+
+// Puszczamy maszynę stanów (wpadnie w krok dojazdu i powinna wejść w 999)
+FOR i := 1 TO 10 DO
+    Executor_Unhappy.CyclicLogic();
+END_FOR
+
+// 3. ASSERT
+AssertTrue(Condition := Executor_Unhappy.Error, 
+           Message := 'Executor nie zglosil bledu, gdy os Z ulegla awarii!');
+AssertFalse(Condition := Executor_Unhappy.Done, 
+            Message := 'Executor zglosil sukces (Done), pomimo bledu osi Z!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+
+    <Method Name="Test_Sequence_ExecutesGroovesCorrectly" Id="{adf8cf32-1234-4567-89ab-cdef01234567}">
+      <Declaration><![CDATA[METHOD Test_Sequence_ExecutesGroovesCorrectly
+VAR_INST
+    Step : INT := 0;
+    RecipeConfig : ST_RecipeBuilder_Config;
+    TestConfig   : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Sequence_ExecutesGroovesCorrectly');
+
+// Wywołujemy CyclicLogic w każdym cyklu zadania PLC, aby test asynchroniczny "żył"
+Executor.CyclicLogic();
+
+CASE Step OF
+    0:
+        // 1. ARRANGE - Przygotowanie receptury BorgoWings (4 frezowania)
+        RecipeConfig.PanelFrontLength := 1000.0;
+        TestRecipe.Config := RecipeConfig;
+        TestRecipe.Build(); 
+        
+        TestConfig.GroovingSpeedX := 10;
+        TestConfig.GroovingSpeedY := 10;
+        TestConfig.GroovingSpeedZ := 10;
+        TestConfig.RapidSpeedX := 10;
+        TestConfig.RapidSpeedY := 10;
+        TestConfig.RapidSpeedZ := 10;
+        TestConfig.GroovingIdleTime := 0.0; 
+        
+        MockConfigProvider.Config := TestConfig;
+
+        // 2. DEPENDENCY INJECTION 
+        Executor.RecipeBuilder  := TestRecipe;
+        Executor.ConfigProvider := MockConfigProvider;
+        Executor.AxisX          := MockAxisX;
+        Executor.AxisY          := MockAxisY;
+        Executor.AxisZ          := MockAxisZ;
+        
+        Step := 10;
+        
+    10:
+        // 3. ACT - Start maszyny
+        Executor.Execute();
+        Step := 20;
+        
+    20:
+        // 4. Czekamy na koniec sekwencji frezowania
+        // UWAGA: Test zajmie kilka sekund ze względu na T#500MS w kodzie produkcyjnym (krok 74)
+        IF Executor.Done THEN
+            Step := 30;
+        ELSIF Executor.Error THEN
+            AssertTrue(FALSE, 'Executor zwrocil Error zamiast Done podczas frezowania!');
+            TEST_FINISHED();
+        END_IF
+        
+    30:
+        // 5. ASSERT - BorgoWings ma 4 segmenty, każdy ma 5 przejść.
+        // Jeśli Done == TRUE, maszyna stanów prawidłowo przeszła cały proces wielokrotnego zjazdu Z.
+        AssertTrue(Condition := Executor.Done, 
+                   Message := 'Frezowanie nie doszlo do flagi Done');
+                   
+        TEST_FINISHED();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+
+    <Method Name="Test_ZeroSegments_FinishesImmediately" Id="{bdf8cf32-1234-4567-89ab-cdef01234567}">
+      <Declaration><![CDATA[METHOD Test_ZeroSegments_FinishesImmediately
+VAR_INST
+    i : INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_ZeroSegments_FinishesImmediately');
+
+// 1. ARRANGE - Arona zwraca 0 segmentów Groove
+Executor_Zero.RecipeBuilder  := BuilderArona;
+Executor_Zero.ConfigProvider := MockConfigProvider;
+Executor_Zero.AxisX          := MockAxisX;
+Executor_Zero.AxisY          := MockAxisY;
+Executor_Zero.AxisZ          := MockAxisZ;
+
+// 2. ACT
+Executor_Zero.Execute();
+
+FOR i := 1 TO 5 DO
+    Executor_Zero.CyclicLogic();
+END_FOR
+
+// 3. ASSERT
+AssertTrue(Condition := Executor_Zero.Done, 
+           Message := 'Executor nie zwrocil Done przy 0 frezowan!');
+           
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+
+  </POU>
+</TcPlcObject>
