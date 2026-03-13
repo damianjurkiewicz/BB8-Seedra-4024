@@ -51,7 +51,46 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <Method Name="METH" Id="{5c79781a-f063-4958-9a0e-9af1fc0ec531}">
+    <Method Name="Test_AxisError_AbortsSequence" Id="{68197cf1-00a4-4603-8849-1889629904d7}">
+      <Declaration><![CDATA[METHOD Test_AxisError_AbortsSequence
+VAR_INST
+    i : INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+TEST('Test_AxisError_AbortsSequence');
+
+// 1. ARRANGE - Używamy poprawnej receptury (BorgoWings)
+Executor_AxisErr.RecipeBuilder  := TestRecipe; 
+Executor_AxisErr.ConfigProvider := THIS^;
+Executor_AxisErr.Cylinder       := MockCylinder;
+Executor_AxisErr.AxisX          := MockAxisX_Err; // Podpinamy złośliwą oś
+Executor_AxisErr.AxisY          := MockAxisY;
+Executor_AxisErr.AxisZ          := MockAxisZ;
+Executor_AxisErr.CutDirection   := E_CutDirection.eCutX;
+
+MockAxisX_Err.ForceError := TRUE; // Zmuszamy oś do błędu!
+
+// 2. ACT
+Executor_AxisErr.Execute();
+
+// Puszczamy maszynę stanów. Wpadnie do kroku 10 (dojazd), potem 20 i od razu zobaczy błąd osi (skok do 999).
+FOR i := 1 TO 10 DO
+    Executor_AxisErr.CyclicLogic();
+END_FOR
+
+// 3. ASSERT
+AssertTrue(Condition := Executor_AxisErr.Error, 
+           Message := 'Executor nie zglosil bledu, gdy os ulegla awarii!');
+
+AssertFalse(Condition := Executor_AxisErr.Done, 
+            Message := 'Executor zglosil sukces (Done), pomimo bledu osi!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Executes_CutY_Direction" Id="{5c79781a-f063-4958-9a0e-9af1fc0ec531}">
       <Declaration><![CDATA[METHOD Test_Executes_CutY_Direction
 VAR_INST
     Step : INT := 0;
@@ -103,45 +142,6 @@ CASE Step OF
                          
         TEST_FINISHED();
 END_CASE]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="Test_AxisError_AbortsSequence" Id="{68197cf1-00a4-4603-8849-1889629904d7}">
-      <Declaration><![CDATA[METHOD Test_AxisError_AbortsSequence
-VAR_INST
-    i : INT;
-END_VAR]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[
-
-TEST('Test_AxisError_AbortsSequence');
-
-// 1. ARRANGE - Używamy poprawnej receptury (BorgoWings)
-Executor_AxisErr.RecipeBuilder  := TestRecipe; 
-Executor_AxisErr.ConfigProvider := THIS^;
-Executor_AxisErr.Cylinder       := MockCylinder;
-Executor_AxisErr.AxisX          := MockAxisX_Err; // Podpinamy złośliwą oś
-Executor_AxisErr.AxisY          := MockAxisY;
-Executor_AxisErr.AxisZ          := MockAxisZ;
-Executor_AxisErr.CutDirection   := E_CutDirection.eCutX;
-
-MockAxisX_Err.ForceError := TRUE; // Zmuszamy oś do błędu!
-
-// 2. ACT
-Executor_AxisErr.Execute();
-
-// Puszczamy maszynę stanów. Wpadnie do kroku 10 (dojazd), potem 20 i od razu zobaczy błąd osi (skok do 999).
-FOR i := 1 TO 10 DO
-    Executor_AxisErr.CyclicLogic();
-END_FOR
-
-// 3. ASSERT
-AssertTrue(Condition := Executor_AxisErr.Error, 
-           Message := 'Executor nie zglosil bledu, gdy os ulegla awarii!');
-
-AssertFalse(Condition := Executor_AxisErr.Done, 
-            Message := 'Executor zglosil sukces (Done), pomimo bledu osi!');
-
-TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
     <Method Name="Test_Sequence_AbortsOnCylinderError" Id="{9a19ee42-2643-46ec-8532-5c6d8bc6c677}">
@@ -339,12 +339,12 @@ TEST_FINISHED();]]></ST>
     <LineIds Name="FB_ExecutorCut_Test.Config.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorCut_Test.METH">
-      <LineId Id="12" Count="43" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
     <LineIds Name="FB_ExecutorCut_Test.Test_AxisError_AbortsSequence">
       <LineId Id="9" Count="29" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCut_Test.Test_Executes_CutY_Direction">
+      <LineId Id="12" Count="43" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCut_Test.Test_Sequence_AbortsOnCylinderError">
