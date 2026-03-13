@@ -101,8 +101,8 @@ CASE nStep OF
         nStep := 20;
 
     20: // Czekamy na pozycję XY
-        IF _AxisX.InPosition AND _AxisY.InPosition THEN nStep := 30;
-        ELSIF _AxisX.Error OR _AxisY.Error THEN nStep := 999; END_IF
+		IF _AxisX.Error OR _AxisY.Error THEN nStep := 999; 
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN nStep := 30; END_IF
 
     30: // Wysunięcie siłownika (obojętnie jakiego, bo to wie interfejs _Cylinder!)
         _Cylinder.Extend();
@@ -127,8 +127,8 @@ CASE nStep OF
         nStep := 70;
 
     70: // Czekamy na koniec cięcia
-        IF _AxisX.InPosition AND _AxisY.InPosition THEN nStep := 80;
-        ELSIF _AxisX.Error OR _AxisY.Error THEN nStep := 999; END_IF
+		IF _AxisX.Error OR _AxisY.Error THEN nStep := 999; 
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN nStep := 80; END_IF
 
     80: // Chowanie ostrza
         _Cylinder.Retract();
@@ -172,7 +172,11 @@ END_CASE]]></ST>
     <LineIds Name="FB_ExecutorCut.CyclicLogic">
       <LineId Id="15" Count="7" />
       <LineId Id="137" Count="18" />
-      <LineId Id="38" Count="88" />
+      <LineId Id="38" Count="32" />
+      <LineId Id="166" Count="0" />
+      <LineId Id="72" Count="24" />
+      <LineId Id="167" Count="0" />
+      <LineId Id="98" Count="28" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>

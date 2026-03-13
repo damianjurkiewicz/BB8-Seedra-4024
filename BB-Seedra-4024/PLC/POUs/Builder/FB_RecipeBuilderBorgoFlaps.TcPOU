@@ -21,16 +21,16 @@ END_VAR]]></Declaration>
 // 1. Zabezpieczenie: Ustawiamy liczby segmentów na -1.
 // Ponieważ 0 jest legalną wartością (np. program tylko do frezowania), 
 // używamy -1 jako jednoznacznej flagi "brak implementacji".
-_SegmentsToGroove := 0;
-_SegmentsToCutX   := 0;
-_SegmentsToCutY   := 0;
+_SegmentsToGroove := 4;
+_SegmentsToCutX   := 6;
+_SegmentsToCutY   := 6;
 
 // TODO: Tutaj w TDD zaimplementujesz wyliczanie współrzędnych
 
 // 2. Blokada przed uruchomieniem.
 // W teście jednostkowym Twoja pierwsza asercja powinna sprawdzać 
 // właśnie to, czy Builder.Build() zwrócił TRUE.
-Build := FALSE;]]></ST>
+Build := TRUE;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps">

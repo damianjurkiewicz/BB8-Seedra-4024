@@ -1,10 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_ExecutorCut_Test" Id="{7df5cf70-cbe1-43ae-a8be-81dbfb352aaf}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCut_Test EXTENDS TcUnit.FB_TestSuite IMPLEMENTS I_GantryConfigProvider
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCut_Test EXTENDS TcUnit.FB_TestSuite 
 VAR
     Executor : FB_ExecutorCut;
 	Executor_Unhappy     : FB_ExecutorCut;
+	
+	MockConfigProvider : FB_MockConfigProvider;
 
     MockCylinder : FB_MockCylinder;
 	MockCylinder_Unhappy : FB_MockCylinder;
@@ -13,7 +15,7 @@ VAR
     MockAxisZ    : FB_MockAxis := (Name := 'MockZ');
     
     TestRecipe   : FB_RecipeBuilderBorgoWings;
-    _TestConfig  : ST_GantryXYZ_Config;
+
 	
 	Executor_Zero       : FB_ExecutorCut;
     MockCylinder_Zero   : FB_MockCylinder;
@@ -24,6 +26,7 @@ VAR
 
     Executor_CutY       : FB_ExecutorCut;
     MockCylinder_CutY   : FB_MockCylinder;
+	
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[Test_Sequence_ExecutesCutsCorrectly();
@@ -32,29 +35,11 @@ Test_ZeroSegments_FinishesImmediately();
 Test_AxisError_AbortsSequence();
 Test_Executes_CutY_Direction();]]></ST>
     </Implementation>
-    <Property Name="Config" Id="{98ba9e04-c6dd-4bd0-953b-b00b87da8f4b}">
-      <Declaration><![CDATA[PROPERTY Config : ST_GantryXYZ_Config]]></Declaration>
-      <Get Name="Get" Id="{a7ec6669-d8cc-485f-ad66-71b6c5dd4e2e}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[Config := _TestConfig;]]></ST>
-        </Implementation>
-      </Get>
-      <Set Name="Set" Id="{7aa55b37-d946-42cb-bdab-7d5120bef258}">
-        <Declaration><![CDATA[VAR
-END_VAR
-]]></Declaration>
-        <Implementation>
-          <ST><![CDATA[_TestConfig := Config;]]></ST>
-        </Implementation>
-      </Set>
-    </Property>
     <Method Name="Test_AxisError_AbortsSequence" Id="{68197cf1-00a4-4603-8849-1889629904d7}">
       <Declaration><![CDATA[METHOD Test_AxisError_AbortsSequence
 VAR_INST
     i : INT;
+    RecipeConfig : ST_RecipeBuilder_Config; 
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -62,8 +47,11 @@ END_VAR]]></Declaration>
 TEST('Test_AxisError_AbortsSequence');
 
 // 1. ARRANGE - Używamy poprawnej receptury (BorgoWings)
+RecipeConfig.PanelFrontLength := 1000.0;  
+TestRecipe.Config := RecipeConfig;        
+TestRecipe.Build();                       
 Executor_AxisErr.RecipeBuilder  := TestRecipe; 
-Executor_AxisErr.ConfigProvider := THIS^;
+Executor_AxisErr.ConfigProvider := MockConfigProvider; // Poprawiona nazwa
 Executor_AxisErr.Cylinder       := MockCylinder;
 Executor_AxisErr.AxisX          := MockAxisX_Err; // Podpinamy złośliwą oś
 Executor_AxisErr.AxisY          := MockAxisY;
@@ -109,7 +97,7 @@ CASE Step OF
         TestRecipe.Build(); 
         
         Executor_CutY.RecipeBuilder  := TestRecipe;
-        Executor_CutY.ConfigProvider := THIS^;
+		Executor_CutY.ConfigProvider := MockConfigProvider;
         Executor_CutY.Cylinder       := MockCylinder_CutY;
         Executor_CutY.AxisX          := MockAxisX;
         Executor_CutY.AxisY          := MockAxisY;
@@ -149,6 +137,7 @@ END_CASE]]></ST>
 VAR_INST
     Step : INT := 0;
     RecipeConfig : ST_RecipeBuilder_Config;
+	TestConfig : ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
@@ -164,22 +153,23 @@ CASE Step OF
         TestRecipe.Config := RecipeConfig;
         TestRecipe.Build(); 
 		
-		_TestConfig.CuttingSpeedX := 10;
-		_TestConfig.GroovingSpeedX := 10;
-		_TestConfig.RapidSpeedX := 10;
-		_TestConfig.CuttingSpeedY := 10;
-		_TestConfig.GroovingSpeedY := 10;
-		_TestConfig.RapidSpeedY := 10;
+		TestConfig.CuttingSpeedX := 10;    
+		TestConfig.GroovingSpeedX := 10;
+		TestConfig.RapidSpeedX := 10;
+		TestConfig.CuttingSpeedY := 10;
+		TestConfig.GroovingSpeedY := 10;
+		TestConfig.RapidSpeedY := 10;
 	
         
-        _TestConfig.CuttingIdleTime := 0.0; 
+        TestConfig.CuttingIdleTime := 0.0; 
         
         // ZMUSZAMY MOCK DO AWARII PRZY 3. PRÓBIE WYSUNIĘCIA
         MockCylinder_Unhappy.FailOnExtendCount := 3;
         
         // Wstrzykujemy zależności do Executora "Unhappy"
-        Executor_Unhappy.RecipeBuilder  := TestRecipe;
-        Executor_Unhappy.ConfigProvider := THIS^; 
+		MockConfigProvider.Config := TestConfig; 
+		Executor_Unhappy.RecipeBuilder  := TestRecipe;
+		Executor_Unhappy.ConfigProvider := MockConfigProvider; 
         Executor_Unhappy.Cylinder       := MockCylinder_Unhappy;
         Executor_Unhappy.AxisX          := MockAxisX;
         Executor_Unhappy.AxisY          := MockAxisY;
@@ -224,11 +214,10 @@ END_CASE]]></ST>
 VAR_INST
     Step : INT := 0;
     RecipeConfig : ST_RecipeBuilder_Config;
+	TestConfig : ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-
-TEST('Test_Sequence_ExecutesCutsCorrectly');
+        <ST><![CDATA[TEST('Test_Sequence_ExecutesCutsCorrectly');
 
 // Wywołujemy CyclicLogic dla Executora (Mocki nie potrzebują, bo nic w nich w tle nie tyka)
 Executor.CyclicLogic();
@@ -239,20 +228,21 @@ CASE Step OF
         RecipeConfig.PanelFrontLength := 1000.0;
         TestRecipe.Config := RecipeConfig;
         TestRecipe.Build(); 
-		_TestConfig.CuttingSpeedX := 10;
-		_TestConfig.GroovingSpeedX := 10;
-		_TestConfig.RapidSpeedX := 10;
-		_TestConfig.CuttingSpeedY := 10;
-		_TestConfig.GroovingSpeedY := 10;
-		_TestConfig.RapidSpeedY := 10;
+		TestConfig.CuttingSpeedX := 10;
+		TestConfig.GroovingSpeedX := 10;
+		TestConfig.RapidSpeedX := 10;
+		TestConfig.CuttingSpeedY := 10;
+		TestConfig.GroovingSpeedY := 10;
+		TestConfig.RapidSpeedY := 10;
 	
 
         // Czas stabilizacji dla testu ucinamy do zera
-        _TestConfig.CuttingIdleTime := 0.0; 
+        TestConfig.CuttingIdleTime := 0.0; 
         
         // 2. DEPENDENCY INJECTION - Wstrzykujemy nasze Zaślepki!
-        Executor.RecipeBuilder  := TestRecipe;
-        Executor.ConfigProvider := THIS^; 
+		MockConfigProvider.Config := TestConfig; 
+		Executor.RecipeBuilder  := TestRecipe;
+		Executor.ConfigProvider := MockConfigProvider;
         Executor.Cylinder       := MockCylinder;
         Executor.AxisX          := MockAxisX;
         Executor.AxisY          := MockAxisY;
@@ -302,7 +292,7 @@ TEST('Test_ZeroSegments_FinishesImmediately');
 
 // 1. ARRANGE - Arona aktualnie zwraca 0 segmentów (wydmuszka)
 Executor_Zero.RecipeBuilder  := BuilderArona;
-Executor_Zero.ConfigProvider := THIS^;
+Executor_Zero.ConfigProvider := MockConfigProvider; 
 Executor_Zero.Cylinder       := MockCylinder_Zero;
 Executor_Zero.AxisX          := MockAxisX;
 Executor_Zero.AxisY          := MockAxisY;
@@ -333,14 +323,11 @@ TEST_FINISHED();]]></ST>
       <LineId Id="87" Count="3" />
       <LineId Id="37" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorCut_Test.Config.Get">
-      <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_ExecutorCut_Test.Config.Set">
-      <LineId Id="2" Count="0" />
-    </LineIds>
     <LineIds Name="FB_ExecutorCut_Test.Test_AxisError_AbortsSequence">
-      <LineId Id="9" Count="29" />
+      <LineId Id="9" Count="4" />
+      <LineId Id="47" Count="1" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="14" Count="24" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCut_Test.Test_Executes_CutY_Direction">
@@ -354,16 +341,15 @@ TEST_FINISHED();]]></ST>
       <LineId Id="71" Count="0" />
       <LineId Id="73" Count="5" />
       <LineId Id="72" Count="0" />
-      <LineId Id="20" Count="44" />
+      <LineId Id="20" Count="6" />
+      <LineId Id="85" Count="1" />
+      <LineId Id="28" Count="36" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCut_Test.Test_Sequence_ExecutesCutsCorrectly">
-      <LineId Id="10" Count="12" />
-      <LineId Id="67" Count="2" />
-      <LineId Id="71" Count="1" />
-      <LineId Id="70" Count="0" />
-      <LineId Id="73" Count="0" />
-      <LineId Id="23" Count="39" />
+      <LineId Id="84" Count="22" />
+      <LineId Id="142" Count="1" />
+      <LineId Id="108" Count="33" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCut_Test.Test_ZeroSegments_FinishesImmediately">

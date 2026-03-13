@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_MockConfigProvider" Id="{1cf22c00-32b1-4334-b0ba-bb0033a9fe6a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MockConfigProvider IMPLEMENTS I_GantryConfigProvider
+VAR
+    _MockConfig : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="Config" Id="{98ba9e04-c6dd-4bd0-953b-b00b87da8f4b}">
+      <Declaration><![CDATA[PROPERTY Config : ST_GantryXYZ_Config]]></Declaration>
+      <Get Name="Get" Id="{a7ec6669-d8cc-485f-ad66-71b6c5dd4e2e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Config := _MockConfig;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{7aa55b37-d946-42cb-bdab-7d5120bef258}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_MockConfig := Config;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_MockConfigProvider">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockConfigProvider.Config.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockConfigProvider.Config.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

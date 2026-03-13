@@ -76,7 +76,7 @@ CASE nStep OF
             
             IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN
 
-				//set it to 1000 to ignore all steps
+				//set it to 1000 to ignore all steps (default 10)
                 nStep := 1000;
 				
 
@@ -90,10 +90,10 @@ CASE nStep OF
         _AxisY.MoveAbsolute(currentSeg.Start.Y + localConfig.GlobalOffset, 0);
         nStep := 20;
 
-    20: // Czekamy na pozycje XY
-        IF _AxisX.InPosition AND _AxisY.InPosition THEN 
-            // UWAGA: Tu w oryginale bylo IO.SpindleEnable := TRUE i IO.CoolingEnable := TRUE;
-            // Nalezy zarzadzac zewnetrznym wrzecionem przez wyjscia maszyny/narzedzia
+	20: // Czekamy na pozycje XY
+        IF _AxisX.Error OR _AxisY.Error THEN nStep := 999;
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN 
+            // UWAGA: IO.SpindleEnable := TRUE i IO.CoolingEnable := TRUE;
             _AxisZ.Velocity := localConfig.GroovingSpeedZ;
             nStep := 30;
         END_IF
@@ -115,7 +115,8 @@ CASE nStep OF
         nStep := 40;
 
     40: // Czekamy az os Z zjedzie
-        IF _AxisZ.InPosition THEN
+		IF _AxisZ.Error THEN nStep := 999;        
+		ELSIF _AxisZ.InPosition THEN
             // Wybor predkosci posuwu roboczego w zaleznosci od przejscia
             CASE iPass OF
                 1: _AxisX.Velocity := localConfig.GroovingSpeedX * v1; _AxisY.Velocity := localConfig.GroovingSpeedY * v1;
@@ -142,8 +143,9 @@ CASE nStep OF
         _AxisY.MoveAbsolute(currentSeg.Stop.Y + localConfig.GlobalOffset, 0);
         nStep := 70;
 
-    70: // Czekamy na koniec cięcia
-        IF _AxisX.InPosition AND _AxisY.InPosition AND _AxisZ.InPosition THEN
+	70: // Czekamy na koniec cięcia
+        IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error THEN nStep := 999;
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition AND _AxisZ.InPosition THEN
             IF iPass = 5 THEN
                 //Trace('Step 70: Pass 5 (Final) -> Going to Return Path');
                 nStep := 74;
@@ -168,8 +170,9 @@ CASE nStep OF
         _AxisY.MoveAbsolute(currentSeg.Start.Y + localConfig.GlobalOffset, 0);
         nStep := 76;
         
-    76: 
-        IF _AxisX.InPosition AND _AxisY.InPosition THEN
+	76: 
+        IF _AxisX.Error OR _AxisY.Error THEN nStep := 999;
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN
             _AxisZ.Velocity := localConfig.RapidSpeedZ;
             nStep := 80;
         END_IF
@@ -180,10 +183,11 @@ CASE nStep OF
         _AxisZ.MoveAbsolute(0, 0);
         nStep := 90;
 
-    90: 
-        IF _AxisZ.InPosition THEN
+	90: 
+        IF _AxisZ.Error THEN nStep := 999;
+        ELSIF _AxisZ.InPosition THEN
             nStep := 100;
-        END_IF    
+        END_IF  
 
     100: // Czas stabilizacji po przejsciu
         StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.GroovingIdleTime * 1000.0));
@@ -212,12 +216,18 @@ CASE nStep OF
             END_IF
         END_IF
 
-    // -------- Zakończenie pracy Executora --------
+	999: // Błąd którejkolwiek osi
+        _bBusy  := FALSE;
+        _bError := TRUE; 
+        _bDone  := FALSE;
+        nStep   := 0;
+
     1000:
         //Trace('Step 1000: FINISH');
         _bBusy := FALSE; // Zwolnienie flagi pracy
-        _bDone := TRUE;  // Sygnal dla Orchestratora (GantryXYZ)
-        nStep := 0;      // Powrot do IDLE
+        _bDone := TRUE;
+        // Sygnal dla Orchestratora (GantryXYZ)
+        nStep := 0;
         
 END_CASE]]></ST>
       </Implementation>
@@ -236,7 +246,20 @@ END_CASE]]></ST>
       <LineId Id="385" Count="0" />
       <LineId Id="215" Count="0" />
       <LineId Id="389" Count="1" />
-      <LineId Id="216" Count="138" />
+      <LineId Id="216" Count="9" />
+      <LineId Id="403" Count="3" />
+      <LineId Id="408" Count="1" />
+      <LineId Id="232" Count="19" />
+      <LineId Id="410" Count="0" />
+      <LineId Id="252" Count="25" />
+      <LineId Id="411" Count="10" />
+      <LineId Id="288" Count="15" />
+      <LineId Id="422" Count="4" />
+      <LineId Id="308" Count="7" />
+      <LineId Id="427" Count="3" />
+      <LineId Id="319" Count="28" />
+      <LineId Id="431" Count="10" />
+      <LineId Id="353" Count="1" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>
