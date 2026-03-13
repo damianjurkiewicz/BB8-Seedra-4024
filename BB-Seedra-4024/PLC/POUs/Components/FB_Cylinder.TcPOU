@@ -65,9 +65,7 @@ END_VAR
 VAR_INPUT
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[SUPER^.CreateEvents();
-
-// Powiązanie tablicy alarmów z klasą CylinderAlarms z TMC
+        <ST><![CDATA[// Powiązanie tablicy alarmów z klasą CylinderAlarms z TMC
 F_CreateAllEventsInClass(
     Alarms     := CylinderAlarms,
     ClassSize  := SIZEOF(TC_EVENTS.CylinderAlarms),
@@ -269,7 +267,7 @@ END_VAR]]></Declaration>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Cylinder.CreateEvents">
-      <LineId Id="8" Count="7" />
+      <LineId Id="10" Count="5" />
       <LineId Id="5" Count="0" />
       <LineId Id="7" Count="0" />
       <LineId Id="6" Count="0" />
