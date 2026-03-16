@@ -47,10 +47,10 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[_Config.PanelFrontLength     := LIMIT(100.0, Config.PanelFrontLength, 2000.0);
-_Config.PanelFrontWidth      := LIMIT(100.0, Config.PanelFrontWidth,  1000.0);
-_Config.PanelHeight          := LIMIT(40.0,  Config.PanelHeight,      120.0);
-_Config.RailHeightCorrection := LIMIT(10.0,  Config.RailHeightCorrection, 16.0);]]></ST>
+          <ST><![CDATA[_Config.PanelFrontLength     := LIMIT(_Limits.PanelFrontLength.MinVal, Config.PanelFrontLength, _Limits.PanelFrontLength.MaxVal);
+_Config.PanelFrontWidth      := LIMIT(_Limits.PanelFrontWidth.MinVal,  Config.PanelFrontWidth,  _Limits.PanelFrontWidth.MaxVal);
+_Config.PanelHeight          := LIMIT(_Limits.PanelHeight.MinVal,      Config.PanelHeight,      _Limits.PanelHeight.MaxVal);
+_Config.RailHeightCorrection := LIMIT(_Limits.RailHeightCorrection.MinVal, Config.RailHeightCorrection, _Limits.RailHeightCorrection.MaxVal);]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -147,7 +147,7 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Config.Set">
-      <LineId Id="17" Count="2" />
+      <LineId Id="22" Count="2" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Limits.Get">
