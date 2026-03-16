@@ -239,7 +239,42 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[GantryXYZ_HMI.Config := Config;]]></ST>
+          <ST><![CDATA[// =========================================================================
+// OCHRONA BACKENDU (Docinanie wartości / Clamping)
+// Zabezpiecza przed wpisaniem zera (np. dla prędkości) oraz wartości ujemnych.
+// =========================================================================
+
+// --- 1. OFFSETY (Dopuszczalne wartości ujemne w zależności od bazy, limit np. +/- 500) ---
+GantryXYZ_HMI.Config.CutterXOffsetX   := LIMIT(-200.0, Config.CutterXOffsetX, 200.0);
+GantryXYZ_HMI.Config.CutterXOffsetY   := LIMIT(-200.0, Config.CutterXOffsetY, 200.0);
+GantryXYZ_HMI.Config.CutterYOffsetX   := LIMIT(-200.0, Config.CutterYOffsetX, 200.0);
+GantryXYZ_HMI.Config.CutterYOffsetY   := LIMIT(-200.0, Config.CutterYOffsetY, 200.0);
+GantryXYZ_HMI.Config.GlobalOffset     := LIMIT(-500, Config.GlobalOffset, 500);
+
+// --- 2. PRĘDKOŚCI CIĘCIA (Twarde minimum = 1.0, zapobiega zawieszeniu osi/dzieleniu przez zero) ---
+GantryXYZ_HMI.Config.CuttingSpeedX    := LIMIT(1.0, Config.CuttingSpeedX, 100.0);
+GantryXYZ_HMI.Config.CuttingSpeedY    := LIMIT(1.0, Config.CuttingSpeedY, 100.0);
+
+// --- 3. PRĘDKOŚCI FREZOWANIA ---
+GantryXYZ_HMI.Config.GroovingSpeedX   := LIMIT(1.0, Config.GroovingSpeedX, 100.0);
+GantryXYZ_HMI.Config.GroovingSpeedY   := LIMIT(1.0, Config.GroovingSpeedY, 100.0);
+GantryXYZ_HMI.Config.GroovingSpeedZ   := LIMIT(1.0, Config.GroovingSpeedZ, 100.0); // Zazwyczaj wolniej w osi Z
+
+// --- 4. PRĘDKOŚCI DOJAZDOWE (RAPID) ---
+GantryXYZ_HMI.Config.RapidSpeedX      := LIMIT(1.0, Config.RapidSpeedX, 500.0);
+GantryXYZ_HMI.Config.RapidSpeedY      := LIMIT(1.0, Config.RapidSpeedY, 500.0);
+GantryXYZ_HMI.Config.RapidSpeedZ      := LIMIT(1.0, Config.RapidSpeedZ, 20.0);
+
+// --- 5. CZASY STABILIZACJI I OCZEKIWANIA (Od zera do np. 10 sekund) ---
+GantryXYZ_HMI.Config.CuttingIdleTime  := LIMIT(0.0, Config.CuttingIdleTime, 10.0);
+GantryXYZ_HMI.Config.GroovingIdleTime := LIMIT(0.0, Config.GroovingIdleTime, 10.0);
+
+// --- 6. WYJAZDY POZA MATERIAŁ (Overpass - zapobiega cofaniu osi, gdyby wpisano ujemne) ---
+GantryXYZ_HMI.Config.CuttingOverpass  := LIMIT(0.0, Config.CuttingOverpass, 50.0);
+GantryXYZ_HMI.Config.GroovingOverpass := LIMIT(0.0, Config.GroovingOverpass, 50.0);
+
+// --- 7. GŁĘBOKOŚĆ FREZOWANIA ---
+GantryXYZ_HMI.Config.GrooveDepthZ     := LIMIT(0.0, Config.GrooveDepthZ, 100.0);]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -802,6 +837,7 @@ SUPER^.Resetting();]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Config.Set">
+      <LineId Id="8" Count="34" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CreateEvents">

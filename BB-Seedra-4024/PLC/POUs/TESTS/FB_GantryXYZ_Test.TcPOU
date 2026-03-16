@@ -1,0 +1,84 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_GantryXYZ_Test" Id="{d7107c61-760f-4794-959d-ee1b05f27712}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_GantryXYZ_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+	Gantry : FB_GantryXYZ;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_Speeds_Never_Zero_Or_Negative();
+]]></ST>
+    </Implementation>
+    <Method Name="Test_Aborting_Stops_Executors_And_Axes" Id="{9a85fd70-020d-4632-a23d-2731b4b5ff8e}">
+      <Declaration><![CDATA[METHOD Test_Aborting_Stops_Executors_And_Axes 
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Resetting_Initializes_Axes" Id="{2a45b629-3f4f-4690-a9bc-e19fe5313d8e}">
+      <Declaration><![CDATA[METHOD Test_Resetting_Initializes_Axes ]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Speeds_Never_Zero_Or_Negative" Id="{f54ec5ac-644d-440e-a228-c238a39dad40}">
+      <Declaration><![CDATA[METHOD Test_Speeds_Never_Zero_Or_Negative
+VAR
+    BadConfig    : ST_GantryXYZ_Config;
+    ActualConfig : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Speeds_Never_Zero_Or_Negative');
+
+// 1. ARRANGE - Złe dane (np. wpisane przez uszkodzone HMI lub błąd ludzki)
+BadConfig.RapidSpeedX := 0.0;        // Zero! Oś nigdy nie dojedzie, zawiesi maszynę stanów
+BadConfig.CuttingSpeedY := -50.0;    // Ujemna prędkość!
+BadConfig.GroovingSpeedZ := -0.01;   // Prędkość zagłębiania bliska 0/ujemna
+BadConfig.CuttingIdleTime := -2.0;   // Ujemny czas postoju? Timer zwariuje
+
+// 2. ACT - Próba wstrzyknięcia do Gantry
+Gantry.Config := BadConfig;
+ActualConfig := Gantry.Config; // Odczytujemy stan po "obronie" przez Set
+
+// 3. ASSERT - Sprawdzamy czy Gantry ustawiło bezpieczne minima
+AssertEquals_REAL(Expected := 1.0, 
+                  Actual := ActualConfig.RapidSpeedX, 
+                  Delta := 0.01, 
+                  Message := 'RapidSpeedX rowne 0 zostalo przepuszczone!');
+
+AssertEquals_REAL(Expected := 1.0, 
+                  Actual := ActualConfig.CuttingSpeedY, 
+                  Delta := 0.01, 
+                  Message := 'Ujemna predkosc ciecia przeszla do systemu!');
+
+AssertEquals_REAL(Expected := 1.0, 
+                  Actual := ActualConfig.GroovingSpeedZ, 
+                  Delta := 0.01, 
+                  Message := 'Ujemna/Zerowa predkosc zaglabiania (Z) przeszla!');
+                  
+AssertEquals_REAL(Expected := 0.0, 
+                  Actual := ActualConfig.CuttingIdleTime, 
+                  Delta := 0.01, 
+                  Message := 'Ujemny czas oczekiwania przeszedl do systemu!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_GantryXYZ_Test">
+      <LineId Id="28" Count="0" />
+      <LineId Id="53" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ_Test.Test_Aborting_Stops_Executors_And_Axes">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ_Test.Test_Resetting_Initializes_Axes">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ_Test.Test_Speeds_Never_Zero_Or_Negative">
+      <LineId Id="59" Count="32" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

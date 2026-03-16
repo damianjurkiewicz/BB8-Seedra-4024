@@ -33,12 +33,55 @@ _SegmentsToCutY   := 2;
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
+    <Property Name="Config" Id="{4201c8cc-29f5-4f95-b0ac-44d99248c761}">
+      <Declaration><![CDATA[PROPERTY Config : ST_RecipeBuilder_Config]]></Declaration>
+      <Set Name="Set" Id="{bb1d1850-b265-4039-a699-4f3bc41b18bb}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Config.PanelFrontLength := LIMIT(_Limits.PanelFrontLength.MinVal, Config.PanelFrontLength, _Limits.PanelFrontLength.MaxVal);
+_Config.PanelFrontWidth  := LIMIT(_Limits.PanelFrontWidth.MinVal,  Config.PanelFrontWidth,  _Limits.PanelFrontWidth.MaxVal);
+_Config.PanelHeight      := LIMIT(_Limits.PanelHeight.MinVal,      Config.PanelHeight,      _Limits.PanelHeight.MaxVal);
+_Config.RailHeightCorrection := LIMIT(_Limits.RailHeightCorrection.MinVal, Config.RailHeightCorrection, _Limits.RailHeightCorrection.MaxVal);]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="FB_init" Id="{fc78a4c1-f2de-4ec3-8288-cc1bf83cb800}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 10.0;
+_Limits.PanelFrontLength.MaxVal := 1111.0;
+
+_Limits.PanelFrontWidth.MinVal  := 10.0;
+_Limits.PanelFrontWidth.MaxVal  := 1111.0;
+
+_Limits.PanelHeight.MinVal      := 10.0;
+_Limits.PanelHeight.MaxVal      := 1111.0;
+
+_Limits.RailHeightCorrection.MinVal := 10.0;
+_Limits.RailHeightCorrection.MaxVal := 1111.0;]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="FB_RecipeBuilderArona">
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderArona.Build">
       <LineId Id="581" Count="15" />
       <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderArona.Config.Set">
+      <LineId Id="5" Count="2" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderArona.FB_init">
+      <LineId Id="9" Count="9" />
+      <LineId Id="7" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

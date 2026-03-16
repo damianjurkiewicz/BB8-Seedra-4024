@@ -78,40 +78,55 @@ SUPER^.CreateEvents();]]></ST>
     </Method>
     <Method Name="CyclicLogic" Id="{340a2930-ae35-0e59-083f-71f30be69564}">
       <Declaration><![CDATA[METHOD CyclicLogic
-VAR_INPUT
+VAR
+    CurrentBuilder : I_RecipeBuilder;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
+// =========================================================
+// 1. INICJALIZACJA
+// =========================================================
 IF NOT _InitComplete THEN
     _InitComplete := Initialize();
     RETURN;
 END_IF
 
+// =========================================================
+// 2. LOGIKA BAZOWA (Maszyna Stanów, Submoduły)
+// =========================================================
 SUPER^.CyclicLogic();
 
+// =========================================================
+// 3. OOP ACTIVE CLAMPING & LIMITS (Single Source of Truth)
+// =========================================================
+// Wyciągamy interfejs programu, który aktualnie jest wybrany na HMI
+CurrentBuilder := RecipeFactory.GetBuilder(GantryXYZ.ProgramIdRequested);
 
-
-// 1. Zapis konfiguracji Gantry do persistentów (bez zmian)
-ConfigManager.GantryConfig := GantryXYZ.Config;
-
-// 2. Zapis aktualnych wymiarów z uniwersalnego HMI do persistentów
-ConfigManager.Config := RecipeConfig_HMI.Config;
-
-// 3. Rozesłanie aktualnej konfiguracji z HMI do wszystkich builderów w Fabryce
-RecipeFactory.UpdateConfig(RecipeConfig_HMI.Config);
-  
-IF (GVL_Safety.eStopHMI OR NOT GVL_Safety.eStopButton) AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
-	THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
-	RaiseAlarmWithStrings(MachineAlarms[E_Seedra.EmergencyStop],'','');
-//	ELSIF NOT SafetyGlobalVariableList.eStop THEN
-//	MachineAlarms[E_Seedra.EmergencyStop].Clear(0, 0);
-
+IF CurrentBuilder <> 0 THEN
+    // A) Wrzucamy dane z ekranu HMI do Buildera (wyzwala to Config.Set i docinanie LIMIT)
+    CurrentBuilder.Config := RecipeConfig_HMI.Config;
+    
+    // B) Odczytujemy bezpieczną (dociętą) konfigurację z powrotem i przypisujemy do HMI.
+    RecipeConfig_HMI.Config := CurrentBuilder.Config;
+    
+    // C) Odczytujemy aktualne MIN/MAX z Buildera, aby Numpad w HMI wiedział na co pozwalać
+    RecipeConfig_HMI.Limits := CurrentBuilder.Limits;
 END_IF
 
+// =========================================================
+// 4. ZAPIS DO PERSISTENTÓW I FABRYKI 
+// =========================================================
+ConfigManager.GantryConfig := GantryXYZ.Config;
+ConfigManager.Config := RecipeConfig_HMI.Config;
+RecipeFactory.UpdateConfig(RecipeConfig_HMI.Config);
 
-
-
-]]></ST>
+// =========================================================
+// 5. OBSŁUGA BEZPIECZEŃSTWA (SAFETY)
+// =========================================================
+IF (GVL_Safety.eStopHMI OR NOT GVL_Safety.eStopButton) AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
+    THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
+    RaiseAlarmWithStrings(MachineAlarms[E_Seedra.EmergencyStop],'','');
+END_IF]]></ST>
       </Implementation>
     </Method>
     <Method Name="Execute" Id="{729254ca-03f3-4bb9-98a5-84b797a61e6c}" FolderPath="States\">
@@ -475,23 +490,7 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.CyclicLogic">
-      <LineId Id="18" Count="0" />
-      <LineId Id="3" Count="4" />
-      <LineId Id="61" Count="2" />
-      <LineId Id="74" Count="3" />
-      <LineId Id="85" Count="3" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="40" Count="0" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="24" Count="0" />
-      <LineId Id="22" Count="1" />
-      <LineId Id="29" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="44" Count="0" />
-      <LineId Id="43" Count="0" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="14" Count="0" />
+      <LineId Id="155" Count="43" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Execute">

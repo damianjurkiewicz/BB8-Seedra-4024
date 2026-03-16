@@ -12,7 +12,8 @@ END_VAR]]></Declaration>
       <ST><![CDATA[Test_Arona_Calculates_Segments();
 Test_BorgoFlaps_Calculates_Segments();
 Test_BorgoWings_Calculates_Segments();
-Test_BorgoWings_Calculates_Coordinates();]]></ST>
+Test_BorgoWings_Calculates_Coordinates();
+Test_BoundaryValues_Are_Clamped();]]></ST>
     </Implementation>
     <Method Name="Test_Arona_Calculates_Segments" Id="{7a994464-7f61-40a8-a740-1b9398842f86}">
       <Declaration><![CDATA[METHOD Test_Arona_Calculates_Segments
@@ -206,10 +207,48 @@ AssertEquals_INT(Expected := 4,
 TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Test_BoundaryValues_Are_Clamped" Id="{42790018-0df2-45af-a897-5bb318a46d46}">
+      <Declaration><![CDATA[METHOD Test_BoundaryValues_Are_Clamped
+VAR
+    TestConfig : ST_RecipeBuilder_Config;
+    ActualConfig : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BoundaryValues_Are_Clamped');
+
+// 1. ARRANGE - Ekstremalnie złe wartości z "HMI"
+TestConfig.PanelFrontLength := -500.0;     // Ujemna długość!
+TestConfig.PanelFrontWidth  := 999999.0;   // Kosmiczna szerokość!
+TestConfig.PanelHeight      := 0.0;        // Zerowa wysokość (grozi dzieleniem przez 0!)
+
+// 2. ACT - Próba wstrzyknięcia złych danych do Buildera
+BuilderBorgoWings.Config := TestConfig; 
+ActualConfig := BuilderBorgoWings.Config; // Odczytujemy to, co Builder fizycznie zapisał
+
+// 3. ASSERT - Sprawdzamy czy Builder użył funkcji LIMIT
+AssertEquals_REAL(Expected := 100.0, // Założone minimum dla długości
+                  Actual := ActualConfig.PanelFrontLength, 
+                  Delta := 0.01, 
+                  Message := 'Ujemna dlugosc nie zostala przycieta do minimum!');
+
+AssertEquals_REAL(Expected := 1160.0, // Założone maximum dla szerokości z Twojego HMI
+                  Actual := ActualConfig.PanelFrontWidth, 
+                  Delta := 0.01, 
+                  Message := 'Kosmiczna szerokosc nie zostala przycieta do maximum!');
+
+AssertEquals_REAL(Expected := 40.0, // Założone minimum dla wysokości z Twojego HMI
+                  Actual := ActualConfig.PanelHeight, 
+                  Delta := 0.01, 
+                  Message := 'Zerowa wysokosc nie zostala bezpiecznie ograniczona!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="FB_RecipeBuilder_Test">
       <LineId Id="9" Count="0" />
       <LineId Id="25" Count="1" />
       <LineId Id="39" Count="0" />
+      <LineId Id="46" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_Arona_Calculates_Segments">
       <LineId Id="78" Count="28" />
@@ -225,6 +264,10 @@ TEST_FINISHED();]]></ST>
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Segments">
       <LineId Id="78" Count="28" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BoundaryValues_Are_Clamped">
+      <LineId Id="10" Count="26" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

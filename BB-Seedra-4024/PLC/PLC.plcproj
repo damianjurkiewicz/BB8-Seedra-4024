@@ -19,6 +19,12 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DUTs\ST_Recipe_Limits.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\ST_LimitInfo.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\E_CutDirection.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -154,6 +160,9 @@
     <Compile Include="POUs\TESTS\FB_Cylinder_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\TESTS\FB_GantryXYZ_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\TESTS\FB_ExecutorCut_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -180,7 +189,7 @@
     </Compile>
     <Compile Include="Visualization Manager.TcVMO">
       <SubType>Code</SubType>
-      <ExcludeFromBuild>true</ExcludeFromBuild>
+      <ExcludeFromBuild>false</ExcludeFromBuild>
     </Compile>
     <Compile Include="VISUs\Modes\ProductionMode\V_ProductionArona.TcVIS">
       <SubType>Code</SubType>

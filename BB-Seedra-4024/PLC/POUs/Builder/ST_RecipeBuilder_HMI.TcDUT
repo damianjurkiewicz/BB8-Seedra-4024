@@ -4,6 +4,7 @@
     <Declaration><![CDATA[TYPE ST_RecipeBuilder_HMI :
     STRUCT
         Config  : ST_RecipeBuilder_Config;
+		Limits  : ST_Recipe_Limits; 
     END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

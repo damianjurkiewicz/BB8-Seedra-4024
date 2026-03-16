@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <DUT Name="ST_LimitInfo" Id="{47c92a18-e592-4978-87f9-9cc70ff74b35}">
+    <Declaration><![CDATA[TYPE ST_LimitInfo :
+STRUCT
+    MinVal : REAL;
+    MaxVal : REAL;
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

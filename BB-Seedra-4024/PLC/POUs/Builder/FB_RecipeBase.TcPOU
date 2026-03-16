@@ -9,6 +9,8 @@ VAR
     _PanelFrontWidth        : REAL;      
     _PanelHeight            : REAL;    
     _RailHeightCorrection   : REAL;
+	
+	_Limits : ST_Recipe_Limits;
 
     // --- NOWE ZMIENNE DO PRZECHOWYWANIA SEGMENTÓW ---
     _SegmentsCutX           : ARRAY [1..32] OF ST_CutSegment;
@@ -45,10 +47,23 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[_Config := Config;
-]]></ST>
+          <ST><![CDATA[_Config.PanelFrontLength     := LIMIT(100.0, Config.PanelFrontLength, 2000.0);
+_Config.PanelFrontWidth      := LIMIT(100.0, Config.PanelFrontWidth,  1000.0);
+_Config.PanelHeight          := LIMIT(40.0,  Config.PanelHeight,      120.0);
+_Config.RailHeightCorrection := LIMIT(10.0,  Config.RailHeightCorrection, 16.0);]]></ST>
         </Implementation>
       </Set>
+    </Property>
+    <Property Name="Limits" Id="{d6f83e87-8dd7-4840-949b-411b575caaa2}">
+      <Declaration><![CDATA[PROPERTY Limits : ST_Recipe_Limits]]></Declaration>
+      <Get Name="Get" Id="{ec01404a-7a39-4271-9193-9e9005040333}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Limits := _Limits;]]></ST>
+        </Implementation>
+      </Get>
     </Property>
     <Property Name="SegmentsCutX" Id="{3184be54-f03a-4975-8cf1-db07c128d253}">
       <Declaration><![CDATA[PROPERTY SegmentsCutX : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
@@ -132,7 +147,10 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Config.Set">
-      <LineId Id="5" Count="0" />
+      <LineId Id="17" Count="2" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.Limits.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.SegmentsCutX.Get">

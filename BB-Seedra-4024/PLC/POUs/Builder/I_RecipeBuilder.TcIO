@@ -15,6 +15,12 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Property Name="Limits" Id="{cb52d8bb-7c49-4fc2-8442-7c9db617c87d}">
+      <Declaration><![CDATA[PROPERTY Limits : ST_Recipe_Limits]]></Declaration>
+      <Get Name="Get" Id="{b51051d6-7967-4941-b388-23830aee7422}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Property Name="SegmentsCutX" Id="{a7b8c9d0-7777-4888-b999-c0d1e2f3a4b5}">
       <Declaration><![CDATA[PROPERTY SegmentsCutX : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
       <Get Name="Get" Id="{b8c9d0e1-8888-4999-c000-d1e2f3a4b5c6}">
