@@ -14,6 +14,8 @@ VAR
 	ExecutorCutY : FB_ExecutorCut;	
 	
 	ExecutorGrooveXY	: FB_ExecutorGrooveXY;
+	
+	_Limits : ST_GantryXYZ_Limits;
 
 
     // =========================================================
@@ -239,42 +241,32 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[// =========================================================================
-// OCHRONA BACKENDU (Docinanie wartości / Clamping)
-// Zabezpiecza przed wpisaniem zera (np. dla prędkości) oraz wartości ujemnych.
-// =========================================================================
+          <ST><![CDATA[GantryXYZ_HMI.Config.CutterXOffsetX   := LIMIT(_Limits.CutterXOffsetX.MinVal, Config.CutterXOffsetX, _Limits.CutterXOffsetX.MaxVal);
+GantryXYZ_HMI.Config.CutterXOffsetY   := LIMIT(_Limits.CutterXOffsetY.MinVal, Config.CutterXOffsetY, _Limits.CutterXOffsetY.MaxVal);
+GantryXYZ_HMI.Config.CutterYOffsetX   := LIMIT(_Limits.CutterYOffsetX.MinVal, Config.CutterYOffsetX, _Limits.CutterYOffsetX.MaxVal);
+GantryXYZ_HMI.Config.CutterYOffsetY   := LIMIT(_Limits.CutterYOffsetY.MinVal, Config.CutterYOffsetY, _Limits.CutterYOffsetY.MaxVal);
 
-// --- 1. OFFSETY (Dopuszczalne wartości ujemne w zależności od bazy, limit np. +/- 500) ---
-GantryXYZ_HMI.Config.CutterXOffsetX   := LIMIT(-200.0, Config.CutterXOffsetX, 200.0);
-GantryXYZ_HMI.Config.CutterXOffsetY   := LIMIT(-200.0, Config.CutterXOffsetY, 200.0);
-GantryXYZ_HMI.Config.CutterYOffsetX   := LIMIT(-200.0, Config.CutterYOffsetX, 200.0);
-GantryXYZ_HMI.Config.CutterYOffsetY   := LIMIT(-200.0, Config.CutterYOffsetY, 200.0);
-GantryXYZ_HMI.Config.GlobalOffset     := LIMIT(-500, Config.GlobalOffset, 500);
 
-// --- 2. PRĘDKOŚCI CIĘCIA (Twarde minimum = 1.0, zapobiega zawieszeniu osi/dzieleniu przez zero) ---
-GantryXYZ_HMI.Config.CuttingSpeedX    := LIMIT(1.0, Config.CuttingSpeedX, 100.0);
-GantryXYZ_HMI.Config.CuttingSpeedY    := LIMIT(1.0, Config.CuttingSpeedY, 100.0);
+GantryXYZ_HMI.Config.GlobalOffset     := LIMIT(_Limits.GlobalOffset.MinVal, Config.GlobalOffset, _Limits.GlobalOffset.MaxVal);
 
-// --- 3. PRĘDKOŚCI FREZOWANIA ---
-GantryXYZ_HMI.Config.GroovingSpeedX   := LIMIT(1.0, Config.GroovingSpeedX, 100.0);
-GantryXYZ_HMI.Config.GroovingSpeedY   := LIMIT(1.0, Config.GroovingSpeedY, 100.0);
-GantryXYZ_HMI.Config.GroovingSpeedZ   := LIMIT(1.0, Config.GroovingSpeedZ, 100.0); // Zazwyczaj wolniej w osi Z
+GantryXYZ_HMI.Config.CuttingSpeedX    := LIMIT(_Limits.CuttingSpeedX.MinVal, Config.CuttingSpeedX, _Limits.CuttingSpeedX.MaxVal);
+GantryXYZ_HMI.Config.CuttingSpeedY    := LIMIT(_Limits.CuttingSpeedY.MinVal, Config.CuttingSpeedY, _Limits.CuttingSpeedY.MaxVal);
 
-// --- 4. PRĘDKOŚCI DOJAZDOWE (RAPID) ---
-GantryXYZ_HMI.Config.RapidSpeedX      := LIMIT(1.0, Config.RapidSpeedX, 500.0);
-GantryXYZ_HMI.Config.RapidSpeedY      := LIMIT(1.0, Config.RapidSpeedY, 500.0);
-GantryXYZ_HMI.Config.RapidSpeedZ      := LIMIT(1.0, Config.RapidSpeedZ, 20.0);
+GantryXYZ_HMI.Config.GroovingSpeedX   := LIMIT(_Limits.GroovingSpeedX.MinVal, Config.GroovingSpeedX, _Limits.GroovingSpeedX.MaxVal);
+GantryXYZ_HMI.Config.GroovingSpeedY   := LIMIT(_Limits.GroovingSpeedY.MinVal, Config.GroovingSpeedY, _Limits.GroovingSpeedY.MaxVal);
+GantryXYZ_HMI.Config.GroovingSpeedZ   := LIMIT(_Limits.GroovingSpeedZ.MinVal, Config.GroovingSpeedZ, _Limits.GroovingSpeedZ.MaxVal);
 
-// --- 5. CZASY STABILIZACJI I OCZEKIWANIA (Od zera do np. 10 sekund) ---
-GantryXYZ_HMI.Config.CuttingIdleTime  := LIMIT(0.0, Config.CuttingIdleTime, 10.0);
-GantryXYZ_HMI.Config.GroovingIdleTime := LIMIT(0.0, Config.GroovingIdleTime, 10.0);
+GantryXYZ_HMI.Config.RapidSpeedX      := LIMIT(_Limits.RapidSpeedX.MinVal, Config.RapidSpeedX, _Limits.RapidSpeedX.MaxVal);
+GantryXYZ_HMI.Config.RapidSpeedY      := LIMIT(_Limits.RapidSpeedY.MinVal, Config.RapidSpeedY, _Limits.RapidSpeedY.MaxVal);
+GantryXYZ_HMI.Config.RapidSpeedZ      := LIMIT(_Limits.RapidSpeedZ.MinVal, Config.RapidSpeedZ, _Limits.RapidSpeedZ.MaxVal);
 
-// --- 6. WYJAZDY POZA MATERIAŁ (Overpass - zapobiega cofaniu osi, gdyby wpisano ujemne) ---
-GantryXYZ_HMI.Config.CuttingOverpass  := LIMIT(0.0, Config.CuttingOverpass, 50.0);
-GantryXYZ_HMI.Config.GroovingOverpass := LIMIT(0.0, Config.GroovingOverpass, 50.0);
+GantryXYZ_HMI.Config.CuttingIdleTime  := LIMIT(_Limits.CuttingIdleTime.MinVal, Config.CuttingIdleTime, _Limits.CuttingIdleTime.MaxVal);
+GantryXYZ_HMI.Config.GroovingIdleTime := LIMIT(_Limits.GroovingIdleTime.MinVal, Config.GroovingIdleTime, _Limits.GroovingIdleTime.MaxVal);
 
-// --- 7. GŁĘBOKOŚĆ FREZOWANIA ---
-GantryXYZ_HMI.Config.GrooveDepthZ     := LIMIT(0.0, Config.GrooveDepthZ, 100.0);]]></ST>
+GantryXYZ_HMI.Config.CuttingOverpass  := LIMIT(_Limits.CuttingOverpass.MinVal, Config.CuttingOverpass, _Limits.CuttingOverpass.MaxVal);
+GantryXYZ_HMI.Config.GroovingOverpass := LIMIT(_Limits.GroovingOverpass.MinVal, Config.GroovingOverpass, _Limits.GroovingOverpass.MaxVal);
+
+GantryXYZ_HMI.Config.GrooveDepthZ     := LIMIT(_Limits.GrooveDepthZ.MinVal, Config.GrooveDepthZ, _Limits.GrooveDepthZ.MaxVal);]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -404,6 +396,40 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Method Name="FB_init" Id="{8fe58202-5a1a-4ae0-a78e-7b540fc3cb9d}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[		_Limits.CutterXOffsetX.MinVal := -200.0;   _Limits.CutterXOffsetX.MaxVal := 200.0;
+		_Limits.CutterXOffsetY.MinVal := -200.0;   _Limits.CutterXOffsetY.MaxVal := 200.0;
+		_Limits.CutterYOffsetX.MinVal := -200.0;   _Limits.CutterYOffsetX.MaxVal := 200.0;
+		_Limits.CutterYOffsetY.MinVal := -200.0;   _Limits.CutterYOffsetY.MaxVal := 200.0;
+		_Limits.GlobalOffset.MinVal   := -500.0;   _Limits.GlobalOffset.MaxVal   := 500.0;
+		
+		_Limits.CuttingSpeedX.MinVal  := 1.0;      _Limits.CuttingSpeedX.MaxVal  := 100.0;
+		_Limits.CuttingSpeedY.MinVal  := 1.0;      _Limits.CuttingSpeedY.MaxVal  := 100.0;
+		
+		_Limits.GroovingSpeedX.MinVal := 1.0;      _Limits.GroovingSpeedX.MaxVal := 100.0;
+		_Limits.GroovingSpeedY.MinVal := 1.0;      _Limits.GroovingSpeedY.MaxVal := 100.0;
+		_Limits.GroovingSpeedZ.MinVal := 1.0;      _Limits.GroovingSpeedZ.MaxVal := 100.0;
+		
+		_Limits.RapidSpeedX.MinVal    := 1.0;      _Limits.RapidSpeedX.MaxVal    := 500.0;
+		_Limits.RapidSpeedY.MinVal    := 1.0;      _Limits.RapidSpeedY.MaxVal    := 500.0;
+		_Limits.RapidSpeedZ.MinVal    := 1.0;      _Limits.RapidSpeedZ.MaxVal    := 20.0;
+		
+		_Limits.CuttingIdleTime.MinVal  := 0.0;    _Limits.CuttingIdleTime.MaxVal  := 10.0;
+		_Limits.GroovingIdleTime.MinVal := 0.0;    _Limits.GroovingIdleTime.MaxVal := 10.0;
+		
+		_Limits.CuttingOverpass.MinVal  := 0.0;    _Limits.CuttingOverpass.MaxVal  := 50.0;
+		_Limits.GroovingOverpass.MinVal := 0.0;    _Limits.GroovingOverpass.MaxVal := 50.0;
+		
+		_Limits.GrooveDepthZ.MinVal     := 0.0;    _Limits.GrooveDepthZ.MaxVal     := 100.0;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="HMICommunication" Id="{0dce72f4-da14-4dd2-b6a3-5db9db3404e0}">
       <Declaration><![CDATA[// Provides interlocks for HMI control and updates HMI status information for this module
 //Only in this place HMI input can overwrite internal data 
@@ -414,8 +440,8 @@ METHOD PROTECTED HMICommunication
 
 _ProgramIdRequested   := GantryXYZ_HMI.Command.ProgramIdRequested;
 
-
-
+GantryXYZ_HMI.Limits := _Limits;
+THIS^.Config := GantryXYZ_HMI.Config;
 ]]></ST>
       </Implementation>
     </Method>
@@ -474,6 +500,10 @@ CASE DescendantSequenceState OF
 		RegisterComponent(CylinderCuttingX);
         _LogModeChanges         := FALSE;
         _LogStateChanges        := FALSE;
+		
+
+
+		
         DescendantSequenceState := DescendantSequenceState + 10;
     10:
 
@@ -837,7 +867,7 @@ SUPER^.Resetting();]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Config.Set">
-      <LineId Id="8" Count="34" />
+      <LineId Id="45" Count="24" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CreateEvents">
@@ -876,6 +906,10 @@ SUPER^.Resetting();]]></ST>
       <LineId Id="177" Count="10" />
       <LineId Id="23" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.FB_init">
+      <LineId Id="8" Count="22" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.HMICommunication">
       <LineId Id="6" Count="0" />
       <LineId Id="105" Count="0" />
@@ -894,7 +928,12 @@ SUPER^.Resetting();]]></ST>
       <LineId Id="68" Count="0" />
       <LineId Id="8" Count="0" />
       <LineId Id="90" Count="0" />
-      <LineId Id="10" Count="3" />
+      <LineId Id="10" Count="1" />
+      <LineId Id="272" Count="0" />
+      <LineId Id="275" Count="0" />
+      <LineId Id="274" Count="0" />
+      <LineId Id="273" Count="0" />
+      <LineId Id="12" Count="1" />
       <LineId Id="80" Count="0" />
       <LineId Id="100" Count="0" />
       <LineId Id="106" Count="7" />
