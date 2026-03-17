@@ -81,9 +81,9 @@ CASE nStep OF
                 RETURN;
             END_IF;
 
-            _AxisX.Acceleration := 500; _AxisX.Deceleration := 8000;
-            _AxisY.Acceleration := 500; _AxisY.Deceleration := 8000;
-            _AxisZ.Acceleration := 500; _AxisZ.Deceleration := 8000;
+//            _AxisX.Acceleration := 500; _AxisX.Deceleration := 8000;
+//            _AxisY.Acceleration := 500; _AxisY.Deceleration := 8000;
+//            _AxisZ.Acceleration := 500; _AxisZ.Deceleration := 8000;
             
             _AxisX.Velocity := localConfig.RapidSpeedX;
             _AxisY.Velocity := localConfig.RapidSpeedY;

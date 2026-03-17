@@ -62,9 +62,9 @@ CASE nStep OF
             END_IF;
 
             // Jednorazowe nastawy dynamiki
-            _AxisX.Acceleration := 500;   _AxisX.Deceleration := 8000;
-            _AxisY.Acceleration := 500;   _AxisY.Deceleration := 8000;
-            _AxisZ.Acceleration := 500;   _AxisZ.Deceleration := 8000;
+//            _AxisX.Acceleration := 500;   _AxisX.Deceleration := 8000;
+//            _AxisY.Acceleration := 500;   _AxisY.Deceleration := 8000;
+//            _AxisZ.Acceleration := 500;   _AxisZ.Deceleration := 8000;
             
             _AxisX.Velocity := localConfig.RapidSpeedX;
             _AxisY.Velocity := localConfig.RapidSpeedY;
@@ -76,7 +76,7 @@ CASE nStep OF
             
             IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN
 
-				//set it to 1000 to ignore all steps (default 10)
+				//set it to 1000 to ignore all the steps (default 10)
                 nStep := 10;
 				
 

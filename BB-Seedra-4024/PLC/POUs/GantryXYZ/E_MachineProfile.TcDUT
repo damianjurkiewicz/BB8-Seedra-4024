@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <DUT Name="E_MachineProfile" Id="{40400825-fd66-4322-b0cf-4871cdbc3d9c}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_MachineProfile :
+(
+    eHoming,        // Otwarte limity, spokojna jazda
+    eProduction,    // Zamknięte limity, ostra jazda (Aggressive)
+    eManual         // Ograniczone limity, spokojny Jog
+);
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>
