@@ -51,7 +51,10 @@ _Limits.PanelHeight.MinVal      := 11.0;
 _Limits.PanelHeight.MaxVal      := 1111.0;
 
 _Limits.RailHeightCorrection.MinVal := 11.0;
-_Limits.RailHeightCorrection.MaxVal := 1111.0;]]></ST>
+_Limits.RailHeightCorrection.MaxVal := 1111.0;
+
+_Limits.CuttingOverpass.MinVal := 20;
+_Limits.GroovingOverpass.MaxVal := 20;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps">
@@ -64,6 +67,8 @@ _Limits.RailHeightCorrection.MaxVal := 1111.0;]]></ST>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.FB_init">
       <LineId Id="9" Count="9" />
       <LineId Id="7" Count="0" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="24" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

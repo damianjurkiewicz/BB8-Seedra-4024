@@ -15,16 +15,15 @@ VAR_INST
     TotalX          : REAL;
     ShorterY        : REAL;
     ShorterX        : REAL;
-    
-    // Zmienna lokalna, dopóki nie dodasz jej do ST_RecipeBuilder_Config
-    CuttingOverpass : REAL := 20.0; 
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[TotalY   := _Config.PanelFrontLength + 2 * _Config.PanelHeight;
-TotalX   := _Config.PanelFrontWidth  + 2 * _Config.PanelHeight; // Uwaga na literówkę 'Widht' w strukturze!
+TotalX   := _Config.PanelFrontWidth  + 2 * _Config.PanelHeight; 
 ShorterY := TotalY - _Config.PanelHeight;
 ShorterX := TotalX - _Config.PanelHeight;
+_FootprintX := TotalX;
+_FootprintY := TotalY;
 
 
 // ------------------------------------
@@ -58,34 +57,34 @@ _SegmentsGroove[4].Stop.X  := _Config.PanelHeight;
 _SegmentsToCutX := 6;
 
 // Short Box Segments
-_SegmentsCutX[1].Start.X := TotalX + CuttingOverpass;
+_SegmentsCutX[1].Start.X := TotalX + _Config.CuttingOverpass;
 _SegmentsCutX[1].Stop.X  := ShorterX;
 _SegmentsCutX[1].Start.Y := ShorterY;
 _SegmentsCutX[1].Stop.Y  := ShorterY;
 
 _SegmentsCutX[2].Start.X := _Config.PanelHeight;
-_SegmentsCutX[2].Stop.X  := -CuttingOverpass;
+_SegmentsCutX[2].Stop.X  := -_Config.CuttingOverpass;
 _SegmentsCutX[2].Start.Y := ShorterY;
 _SegmentsCutX[2].Stop.Y  := ShorterY;
 
-_SegmentsCutX[3].Start.X := TotalX + CuttingOverpass;
+_SegmentsCutX[3].Start.X := TotalX + _Config.CuttingOverpass;
 _SegmentsCutX[3].Stop.X  := ShorterX;
 _SegmentsCutX[3].Start.Y := _Config.PanelHeight;
 _SegmentsCutX[3].Stop.Y  := _Config.PanelHeight;
 
 _SegmentsCutX[4].Start.X := _Config.PanelHeight;
-_SegmentsCutX[4].Stop.X  := -CuttingOverpass;
+_SegmentsCutX[4].Stop.X  := -_Config.CuttingOverpass;
 _SegmentsCutX[4].Start.Y := _Config.PanelHeight;
 _SegmentsCutX[4].Stop.Y  := _Config.PanelHeight;
 
 // Panel Dimensions Shorter Flaps
-_SegmentsCutX[5].Start.X := TotalX + CuttingOverpass;
-_SegmentsCutX[5].Stop.X  := -CuttingOverpass;
+_SegmentsCutX[5].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[5].Stop.X  := -_Config.CuttingOverpass;
 _SegmentsCutX[5].Start.Y := TotalY - _Config.RailHeightCorrection;
 _SegmentsCutX[5].Stop.Y  := TotalY - _Config.RailHeightCorrection;
 
-_SegmentsCutX[6].Start.X := TotalX + CuttingOverpass;
-_SegmentsCutX[6].Stop.X  := -CuttingOverpass;
+_SegmentsCutX[6].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[6].Stop.X  := -_Config.CuttingOverpass;
 _SegmentsCutX[6].Start.Y := _Config.RailHeightCorrection;
 _SegmentsCutX[6].Stop.Y  := _Config.RailHeightCorrection;
 
@@ -97,34 +96,34 @@ _SegmentsToCutY := 6;
 // Short Box Segments
 _SegmentsCutY[1].Start.X := ShorterX;
 _SegmentsCutY[1].Stop.X  := ShorterX;
-_SegmentsCutY[1].Start.Y := TotalY + CuttingOverpass;
+_SegmentsCutY[1].Start.Y := TotalY + _Config.CuttingOverpass;
 _SegmentsCutY[1].Stop.Y  := ShorterY;
 
 _SegmentsCutY[2].Start.X := _Config.PanelHeight;
 _SegmentsCutY[2].Stop.X  := _Config.PanelHeight;
-_SegmentsCutY[2].Start.Y := TotalY + CuttingOverpass;
+_SegmentsCutY[2].Start.Y := TotalY + _Config.CuttingOverpass;
 _SegmentsCutY[2].Stop.Y  := ShorterY;
 
 _SegmentsCutY[3].Start.X := ShorterX;
 _SegmentsCutY[3].Stop.X  := ShorterX;
 _SegmentsCutY[3].Start.Y := _Config.PanelHeight;
-_SegmentsCutY[3].Stop.Y  := -CuttingOverpass;
+_SegmentsCutY[3].Stop.Y  := -_Config.CuttingOverpass;
 
 _SegmentsCutY[4].Start.X := _Config.PanelHeight;
 _SegmentsCutY[4].Stop.X  := _Config.PanelHeight;
 _SegmentsCutY[4].Start.Y := _Config.PanelHeight;
-_SegmentsCutY[4].Stop.Y  := -CuttingOverpass;
+_SegmentsCutY[4].Stop.Y  := -_Config.CuttingOverpass;
 
 // Panel Dimensions
 _SegmentsCutY[5].Start.X := TotalX;
 _SegmentsCutY[5].Stop.X  := TotalX;
-_SegmentsCutY[5].Start.Y := TotalY + CuttingOverpass;
-_SegmentsCutY[5].Stop.Y  := -CuttingOverpass;
+_SegmentsCutY[5].Start.Y := TotalY + _Config.CuttingOverpass;
+_SegmentsCutY[5].Stop.Y  := -_Config.CuttingOverpass;
 
 _SegmentsCutY[6].Start.X := 0;
 _SegmentsCutY[6].Stop.X  := 0;
-_SegmentsCutY[6].Start.Y := TotalY + CuttingOverpass;
-_SegmentsCutY[6].Stop.Y  := -CuttingOverpass;
+_SegmentsCutY[6].Start.Y := TotalY + _Config.CuttingOverpass;
+_SegmentsCutY[6].Stop.Y  := -_Config.CuttingOverpass;
 
 
 Build := TRUE;]]></ST>
@@ -148,19 +147,28 @@ _Limits.PanelHeight.MinVal      := 12.0;
 _Limits.PanelHeight.MaxVal      := 1234.0;
 
 _Limits.RailHeightCorrection.MinVal := 12.0;
-_Limits.RailHeightCorrection.MaxVal := 1234.0;]]></ST>
+_Limits.RailHeightCorrection.MaxVal := 1234.0;
+
+_Limits.CuttingOverpass.MinVal := 20;
+_Limits.GroovingOverpass.MaxVal := 20;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeBuilderBorgoWings">
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoWings.Build">
-      <LineId Id="563" Count="105" />
+      <LineId Id="563" Count="4" />
+      <LineId Id="680" Count="0" />
+      <LineId Id="679" Count="0" />
+      <LineId Id="568" Count="100" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoWings.FB_init">
       <LineId Id="9" Count="9" />
       <LineId Id="7" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="24" Count="0" />
+      <LineId Id="26" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

@@ -240,6 +240,9 @@
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
+    <Compile Include="VISU_TASK.TcTTO">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="DUTs" />
@@ -368,11 +371,6 @@
     <None Include="PLC.tmc">
       <SubType>Content</SubType>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <SubObject Include="Visualization Manager.TargetVisualization">
-      <ExcludeFromBuild>true</ExcludeFromBuild>
-    </SubObject>
   </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>

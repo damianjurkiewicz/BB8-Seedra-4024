@@ -51,7 +51,13 @@ _Limits.PanelHeight.MinVal      := 10.0;
 _Limits.PanelHeight.MaxVal      := 1000.0;
 
 _Limits.RailHeightCorrection.MinVal := 10.0;
-_Limits.RailHeightCorrection.MaxVal := 1000.0;]]></ST>
+_Limits.RailHeightCorrection.MaxVal := 1000.0;
+
+_Limits.CuttingOverpass.MinVal := 0;
+_Limits.CuttingOverpass.MaxVal := 50;
+
+_Limits.GroovingOverpass.MinVal := 0;
+_Limits.GroovingOverpass.MaxVal := 50;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeBuilderArona">
@@ -64,6 +70,9 @@ _Limits.RailHeightCorrection.MaxVal := 1000.0;]]></ST>
     <LineIds Name="FB_RecipeBuilderArona.FB_init">
       <LineId Id="9" Count="9" />
       <LineId Id="7" Count="0" />
+      <LineId Id="25" Count="2" />
+      <LineId Id="29" Count="1" />
+      <LineId Id="28" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

@@ -1987,11 +1987,31 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{D1398101-A9C6-7ABA-D3B3-562E8ECC32EE}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{D460B168-B545-2B57-0BEF-A46D07D87E21}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
 						<Name>PlcTask Inputs</Name>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.AxisY.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.AxisZ.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
 						<Var>
 							<Name>GVL_Safety.FBError</Name>
 							<Type>BOOL</Type>
@@ -2024,49 +2044,9 @@ External Setpoint Generation:
 							<Name>IO.ProximitySensorZ</Name>
 							<Type>BOOL</Type>
 						</Var>
-						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.NcToPlc</Name>
-							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.AxisY.BasicAxis._Axis.NcToPlc</Name>
-							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.AxisZ.BasicAxis._Axis.NcToPlc</Name>
-							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.Sensor</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Sensor</Name>
-							<Type>BOOL</Type>
-						</Var>
 					</Vars>
 					<Vars VarGrpType="2" AreaNo="1">
 						<Name>PlcTask Outputs</Name>
-						<Var>
-							<Name>GVL_Safety.RunStop</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.ErrorAck</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.RestartFBs</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.SpindleEnable</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.CoolingEnable</Name>
-							<Type>BOOL</Type>
-						</Var>
 						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
@@ -2087,46 +2067,29 @@ External Setpoint Generation:
 							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Valve</Name>
 							<Type>BOOL</Type>
 						</Var>
+						<Var>
+							<Name>GVL_Safety.RunStop</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.ErrorAck</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.RestartFBs</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.SpindleEnable</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.CoolingEnable</Name>
+							<Type>BOOL</Type>
+						</Var>
 					</Vars>
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>SafetyTask Inputs</Name>
-						<Var>
-							<Name>GVL_Safety.SafetyPermissionI</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI1</Name>
-							<Comment><![CDATA[Terminal EL1008]]></Comment>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI2</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI3</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI4</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI5</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI6</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI7</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI8</Name>
-							<Type>BOOL</Type>
-						</Var>
 						<Var>
 							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_ExtendHappy.Sensor</Name>
 							<Type>BOOL</Type>
@@ -2199,13 +2162,46 @@ External Setpoint Generation:
 							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingY.Sensor</Name>
 							<Type>BOOL</Type>
 						</Var>
+						<Var>
+							<Name>GVL_Safety.SafetyPermissionI</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI1</Name>
+							<Comment><![CDATA[Terminal EL1008]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI2</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI3</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI4</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI5</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI6</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI7</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI8</Name>
+							<Type>BOOL</Type>
+						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
-						<Var>
-							<Name>GVL_Safety.SafetyPermissionQ</Name>
-							<Type>BOOL</Type>
-						</Var>
 						<Var>
 							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_ExtendHappy.Valve</Name>
 							<Type>BOOL</Type>
@@ -2278,6 +2274,10 @@ External Setpoint Generation:
 							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingY.Valve</Name>
 							<Type>BOOL</Type>
 						</Var>
+						<Var>
+							<Name>GVL_Safety.SafetyPermissionQ</Name>
+							<Type>BOOL</Type>
+						</Var>
 					</Vars>
 					<UnrestoredVarLinks ImportTime="2026-01-27T16:22:49">
 						<OwnerA Name="OutputSrc" Prefix="TIPC^PLC^PLC Instance" Type="2">
@@ -2317,10 +2317,20 @@ External Setpoint Generation:
 							<Priority>21</Priority>
 							<CycleTime>10000000</CycleTime>
 						</Context>
+						<Context>
+							<Id>2</Id>
+							<Name>VISU_TASK</Name>
+							<ManualConfig>
+								<OTCID>#x02010070</OTCID>
+							</ManualConfig>
+							<Priority>30</Priority>
+							<CycleTime>200000000</CycleTime>
+						</Context>
 					</Contexts>
 					<TaskPouOids>
 						<TaskPouOid Prio="20" OTCID="#x08502001"/>
 						<TaskPouOid Prio="21" OTCID="#x08502002"/>
+						<TaskPouOid Prio="30" OTCID="#x08502003"/>
 					</TaskPouOids>
 				</Instance>
 			</Project>

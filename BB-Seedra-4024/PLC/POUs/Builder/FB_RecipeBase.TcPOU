@@ -19,6 +19,8 @@ VAR
     _SegmentsToCutX         : INT;
     _SegmentsToCutY         : INT;
     _SegmentsToGroove       : INT;
+	_FootprintX 			: REAL;
+	_FootprintY 			: REAL;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -50,7 +52,47 @@ END_VAR
           <ST><![CDATA[_Config.PanelFrontLength     := LIMIT(_Limits.PanelFrontLength.MinVal, Config.PanelFrontLength, _Limits.PanelFrontLength.MaxVal);
 _Config.PanelFrontWidth      := LIMIT(_Limits.PanelFrontWidth.MinVal,  Config.PanelFrontWidth,  _Limits.PanelFrontWidth.MaxVal);
 _Config.PanelHeight          := LIMIT(_Limits.PanelHeight.MinVal,      Config.PanelHeight,      _Limits.PanelHeight.MaxVal);
-_Config.RailHeightCorrection := LIMIT(_Limits.RailHeightCorrection.MinVal, Config.RailHeightCorrection, _Limits.RailHeightCorrection.MaxVal);]]></ST>
+_Config.RailHeightCorrection := LIMIT(_Limits.RailHeightCorrection.MinVal, Config.RailHeightCorrection, _Limits.RailHeightCorrection.MaxVal);
+_Config.CuttingOverpass  := LIMIT(_Limits.CuttingOverpass.MinVal, Config.CuttingOverpass, _Limits.CuttingOverpass.MaxVal);
+_Config.GroovingOverpass := LIMIT(_Limits.GroovingOverpass.MinVal, Config.GroovingOverpass, _Limits.GroovingOverpass.MaxVal);]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="FootprintX" Id="{31cc2579-4943-4072-adcb-7298a1ade9ce}">
+      <Declaration><![CDATA[PROPERTY FootprintX : REAL]]></Declaration>
+      <Get Name="Get" Id="{e9997c45-4a9f-41c6-91e6-e1fa92e42836}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[FootprintX := _FootprintX;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{4b7b29b6-122d-49af-a98f-be17039311b8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_FootprintX := FootprintX;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="FootprintY" Id="{ff2a3b37-b1bb-44a6-b5de-6e4f50f25550}">
+      <Declaration><![CDATA[PROPERTY FootprintY : REAL]]></Declaration>
+      <Get Name="Get" Id="{7db99de3-36d4-4fef-ac1d-4a0b509bbfca}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[FootprintY := _FootprintY;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{28566d1d-285b-4a14-82b8-bb0c44370488}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_FootprintY := FootprintY;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -148,6 +190,20 @@ END_VAR
     </LineIds>
     <LineIds Name="FB_RecipeBase.Config.Set">
       <LineId Id="22" Count="2" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="27" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.FootprintX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.FootprintX.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.FootprintY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.FootprintY.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Limits.Get">

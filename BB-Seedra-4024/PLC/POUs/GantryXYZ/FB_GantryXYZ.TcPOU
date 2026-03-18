@@ -210,7 +210,7 @@ END_CASE
 SUPER^.Clearing();]]></ST>
       </Implementation>
     </Method>
-    <Property Name="Config" Id="{ca63134f-ae96-41d5-9585-0ef3c006e9b8}">
+    <Property Name="Config" Id="{ca63134f-ae96-41d5-9585-0ef3c006e9b8}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY Config : ST_GantryXYZ_Config]]></Declaration>
       <Get Name="Get" Id="{076a1a2b-8400-4320-936d-862f5092941b}">
         <Declaration><![CDATA[VAR
@@ -230,7 +230,6 @@ GantryXYZ_HMI.Config.CutterXOffsetY   := LIMIT(_Limits.CutterXOffsetY.MinVal, Co
 GantryXYZ_HMI.Config.CutterYOffsetX   := LIMIT(_Limits.CutterYOffsetX.MinVal, Config.CutterYOffsetX, _Limits.CutterYOffsetX.MaxVal);
 GantryXYZ_HMI.Config.CutterYOffsetY   := LIMIT(_Limits.CutterYOffsetY.MinVal, Config.CutterYOffsetY, _Limits.CutterYOffsetY.MaxVal);
 
-
 GantryXYZ_HMI.Config.GlobalOffset     := LIMIT(_Limits.GlobalOffset.MinVal, Config.GlobalOffset, _Limits.GlobalOffset.MaxVal);
 
 GantryXYZ_HMI.Config.CuttingSpeedX    := LIMIT(_Limits.CuttingSpeedX.MinVal, Config.CuttingSpeedX, _Limits.CuttingSpeedX.MaxVal);
@@ -246,9 +245,6 @@ GantryXYZ_HMI.Config.RapidSpeedZ      := LIMIT(_Limits.RapidSpeedZ.MinVal, Confi
 
 GantryXYZ_HMI.Config.CuttingIdleTime  := LIMIT(_Limits.CuttingIdleTime.MinVal, Config.CuttingIdleTime, _Limits.CuttingIdleTime.MaxVal);
 GantryXYZ_HMI.Config.GroovingIdleTime := LIMIT(_Limits.GroovingIdleTime.MinVal, Config.GroovingIdleTime, _Limits.GroovingIdleTime.MaxVal);
-
-GantryXYZ_HMI.Config.CuttingOverpass  := LIMIT(_Limits.CuttingOverpass.MinVal, Config.CuttingOverpass, _Limits.CuttingOverpass.MaxVal);
-GantryXYZ_HMI.Config.GroovingOverpass := LIMIT(_Limits.GroovingOverpass.MinVal, Config.GroovingOverpass, _Limits.GroovingOverpass.MaxVal);
 
 GantryXYZ_HMI.Config.GrooveDepthZ     := LIMIT(_Limits.GrooveDepthZ.MinVal, Config.GrooveDepthZ, _Limits.GrooveDepthZ.MaxVal);]]></ST>
         </Implementation>
@@ -402,9 +398,6 @@ END_VAR
 		
 		_Limits.CuttingIdleTime.MinVal  := 0.0;    _Limits.CuttingIdleTime.MaxVal  := 10.0;
 		_Limits.GroovingIdleTime.MinVal := 0.0;    _Limits.GroovingIdleTime.MaxVal := 10.0;
-		
-		_Limits.CuttingOverpass.MinVal  := 0.0;    _Limits.CuttingOverpass.MaxVal  := 50.0;
-		_Limits.GroovingOverpass.MinVal := 0.0;    _Limits.GroovingOverpass.MaxVal := 50.0;
 		
 		_Limits.GrooveDepthZ.MinVal     := 0.0;    _Limits.GrooveDepthZ.MaxVal     := 100.0;
 		
@@ -652,7 +645,7 @@ END_CASE]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="RecipeBuilder" Id="{7e3c2008-dd15-410b-92f3-2adf472e0386}">
+    <Property Name="RecipeBuilder" Id="{7e3c2008-dd15-410b-92f3-2adf472e0386}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY RecipeBuilder : I_RecipeBuilder]]></Declaration>
       <Get Name="Get" Id="{646b66c6-cab8-496a-a121-e2412f446155}">
         <Declaration><![CDATA[VAR
@@ -675,7 +668,7 @@ ExecutorGrooveXY.RecipeBuilder := _RecipeBuilder;]]></ST>
         </Implementation>
       </Set>
     </Property>
-    <Property Name="RefAxisX" Id="{967ef8ae-5559-4f2d-852f-051df897bca4}">
+    <Property Name="RefAxisX" Id="{967ef8ae-5559-4f2d-852f-051df897bca4}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY RefAxisX : I_BasicAxis]]></Declaration>
       <Get Name="Get" Id="{466186e1-ca25-455d-b3ae-fb439bbd9016}">
         <Declaration><![CDATA[VAR
@@ -915,7 +908,9 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Config.Set">
-      <LineId Id="45" Count="24" />
+      <LineId Id="45" Count="3" />
+      <LineId Id="50" Count="15" />
+      <LineId Id="69" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CreateEvents">
@@ -959,7 +954,7 @@ END_CASE]]></ST>
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.FB_init">
-      <LineId Id="8" Count="22" />
+      <LineId Id="8" Count="19" />
       <LineId Id="7" Count="0" />
       <LineId Id="31" Count="1" />
       <LineId Id="58" Count="74" />

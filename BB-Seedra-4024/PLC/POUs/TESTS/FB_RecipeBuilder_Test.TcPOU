@@ -12,6 +12,7 @@ END_VAR]]></Declaration>
       <ST><![CDATA[Test_Arona_Calculates_Segments();
 Test_BorgoFlaps_Calculates_Segments();
 Test_BorgoWings_Calculates_Segments();
+Test_BorgoWings_Calculates_Footprint();
 Test_BorgoWings_Calculates_Coordinates();
 Test_BoundaryValues_Are_Clamped();]]></ST>
     </Implementation>
@@ -169,6 +170,39 @@ AssertEquals_REAL(Expected := 0.0,
 TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Test_BorgoWings_Calculates_Footprint" Id="{ed00ac38-c444-4894-ad76-3a4bb1d8321f}">
+      <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_Footprint
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BorgoWings_Calculates_Footprint');
+
+// 1. Arrange - Wymiary z Twojego HMI
+Config.PanelFrontWidth  := 400.0;
+Config.PanelFrontLength := 400.0;
+Config.PanelHeight      := 100.0;
+BuilderBorgoWings.Config := Config;
+
+// 2. Act
+WasBuilt := BuilderBorgoWings.Build();
+
+// 3. Assert - Całkowity wymiar cięcia na płycie
+// TotalX = PanelFrontWidth (400) + 2 * PanelHeight (200) = 600.0
+AssertEquals_REAL(Expected := 600.0, 
+                  Actual := BuilderBorgoWings.FootprintX, 
+                  Delta := 0.01, 
+                  Message := 'Zle wyliczony gabaryt X (FootprintX) dla BorgoWings!');
+
+// TotalY = PanelFrontLength (400) + 2 * PanelHeight (200) = 600.0
+AssertEquals_REAL(Expected := 600.0, 
+                  Actual := BuilderBorgoWings.FootprintY, 
+                  Delta := 0.01, 
+                  Message := 'Zle wyliczony gabaryt Y (FootprintY) dla BorgoWings!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Test_BorgoWings_Calculates_Segments" Id="{4f99f096-b258-4dd7-ae67-c8bae6dcb49d}">
       <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_Segments
 VAR
@@ -247,6 +281,7 @@ TEST_FINISHED();]]></ST>
     <LineIds Name="FB_RecipeBuilder_Test">
       <LineId Id="9" Count="0" />
       <LineId Id="25" Count="1" />
+      <LineId Id="53" Count="0" />
       <LineId Id="39" Count="0" />
       <LineId Id="46" Count="0" />
     </LineIds>
@@ -260,6 +295,10 @@ TEST_FINISHED();]]></ST>
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Coordinates">
       <LineId Id="173" Count="68" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Footprint">
+      <LineId Id="9" Count="23" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Segments">

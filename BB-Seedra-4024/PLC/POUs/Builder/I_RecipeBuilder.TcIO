@@ -15,6 +15,24 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Property Name="FootprintX" Id="{b2c0660e-2273-4d0b-a3ff-b3d685a837ce}">
+      <Declaration><![CDATA[PROPERTY FootprintX : REAL]]></Declaration>
+      <Get Name="Get" Id="{1c249b0f-2c24-4249-828f-a42f5a98a347}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{69901a39-3c4a-43c9-9774-7abb6f456824}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="FootprintY" Id="{2613b715-d424-4985-974e-570c5f3a3a3a}">
+      <Declaration><![CDATA[PROPERTY FootprintY : REAL]]></Declaration>
+      <Get Name="Get" Id="{0c30c23d-b3d9-441f-89eb-313480456f50}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{0a3a18d1-13c3-4727-bb69-a7fa42e8a244}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="Limits" Id="{cb52d8bb-7c49-4fc2-8442-7c9db617c87d}">
       <Declaration><![CDATA[PROPERTY Limits : ST_Recipe_Limits]]></Declaration>
       <Get Name="Get" Id="{b51051d6-7967-4941-b388-23830aee7422}">
