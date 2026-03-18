@@ -675,6 +675,17 @@ ExecutorGrooveXY.RecipeBuilder := _RecipeBuilder;]]></ST>
         </Implementation>
       </Set>
     </Property>
+    <Property Name="RefAxisX" Id="{967ef8ae-5559-4f2d-852f-051df897bca4}">
+      <Declaration><![CDATA[PROPERTY RefAxisX : I_BasicAxis]]></Declaration>
+      <Get Name="Get" Id="{466186e1-ca25-455d-b3ae-fb439bbd9016}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RefAxisX := AxisX;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="Resetting" Id="{e7a01217-de28-430f-aeef-f83d9f1b6f0d}" FolderPath="States\">
       <Declaration><![CDATA[METHOD PROTECTED Resetting
 VAR
@@ -1019,6 +1030,9 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
       <LineId Id="6" Count="2" />
       <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.RefAxisX.Get">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
       <LineId Id="597" Count="7" />

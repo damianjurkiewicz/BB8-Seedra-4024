@@ -17,6 +17,44 @@ END_VAR]]></Declaration>
         <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Test_ApplyProfile_Applies_Correct_Dynamics" Id="{8083ce83-c327-409b-a072-d96a42a0e0a1}">
+      <Declaration><![CDATA[METHOD Test_ApplyProfile_Applies_Correct_Dynamics
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_ApplyProfile_Applies_Correct_Dynamics');
+
+// 1. ACT - Aplikujemy profil Homing (powolny, otwarte limity)
+Gantry.ApplyProfile(E_MachineProfile.eHoming);
+
+// 2. ASSERT - Akceleracja osi X powinna wynosić 200.0
+AssertEquals_LREAL(Expected := 200.0, 
+                   Actual := Gantry.RefAxisX.Acceleration, 
+                   Delta := 0.01, 
+                   Message := 'ApplyProfile: Blad akceleracji X dla profilu Homing');
+
+// 3. ACT - Aplikujemy profil Production (agresywny)
+Gantry.ApplyProfile(E_MachineProfile.eProduction);
+
+// 4. ASSERT - Akceleracja osi X powinna wynosić 1500.0
+AssertEquals_LREAL(Expected := 1500.0, 
+                   Actual := Gantry.RefAxisX.Acceleration, 
+                   Delta := 0.01, 
+                   Message := 'ApplyProfile: Blad akceleracji X dla profilu Production');
+
+// 5. ACT - Aplikujemy profil Manual (pośredni)
+Gantry.ApplyProfile(E_MachineProfile.eManual);
+
+// 6. ASSERT - Akceleracja osi X powinna wynosić 500.0
+AssertEquals_LREAL(Expected := 500.0, 
+                   Actual := Gantry.RefAxisX.Acceleration, 
+                   Delta := 0.01, 
+                   Message := 'ApplyProfile: Blad akceleracji X dla profilu Manual');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Test_Resetting_Initializes_Axes" Id="{2a45b629-3f4f-4690-a9bc-e19fe5313d8e}">
       <Declaration><![CDATA[METHOD Test_Resetting_Initializes_Axes ]]></Declaration>
       <Implementation>
@@ -66,6 +104,89 @@ AssertEquals_REAL(Expected := 0.0,
 TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Test_StateChanged_Updates_Profile" Id="{abb7b416-1445-41ed-9997-c2f59a2f7f59}">
+      <Declaration><![CDATA[METHOD Test_StateChanged_Updates_Profile
+VAR_INST
+    Step : INT := 0;
+    Watchdog : TON; // Zabezpieczenie przed zawieszeniem IDE
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_StateChanged_Updates_Profile');
+
+// Krytyczne: Wywołujemy logikę Gantry raz na cykl PLC, BEZ ŻADNYCH PĘTLI WHILE/FOR!
+Gantry.CyclicLogic();
+
+// Zabezpieczenie testu: jeżeli maszyna PackML utknie i nie zmieni stanu,
+// po 2 sekundach przerywamy test, by chronić IDE przed zawieszeniem.
+Watchdog(IN := (Step > 0 AND Step < 100), PT := T#2S);
+IF Watchdog.Q THEN
+    AssertTrue(Condition := FALSE, Message := 'Timeout testu - PackML utknelo w jednym ze stanow! Prawdopodobnie odrzucono komende.');
+    TEST_FINISHED();
+    Step := 100; // Blokada przed dalszym wykonywaniem
+END_IF
+
+CASE Step OF
+    0:
+        // 1. Zmieniamy tryb na Manualny (od razu na starcie)
+        Gantry.ChangeMode(E_PMLUnitMode.ePMLUnitMode_Manual);
+        Step := 5;
+
+    5:
+        // Czekamy aż PackML fizycznie "zrozumie" zmianę trybu
+        IF Gantry.CurrentMode = E_PMLUnitMode.ePMLUnitMode_Manual THEN
+            // Zrzucamy maszynę do bezpiecznego stanu Aborted
+            Gantry.ChangeState(E_PMLCommand.ePMLCommand_Abort);
+            Step := 10;
+        END_IF
+
+    10:
+        // Czekamy na wejście w Aborted
+        IF Gantry.CurrentState = E_PMLState.ePMLState_Aborted THEN
+            
+            // W trybie Manual zawsze profil ma być ustawiony na Acc=500.0
+            AssertEquals_LREAL(Expected := 500.0, 
+                               Actual := Gantry.RefAxisX.Acceleration, 
+                               Delta := 0.01, 
+                               Message := 'Tryb Manualny nie zaladowal prawidlowego profilu!');
+
+            // Zmieniamy tryb z powrotem na produkcyjny
+            Gantry.ChangeMode(E_PMLUnitMode.ePMLUnitMode_Production);
+            Step := 15;
+        END_IF
+
+    15:
+        // Czekamy aż PackML potwierdzi tryb produkcyjny
+        IF Gantry.CurrentMode = E_PMLUnitMode.ePMLUnitMode_Production THEN
+            // Ze stanu Aborted przechodzimy komendą Clear
+            Gantry.ChangeState(E_PMLCommand.ePMLCommand_Clear);
+            Step := 20;
+        END_IF
+        
+    20:
+        // Maszyna po "Clearing" wejdzie w stan "Stopped"
+        IF Gantry.CurrentState = E_PMLState.ePMLState_Stopped THEN
+            
+            // DOPIERO stąd można bezpiecznie wezwać komendę Reset!
+            Gantry.ChangeState(E_PMLCommand.ePMLCommand_Reset);
+            Step := 30;
+        END_IF
+
+    30:
+        // Łapiemy moment wejścia w Resetting
+        IF Gantry.CurrentState = E_PMLState.ePMLState_Resetting THEN
+            
+            // To nasz ostateczny sprawdzian: StateChanged() powinno było podmienić profil!
+            AssertEquals_LREAL(Expected := 200.0, 
+                               Actual := Gantry.RefAxisX.Acceleration, 
+                               Delta := 0.01, 
+                               Message := 'Rozpoczecie bazowania (Resetting) nie zmienilo profilu maszyny na Homing!');
+                               
+            TEST_FINISHED(); // Sukces!
+            Step := 100; // Koniec
+        END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="FB_GantryXYZ_Test">
       <LineId Id="28" Count="0" />
       <LineId Id="53" Count="0" />
@@ -73,11 +194,19 @@ TEST_FINISHED();]]></ST>
     <LineIds Name="FB_GantryXYZ_Test.Test_Aborting_Stops_Executors_And_Axes">
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ_Test.Test_ApplyProfile_Applies_Correct_Dynamics">
+      <LineId Id="6" Count="28" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ_Test.Test_Resetting_Initializes_Axes">
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ_Test.Test_Speeds_Never_Zero_Or_Negative">
       <LineId Id="59" Count="32" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ_Test.Test_StateChanged_Updates_Profile">
+      <LineId Id="10" Count="72" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>
