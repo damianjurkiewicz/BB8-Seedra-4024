@@ -11,9 +11,11 @@ END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[Test_Arona_Calculates_Segments();
 Test_BorgoFlaps_Calculates_Segments();
-Test_BorgoWings_Calculates_Segments();
-Test_BorgoWings_Calculates_Footprint();
+Test_BorgoWings_Calculates_ActualCopies();
 Test_BorgoWings_Calculates_Coordinates();
+Test_BorgoWings_Calculates_Footprint();
+Test_BorgoWings_Calculates_MaxCopies();
+Test_BorgoWings_Calculates_Segments();
 Test_BoundaryValues_Are_Clamped();]]></ST>
     </Implementation>
     <Method Name="Test_Arona_Calculates_Segments" Id="{7a994464-7f61-40a8-a740-1b9398842f86}">
@@ -92,6 +94,63 @@ AssertEquals_INT(Expected := 4,
 TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Test_BorgoWings_Calculates_ActualCopies" Id="{8e114aa5-44a1-432a-ba0a-6d383b7a8031}">
+      <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_ActualCopies
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BorgoWings_Calculates_ActualCopies');
+
+// ARRANGE - Ustawiamy gabaryty (Wiemy z poprzedniego testu, że Max to 4 w X i 2 w Y)
+Config.PanelFrontWidth  := 400.0;
+Config.PanelFrontLength := 400.0;
+Config.PanelHeight      := 100.0;
+Config.CuttingOverpass  := 20.0;
+
+// =========================================================================
+// SCENARIUSZ 1: Użytkownik chce wpisać za dużo (np. 10 sztuk), FillAll = FALSE
+// =========================================================================
+Config.FillAll := FALSE;
+Config.RequestedCopiesX := 10; // Kosmos, na płycie wejdą tylko 4
+Config.RequestedCopiesY := 10; // Kosmos, na płycie wejdą tylko 2
+BuilderBorgoWings.Config := Config;
+
+// ACT 1
+WasBuilt := BuilderBorgoWings.Build(); 
+
+// ASSERT 1
+AssertEquals_DINT(Expected := 4, 
+                 Actual := BuilderBorgoWings.ActualCopiesX, 
+                 Message := 'Nie obcieto ActualCopiesX do maksimum przy przekroczeniu!');
+                 
+AssertEquals_DINT(Expected := 2, 
+                 Actual := BuilderBorgoWings.ActualCopiesY, 
+                 Message := 'Nie obcieto ActualCopiesY do maksimum przy przekroczeniu!');
+
+// =========================================================================
+// SCENARIUSZ 2: Wypełnij całość (FillAll = TRUE)
+// =========================================================================
+Config.FillAll := TRUE;
+Config.RequestedCopiesX := 1; // Operator zostawił 1, ale kliknął "Wypełnij"
+Config.RequestedCopiesY := 1;
+BuilderBorgoWings.Config := Config;
+
+// ACT 2
+WasBuilt := BuilderBorgoWings.Build();
+
+// ASSERT 2
+AssertEquals_DINT(Expected := 4, 
+                 Actual := BuilderBorgoWings.ActualCopiesX, 
+                 Message := 'FillAll=TRUE nie ustawilo ActualCopiesX na Max!');
+                 
+AssertEquals_DINT(Expected := 2, 
+                 Actual := BuilderBorgoWings.ActualCopiesY, 
+                 Message := 'FillAll=TRUE nie ustawilo ActualCopiesY na Max!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Test_BorgoWings_Calculates_Coordinates" Id="{f3f6458e-fd2a-4cc3-8897-e56c4b46d59b}">
       <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_Coordinates
 VAR
@@ -107,7 +166,10 @@ Config.PanelFrontLength := 1000.0;
 Config.PanelHeight := 100.0;
 Config.PanelFrontWidth := 500.0;
 Config.RailHeightCorrection := 13.0;
+Config.CuttingOverpass := 20.0;
 BuilderBorgoWings.Config := Config;
+
+
 
 // 2. Act - budujemy
 WasBuilt := BuilderBorgoWings.Build();
@@ -203,6 +265,38 @@ AssertEquals_REAL(Expected := 600.0,
 TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Test_BorgoWings_Calculates_MaxCopies" Id="{7e637d7e-3dcd-44e6-a0cd-b3ae4944a9b4}">
+      <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_MaxCopies
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BorgoWings_Calculates_MaxCopies');
+
+// 1. Arrange
+Config.PanelFrontWidth  := 400.0;
+Config.PanelFrontLength := 400.0;
+Config.PanelHeight      := 100.0;
+Config.CuttingOverpass  := 20.0;
+BuilderBorgoWings.Config := Config;
+
+// 2. Act
+WasBuilt := BuilderBorgoWings.Build();
+
+// 3. Assert
+// Footprint X = 400 + 2*100 = 600. Płyta (zakładamy 2400). 2400 / 600 = 4 sztuki
+AssertEquals_DINT(Expected := 4, 
+                 Actual := BuilderBorgoWings.MaxCopiesX, 
+                 Message := 'Zle wyliczona maksymalna liczba sztuk w osi X!');
+
+// Footprint Y = 400 + 2*100 = 600. Płyta (zakładamy 1200). 1200 / 600 = 2 sztuki
+AssertEquals_DINT(Expected := 2, 
+                 Actual := BuilderBorgoWings.MaxCopiesY, 
+                 Message := 'Zle wyliczona maksymalna liczba sztuk w osi Y!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Test_BorgoWings_Calculates_Segments" Id="{4f99f096-b258-4dd7-ae67-c8bae6dcb49d}">
       <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_Segments
 VAR
@@ -280,8 +374,10 @@ TEST_FINISHED();]]></ST>
     </Method>
     <LineIds Name="FB_RecipeBuilder_Test">
       <LineId Id="9" Count="0" />
-      <LineId Id="25" Count="1" />
-      <LineId Id="53" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="53" Count="1" />
       <LineId Id="39" Count="0" />
       <LineId Id="46" Count="0" />
     </LineIds>
@@ -293,12 +389,25 @@ TEST_FINISHED();]]></ST>
       <LineId Id="78" Count="28" />
       <LineId Id="5" Count="0" />
     </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_ActualCopies">
+      <LineId Id="9" Count="47" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Coordinates">
-      <LineId Id="173" Count="68" />
+      <LineId Id="173" Count="8" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="182" Count="0" />
+      <LineId Id="246" Count="0" />
+      <LineId Id="245" Count="0" />
+      <LineId Id="183" Count="58" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Footprint">
       <LineId Id="9" Count="23" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_MaxCopies">
+      <LineId Id="9" Count="22" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Segments">

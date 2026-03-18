@@ -24,6 +24,17 @@ ShorterY := TotalY - _Config.PanelHeight;
 ShorterX := TotalX - _Config.PanelHeight;
 _FootprintX := TotalX;
 _FootprintY := TotalY;
+_MaxCopiesX := DINT_TO_INT(TRUNC(RAW_BOARD_X / _FootprintX));
+_MaxCopiesY := DINT_TO_INT(TRUNC(RAW_BOARD_Y / _FootprintY));
+
+IF _Config.FillAll THEN
+    _ActualCopiesX := _MaxCopiesX;
+    _ActualCopiesY := _MaxCopiesY;
+ELSE
+    // Jeśli nie "wypełnij", to bierzemy to co chce operator, ale obcinamy od 1 do Max!
+    _ActualCopiesX := LIMIT(1, _Config.RequestedCopiesX, _MaxCopiesX);
+    _ActualCopiesY := LIMIT(1, _Config.RequestedCopiesY, _MaxCopiesY);
+END_IF
 
 
 // ------------------------------------
@@ -149,8 +160,11 @@ _Limits.PanelHeight.MaxVal      := 1234.0;
 _Limits.RailHeightCorrection.MinVal := 12.0;
 _Limits.RailHeightCorrection.MaxVal := 1234.0;
 
-_Limits.CuttingOverpass.MinVal := 20;
-_Limits.GroovingOverpass.MaxVal := 20;]]></ST>
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeBuilderBorgoWings">
@@ -159,15 +173,20 @@ _Limits.GroovingOverpass.MaxVal := 20;]]></ST>
     <LineIds Name="FB_RecipeBuilderBorgoWings.Build">
       <LineId Id="563" Count="4" />
       <LineId Id="680" Count="0" />
-      <LineId Id="679" Count="0" />
-      <LineId Id="568" Count="100" />
+      <LineId Id="694" Count="0" />
+      <LineId Id="682" Count="0" />
+      <LineId Id="686" Count="7" />
+      <LineId Id="685" Count="0" />
+      <LineId Id="683" Count="0" />
+      <LineId Id="681" Count="0" />
+      <LineId Id="569" Count="99" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoWings.FB_init">
       <LineId Id="9" Count="9" />
       <LineId Id="7" Count="0" />
       <LineId Id="25" Count="0" />
-      <LineId Id="24" Count="0" />
+      <LineId Id="27" Count="3" />
       <LineId Id="26" Count="0" />
     </LineIds>
   </POU>

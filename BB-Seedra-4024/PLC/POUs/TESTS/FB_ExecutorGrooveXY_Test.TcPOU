@@ -22,11 +22,11 @@ VAR
     BuilderArona : FB_RecipeBuilderArona;      // Wydmuszka, posiada 0 frezowań
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[Test_Sequence_ExecutesGroovesCorrectly();
+      <ST><![CDATA[Test_AxisError_AbortsSequence();
+Test_Sequence_ExecutesGroovesCorrectly();
 Test_ZeroSegments_FinishesImmediately();
-Test_AxisError_AbortsSequence();]]></ST>
+]]></ST>
     </Implementation>
-    
     <Method Name="Test_AxisError_AbortsSequence" Id="{9df8cf32-1234-4567-89ab-cdef01234567}">
       <Declaration><![CDATA[METHOD Test_AxisError_AbortsSequence
 VAR_INST
@@ -70,7 +70,6 @@ AssertFalse(Condition := Executor_Unhappy.Done,
 TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
-
     <Method Name="Test_Sequence_ExecutesGroovesCorrectly" Id="{adf8cf32-1234-4567-89ab-cdef01234567}">
       <Declaration><![CDATA[METHOD Test_Sequence_ExecutesGroovesCorrectly
 VAR_INST
@@ -135,7 +134,6 @@ CASE Step OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-
     <Method Name="Test_ZeroSegments_FinishesImmediately" Id="{bdf8cf32-1234-4567-89ab-cdef01234567}">
       <Declaration><![CDATA[METHOD Test_ZeroSegments_FinishesImmediately
 VAR_INST
@@ -165,6 +163,22 @@ AssertTrue(Condition := Executor_Zero.Done,
 TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
-
+    <LineIds Name="FB_ExecutorGrooveXY_Test">
+      <LineId Id="24" Count="0" />
+      <LineId Id="3" Count="1" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorGrooveXY_Test.Test_AxisError_AbortsSequence">
+      <LineId Id="3" Count="31" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorGrooveXY_Test.Test_Sequence_ExecutesGroovesCorrectly">
+      <LineId Id="3" Count="52" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorGrooveXY_Test.Test_ZeroSegments_FinishesImmediately">
+      <LineId Id="3" Count="19" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>

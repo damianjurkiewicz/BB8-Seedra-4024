@@ -29,11 +29,13 @@ VAR
 	
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[Test_Sequence_ExecutesCutsCorrectly();
+      <ST><![CDATA[Test_AxisError_AbortsSequence();
+Test_Executes_CutY_Direction();
 Test_Sequence_AbortsOnCylinderError();
+Test_Sequence_ExecutesCutsCorrectly();
 Test_ZeroSegments_FinishesImmediately();
-Test_AxisError_AbortsSequence();
-Test_Executes_CutY_Direction();]]></ST>
+
+]]></ST>
     </Implementation>
     <Method Name="Test_AxisError_AbortsSequence" Id="{68197cf1-00a4-4603-8849-1889629904d7}">
       <Declaration><![CDATA[METHOD Test_AxisError_AbortsSequence
@@ -320,7 +322,9 @@ TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_ExecutorCut_Test">
-      <LineId Id="87" Count="3" />
+      <LineId Id="117" Count="2" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="89" Count="1" />
       <LineId Id="37" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCut_Test.Test_AxisError_AbortsSequence">

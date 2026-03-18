@@ -12,11 +12,13 @@ VAR
     Cylinder_Reset        : FB_Cylinder;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[Test_Extend_TurnsOnValve_And_ReportsExtended();
+      <ST><![CDATA[Test_Error_Resets_When_TargetReached();
 Test_Extend_Timeout_RaisesError(); 
-Test_Retract_TurnsOffValve_And_ReportsRetracted();
+Test_Extend_TurnsOnValve_And_ReportsExtended();
 Test_Retract_Timeout_RaisesError();
-Test_Error_Resets_When_TargetReached();]]></ST>
+Test_Retract_TurnsOffValve_And_ReportsRetracted();
+
+]]></ST>
     </Implementation>
     <Method Name="Test_Error_Resets_When_TargetReached" Id="{ddd37155-1ed2-442e-87a3-d674dcccd51f}">
       <Declaration><![CDATA[METHOD Test_Error_Resets_When_TargetReached
@@ -264,6 +266,7 @@ END_CASE]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_Cylinder_Test">
+      <LineId Id="40" Count="1" />
       <LineId Id="13" Count="1" />
       <LineId Id="29" Count="1" />
       <LineId Id="28" Count="0" />

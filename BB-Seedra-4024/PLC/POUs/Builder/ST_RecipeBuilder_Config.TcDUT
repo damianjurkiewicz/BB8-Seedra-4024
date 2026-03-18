@@ -9,6 +9,9 @@
 	RailHeightCorrection :REAL;
 	CuttingOverpass      : REAL;
     GroovingOverpass     : REAL;
+	FillAll         : BOOL; 
+    RequestedCopiesX: DINT;  
+    RequestedCopiesY: DINT;  
     END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

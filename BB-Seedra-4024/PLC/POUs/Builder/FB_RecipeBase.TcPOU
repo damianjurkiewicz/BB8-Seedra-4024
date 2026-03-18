@@ -21,11 +21,42 @@ VAR
     _SegmentsToGroove       : INT;
 	_FootprintX 			: REAL;
 	_FootprintY 			: REAL;
+	_MaxCopiesX				: DINT;
+	_MaxCopiesY				: DINT;
+	RAW_BOARD_X : REAL := 2400.0; 
+	RAW_BOARD_Y : REAL := 1200.0;
+	_ActualCopiesX			:DINT;
+	_ActualCopiesY			:DINT;
+	
+	
+	
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Property Name="ActualCopiesX" Id="{f6bb53f7-fe6a-4e43-854b-3965a8a4a1af}">
+      <Declaration><![CDATA[PROPERTY ActualCopiesX : DINT]]></Declaration>
+      <Get Name="Get" Id="{acf86470-a159-4078-98de-d4ec1d0fe9ea}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ActualCopiesX := _ActualCopiesX;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ActualCopiesY" Id="{28c47b7e-b948-4a5e-8a09-4953e885c928}">
+      <Declaration><![CDATA[PROPERTY ActualCopiesY : DINT]]></Declaration>
+      <Get Name="Get" Id="{0f5cef6e-b24f-4a80-ae1b-1e315e1a7393}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ActualCopiesY := _ActualCopiesY;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="Build" Id="{47409b61-265d-42e6-ab22-9bedebae5b88}">
       <Declaration><![CDATA[METHOD Build : BOOL
 
@@ -49,12 +80,14 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[_Config.PanelFrontLength     := LIMIT(_Limits.PanelFrontLength.MinVal, Config.PanelFrontLength, _Limits.PanelFrontLength.MaxVal);
+          <ST><![CDATA[_Config := Config;
+
+_Config.PanelFrontLength     := LIMIT(_Limits.PanelFrontLength.MinVal, Config.PanelFrontLength, _Limits.PanelFrontLength.MaxVal);
 _Config.PanelFrontWidth      := LIMIT(_Limits.PanelFrontWidth.MinVal,  Config.PanelFrontWidth,  _Limits.PanelFrontWidth.MaxVal);
 _Config.PanelHeight          := LIMIT(_Limits.PanelHeight.MinVal,      Config.PanelHeight,      _Limits.PanelHeight.MaxVal);
 _Config.RailHeightCorrection := LIMIT(_Limits.RailHeightCorrection.MinVal, Config.RailHeightCorrection, _Limits.RailHeightCorrection.MaxVal);
-_Config.CuttingOverpass  := LIMIT(_Limits.CuttingOverpass.MinVal, Config.CuttingOverpass, _Limits.CuttingOverpass.MaxVal);
-_Config.GroovingOverpass := LIMIT(_Limits.GroovingOverpass.MinVal, Config.GroovingOverpass, _Limits.GroovingOverpass.MaxVal);]]></ST>
+_Config.CuttingOverpass      := LIMIT(_Limits.CuttingOverpass.MinVal, Config.CuttingOverpass, _Limits.CuttingOverpass.MaxVal);
+_Config.GroovingOverpass     := LIMIT(_Limits.GroovingOverpass.MinVal, Config.GroovingOverpass, _Limits.GroovingOverpass.MaxVal);]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -104,6 +137,28 @@ END_VAR
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[Limits := _Limits;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="MaxCopiesX" Id="{141e0a02-d648-49f9-a7cf-0bb7a2866c40}">
+      <Declaration><![CDATA[PROPERTY MaxCopiesX : DINT]]></Declaration>
+      <Get Name="Get" Id="{01ae6afa-0069-4c7f-a7d7-529c551d837a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[MaxCopiesX := _MaxCopiesX;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="MaxCopiesY" Id="{020d58bf-374a-498a-a7f1-941fa55b76a6}">
+      <Declaration><![CDATA[PROPERTY MaxCopiesY : DINT]]></Declaration>
+      <Get Name="Get" Id="{34530db3-9b5f-4311-bde6-21781e13e93c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[MaxCopiesY := _MaxCopiesY ;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -182,6 +237,12 @@ END_VAR
     <LineIds Name="FB_RecipeBase">
       <LineId Id="9" Count="0" />
     </LineIds>
+    <LineIds Name="FB_RecipeBase.ActualCopiesX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.ActualCopiesY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_RecipeBase.Build">
       <LineId Id="11" Count="0" />
     </LineIds>
@@ -189,10 +250,10 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Config.Set">
-      <LineId Id="22" Count="2" />
-      <LineId Id="2" Count="0" />
-      <LineId Id="28" Count="0" />
-      <LineId Id="27" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="32" Count="4" />
+      <LineId Id="29" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.FootprintX.Get">
       <LineId Id="2" Count="0" />
@@ -207,6 +268,12 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Limits.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.MaxCopiesX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.MaxCopiesY.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.SegmentsCutX.Get">

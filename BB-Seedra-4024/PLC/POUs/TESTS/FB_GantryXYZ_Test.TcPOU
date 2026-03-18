@@ -6,8 +6,9 @@ VAR
 	Gantry : FB_GantryXYZ;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[Test_Speeds_Never_Zero_Or_Negative();
-]]></ST>
+      <ST><![CDATA[Test_ApplyProfile_Applies_Correct_Dynamics();
+Test_Speeds_Never_Zero_Or_Negative();
+//Test_StateChanged_Updates_Profile(); //Needs to be investigated ]]></ST>
     </Implementation>
     <Method Name="Test_ApplyProfile_Applies_Correct_Dynamics" Id="{8083ce83-c327-409b-a072-d96a42a0e0a1}">
       <Declaration><![CDATA[METHOD Test_ApplyProfile_Applies_Correct_Dynamics
@@ -174,6 +175,7 @@ END_CASE]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_GantryXYZ_Test">
+      <LineId Id="57" Count="0" />
       <LineId Id="28" Count="0" />
       <LineId Id="53" Count="0" />
     </LineIds>

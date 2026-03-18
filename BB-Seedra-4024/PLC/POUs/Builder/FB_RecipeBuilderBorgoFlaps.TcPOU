@@ -41,20 +41,23 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 11.0;
-_Limits.PanelFrontLength.MaxVal := 1111.0;
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 12.0;
+_Limits.PanelFrontLength.MaxVal := 1234.0;
 
-_Limits.PanelFrontWidth.MinVal  := 11.0;
-_Limits.PanelFrontWidth.MaxVal  := 1111.0;
+_Limits.PanelFrontWidth.MinVal  := 12.0;
+_Limits.PanelFrontWidth.MaxVal  := 1234.0;
 
-_Limits.PanelHeight.MinVal      := 11.0;
-_Limits.PanelHeight.MaxVal      := 1111.0;
+_Limits.PanelHeight.MinVal      := 12.0;
+_Limits.PanelHeight.MaxVal      := 1234.0;
 
-_Limits.RailHeightCorrection.MinVal := 11.0;
-_Limits.RailHeightCorrection.MaxVal := 1111.0;
+_Limits.RailHeightCorrection.MinVal := 12.0;
+_Limits.RailHeightCorrection.MaxVal := 1234.0;
 
-_Limits.CuttingOverpass.MinVal := 20;
-_Limits.GroovingOverpass.MaxVal := 20;]]></ST>
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps">
@@ -65,9 +68,7 @@ _Limits.GroovingOverpass.MaxVal := 20;]]></ST>
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.FB_init">
-      <LineId Id="9" Count="9" />
-      <LineId Id="7" Count="0" />
-      <LineId Id="25" Count="1" />
+      <LineId Id="27" Count="15" />
       <LineId Id="24" Count="0" />
     </LineIds>
   </POU>
