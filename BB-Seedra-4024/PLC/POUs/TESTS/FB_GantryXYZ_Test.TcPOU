@@ -9,14 +9,6 @@ END_VAR]]></Declaration>
       <ST><![CDATA[Test_Speeds_Never_Zero_Or_Negative();
 ]]></ST>
     </Implementation>
-    <Method Name="Test_Aborting_Stops_Executors_And_Axes" Id="{9a85fd70-020d-4632-a23d-2731b4b5ff8e}">
-      <Declaration><![CDATA[METHOD Test_Aborting_Stops_Executors_And_Axes 
-
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[]]></ST>
-      </Implementation>
-    </Method>
     <Method Name="Test_ApplyProfile_Applies_Correct_Dynamics" Id="{8083ce83-c327-409b-a072-d96a42a0e0a1}">
       <Declaration><![CDATA[METHOD Test_ApplyProfile_Applies_Correct_Dynamics
 VAR_INPUT
@@ -53,12 +45,6 @@ AssertEquals_LREAL(Expected := 500.0,
                    Message := 'ApplyProfile: Blad akceleracji X dla profilu Manual');
 
 TEST_FINISHED();]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="Test_Resetting_Initializes_Axes" Id="{2a45b629-3f4f-4690-a9bc-e19fe5313d8e}">
-      <Declaration><![CDATA[METHOD Test_Resetting_Initializes_Axes ]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[]]></ST>
       </Implementation>
     </Method>
     <Method Name="Test_Speeds_Never_Zero_Or_Negative" Id="{f54ec5ac-644d-440e-a228-c238a39dad40}">
@@ -191,14 +177,8 @@ END_CASE]]></ST>
       <LineId Id="28" Count="0" />
       <LineId Id="53" Count="0" />
     </LineIds>
-    <LineIds Name="FB_GantryXYZ_Test.Test_Aborting_Stops_Executors_And_Axes">
-      <LineId Id="5" Count="0" />
-    </LineIds>
     <LineIds Name="FB_GantryXYZ_Test.Test_ApplyProfile_Applies_Correct_Dynamics">
       <LineId Id="6" Count="28" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_GantryXYZ_Test.Test_Resetting_Initializes_Axes">
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ_Test.Test_Speeds_Never_Zero_Or_Negative">
