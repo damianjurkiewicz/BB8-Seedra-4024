@@ -80,10 +80,6 @@ CASE nStep OF
                 nStep := 1000;
                 RETURN;
             END_IF;
-
-//            _AxisX.Acceleration := 500; _AxisX.Deceleration := 8000;
-//            _AxisY.Acceleration := 500; _AxisY.Deceleration := 8000;
-//            _AxisZ.Acceleration := 500; _AxisZ.Deceleration := 8000;
             
             _AxisX.Velocity := localConfig.RapidSpeedX;
             _AxisY.Velocity := localConfig.RapidSpeedY;
@@ -96,8 +92,7 @@ CASE nStep OF
     // -------- Dojazd do początku cięcia --------
     10:
         // Zobacz jak czysto to teraz wygląda! Żadnych X/Y, po prostu używamy zmiennych z rozdzielacza:
-        _AxisX.MoveAbsolute(currentSeg.Start.X + offsetX + localConfig.GlobalOffset, 0);
-        _AxisY.MoveAbsolute(currentSeg.Start.Y + offsetY + localConfig.GlobalOffset, 0);
+		MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, offsetX, offsetY);
         nStep := 20;
 
     20: // Czekamy na pozycję XY
@@ -122,8 +117,7 @@ CASE nStep OF
         IF StepTimer.Q THEN StepTimer(IN := FALSE); nStep := 60; END_IF
 
     60: // Cięcie XY do końca
-        _AxisX.MoveAbsolute(currentSeg.Stop.X + offsetX + localConfig.GlobalOffset, 0);
-        _AxisY.MoveAbsolute(currentSeg.Stop.Y + offsetY + localConfig.GlobalOffset, 0);
+		MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, offsetX, offsetY);
         nStep := 70;
 
     70: // Czekamy na koniec cięcia
@@ -172,9 +166,12 @@ END_CASE]]></ST>
     <LineIds Name="FB_ExecutorCut.CyclicLogic">
       <LineId Id="15" Count="7" />
       <LineId Id="137" Count="18" />
-      <LineId Id="38" Count="32" />
+      <LineId Id="38" Count="11" />
+      <LineId Id="54" Count="11" />
+      <LineId Id="67" Count="3" />
       <LineId Id="166" Count="0" />
-      <LineId Id="72" Count="24" />
+      <LineId Id="72" Count="19" />
+      <LineId Id="93" Count="3" />
       <LineId Id="167" Count="0" />
       <LineId Id="98" Count="28" />
       <LineId Id="4" Count="0" />

@@ -199,6 +199,29 @@ nStep     := 5;
 Execute   := TRUE;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="MoveToXY" Id="{f3cfb8fb-8034-47cd-9b96-9d74f02c4bfe}">
+      <Declaration><![CDATA[METHOD PROTECTED MoveToXY 
+VAR_INPUT
+    TargetX     : REAL; 
+    TargetY     : REAL; 
+    ToolOffsetX : REAL := 0.0; 
+    ToolOffsetY : REAL := 0.0; 
+END_VAR
+VAR
+    localConfig : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Pobieramy bezpieczną konfigurację z Providera (zawiera GlobalOffset)
+localConfig := _ConfigProvider.Config;
+
+// Wykonujemy właściwe ruchy absolutne
+// Do pozycji docelowej dodajemy offset konkretnego narzędzia oraz offset globalny maszyny
+_AxisX.MoveAbsolute(TargetX + ToolOffsetX + localConfig.GlobalOffset, 0);
+_AxisY.MoveAbsolute(TargetY + ToolOffsetY + localConfig.GlobalOffset, 0);
+
+]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="RecipeBuilder" Id="{cbbaad3b-7e73-402c-b55d-1c46460bfd77}">
       <Declaration><![CDATA[PROPERTY RecipeBuilder : I_RecipeBuilder]]></Declaration>
       <Get Name="Get" Id="{ee8216eb-1e0d-45e3-8dfd-22bbcbfa2526}">
@@ -273,6 +296,10 @@ END_VAR
     <LineIds Name="FB_ExecutorBase.Execute">
       <LineId Id="6" Count="6" />
       <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorBase.MoveToXY">
+      <LineId Id="15" Count="7" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorBase.RecipeBuilder.Get">
       <LineId Id="2" Count="0" />

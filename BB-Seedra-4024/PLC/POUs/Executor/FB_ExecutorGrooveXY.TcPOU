@@ -60,18 +60,13 @@ CASE nStep OF
                 nStep := 1000;
                 RETURN;
             END_IF;
-
-            // Jednorazowe nastawy dynamiki
-//            _AxisX.Acceleration := 500;   _AxisX.Deceleration := 8000;
-//            _AxisY.Acceleration := 500;   _AxisY.Deceleration := 8000;
-//            _AxisZ.Acceleration := 500;   _AxisZ.Deceleration := 8000;
-            
+           
             _AxisX.Velocity := localConfig.RapidSpeedX;
             _AxisY.Velocity := localConfig.RapidSpeedY;
             _AxisZ.Velocity := localConfig.RapidSpeedZ;
 
             iCurrentSegment := 1;
-            // Zgodnie ze stara logika: zacznij od poziomu, ostroznie
+            // Zgodnie ze stara logika: zacznij od poziomu 5, ostroznie
             iPass := 5; 
             
             IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN
@@ -86,8 +81,9 @@ CASE nStep OF
     // -------- Dojazd XY do poczatku (Start) --------
     10:
         //Trace(CONCAT('Step 10: Rapid to Start XY. Pass: ', TO_STRING(iPass)));
-        _AxisX.MoveAbsolute(currentSeg.Start.X + localConfig.GlobalOffset, 0);
-        _AxisY.MoveAbsolute(currentSeg.Start.Y + localConfig.GlobalOffset, 0);
+		MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, 0.0, 0.0);
+		
+		
         nStep := 20;
 
 	20: // Czekamy na pozycje XY
@@ -139,8 +135,7 @@ CASE nStep OF
     // -------- Frezowanie do punktu koncowego --------
     60:
         //Trace('Step 60: Cutting Move to Stop XY');
-        _AxisX.MoveAbsolute(currentSeg.Stop.X + localConfig.GlobalOffset, 0);
-        _AxisY.MoveAbsolute(currentSeg.Stop.Y + localConfig.GlobalOffset, 0);
+		MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, 0.0, 0.0);
         nStep := 70;
 
 	70: // Czekamy na koniec cięcia
@@ -166,8 +161,7 @@ CASE nStep OF
 
     75: 
         //Trace('Step 75: Cleaning Return (Z stays down)');
-        _AxisX.MoveAbsolute(currentSeg.Start.X + localConfig.GlobalOffset, 0);
-        _AxisY.MoveAbsolute(currentSeg.Start.Y + localConfig.GlobalOffset, 0);
+		MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, 0.0, 0.0);
         nStep := 76;
         
 	76: 
@@ -241,19 +235,26 @@ END_CASE]]></ST>
       <LineId Id="171" Count="0" />
       <LineId Id="370" Count="1" />
       <LineId Id="369" Count="0" />
-      <LineId Id="172" Count="42" />
+      <LineId Id="172" Count="27" />
+      <LineId Id="205" Count="9" />
       <LineId Id="386" Count="0" />
       <LineId Id="385" Count="0" />
       <LineId Id="215" Count="0" />
       <LineId Id="389" Count="1" />
-      <LineId Id="216" Count="9" />
+      <LineId Id="216" Count="5" />
+      <LineId Id="454" Count="0" />
+      <LineId Id="456" Count="0" />
+      <LineId Id="455" Count="0" />
+      <LineId Id="224" Count="1" />
       <LineId Id="403" Count="3" />
       <LineId Id="408" Count="1" />
       <LineId Id="232" Count="19" />
       <LineId Id="410" Count="0" />
-      <LineId Id="252" Count="25" />
+      <LineId Id="252" Count="21" />
+      <LineId Id="275" Count="2" />
       <LineId Id="411" Count="10" />
-      <LineId Id="288" Count="15" />
+      <LineId Id="288" Count="11" />
+      <LineId Id="301" Count="2" />
       <LineId Id="422" Count="4" />
       <LineId Id="308" Count="7" />
       <LineId Id="427" Count="3" />
