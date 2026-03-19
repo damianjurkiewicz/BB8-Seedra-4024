@@ -110,11 +110,11 @@ IF CurrentBuilder <> 0 THEN
     RecipeConfig_HMI.Config := CurrentBuilder.Config;
     RecipeConfig_HMI.Limits := CurrentBuilder.Limits;
     
-    // C) Jeśli FILL ALL wciśnięte, na żywo wymuszamy wartości na maksymalne!
-    IF RecipeConfig_HMI.Config.FillAll THEN
-        RecipeConfig_HMI.Config.RequestedCopiesX := CurrentBuilder.MaxCopiesX;
-        RecipeConfig_HMI.Config.RequestedCopiesY := CurrentBuilder.MaxCopiesY;
-    END_IF
+//    // C) Jeśli FILL ALL wciśnięte, na żywo wymuszamy wartości na maksymalne!
+//    IF RecipeConfig_HMI.Config.FillAll THEN
+//        RecipeConfig_HMI.Config.RequestedCopiesX := CurrentBuilder.MaxCopiesX;
+//        RecipeConfig_HMI.Config.RequestedCopiesY := CurrentBuilder.MaxCopiesY;
+//    END_IF
 END_IF
 
 // =========================================================

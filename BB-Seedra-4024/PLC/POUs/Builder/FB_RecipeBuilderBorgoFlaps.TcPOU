@@ -95,7 +95,7 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       </Implementation>
     </Method>
     <Method Name="UpdateNestingLimits" Id="{2b71f6ce-b964-482a-9b7f-2de722577ce3}">
-      <Declaration><![CDATA[METHOD PROTECTED UpdateNestingLimits
+      <Declaration><![CDATA[METHOD PUBLIC UpdateNestingLimits
 VAR
     TotalX      : REAL;
     TotalY      : REAL;

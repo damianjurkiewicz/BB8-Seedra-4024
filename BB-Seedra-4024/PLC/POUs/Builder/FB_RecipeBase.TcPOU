@@ -82,14 +82,23 @@ END_VAR
         <Implementation>
           <ST><![CDATA[_Config := Config;
 
+
 _Config.PanelFrontLength     := LIMIT(_Limits.PanelFrontLength.MinVal, Config.PanelFrontLength, _Limits.PanelFrontLength.MaxVal);
 _Config.PanelFrontWidth      := LIMIT(_Limits.PanelFrontWidth.MinVal,  Config.PanelFrontWidth,  _Limits.PanelFrontWidth.MaxVal);
 _Config.PanelHeight          := LIMIT(_Limits.PanelHeight.MinVal,      Config.PanelHeight,      _Limits.PanelHeight.MaxVal);
 _Config.RailHeightCorrection := LIMIT(_Limits.RailHeightCorrection.MinVal, Config.RailHeightCorrection, _Limits.RailHeightCorrection.MaxVal);
-_Config.CuttingOverpass      := LIMIT(_Limits.CuttingOverpass.MinVal, Config.CuttingOverpass, _Limits.CuttingOverpass.MaxVal);
-_Config.GroovingOverpass     := LIMIT(_Limits.GroovingOverpass.MinVal, Config.GroovingOverpass, _Limits.GroovingOverpass.MaxVal);
 
-THIS^.UpdateNestingLimits();]]></ST>
+
+THIS^.UpdateNestingLimits();
+
+
+IF _Config.FillAll THEN
+    _Config.RequestedCopiesX := _MaxCopiesX;
+    _Config.RequestedCopiesY := _MaxCopiesY;
+ELSE
+    _Config.RequestedCopiesX := LIMIT(1, _Config.RequestedCopiesX, _MaxCopiesX);
+    _Config.RequestedCopiesY := LIMIT(1, _Config.RequestedCopiesY, _MaxCopiesY);
+END_IF]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -261,11 +270,9 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Config.Set">
-      <LineId Id="31" Count="0" />
-      <LineId Id="30" Count="0" />
-      <LineId Id="32" Count="4" />
-      <LineId Id="29" Count="0" />
-      <LineId Id="40" Count="0" />
+      <LineId Id="43" Count="12" />
+      <LineId Id="57" Count="2" />
+      <LineId Id="62" Count="1" />
       <LineId Id="39" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.FootprintX.Get">
