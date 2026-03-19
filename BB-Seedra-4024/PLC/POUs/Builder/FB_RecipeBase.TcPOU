@@ -23,11 +23,12 @@ VAR
 	_FootprintY 			: REAL;
 	_MaxCopiesX				: DINT;
 	_MaxCopiesY				: DINT;
-	RAW_BOARD_X : REAL := 2400.0; 
-	RAW_BOARD_Y : REAL := 1200.0;
+	RAW_BOARD_X : REAL := 1200.0; 
+	RAW_BOARD_Y : REAL := 2400.0;
 	_ActualCopiesX			:DINT;
 	_ActualCopiesY			:DINT;
-	
+	_NominalX 				: REAL;
+    _NominalY 				: REAL;
 	
 	
 END_VAR
@@ -42,7 +43,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ActualCopiesX := _ActualCopiesX;]]></ST>
+          <ST><![CDATA[ActualCopiesX := _Config.RequestedCopiesX;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -53,7 +54,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ActualCopiesY := _ActualCopiesY;]]></ST>
+          <ST><![CDATA[ActualCopiesY := _Config.RequestedCopiesY;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -63,6 +64,17 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[Build := FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CalculateFootprint" Id="{b5903cf0-35f3-4a36-9bbd-0a6781b9e2f5}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Domyślny wymiar detalu (bez dodatków)
+_NominalX := _Config.PanelFrontWidth;
+_NominalY := _Config.PanelFrontLength;]]></ST>
       </Implementation>
     </Method>
     <Property Name="Config" Id="{cc8b22ea-aed1-438f-8cdd-5e3e5f7b2e90}">
@@ -246,12 +258,67 @@ END_VAR
       </Get>
     </Property>
     <Method Name="UpdateNestingLimits" Id="{b78c73fe-7983-4c8d-9c71-a0293b8dccf5}">
-      <Declaration><![CDATA[METHOD UpdateNestingLimits
-VAR_INPUT
+      <Declaration><![CDATA[METHOD PUBLIC UpdateNestingLimits
+VAR
+    MaxOverpass : REAL;
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[
+// 1. POLIMORFIZM: Każda receptura liczy swój własny, unikalny wymiar "czysty"
+THIS^.CalculateFootprint();
+
+// 2. Pobieramy największy wyjazd narzędzia (Overpass) Z WŁASNEJ KONFIGURACJI RECEPTURY!
+MaxOverpass := MAX(_Config.CuttingOverpass, _Config.GroovingOverpass);
+
+// 3. Gabaryt (Footprint) to nominalny wymiar + bezpieczna strefa (Overpass x2) z obu stron
+_FootprintX := _NominalX + (2.0 * MaxOverpass);
+_FootprintY := _NominalY + (2.0 * MaxOverpass);
+
+// 4. Wyliczenie maksymalnych kopii na płycie
+IF _FootprintX > 0.0 THEN
+    _MaxCopiesX := REAL_TO_DINT(TRUNC(RAW_BOARD_X / _FootprintX));
+ELSE
+    _MaxCopiesX := 0;
+END_IF
+
+IF _FootprintY > 0.0 THEN
+    _MaxCopiesY := REAL_TO_DINT(TRUNC(RAW_BOARD_Y / _FootprintY));
+ELSE
+    _MaxCopiesY := 0;
+END_IF
+
+// =========================================================
+// 5. WERYFIKACJA GABARYTÓW (Zabezpieczenie przed za dużym detalem)
+// =========================================================
+_Config.IsValid := (_MaxCopiesX > 0) AND (_MaxCopiesY > 0) AND (_NominalX > 0) AND (_NominalY > 0);
+
+// =========================================================
+// 6. AUTO-KOREKTA KOPII I LIMITÓW DLA HMI
+// =========================================================
+IF _Config.IsValid THEN
+    _Limits.RequestedCopiesX.MinVal := 1.0;
+    _Limits.RequestedCopiesX.MaxVal := DINT_TO_REAL(_MaxCopiesX);
+    _Limits.RequestedCopiesY.MinVal := 1.0;
+    _Limits.RequestedCopiesY.MaxVal := DINT_TO_REAL(_MaxCopiesY);
+
+    IF _Config.FillAll THEN
+        _Config.RequestedCopiesX := _MaxCopiesX;
+        _Config.RequestedCopiesY := _MaxCopiesY;
+    ELSE
+        _Config.RequestedCopiesX := LIMIT(1, _Config.RequestedCopiesX, _MaxCopiesX);
+        _Config.RequestedCopiesY := LIMIT(1, _Config.RequestedCopiesY, _MaxCopiesY);
+    END_IF
+ELSE
+    // Blokada całkowita jeśli detal się nie mieści
+    _Limits.RequestedCopiesX.MinVal := 0.0;
+    _Limits.RequestedCopiesX.MaxVal := 0.0;
+    _Limits.RequestedCopiesY.MinVal := 0.0;
+    _Limits.RequestedCopiesY.MaxVal := 0.0;
+    
+    _Config.RequestedCopiesX := 0;
+    _Config.RequestedCopiesY := 0;
+END_IF]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeBase">
@@ -265,6 +332,10 @@ END_VAR
     </LineIds>
     <LineIds Name="FB_RecipeBase.Build">
       <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.CalculateFootprint">
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Config.Get">
       <LineId Id="2" Count="0" />
@@ -315,6 +386,7 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.UpdateNestingLimits">
+      <LineId Id="78" Count="53" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

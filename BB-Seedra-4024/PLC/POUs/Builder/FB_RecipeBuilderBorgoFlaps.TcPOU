@@ -17,26 +17,43 @@ VAR_INST
     ShorterX        : REAL;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ==========================================================
-//  Recepta testowa
-// ==========================================================
-
-TotalY   := _Config.PanelFrontLength + 2 * _Config.PanelHeight;
-TotalX   := _Config.PanelFrontWidth  + 2 * _Config.PanelHeight; 
-ShorterY := TotalY - _Config.PanelHeight;
-ShorterX := TotalX - _Config.PanelHeight;
+        <ST><![CDATA[// 1. Zlecenie przeliczenia gabarytów, footrpintu i limitów klasie bazowej
 THIS^.UpdateNestingLimits();
 
-IF _Config.FillAll THEN
-    _ActualCopiesX := _MaxCopiesX;
-    _ActualCopiesY := _MaxCopiesY;
-ELSE
-    // Jeśli nie "wypełnij", to bierzemy to co chce operator, ale obcinamy od 1 do Max!
-    _ActualCopiesX := LIMIT(1, _Config.RequestedCopiesX, _MaxCopiesX);
-    _ActualCopiesY := LIMIT(1, _Config.RequestedCopiesY, _MaxCopiesY);
+// 2. Jeśli detal wystaje poza maszynę - przerywamy od razu!
+IF NOT _Config.IsValid THEN
+    Build := FALSE;
+    RETURN;
 END_IF
 
-_SegmentsToGroove := 0;
+// 3. Pobieramy wyliczone gabaryty nominalne do lokalnych zmiennych roboczych
+TotalX   := _NominalX;
+TotalY   := _NominalY; 
+ShorterY := TotalY - _Config.PanelHeight;
+ShorterX := TotalX - _Config.PanelHeight;
+
+_SegmentsToGroove := 4;
+
+_SegmentsGroove[1].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsGroove[1].Stop.X  := -_Config.CuttingOverpass;
+_SegmentsGroove[1].Start.Y := TotalY - _Config.RailHeightCorrection;
+_SegmentsGroove[1].Stop.Y  := TotalY - _Config.RailHeightCorrection;
+
+_SegmentsGroove[2].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsGroove[2].Stop.X  := -_Config.CuttingOverpass;
+_SegmentsGroove[2].Start.Y := _Config.RailHeightCorrection;
+_SegmentsGroove[2].Stop.Y  := _Config.RailHeightCorrection;
+
+
+_SegmentsGroove[3].Start.X := TotalX;
+_SegmentsGroove[3].Stop.X  := TotalX;
+_SegmentsGroove[3].Start.Y := TotalY + _Config.CuttingOverpass;
+_SegmentsGroove[3].Stop.Y  := -_Config.CuttingOverpass;
+
+_SegmentsGroove[4].Start.X := 0;
+_SegmentsGroove[4].Stop.X  := 0;
+_SegmentsGroove[4].Start.Y := TotalY + _Config.CuttingOverpass;
+_SegmentsGroove[4].Stop.Y  := -_Config.CuttingOverpass;
 
 _SegmentsToCutX   := 2;
 
@@ -67,6 +84,17 @@ _SegmentsCutY[2].Stop.Y  := -_Config.CuttingOverpass;
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="CalculateFootprint" Id="{9729302b-8841-4a61-a0ae-d9106fc641a1}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// BorgoWings wie, że jego wymiar powiększa się o ścianki zagięcia:
+_NominalX := _Config.PanelFrontWidth  + 2.0 * _Config.PanelHeight; 
+_NominalY := _Config.PanelFrontLength + 2.0 * _Config.PanelHeight;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="FB_init" Id="{4a0331ae-cce1-43c4-8f3f-519ce38c4c04}">
       <Declaration><![CDATA[METHOD FB_init : BOOL
 VAR_INPUT
@@ -75,17 +103,17 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 12.0;
-_Limits.PanelFrontLength.MaxVal := 1234.0;
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
+_Limits.PanelFrontLength.MaxVal := 2400.0;
 
-_Limits.PanelFrontWidth.MinVal  := 12.0;
-_Limits.PanelFrontWidth.MaxVal  := 1234.0;
+_Limits.PanelFrontWidth.MinVal  := 100.0;
+_Limits.PanelFrontWidth.MaxVal  := 1200.0;
 
-_Limits.PanelHeight.MinVal      := 12.0;
-_Limits.PanelHeight.MaxVal      := 1234.0;
+_Limits.PanelHeight.MinVal      := 40.0;
+_Limits.PanelHeight.MaxVal      := 100.0;
 
 _Limits.RailHeightCorrection.MinVal := 12.0;
-_Limits.RailHeightCorrection.MaxVal := 1234.0;
+_Limits.RailHeightCorrection.MaxVal := 14.0;
 
 _Limits.CuttingOverpass.MinVal := 0.0;
 _Limits.CuttingOverpass.MaxVal := 50.0;
@@ -94,62 +122,18 @@ _Limits.GroovingOverpass.MinVal := 0.0;
 _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       </Implementation>
     </Method>
-    <Method Name="UpdateNestingLimits" Id="{2b71f6ce-b964-482a-9b7f-2de722577ce3}">
-      <Declaration><![CDATA[METHOD PUBLIC UpdateNestingLimits
-VAR
-    TotalX      : REAL;
-    TotalY      : REAL;
-    MaxOverpass : REAL;
-END_VAR]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[
-
-// 1. Znajdujemy największy wyjazd narzędzia poza materiał
-MaxOverpass := MAX(_Config.CuttingOverpass, _Config.GroovingOverpass);
-
-// 2. Nominalne wymiary detalu
-TotalX := _Config.PanelFrontWidth  + 2.0 * _Config.PanelHeight; 
-TotalY := _Config.PanelFrontLength + 2.0 * _Config.PanelHeight;
-
-// 3. Gabaryt (Footprint) to nominalny wymiar + bezpieczna strefa z obu stron!
-_FootprintX := TotalX + (2.0 * MaxOverpass);
-_FootprintY := TotalY + (2.0 * MaxOverpass);
-
-// 4. Wyliczenie maksymalnych kopii na płycie
-IF _FootprintX > 0.0 THEN
-    _MaxCopiesX := REAL_TO_DINT(TRUNC(RAW_BOARD_X / _FootprintX));
-ELSE
-    _MaxCopiesX := 1;
-END_IF
-
-IF _FootprintY > 0.0 THEN
-    _MaxCopiesY := REAL_TO_DINT(TRUNC(RAW_BOARD_Y / _FootprintY));
-ELSE
-    _MaxCopiesY := 1;
-END_IF
-
-// Zabezpieczenie minimum
-IF _MaxCopiesX < 1 THEN _MaxCopiesX := 1; END_IF
-IF _MaxCopiesY < 1 THEN _MaxCopiesY := 1; END_IF
-
-// Update limitów dla wizualizacji (Numpad w HMI)
-_Limits.RequestedCopiesX.MinVal := 1.0;
-_Limits.RequestedCopiesX.MaxVal := DINT_TO_REAL(_MaxCopiesX);
-
-_Limits.RequestedCopiesY.MinVal := 1.0;
-_Limits.RequestedCopiesY.MaxVal := DINT_TO_REAL(_MaxCopiesY);]]></ST>
-      </Implementation>
-    </Method>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps">
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.Build">
-      <LineId Id="585" Count="2" />
-      <LineId Id="633" Count="0" />
-      <LineId Id="635" Count="3" />
-      <LineId Id="642" Count="8" />
+      <LineId Id="673" Count="12" />
       <LineId Id="634" Count="0" />
       <LineId Id="591" Count="1" />
+      <LineId Id="687" Count="0" />
+      <LineId Id="696" Count="7" />
+      <LineId Id="686" Count="0" />
+      <LineId Id="705" Count="9" />
+      <LineId Id="704" Count="0" />
       <LineId Id="632" Count="0" />
       <LineId Id="593" Count="0" />
       <LineId Id="606" Count="0" />
@@ -165,13 +149,13 @@ _Limits.RequestedCopiesY.MaxVal := DINT_TO_REAL(_MaxCopiesY);]]></ST>
       <LineId Id="600" Count="0" />
       <LineId Id="11" Count="0" />
     </LineIds>
+    <LineIds Name="FB_RecipeBuilderBorgoFlaps.CalculateFootprint">
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.FB_init">
       <LineId Id="27" Count="15" />
       <LineId Id="24" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_RecipeBuilderBorgoFlaps.UpdateNestingLimits">
-      <LineId Id="49" Count="34" />
-      <LineId Id="5" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

@@ -11,7 +11,8 @@
     GroovingOverpass     : REAL;
 	FillAll         : BOOL; 
     RequestedCopiesX: DINT;  
-    RequestedCopiesY: DINT;  
+    RequestedCopiesY: DINT; 
+	IsValid			:BOOL; 
     END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

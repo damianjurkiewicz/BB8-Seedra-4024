@@ -18,20 +18,20 @@ VAR_INST
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[TotalY   := _Config.PanelFrontLength + 2 * _Config.PanelHeight;
-TotalX   := _Config.PanelFrontWidth  + 2 * _Config.PanelHeight; 
-ShorterY := TotalY - _Config.PanelHeight;
-ShorterX := TotalX - _Config.PanelHeight;
+        <ST><![CDATA[// 1. Zlecenie przeliczenia gabarytów, footrpintu i limitów klasie bazowej
 THIS^.UpdateNestingLimits();
 
-IF _Config.FillAll THEN
-    _ActualCopiesX := _MaxCopiesX;
-    _ActualCopiesY := _MaxCopiesY;
-ELSE
-    // Jeśli nie "wypełnij", to bierzemy to co chce operator, ale obcinamy od 1 do Max!
-    _ActualCopiesX := LIMIT(1, _Config.RequestedCopiesX, _MaxCopiesX);
-    _ActualCopiesY := LIMIT(1, _Config.RequestedCopiesY, _MaxCopiesY);
+// 2. Jeśli detal wystaje poza maszynę - przerywamy od razu!
+IF NOT _Config.IsValid THEN
+    Build := FALSE;
+    RETURN;
 END_IF
+
+// 3. Pobieramy wyliczone gabaryty nominalne do lokalnych zmiennych roboczych
+TotalX   := _NominalX;
+TotalY   := _NominalY; 
+ShorterY := TotalY - _Config.PanelHeight;
+ShorterX := TotalX - _Config.PanelHeight;
 
 
 // ------------------------------------
@@ -168,9 +168,7 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoWings.Build">
-      <LineId Id="563" Count="3" />
-      <LineId Id="682" Count="0" />
-      <LineId Id="686" Count="7" />
+      <LineId Id="702" Count="12" />
       <LineId Id="685" Count="0" />
       <LineId Id="683" Count="0" />
       <LineId Id="681" Count="0" />
