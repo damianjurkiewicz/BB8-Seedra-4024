@@ -11,25 +11,62 @@
     <Method Name="Build" Id="{a7636aac-6540-4877-9111-d7366342a8fe}">
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR_INST
-    // Zmienne zostaną dodane w trakcie cyklu TDD
+    TotalY          : REAL;
+    TotalX          : REAL;
+    ShorterY        : REAL;
+    ShorterX        : REAL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ==========================================================
-//  PLACEHOLDER / WYDMUSZKA - KOD DO ROZWOJU W TDD
+//  Recepta testowa
 // ==========================================================
 
-// 1. Zabezpieczenie: Ustawiamy liczby segmentów na -1.
-// Ponieważ 0 jest legalną wartością (np. program tylko do frezowania), 
-// używamy -1 jako jednoznacznej flagi "brak implementacji".
-_SegmentsToGroove := 4;
-_SegmentsToCutX   := 6;
-_SegmentsToCutY   := 6;
+TotalY   := _Config.PanelFrontLength + 2 * _Config.PanelHeight;
+TotalX   := _Config.PanelFrontWidth  + 2 * _Config.PanelHeight; 
+ShorterY := TotalY - _Config.PanelHeight;
+ShorterX := TotalX - _Config.PanelHeight;
+_FootprintX := TotalX;
+_FootprintY := TotalY;
+_MaxCopiesX := DINT_TO_INT(TRUNC(RAW_BOARD_X / _FootprintX));
+_MaxCopiesY := DINT_TO_INT(TRUNC(RAW_BOARD_Y / _FootprintY));
 
-// TODO: Tutaj w TDD zaimplementujesz wyliczanie współrzędnych
+IF _Config.FillAll THEN
+    _ActualCopiesX := _MaxCopiesX;
+    _ActualCopiesY := _MaxCopiesY;
+ELSE
+    // Jeśli nie "wypełnij", to bierzemy to co chce operator, ale obcinamy od 1 do Max!
+    _ActualCopiesX := LIMIT(1, _Config.RequestedCopiesX, _MaxCopiesX);
+    _ActualCopiesY := LIMIT(1, _Config.RequestedCopiesY, _MaxCopiesY);
+END_IF
 
-// 2. Blokada przed uruchomieniem.
-// W teście jednostkowym Twoja pierwsza asercja powinna sprawdzać 
-// właśnie to, czy Builder.Build() zwrócił TRUE.
+_SegmentsToGroove := 0;
+
+_SegmentsToCutX   := 2;
+
+_SegmentsCutX[1].Start.X := TotalX;
+_SegmentsCutX[1].Stop.X  := 0;
+_SegmentsCutX[1].Start.Y := TotalY;
+_SegmentsCutX[1].Stop.Y  := TotalY;
+
+_SegmentsCutX[2].Start.X := TotalX;
+_SegmentsCutX[2].Stop.X  := 0;
+_SegmentsCutX[2].Start.Y := 0;
+_SegmentsCutX[2].Stop.Y  := 0;
+
+_SegmentsToCutY   := 2;
+
+_SegmentsCutY[1].Start.X := TotalX;
+_SegmentsCutY[1].Stop.X  := TotalX;
+_SegmentsCutY[1].Start.Y := TotalY;
+_SegmentsCutY[1].Stop.Y  := 0;
+
+_SegmentsCutY[2].Start.X := 0;
+_SegmentsCutY[2].Stop.X  := 0;
+_SegmentsCutY[2].Start.Y := TotalY;
+_SegmentsCutY[2].Stop.Y  := 0;
+
+
+
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -60,16 +97,74 @@ _Limits.GroovingOverpass.MinVal := 0.0;
 _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="UpdateNestingLimits" Id="{2b71f6ce-b964-482a-9b7f-2de722577ce3}">
+      <Declaration><![CDATA[METHOD UpdateNestingLimits
+VAR
+    TotalX : REAL;
+    TotalY : REAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+// Liczymy Footprint "w locie"
+TotalX := _Config.PanelFrontWidth  + 2 * _Config.PanelHeight; 
+TotalY := _Config.PanelFrontLength + 2 * _Config.PanelHeight;
+
+_FootprintX := TotalX;
+_FootprintY := TotalY;
+
+IF _FootprintX > 0.0 THEN
+    _MaxCopiesX := REAL_TO_DINT(TRUNC(RAW_BOARD_X / _FootprintX));
+ELSE
+    _MaxCopiesX := 1;
+END_IF
+
+IF _FootprintY > 0.0 THEN
+    _MaxCopiesY := REAL_TO_DINT(TRUNC(RAW_BOARD_Y / _FootprintY));
+ELSE
+    _MaxCopiesY := 1;
+END_IF
+
+// Zabezpieczenie przed bzdurami
+IF _MaxCopiesX < 1 THEN _MaxCopiesX := 1; END_IF
+IF _MaxCopiesY < 1 THEN _MaxCopiesY := 1; END_IF
+
+// Update limitów dla wizualizacji (Numpad HMI)
+_Limits.RequestedCopiesX.MinVal := 1.0;
+_Limits.RequestedCopiesX.MaxVal := DINT_TO_REAL(_MaxCopiesX);
+
+_Limits.RequestedCopiesY.MinVal := 1.0;
+_Limits.RequestedCopiesY.MaxVal := DINT_TO_REAL(_MaxCopiesY);]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps">
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.Build">
-      <LineId Id="585" Count="15" />
+      <LineId Id="585" Count="2" />
+      <LineId Id="633" Count="0" />
+      <LineId Id="635" Count="15" />
+      <LineId Id="634" Count="0" />
+      <LineId Id="591" Count="1" />
+      <LineId Id="632" Count="0" />
+      <LineId Id="593" Count="0" />
+      <LineId Id="606" Count="8" />
+      <LineId Id="605" Count="0" />
+      <LineId Id="604" Count="0" />
+      <LineId Id="594" Count="0" />
+      <LineId Id="616" Count="9" />
+      <LineId Id="615" Count="0" />
+      <LineId Id="595" Count="0" />
+      <LineId Id="600" Count="0" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.FB_init">
       <LineId Id="27" Count="15" />
       <LineId Id="24" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderBorgoFlaps.UpdateNestingLimits">
+      <LineId Id="10" Count="29" />
+      <LineId Id="5" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

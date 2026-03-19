@@ -9,6 +9,8 @@ STRUCT
     RailHeightCorrection : ST_LimitInfo;
 	CuttingOverpass 	 : ST_LimitInfo;
 	GroovingOverpass 	 : ST_LimitInfo;
+	RequestedCopiesX 	 : ST_LimitInfo;
+	RequestedCopiesY 	 : ST_LimitInfo;
 END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

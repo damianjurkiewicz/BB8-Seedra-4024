@@ -103,14 +103,18 @@ SUPER^.CyclicLogic();
 CurrentBuilder := RecipeFactory.GetBuilder(GantryXYZ.ProgramIdRequested);
 
 IF CurrentBuilder <> 0 THEN
-    // A) Wrzucamy dane z ekranu HMI do Buildera (wyzwala to Config.Set i docinanie LIMIT)
+    // A) Wrzucamy dane z HMI -> Wyzwala to limity i UpdateNestingLimits()!
     CurrentBuilder.Config := RecipeConfig_HMI.Config;
     
-    // B) Odczytujemy bezpieczną (dociętą) konfigurację z powrotem i przypisujemy do HMI.
+    // B) Odczyt z powrotem na HMI
     RecipeConfig_HMI.Config := CurrentBuilder.Config;
-    
-    // C) Odczytujemy aktualne MIN/MAX z Buildera, aby Numpad w HMI wiedział na co pozwalać
     RecipeConfig_HMI.Limits := CurrentBuilder.Limits;
+    
+    // C) Jeśli FILL ALL wciśnięte, na żywo wymuszamy wartości na maksymalne!
+    IF RecipeConfig_HMI.Config.FillAll THEN
+        RecipeConfig_HMI.Config.RequestedCopiesX := CurrentBuilder.MaxCopiesX;
+        RecipeConfig_HMI.Config.RequestedCopiesY := CurrentBuilder.MaxCopiesY;
+    END_IF
 END_IF
 
 // =========================================================
@@ -290,7 +294,10 @@ CASE DescendantSequenceState OF
 		RecipeConfig_HMI.Limits.CuttingOverpass.MinVal 		:= 0.0;      RecipeConfig_HMI.Limits.CuttingOverpass.MaxVal 	:= 50.0;
 		RecipeConfig_HMI.Limits.GroovingOverpass.MinVal 	:= 0.0;      RecipeConfig_HMI.Limits.GroovingOverpass.MaxVal 	:= 50.0;
 		
-	
+		IF RecipeConfig_HMI.Config.RequestedCopiesX < 1 THEN RecipeConfig_HMI.Config.RequestedCopiesX := 1; END_IF
+		IF RecipeConfig_HMI.Config.RequestedCopiesY < 1 THEN RecipeConfig_HMI.Config.RequestedCopiesY := 1; END_IF
+		
+		
 		// Przekazanie konfiguracji z Persistenta do Fabryki (Fabryka rozda to builderom)
 		RecipeFactory.UpdateConfig(ConfigManager.Config);
 	
@@ -491,7 +498,9 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.CyclicLogic">
-      <LineId Id="155" Count="43" />
+      <LineId Id="155" Count="19" />
+      <LineId Id="202" Count="12" />
+      <LineId Id="184" Count="14" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Execute">
@@ -563,7 +572,11 @@ END_IF]]></ST>
       <LineId Id="126" Count="7" />
       <LineId Id="125" Count="0" />
       <LineId Id="123" Count="0" />
-      <LineId Id="112" Count="3" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="136" Count="0" />
+      <LineId Id="135" Count="0" />
+      <LineId Id="134" Count="0" />
+      <LineId Id="113" Count="2" />
       <LineId Id="78" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="52" Count="4" />

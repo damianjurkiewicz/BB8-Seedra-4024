@@ -41,8 +41,7 @@ VAR_INST
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-// --- START LOGIKI ---
+        <ST><![CDATA[// --- START LOGIKI ---
 StepTimer();
 
 IF _RecipeBuilder = 0 OR _ConfigProvider = 0 THEN RETURN; END_IF
@@ -70,13 +69,13 @@ CASE CutDirection OF
 END_CASE
 // ========================================================
 
-
 CASE nStep OF
     0: // IDLE
     
     5: // INIT
         IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
             IF totalSegments <= 0 THEN
+                Trace(Message := 'Step 5: Brak segmentow do ciecia. Koniec (1000).');
                 nStep := 1000;
                 RETURN;
             END_IF;
@@ -86,45 +85,72 @@ CASE nStep OF
             _AxisZ.Velocity := localConfig.RapidSpeedZ;
 
             iCurrentSegment := 1;
-            IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN nStep := 10; END_IF     
+            IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN 
+                Trace(Message := CONCAT('Step 5: Start ciecia. Kierunek: ', TO_STRING(CutDirection)));
+                nStep := 10; 
+            END_IF     
         END_IF
 
     // -------- Dojazd do początku cięcia --------
     10:
-        // Zobacz jak czysto to teraz wygląda! Żadnych X/Y, po prostu używamy zmiennych z rozdzielacza:
-		MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, offsetX, offsetY);
+        Trace(Message := CONCAT('Step 10: Dojazd do START. Segment: ', TO_STRING(iCurrentSegment)));
+        Trace(Message := CONCAT('--- Kopia X: ', TO_STRING(iCurrentCopyX)));
+        Trace(Message := CONCAT('--- Kopia Y: ', TO_STRING(iCurrentCopyY)));
+        Trace(Message := CONCAT('--- Target Start X: ', TO_STRING(currentSeg.Start.X)));
+        Trace(Message := CONCAT('--- Target Start Y: ', TO_STRING(currentSeg.Start.Y)));
+        
+        MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, offsetX, offsetY);
         nStep := 20;
 
     20: // Czekamy na pozycję XY
-		IF _AxisX.Error OR _AxisY.Error THEN nStep := 999; 
-        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN nStep := 30; END_IF
+        IF _AxisX.Error OR _AxisY.Error THEN 
+            Trace(Message := 'Step 20: BLAD OSI X LUB Y!');
+            nStep := 999; 
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN 
+            nStep := 30; 
+        END_IF
 
-    30: // Wysunięcie siłownika (obojętnie jakiego, bo to wie interfejs _Cylinder!)
+    30: // Wysunięcie siłownika
+        Trace(Message := 'Step 30: Wysuwanie cylindra (Extend)');
         _Cylinder.Extend();
         nStep := 40;
 
     40: 
         IF _Cylinder.Extended THEN
-            // Bierzemy prędkość cięcia (tu też możemy zrobić małego if'a, jeśli zależy nam na precyzji,
-            // bo w starym kodzie zawsze brałeś CuttingSpeedX i Y[cite: 3757, 3758]. Zostawiam obie)
+            Trace(Message := 'Step 40: Cylinder wysuniety. Ustawianie predkosci roboczej.');
             _AxisX.Velocity := localConfig.CuttingSpeedX;
             _AxisY.Velocity := localConfig.CuttingSpeedY;
             nStep := 50;
-        ELSIF _Cylinder.Error THEN nStep := 999; END_IF
+        ELSIF _Cylinder.Error THEN 
+            Trace(Message := 'Step 40: BLAD CYLINDRA (Wysuw)!');
+            nStep := 999; 
+        END_IF
             
-    50: // Czekanie
+    50: // Czekanie (Idle Time)
         StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.CuttingIdleTime * 1000.0));
-        IF StepTimer.Q THEN StepTimer(IN := FALSE); nStep := 60; END_IF
+        IF StepTimer.Q THEN 
+            StepTimer(IN := FALSE); 
+            nStep := 60; 
+        END_IF
 
     60: // Cięcie XY do końca
-		MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, offsetX, offsetY);
+        Trace(Message := CONCAT('Step 60: CIECE DO STOP. Segment: ', TO_STRING(iCurrentSegment)));
+        Trace(Message := CONCAT('--- Target Stop X: ', TO_STRING(currentSeg.Stop.X))); // TUTAJ BYL BLAD! Wczesniej bylo Start.X
+        Trace(Message := CONCAT('--- Target Stop Y: ', TO_STRING(currentSeg.Stop.Y))); // TUTAJ BYL BLAD! Wczesniej bylo Start.Y
+        
+        MoveToXY(currentSeg.Stop.X, currentSeg.Stop.Y, offsetX, offsetY);
         nStep := 70;
 
     70: // Czekamy na koniec cięcia
-		IF _AxisX.Error OR _AxisY.Error THEN nStep := 999; 
-        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN nStep := 80; END_IF
+        IF _AxisX.Error OR _AxisY.Error THEN 
+            Trace(Message := 'Step 70: BLAD OSI X LUB Y podczas ciecia!');
+            nStep := 999; 
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN 
+            nStep := 80; 
+        END_IF
 
     80: // Chowanie ostrza
+        Trace(Message := 'Step 80: Chowanie cylindra (Retract)');
         _Cylinder.Retract();
         nStep := 85;
 
@@ -132,17 +158,22 @@ CASE nStep OF
         IF _Cylinder.Retracted THEN
              iCurrentSegment := iCurrentSegment + 1;
              nStep := 90;
-        ELSIF _Cylinder.Error THEN nStep := 999; END_IF    
+        ELSIF _Cylinder.Error THEN 
+            Trace(Message := 'Step 85: BLAD CYLINDRA (Chowanie)!');
+            nStep := 999; 
+        END_IF    
 
-    90: // Drugi Idle Time
+    90: // Drugi Idle Time i obsługa Nestingu
         StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.CuttingIdleTime * 1000.0));
         IF StepTimer.Q THEN
             StepTimer(IN := FALSE);
             _AxisX.Velocity := localConfig.RapidSpeedX;
             _AxisY.Velocity := localConfig.RapidSpeedY;
             
-            // CZYSTA PĘTLA NESTINGU (Zastępuje wszystko co tu było)
+            // CZYSTA PĘTLA NESTINGU
             IF iCurrentSegment > totalSegments THEN
+                Trace(Message := CONCAT('Step 90: Zrobiono wszystkie segmenty dla kopii. Calkowicie zakonczone kopie X: ', TO_STRING(iCurrentCopyX)));
+                
                 iCurrentCopyX := iCurrentCopyX + 1;
                 
                 IF iCurrentCopyX > _RecipeBuilder.ActualCopiesX THEN
@@ -150,12 +181,15 @@ CASE nStep OF
                     iCurrentCopyY := iCurrentCopyY + 1;
                     
                     IF iCurrentCopyY > _RecipeBuilder.ActualCopiesY THEN
+                        Trace(Message := 'Step 90: ZAKONCZONO WSZYSTKIE KOPIE (Nesting gotowy). Skok do 1000.');
                         nStep := 1000;
                     ELSE
+                        Trace(Message := CONCAT('Step 90: Skok do nastepnego rzedu (Kopia Y): ', TO_STRING(iCurrentCopyY)));
                         iCurrentSegment := 1;
                         nStep := 10;
                     END_IF
                 ELSE
+                    Trace(Message := CONCAT('Step 90: Skok do nastepnego detalu w rzedzie (Kopia X): ', TO_STRING(iCurrentCopyX)));
                     iCurrentSegment := 1;
                     nStep := 10;
                 END_IF
@@ -165,9 +199,11 @@ CASE nStep OF
         END_IF
 
     999: // Błąd
+        Trace(Message := 'Step 999: FATAL ERROR - Aborting');
         _bBusy := FALSE; _bError := TRUE; _bDone := FALSE; nStep := 0;
 
     1000: // Koniec
+        Trace(Message := 'Step 1000: ZAKONCZONO CALA OPERACJE CIECIA.');
         _bBusy := FALSE; _bDone := TRUE; nStep := 0;
 END_CASE]]></ST>
       </Implementation>
@@ -182,18 +218,7 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCut.CyclicLogic">
-      <LineId Id="15" Count="7" />
-      <LineId Id="137" Count="18" />
-      <LineId Id="38" Count="11" />
-      <LineId Id="54" Count="11" />
-      <LineId Id="67" Count="3" />
-      <LineId Id="166" Count="0" />
-      <LineId Id="72" Count="19" />
-      <LineId Id="93" Count="3" />
-      <LineId Id="167" Count="0" />
-      <LineId Id="98" Count="11" />
-      <LineId Id="206" Count="27" />
-      <LineId Id="120" Count="6" />
+      <LineId Id="244" Count="163" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>

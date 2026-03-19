@@ -148,17 +148,17 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 12.0;
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
 _Limits.PanelFrontLength.MaxVal := 1234.0;
 
-_Limits.PanelFrontWidth.MinVal  := 12.0;
+_Limits.PanelFrontWidth.MinVal  := 100.0;
 _Limits.PanelFrontWidth.MaxVal  := 1234.0;
 
-_Limits.PanelHeight.MinVal      := 12.0;
+_Limits.PanelHeight.MinVal      := 0.0;
 _Limits.PanelHeight.MaxVal      := 1234.0;
 
 _Limits.RailHeightCorrection.MinVal := 12.0;
-_Limits.RailHeightCorrection.MaxVal := 1234.0;
+_Limits.RailHeightCorrection.MaxVal := 14.0;
 
 _Limits.CuttingOverpass.MinVal := 0.0;
 _Limits.CuttingOverpass.MaxVal := 50.0;

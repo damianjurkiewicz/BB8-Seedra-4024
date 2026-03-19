@@ -87,7 +87,9 @@ _Config.PanelFrontWidth      := LIMIT(_Limits.PanelFrontWidth.MinVal,  Config.Pa
 _Config.PanelHeight          := LIMIT(_Limits.PanelHeight.MinVal,      Config.PanelHeight,      _Limits.PanelHeight.MaxVal);
 _Config.RailHeightCorrection := LIMIT(_Limits.RailHeightCorrection.MinVal, Config.RailHeightCorrection, _Limits.RailHeightCorrection.MaxVal);
 _Config.CuttingOverpass      := LIMIT(_Limits.CuttingOverpass.MinVal, Config.CuttingOverpass, _Limits.CuttingOverpass.MaxVal);
-_Config.GroovingOverpass     := LIMIT(_Limits.GroovingOverpass.MinVal, Config.GroovingOverpass, _Limits.GroovingOverpass.MaxVal);]]></ST>
+_Config.GroovingOverpass     := LIMIT(_Limits.GroovingOverpass.MinVal, Config.GroovingOverpass, _Limits.GroovingOverpass.MaxVal);
+
+THIS^.UpdateNestingLimits();]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -234,6 +236,15 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+    <Method Name="UpdateNestingLimits" Id="{b78c73fe-7983-4c8d-9c71-a0293b8dccf5}">
+      <Declaration><![CDATA[METHOD UpdateNestingLimits
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="FB_RecipeBase">
       <LineId Id="9" Count="0" />
     </LineIds>
@@ -254,6 +265,8 @@ END_VAR
       <LineId Id="30" Count="0" />
       <LineId Id="32" Count="4" />
       <LineId Id="29" Count="0" />
+      <LineId Id="40" Count="0" />
+      <LineId Id="39" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.FootprintX.Get">
       <LineId Id="2" Count="0" />
@@ -293,6 +306,9 @@ END_VAR
     </LineIds>
     <LineIds Name="FB_RecipeBase.SegmentsToGroove.Get">
       <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.UpdateNestingLimits">
+      <LineId Id="5" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
