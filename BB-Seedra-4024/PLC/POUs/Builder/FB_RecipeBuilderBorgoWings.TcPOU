@@ -22,10 +22,7 @@ END_VAR
 TotalX   := _Config.PanelFrontWidth  + 2 * _Config.PanelHeight; 
 ShorterY := TotalY - _Config.PanelHeight;
 ShorterX := TotalX - _Config.PanelHeight;
-_FootprintX := TotalX;
-_FootprintY := TotalY;
-_MaxCopiesX := DINT_TO_INT(TRUNC(RAW_BOARD_X / _FootprintX));
-_MaxCopiesY := DINT_TO_INT(TRUNC(RAW_BOARD_Y / _FootprintY));
+THIS^.UpdateNestingLimits();
 
 IF _Config.FillAll THEN
     _ActualCopiesX := _MaxCopiesX;
@@ -171,9 +168,7 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoWings.Build">
-      <LineId Id="563" Count="4" />
-      <LineId Id="680" Count="0" />
-      <LineId Id="694" Count="0" />
+      <LineId Id="563" Count="3" />
       <LineId Id="682" Count="0" />
       <LineId Id="686" Count="7" />
       <LineId Id="685" Count="0" />
