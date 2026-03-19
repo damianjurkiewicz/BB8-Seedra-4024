@@ -141,9 +141,27 @@ CASE nStep OF
             _AxisX.Velocity := localConfig.RapidSpeedX;
             _AxisY.Velocity := localConfig.RapidSpeedY;
             
-            // Decyzja o powrocie na bazie uniwersalnej zmiennej
-            IF iCurrentSegment > totalSegments THEN nStep := 1000;
-            ELSE nStep := 10; END_IF
+            // CZYSTA PĘTLA NESTINGU (Zastępuje wszystko co tu było)
+            IF iCurrentSegment > totalSegments THEN
+                iCurrentCopyX := iCurrentCopyX + 1;
+                
+                IF iCurrentCopyX > _RecipeBuilder.ActualCopiesX THEN
+                    iCurrentCopyX := 1;
+                    iCurrentCopyY := iCurrentCopyY + 1;
+                    
+                    IF iCurrentCopyY > _RecipeBuilder.ActualCopiesY THEN
+                        nStep := 1000;
+                    ELSE
+                        iCurrentSegment := 1;
+                        nStep := 10;
+                    END_IF
+                ELSE
+                    iCurrentSegment := 1;
+                    nStep := 10;
+                END_IF
+            ELSE
+                nStep := 10;
+            END_IF
         END_IF
 
     999: // Błąd
@@ -173,7 +191,9 @@ END_CASE]]></ST>
       <LineId Id="72" Count="19" />
       <LineId Id="93" Count="3" />
       <LineId Id="167" Count="0" />
-      <LineId Id="98" Count="28" />
+      <LineId Id="98" Count="11" />
+      <LineId Id="206" Count="27" />
+      <LineId Id="120" Count="6" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>

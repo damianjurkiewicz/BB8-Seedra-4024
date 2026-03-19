@@ -19,6 +19,9 @@ VAR
     _Cylinder       : I_Cylinder;                     
     _RecipeBuilder  : I_RecipeBuilder;
 	_ConfigProvider : I_GantryConfigProvider;
+	
+	iCurrentCopyX : INT := 1;
+    iCurrentCopyY : INT := 1;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -196,6 +199,8 @@ _bDone    := FALSE;
 _bError   := FALSE;
 _uErrorID := 0;
 nStep     := 5; 
+iCurrentCopyX := 1; 
+iCurrentCopyY := 1; 
 Execute   := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -209,15 +214,22 @@ VAR_INPUT
 END_VAR
 VAR
     localConfig : ST_GantryXYZ_Config;
+	NestingOffsetX : REAL;
+    NestingOffsetY : REAL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Pobieramy bezpieczną konfigurację z Providera (zawiera GlobalOffset)
 localConfig := _ConfigProvider.Config;
 
-// Wykonujemy właściwe ruchy absolutne
-// Do pozycji docelowej dodajemy offset konkretnego narzędzia oraz offset globalny maszyny
-_AxisX.MoveAbsolute(TargetX + ToolOffsetX + localConfig.GlobalOffset, 0);
-_AxisY.MoveAbsolute(TargetY + ToolOffsetY + localConfig.GlobalOffset, 0);
+// Odejmujemy 1, bo pierwsza kopia (indeks 1) ma offset 0.0
+NestingOffsetX := (iCurrentCopyX - 1) * _RecipeBuilder.FootprintX;
+NestingOffsetY := (iCurrentCopyY - 1) * _RecipeBuilder.FootprintY;
+
+// I dodajemy to do naszych wspaniałych komend jazdy:
+_AxisX.MoveAbsolute(TargetX + ToolOffsetX + NestingOffsetX, 0);
+_AxisY.MoveAbsolute(TargetY + ToolOffsetY + NestingOffsetY, 0);
+
+
 
 ]]></ST>
       </Implementation>
@@ -295,10 +307,16 @@ END_VAR
     </LineIds>
     <LineIds Name="FB_ExecutorBase.Execute">
       <LineId Id="6" Count="6" />
+      <LineId Id="15" Count="0" />
+      <LineId Id="14" Count="0" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorBase.MoveToXY">
-      <LineId Id="15" Count="7" />
+      <LineId Id="15" Count="1" />
+      <LineId Id="35" Count="6" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="17" Count="0" />
+      <LineId Id="21" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorBase.RecipeBuilder.Get">

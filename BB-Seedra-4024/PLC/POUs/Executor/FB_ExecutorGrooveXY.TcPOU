@@ -72,7 +72,7 @@ CASE nStep OF
             IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN
 
 				//set it to 1000 to ignore all the steps (default 10)
-                nStep := 10;
+                nStep := 1000;
 				
 
             END_IF     
