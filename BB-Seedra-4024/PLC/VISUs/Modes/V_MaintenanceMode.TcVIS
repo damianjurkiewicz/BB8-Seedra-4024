@@ -695,11 +695,11 @@
                     </o>
                     <o>
                       <v n="Id">1649127785L</v>
-                      <v n="Value">61</v>
+                      <v n="Value">615</v>
                     </o>
                     <o>
                       <v n="Id">357335551L</v>
-                      <v n="Value">246</v>
+                      <v n="Value">412</v>
                     </o>
                     <o>
                       <v n="Id">2422045748L</v>
@@ -746,7 +746,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"HMI_GantryXYZ.Config.GroovingOverpass"</v>
+                      <v n="Value">"MAIN.Seedra.RecipeConfig_HMI.Config.CuttingOverpass"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -760,7 +760,7 @@
                 <v n="VisualElementIdentifier">"GenElemInst_81"</v>
                 <n n="VisualElementOfflinePaintCommands" />
                 <n n="VisualElementFrameInformation" />
-                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="InputBoxInputAction[]">
+                <d n="VisualElementInputActions" t="Hashtable" ckt="String" cvt="IInputAction[]">
                   <v>OnMouseClick</v>
                   <a cet="InputBoxInputAction">
                     <o>
@@ -839,11 +839,11 @@
                     </o>
                     <o>
                       <v n="Id">1649127785L</v>
-                      <v n="Value">63</v>
+                      <v n="Value">617</v>
                     </o>
                     <o>
                       <v n="Id">357335551L</v>
-                      <v n="Value">204</v>
+                      <v n="Value">370</v>
                     </o>
                     <o>
                       <v n="Id">2422045748L</v>
@@ -3120,7 +3120,7 @@
                     </o>
                     <o>
                       <v n="Id">357335551L</v>
-                      <v n="Value">324</v>
+                      <v n="Value">245</v>
                     </o>
                     <o>
                       <v n="Id">2422045748L</v>
@@ -3167,7 +3167,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"HMI_GantryXYZ.Config.GroovingIdleTime"</v>
+                      <v n="Value">"MAIN.Seedra.RecipeConfig_HMI.Config.GroovingOverpass"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -3264,7 +3264,7 @@
                     </o>
                     <o>
                       <v n="Id">357335551L</v>
-                      <v n="Value">285</v>
+                      <v n="Value">206</v>
                     </o>
                     <o>
                       <v n="Id">2422045748L</v>
@@ -3785,7 +3785,7 @@
                     </o>
                     <o>
                       <v n="Id">2477733581L</v>
-                      <v n="Value">"HMI_GantryXYZ.Config.CuttingOverpass"</v>
+                      <v n="Value">"MAIN.Seedra.RecipeConfig_HMI.Config.CuttingOverpass"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -3805,7 +3805,7 @@
                     <o>
                       <v n="InputBoxVariable">""</v>
                       <v n="InputType">"VisuDialogs.Numpad"</v>
-                      <v n="InputBoxMin">"HMI_Recipe.Limits.CuttingOverpass.MinVal	"</v>
+                      <v n="InputBoxMin">"HMI_Recipe.Limits.CuttingOverpass.MinVal"</v>
                       <v n="InputBoxMax">"HMI_Recipe.Limits.CuttingOverpass.MaxVal"</v>
                       <v n="InputBoxDialogTitle">""</v>
                       <v n="Password">false</v>
@@ -5736,7 +5736,7 @@
                     </o>
                     <o>
                       <v n="Id">357335551L</v>
-                      <v n="Value">369</v>
+                      <v n="Value">288</v>
                     </o>
                     <o>
                       <v n="Id">2422045748L</v>
@@ -5901,7 +5901,7 @@
                     </o>
                     <o>
                       <v n="Id">357335551L</v>
-                      <v n="Value">409</v>
+                      <v n="Value">323</v>
                     </o>
                     <o>
                       <v n="Id">2422045748L</v>
@@ -6200,6 +6200,7 @@
         <Type n="Guid">System.Guid</Type>
         <Type n="Hashtable">System.Collections.Hashtable</Type>
         <Type n="HotkeyConfiguration">{6b108d46-58af-4e41-a3f4-174d8f160cc4}</Type>
+        <Type n="IInputAction[]">_3S.CoDeSys.VisualElem.IInputAction[], VisualElem, Version=3.5.13.0, Culture=neutral, PublicKeyToken=null</Type>
         <Type n="InputBoxInputAction">{e8e7e747-f76f-4dee-ab1c-b9637e41ac26}</Type>
         <Type n="InputBoxInputAction[]">_3S.CoDeSys.VisualElem.InputBoxInputAction[], VisualElem.plugin, Version=3.5.13.32, Culture=neutral, PublicKeyToken=null</Type>
         <Type n="Int16">System.Int16</Type>

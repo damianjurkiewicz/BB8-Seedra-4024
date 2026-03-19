@@ -279,6 +279,17 @@ CASE DescendantSequenceState OF
 	
 		// Przekazanie konfiguracji z Persistenta do HMI (żeby po restarcie na ekranie były dobre wartości)
 		RecipeConfig_HMI.Config := ConfigManager.Config;
+		
+		// =================================================================================
+		// DOMYŚLNE LIMITY FIZYCZNE MASZYNY (Zabezpieczenie Numpadów na ekranie powitalnym)
+		// =================================================================================
+//		RecipeConfig_HMI.Limits.PanelFrontLength.MinVal 	:= 12.0;     RecipeConfig_HMI.Limits.PanelFrontLength.MaxVal 	:= 1234.0;
+//		RecipeConfig_HMI.Limits.PanelFrontWidth.MinVal  	:= 12.0;     RecipeConfig_HMI.Limits.PanelFrontWidth.MaxVal  	:= 1234.0;
+//		RecipeConfig_HMI.Limits.PanelHeight.MinVal      	:= 12.0;     RecipeConfig_HMI.Limits.PanelHeight.MaxVal      	:= 1234.0;
+//		RecipeConfig_HMI.Limits.RailHeightCorrection.MinVal := 12.0; 	 RecipeConfig_HMI.Limits.RailHeightCorrection.MaxVal := 1234.0;
+		RecipeConfig_HMI.Limits.CuttingOverpass.MinVal 		:= 0.0;      RecipeConfig_HMI.Limits.CuttingOverpass.MaxVal 	:= 50.0;
+		RecipeConfig_HMI.Limits.GroovingOverpass.MinVal 	:= 0.0;      RecipeConfig_HMI.Limits.GroovingOverpass.MaxVal 	:= 50.0;
+		
 	
 		// Przekazanie konfiguracji z Persistenta do Fabryki (Fabryka rozda to builderom)
 		RecipeFactory.UpdateConfig(ConfigManager.Config);
@@ -547,7 +558,12 @@ END_IF]]></ST>
       <LineId Id="77" Count="0" />
       <LineId Id="106" Count="3" />
       <LineId Id="119" Count="0" />
-      <LineId Id="111" Count="4" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="124" Count="0" />
+      <LineId Id="126" Count="7" />
+      <LineId Id="125" Count="0" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="112" Count="3" />
       <LineId Id="78" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="52" Count="4" />
