@@ -137,6 +137,17 @@ _SegmentsCutY[6].Stop.Y  := -_Config.CuttingOverpass;
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="CalculateFootprint" Id="{d0703fd7-54d2-42a5-810a-5faa421e709f}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// BorgoWings wie, że jego wymiar powiększa się o ścianki zagięcia:
+_NominalX := _Config.PanelFrontWidth  + 2.0 * _Config.PanelHeight;
+_NominalY := _Config.PanelFrontLength + 2.0 * _Config.PanelHeight;]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="FB_init" Id="{166bcf26-5e69-4b30-9881-84478d8b0138}">
       <Declaration><![CDATA[METHOD FB_init : BOOL
 VAR_INPUT
@@ -174,6 +185,10 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="681" Count="0" />
       <LineId Id="569" Count="99" />
       <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderBorgoWings.CalculateFootprint">
+      <LineId Id="9" Count="1" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoWings.FB_init">
       <LineId Id="9" Count="9" />

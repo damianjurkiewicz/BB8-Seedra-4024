@@ -75,7 +75,7 @@ CASE nStep OF
     5: // INIT
         IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
             IF totalSegments <= 0 THEN
-                Trace(Message := 'Step 5: Brak segmentow do ciecia. Koniec (1000).');
+                //Trace(Message := 'Step 5: Brak segmentow do ciecia. Koniec (1000).');
                 nStep := 1000;
                 RETURN;
             END_IF;
@@ -86,43 +86,43 @@ CASE nStep OF
 
             iCurrentSegment := 1;
             IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN 
-                Trace(Message := CONCAT('Step 5: Start ciecia. Kierunek: ', TO_STRING(CutDirection)));
+                //Trace(Message := CONCAT('Step 5: Start ciecia. Kierunek: ', TO_STRING(CutDirection)));
                 nStep := 10; 
             END_IF     
         END_IF
 
     // -------- Dojazd do początku cięcia --------
     10:
-        Trace(Message := CONCAT('Step 10: Dojazd do START. Segment: ', TO_STRING(iCurrentSegment)));
-        Trace(Message := CONCAT('--- Kopia X: ', TO_STRING(iCurrentCopyX)));
-        Trace(Message := CONCAT('--- Kopia Y: ', TO_STRING(iCurrentCopyY)));
-        Trace(Message := CONCAT('--- Target Start X: ', TO_STRING(currentSeg.Start.X)));
-        Trace(Message := CONCAT('--- Target Start Y: ', TO_STRING(currentSeg.Start.Y)));
+        //Trace(Message := CONCAT('Step 10: Dojazd do START. Segment: ', TO_STRING(iCurrentSegment)));
+        //Trace(Message := CONCAT('--- Kopia X: ', TO_STRING(iCurrentCopyX)));
+        //Trace(Message := CONCAT('--- Kopia Y: ', TO_STRING(iCurrentCopyY)));
+        //Trace(Message := CONCAT('--- Target Start X: ', TO_STRING(currentSeg.Start.X)));
+        //Trace(Message := CONCAT('--- Target Start Y: ', TO_STRING(currentSeg.Start.Y)));
         
         MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, offsetX, offsetY);
         nStep := 20;
 
     20: // Czekamy na pozycję XY
         IF _AxisX.Error OR _AxisY.Error THEN 
-            Trace(Message := 'Step 20: BLAD OSI X LUB Y!');
+            //Trace(Message := 'Step 20: BLAD OSI X LUB Y!');
             nStep := 999; 
         ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN 
             nStep := 30; 
         END_IF
 
     30: // Wysunięcie siłownika
-        Trace(Message := 'Step 30: Wysuwanie cylindra (Extend)');
+        //Trace(Message := 'Step 30: Wysuwanie cylindra (Extend)');
         _Cylinder.Extend();
         nStep := 40;
 
     40: 
         IF _Cylinder.Extended THEN
-            Trace(Message := 'Step 40: Cylinder wysuniety. Ustawianie predkosci roboczej.');
+            //Trace(Message := 'Step 40: Cylinder wysuniety. Ustawianie predkosci roboczej.');
             _AxisX.Velocity := localConfig.CuttingSpeedX;
             _AxisY.Velocity := localConfig.CuttingSpeedY;
             nStep := 50;
         ELSIF _Cylinder.Error THEN 
-            Trace(Message := 'Step 40: BLAD CYLINDRA (Wysuw)!');
+            //Trace(Message := 'Step 40: BLAD CYLINDRA (Wysuw)!');
             nStep := 999; 
         END_IF
             
@@ -134,23 +134,23 @@ CASE nStep OF
         END_IF
 
     60: // Cięcie XY do końca
-        Trace(Message := CONCAT('Step 60: CIECE DO STOP. Segment: ', TO_STRING(iCurrentSegment)));
-        Trace(Message := CONCAT('--- Target Stop X: ', TO_STRING(currentSeg.Stop.X))); // TUTAJ BYL BLAD! Wczesniej bylo Start.X
-        Trace(Message := CONCAT('--- Target Stop Y: ', TO_STRING(currentSeg.Stop.Y))); // TUTAJ BYL BLAD! Wczesniej bylo Start.Y
+        //Trace(Message := CONCAT('Step 60: CIECE DO STOP. Segment: ', TO_STRING(iCurrentSegment)));
+        //Trace(Message := CONCAT('--- Target Stop X: ', TO_STRING(currentSeg.Stop.X))); // TUTAJ BYL BLAD! Wczesniej bylo Start.X
+        //Trace(Message := CONCAT('--- Target Stop Y: ', TO_STRING(currentSeg.Stop.Y))); // TUTAJ BYL BLAD! Wczesniej bylo Start.Y
         
         MoveToXY(currentSeg.Stop.X, currentSeg.Stop.Y, offsetX, offsetY);
         nStep := 70;
 
     70: // Czekamy na koniec cięcia
         IF _AxisX.Error OR _AxisY.Error THEN 
-            Trace(Message := 'Step 70: BLAD OSI X LUB Y podczas ciecia!');
+            //Trace(Message := 'Step 70: BLAD OSI X LUB Y podczas ciecia!');
             nStep := 999; 
         ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN 
             nStep := 80; 
         END_IF
 
     80: // Chowanie ostrza
-        Trace(Message := 'Step 80: Chowanie cylindra (Retract)');
+        //Trace(Message := 'Step 80: Chowanie cylindra (Retract)');
         _Cylinder.Retract();
         nStep := 85;
 
@@ -159,7 +159,7 @@ CASE nStep OF
              iCurrentSegment := iCurrentSegment + 1;
              nStep := 90;
         ELSIF _Cylinder.Error THEN 
-            Trace(Message := 'Step 85: BLAD CYLINDRA (Chowanie)!');
+            //Trace(Message := 'Step 85: BLAD CYLINDRA (Chowanie)!');
             nStep := 999; 
         END_IF    
 
@@ -172,7 +172,7 @@ CASE nStep OF
             
             // CZYSTA PĘTLA NESTINGU
             IF iCurrentSegment > totalSegments THEN
-                Trace(Message := CONCAT('Step 90: Zrobiono wszystkie segmenty dla kopii. Calkowicie zakonczone kopie X: ', TO_STRING(iCurrentCopyX)));
+                //Trace(Message := CONCAT('Step 90: Zrobiono wszystkie segmenty dla kopii. Calkowicie zakonczone kopie X: ', TO_STRING(iCurrentCopyX)));
                 
                 iCurrentCopyX := iCurrentCopyX + 1;
                 
@@ -181,15 +181,15 @@ CASE nStep OF
                     iCurrentCopyY := iCurrentCopyY + 1;
                     
                     IF iCurrentCopyY > _RecipeBuilder.ActualCopiesY THEN
-                        Trace(Message := 'Step 90: ZAKONCZONO WSZYSTKIE KOPIE (Nesting gotowy). Skok do 1000.');
+                        //Trace(Message := 'Step 90: ZAKONCZONO WSZYSTKIE KOPIE (Nesting gotowy). Skok do 1000.');
                         nStep := 1000;
                     ELSE
-                        Trace(Message := CONCAT('Step 90: Skok do nastepnego rzedu (Kopia Y): ', TO_STRING(iCurrentCopyY)));
+                        //Trace(Message := CONCAT('Step 90: Skok do nastepnego rzedu (Kopia Y): ', TO_STRING(iCurrentCopyY)));
                         iCurrentSegment := 1;
                         nStep := 10;
                     END_IF
                 ELSE
-                    Trace(Message := CONCAT('Step 90: Skok do nastepnego detalu w rzedzie (Kopia X): ', TO_STRING(iCurrentCopyX)));
+                    //Trace(Message := CONCAT('Step 90: Skok do nastepnego detalu w rzedzie (Kopia X): ', TO_STRING(iCurrentCopyX)));
                     iCurrentSegment := 1;
                     nStep := 10;
                 END_IF
@@ -199,11 +199,11 @@ CASE nStep OF
         END_IF
 
     999: // Błąd
-        Trace(Message := 'Step 999: FATAL ERROR - Aborting');
+        //Trace(Message := 'Step 999: FATAL ERROR - Aborting');
         _bBusy := FALSE; _bError := TRUE; _bDone := FALSE; nStep := 0;
 
     1000: // Koniec
-        Trace(Message := 'Step 1000: ZAKONCZONO CALA OPERACJE CIECIA.');
+        //Trace(Message := 'Step 1000: ZAKONCZONO CALA OPERACJE CIECIA.');
         _bBusy := FALSE; _bDone := TRUE; nStep := 0;
 END_CASE]]></ST>
       </Implementation>

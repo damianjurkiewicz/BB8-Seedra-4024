@@ -91,6 +91,17 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+    <Property Name="Error" Id="{52e1f837-5dd1-4291-8f40-b3ee3120995e}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1890e02-b63b-4e19-846d-4413c1d29782}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := _Error;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Property Name="ForceError" Id="{f514eeb6-a551-4e27-aaab-28fe692ebd49}">
       <Declaration><![CDATA[PROPERTY ForceError : BOOL]]></Declaration>
       <Get Name="Get" Id="{fc5c6a10-59c0-4789-bf2a-b69856585819}">
@@ -178,6 +189,9 @@ END_VAR
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_MockAxis.Enabled.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Error.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MockAxis.ForceError.Get">

@@ -159,7 +159,7 @@ CASE Step OF
         // Wykorzystujemy BorgoWings, które domyślnie posiada 6 segmentów CutX
         RecipeConfig.PanelFrontLength := 300.0;
         RecipeConfig.PanelHeight := 100.0;
-        RecipeConfig.PanelFrontWidth := 500.0;
+        RecipeConfig.PanelFrontWidth := 300.0;
         
         // Wymuszamy 2 kopie w X i 2 kopie w Y
         RecipeConfig.FillAll := FALSE;

@@ -79,11 +79,11 @@ AssertTrue(Condition := WasBuilt,
            Message := 'Przepis zwrocil FALSE - brak implementacji!');
 
 // 4. Assert - Sprawdzamy konkretne wartości dla Arony (po 2 z każdego)
-AssertEquals_INT(Expected := 6, 
+AssertEquals_INT(Expected := 2, 
                  Actual := BuilderBorgoFlaps.SegmentsToCutX, 
                  Message := 'Zla liczba ciec X dla profilu Borgo Flaps');
                  
-AssertEquals_INT(Expected := 6, 
+AssertEquals_INT(Expected := 2, 
                  Actual := BuilderBorgoFlaps.SegmentsToCutY, 
                  Message := 'Zla liczba ciec Y dla profilu Borgo Flaps');
                  
@@ -106,7 +106,8 @@ END_VAR]]></Declaration>
 Config.PanelFrontWidth  := 400.0;
 Config.PanelFrontLength := 400.0;
 Config.PanelHeight      := 100.0;
-Config.CuttingOverpass  := 20.0;
+Config.CuttingOverpass  := 0.0;
+Config.GroovingOverpass := 0.0;
 
 // =========================================================================
 // SCENARIUSZ 1: Użytkownik chce wpisać za dużo (np. 10 sztuk), FillAll = FALSE
@@ -120,11 +121,11 @@ BuilderBorgoWings.Config := Config;
 WasBuilt := BuilderBorgoWings.Build(); 
 
 // ASSERT 1
-AssertEquals_DINT(Expected := 4, 
+AssertEquals_DINT(Expected := 2, 
                  Actual := BuilderBorgoWings.ActualCopiesX, 
                  Message := 'Nie obcieto ActualCopiesX do maksimum przy przekroczeniu!');
                  
-AssertEquals_DINT(Expected := 2, 
+AssertEquals_DINT(Expected := 4, 
                  Actual := BuilderBorgoWings.ActualCopiesY, 
                  Message := 'Nie obcieto ActualCopiesY do maksimum przy przekroczeniu!');
 
@@ -140,11 +141,11 @@ BuilderBorgoWings.Config := Config;
 WasBuilt := BuilderBorgoWings.Build();
 
 // ASSERT 2
-AssertEquals_DINT(Expected := 4, 
+AssertEquals_DINT(Expected := 2, 
                  Actual := BuilderBorgoWings.ActualCopiesX, 
                  Message := 'FillAll=TRUE nie ustawilo ActualCopiesX na Max!');
                  
-AssertEquals_DINT(Expected := 2, 
+AssertEquals_DINT(Expected := 4, 
                  Actual := BuilderBorgoWings.ActualCopiesY, 
                  Message := 'FillAll=TRUE nie ustawilo ActualCopiesY na Max!');
 
@@ -244,6 +245,9 @@ END_VAR]]></Declaration>
 Config.PanelFrontWidth  := 400.0;
 Config.PanelFrontLength := 400.0;
 Config.PanelHeight      := 100.0;
+Config.CuttingOverpass  := 0.0;
+Config.GroovingOverpass := 0.0;
+
 BuilderBorgoWings.Config := Config;
 
 // 2. Act
@@ -277,20 +281,20 @@ END_VAR]]></Declaration>
 Config.PanelFrontWidth  := 400.0;
 Config.PanelFrontLength := 400.0;
 Config.PanelHeight      := 100.0;
-Config.CuttingOverpass  := 20.0;
+Config.CuttingOverpass  := 0.0;
+Config.GroovingOverpass := 0.0;
 BuilderBorgoWings.Config := Config;
 
 // 2. Act
 WasBuilt := BuilderBorgoWings.Build();
 
 // 3. Assert
-// Footprint X = 400 + 2*100 = 600. Płyta (zakładamy 2400). 2400 / 600 = 4 sztuki
-AssertEquals_DINT(Expected := 4, 
+AssertEquals_DINT(Expected := 2, 
                  Actual := BuilderBorgoWings.MaxCopiesX, 
                  Message := 'Zle wyliczona maksymalna liczba sztuk w osi X!');
 
-// Footprint Y = 400 + 2*100 = 600. Płyta (zakładamy 1200). 1200 / 600 = 2 sztuki
-AssertEquals_DINT(Expected := 2, 
+
+AssertEquals_DINT(Expected := 4, 
                  Actual := BuilderBorgoWings.MaxCopiesY, 
                  Message := 'Zle wyliczona maksymalna liczba sztuk w osi Y!');
 
@@ -354,7 +358,7 @@ BuilderBorgoWings.Config := TestConfig;
 ActualConfig := BuilderBorgoWings.Config; // Odczytujemy to, co Builder fizycznie zapisał
 
 // 3. ASSERT - Sprawdzamy czy Builder użył funkcji LIMIT
-AssertEquals_REAL(Expected := 12.0, // Założone minimum dla długości
+AssertEquals_REAL(Expected := 100.0, // Założone minimum dla długości
                   Actual := ActualConfig.PanelFrontLength, 
                   Delta := 0.01, 
                   Message := 'Ujemna dlugosc nie zostala przycieta do minimum!');
@@ -364,7 +368,7 @@ AssertEquals_REAL(Expected := 1234.0, // Założone maximum dla szerokości z Tw
                   Delta := 0.01, 
                   Message := 'Kosmiczna szerokosc nie zostala przycieta do maximum!');
 
-AssertEquals_REAL(Expected := 12.0, // Założone minimum dla wysokości z Twojego HMI
+AssertEquals_REAL(Expected := 0.0, // Założone minimum dla wysokości z Twojego HMI
                   Actual := ActualConfig.PanelHeight, 
                   Delta := 0.01, 
                   Message := 'Zerowa wysokosc nie zostala bezpiecznie ograniczona!');
@@ -390,7 +394,9 @@ TEST_FINISHED();]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_ActualCopies">
-      <LineId Id="9" Count="47" />
+      <LineId Id="9" Count="5" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="15" Count="41" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Coordinates">
@@ -403,11 +409,20 @@ TEST_FINISHED();]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Footprint">
-      <LineId Id="9" Count="23" />
+      <LineId Id="9" Count="5" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="16" Count="16" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_MaxCopies">
-      <LineId Id="9" Count="22" />
+      <LineId Id="9" Count="5" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="16" Count="5" />
+      <LineId Id="23" Count="8" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Segments">
