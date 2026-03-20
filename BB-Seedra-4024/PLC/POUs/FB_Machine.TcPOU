@@ -18,6 +18,8 @@ VAR
     RecipeConfig_HMI : ST_RecipeBuilder_HMI; 
 
 	Machine_HMI : ST_Machine_HMI;
+	
+	sSelectedRecipeName : STRING(50);
 
 
 END_VAR
@@ -194,6 +196,19 @@ CastingHelper := _CurrentState;
 Machine_HMI.Status.PackMLState := CastingHelper;
 
 
+CASE GantryXYZ.ProgramIdRequested OF
+    E_RecipeID.eNone:
+        sSelectedRecipeName := 'Choose a Recipe';
+    E_RecipeID.eBorgoFlaps:
+        sSelectedRecipeName := 'Borgo Flaps';
+    E_RecipeID.eBorgoWings:
+        sSelectedRecipeName := 'Borgo Wings';
+    E_RecipeID.eArona:
+        sSelectedRecipeName := ' Arona';
+ELSE
+    sSelectedRecipeName := 'Unknown Recipe';
+END_CASE
+
 SUPER^.HMICommunication();]]></ST>
       </Implementation>
     </Method>
@@ -218,10 +233,10 @@ CASE _CurrentMode OF
             E_PMLState.ePMLState_Suspended:
          		AllowHMIControl(ThisModuleOnly := FALSE);
             E_PMLState.ePMLState_Execute:
-				GVL_HMI.ShowProductionPopup := 1;
+				GVL_HMI.PopupToDisplay := 1;
             	AllowHMIControl(ThisModuleOnly := FALSE); 
 			  E_PMLState.ePMLState_Aborting:
-				GVL_HMI.ShowProductionPopup := 0;
+				GVL_HMI.PopupToDisplay := 0;
 				AllowHMIControl(ThisModuleOnly := FALSE); 
             E_PMLState.ePMLState_Aborted:
 				GVL_HMI.MenuToDisplay := 0;
@@ -229,7 +244,7 @@ CASE _CurrentMode OF
             E_PMLState.ePMLState_Held:
                 AllowHMIControl(ThisModuleOnly := FALSE); 
             E_PMLState.ePMLState_Complete:
-				GVL_HMI.ShowProductionPopup := 0;
+				GVL_HMI.PopupToDisplay := 0;
           		AllowHMIControl(ThisModuleOnly := FALSE); 
 				
         END_CASE
@@ -518,6 +533,8 @@ END_IF]]></ST>
       <LineId Id="12" Count="0" />
       <LineId Id="17" Count="0" />
       <LineId Id="22" Count="0" />
+      <LineId Id="40" Count="11" />
+      <LineId Id="37" Count="0" />
       <LineId Id="10" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>

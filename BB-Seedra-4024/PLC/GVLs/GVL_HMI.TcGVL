@@ -6,7 +6,7 @@ VAR_GLOBAL
 		//0 - Production Mode, 1 - Manual Mode, 2 - Maintenance Mode
 		MenuToDisplay :INT;
 		//0 - will keep MainMenu open, 1- InfoMenu overlay during the production
-		ShowProductionPopup :INT;		
+		PopupToDisplay :INT;		
 END_VAR]]></Declaration>
   </GVL>
 </TcPlcObject>

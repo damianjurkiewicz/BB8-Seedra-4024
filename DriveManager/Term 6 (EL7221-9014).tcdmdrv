@@ -359,7 +359,6 @@
       <Inverter>
         <Device>
           <Name>DMInverterTypeDevice</Name>
-          <ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
           <Parameter>
             <PropertyName>MaxAllowedMainVoltage</PropertyName>
             <Value>48</Value>
@@ -780,7 +779,6 @@
             <Load MoveStyle="Linear">
               <IsMotorRotary>true</IsMotorRotary>
               <Name>InverterChannelTypeBlockLoad</Name>
-              <ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
               <Parameter>
                 <PropertyName>FeedConstantUnit</PropertyName>
                 <Value>mm</Value>
@@ -825,7 +823,6 @@
             <Controller>
               <Filter Id="0">
                 <Name>ControllerFilter</Name>
-                <ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
                 <Parameter>
                   <PropertyName>Filter_Type</PropertyName>
                   <Value>1</Value>
@@ -893,11 +890,11 @@
       </Info>
       <ProcessData>
         <Send>
-          <BitStart>648</BitStart>
+          <BitStart>12576</BitStart>
           <BitLength>80</BitLength>
         </Send>
         <Recv>
-          <BitStart>648</BitStart>
+          <BitStart>12576</BitStart>
           <BitLength>80</BitLength>
         </Recv>
         <Sm2>
@@ -933,8 +930,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593824</IndexGroup>
-              <IndexOffset>-2147483567</IndexOffset>
+              <IndexGroup>50593856</IndexGroup>
+              <IndexOffset>-2147483612</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -966,8 +963,8 @@ Bit 14 - 15 : reserved</Comment>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593824</IndexGroup>
-              <IndexOffset>-2147483563</IndexOffset>
+              <IndexGroup>50593856</IndexGroup>
+              <IndexOffset>-2147483608</IndexOffset>
               <Length>2</Length>
             </AdsInfo>
           </Entry>
@@ -1029,8 +1026,8 @@ Bit 14 - 15 : reserved</Comment>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593824</IndexGroup>
-              <IndexOffset>-2147483561</IndexOffset>
+              <IndexGroup>50593856</IndexGroup>
+              <IndexOffset>-2147483606</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -1192,8 +1189,8 @@ Bit 8 - 15 : reserved</Comment>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593824</IndexGroup>
-              <IndexOffset>-2130706351</IndexOffset>
+              <IndexGroup>50593856</IndexGroup>
+              <IndexOffset>-2130706396</IndexOffset>
               <Length>2</Length>
             </AdsInfo>
           </Entry>
@@ -1211,8 +1208,8 @@ Bit 8 - 15 : reserved</Comment>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593824</IndexGroup>
-              <IndexOffset>-2130706349</IndexOffset>
+              <IndexGroup>50593856</IndexGroup>
+              <IndexOffset>-2130706394</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -1274,8 +1271,8 @@ Bit 8 - 15 : reserved</Comment>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593824</IndexGroup>
-              <IndexOffset>-2130706345</IndexOffset>
+              <IndexGroup>50593856</IndexGroup>
+              <IndexOffset>-2130706390</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -1599,7 +1596,7 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>32784</Index>
               <SubIndex>19</SubIndex>
-              <Data>5300</Data>
+              <Data>6400</Data>
             </InitCmd>
             <InitCmd>
               <Transition>PS</Transition>
@@ -1617,7 +1614,7 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>32784</Index>
               <SubIndex>21</SubIndex>
-              <Data>e8030000</Data>
+              <Data>58020000</Data>
             </InitCmd>
             <InitCmd>
               <Transition>PS</Transition>
@@ -1626,7 +1623,7 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>32784</Index>
               <SubIndex>20</SubIndex>
-              <Data>28000000</Data>
+              <Data>32000000</Data>
             </InitCmd>
             <InitCmd>
               <Transition>PS</Transition>
@@ -1644,7 +1641,16 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>28688</Index>
               <SubIndex>3</SubIndex>
-              <Data>09</Data>
+              <Data>08</Data>
+            </InitCmd>
+            <InitCmd>
+              <Transition>PS</Transition>
+              <Comment><![CDATA[DRV Amplifier Settings / Position loop proportional gain]]></Comment>
+              <Timeout>0</Timeout>
+              <Ccs>1</Ccs>
+              <Index>32784</Index>
+              <SubIndex>23</SubIndex>
+              <Data>c4090000</Data>
             </InitCmd>
           </InitCmds>
           <CanOpenType>39</CanOpenType>
@@ -1917,7 +1923,7 @@ Bit 8 - 15 : reserved</Comment>
           <Cmd>5</Cmd>
           <Adp>1006</Adp>
           <Ado>2464</Ado>
-          <Data>80841e00e8030000</Data>
+          <Data>80969800e8030000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -2015,7 +2021,7 @@ Bit 8 - 15 : reserved</Comment>
           <Cmd>5</Cmd>
           <Adp>1006</Adp>
           <Ado>1536</Ado>
-          <Data>0a0000010a0000070011000201000000</Data>
+          <Data>0a0000020a0000070011000201000000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -2025,7 +2031,7 @@ Bit 8 - 15 : reserved</Comment>
           <Cmd>5</Cmd>
           <Adp>1006</Adp>
           <Ado>1552</Ado>
-          <Data>0a0000010a0000078011000101000000</Data>
+          <Data>0a0000020a0000078011000101000000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -2283,7 +2289,7 @@ Bit 8 - 15 : reserved</Comment>
         <PotentialReferenceClock>false</PotentialReferenceClock>
         <TimeLoopControlOnly>false</TimeLoopControlOnly>
         <ReferenceClock>false</ReferenceClock>
-        <CycleTime0>2000000</CycleTime0>
+        <CycleTime0>10000000</CycleTime0>
         <CycleTime1>1000</CycleTime1>
         <ShiftTime>30000</ShiftTime>
         <OpMode Selected="true">
