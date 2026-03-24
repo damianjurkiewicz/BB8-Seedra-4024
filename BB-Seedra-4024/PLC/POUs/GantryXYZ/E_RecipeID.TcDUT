@@ -4,11 +4,12 @@
     <Declaration><![CDATA[{attribute 'qualified_only'}
 TYPE E_RecipeId :
 (
-    eNone       := 0, // Welcome Screen
+    eNone       := 0, 
     eBorgoFlaps := 1,
     eBorgoWings := 2,
-    eArona      := 3
-) := eNone; // Welcome screen by default
+    eArona      := 3,
+	eRectangle 	:= 4
+) := eNone; 
 END_TYPE]]></Declaration>
   </DUT>
 </TcPlcObject>

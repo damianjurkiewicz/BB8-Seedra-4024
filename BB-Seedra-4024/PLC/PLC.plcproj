@@ -52,6 +52,18 @@
     <Compile Include="PlcTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderArona.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderRectangle.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderBorgoFlaps.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderBorgoWings.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Components\FB_Cylinder.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -136,15 +148,6 @@
     <Compile Include="POUs\Builder\FB_RecipeBase.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\FB_RecipeBuilderArona.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\Builder\FB_RecipeBuilderBorgoFlaps.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\Builder\FB_RecipeBuilderBorgoWings.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="POUs\Builder\FB_RecipeFactory.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -208,6 +211,10 @@
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionRectangle.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
     <Compile Include="VISUs\Modes\ProductionMode\V_ProductionBorgoFlaps.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
@@ -251,6 +258,7 @@
   <ItemGroup>
     <Folder Include="DUTs" />
     <Folder Include="GVLs" />
+    <Folder Include="POUs\Builder\Recipes" />
     <Folder Include="POUs\Components" />
     <Folder Include="POUs\GantryXYZ" />
     <Folder Include="POUs\Executor" />

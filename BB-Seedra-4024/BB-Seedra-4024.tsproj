@@ -1519,6 +1519,11 @@ External Setpoint Generation:
 	</ImageDatas>
 	<Project ProjectGUID="{92C1A8B7-D820-4544-891C-65FDF8A5BC46}" TargetNetId="5.141.80.204.1.1" RelativeTargetNetId="true" RelativeIpAddresses="true" ShowHideConfigurations="#x6">
 		<System>
+			<Licenses>
+				<Target BkhfOrder="01783799">
+					<ManualSelect>{DEA72F0A-9EA0-48F4-ABB5-766516202B8E}</ManualSelect>
+				</Target>
+			</Licenses>
 			<Tasks>
 				<Task Id="5" Priority="20" CycleTime="100000" AmsPort="350" AdtTasks="true">
 					<Name>PlcTask</Name>
@@ -1987,7 +1992,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{C7A38EC8-F773-3930-E454-0D68D7395591}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{CC089124-4589-C6E0-EE71-1E8C1487A0EE}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
