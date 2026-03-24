@@ -20,6 +20,7 @@ VAR
 	Machine_HMI : ST_Machine_HMI;
 	
 	sSelectedRecipeName : STRING(50);
+	aRecipeNames : ARRAY[0..10] OF STRING(50);
 
 
 END_VAR
@@ -194,6 +195,14 @@ END_IF
 
 CastingHelper := _CurrentState;
 Machine_HMI.Status.PackMLState := CastingHelper;
+
+
+aRecipeNames[E_RecipeID.eNone]       := 'Brak programu';
+aRecipeNames[E_RecipeID.eBorgoFlaps] := 'Borgo Flaps';
+aRecipeNames[E_RecipeID.eBorgoWings] := 'Borgo Wings';
+aRecipeNames[E_RecipeID.eArona]      := 'Profil Arona';
+
+
 
 
 CASE GantryXYZ.ProgramIdRequested OF
@@ -532,6 +541,9 @@ END_IF]]></ST>
       <LineId Id="29" Count="0" />
       <LineId Id="12" Count="0" />
       <LineId Id="17" Count="0" />
+      <LineId Id="59" Count="0" />
+      <LineId Id="62" Count="5" />
+      <LineId Id="61" Count="0" />
       <LineId Id="22" Count="0" />
       <LineId Id="40" Count="11" />
       <LineId Id="37" Count="0" />

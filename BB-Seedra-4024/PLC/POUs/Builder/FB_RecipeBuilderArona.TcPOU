@@ -30,6 +30,8 @@ _SegmentsToCutY   := 2;
 // 2. Blokada przed uruchomieniem.
 // W teście jednostkowym Twoja pierwsza asercja powinna sprawdzać 
 // właśnie to, czy Builder.Build() zwrócił TRUE.
+
+
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -76,6 +78,7 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
     </LineIds>
     <LineIds Name="FB_RecipeBuilderArona.Build">
       <LineId Id="581" Count="15" />
+      <LineId Id="600" Count="1" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderArona.CalculateFootprint">

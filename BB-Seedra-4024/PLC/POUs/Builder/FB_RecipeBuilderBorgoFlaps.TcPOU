@@ -80,7 +80,6 @@ _SegmentsCutY[2].Start.Y := TotalY + _Config.CuttingOverpass;
 _SegmentsCutY[2].Stop.Y  := -_Config.CuttingOverpass;
 
 
-
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -145,7 +144,6 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="657" Count="7" />
       <LineId Id="625" Count="0" />
       <LineId Id="615" Count="0" />
-      <LineId Id="595" Count="0" />
       <LineId Id="600" Count="0" />
       <LineId Id="11" Count="0" />
     </LineIds>

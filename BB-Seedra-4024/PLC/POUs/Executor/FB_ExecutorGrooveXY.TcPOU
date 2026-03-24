@@ -43,6 +43,7 @@ CASE nStep OF
 
     // -------- Inicjalizacja procesu --------
     5:
+		Trace(Message := CONCAT('WYBRANY PROGRAM: ', TO_STRING(MAIN.Seedra.aRecipeNames[MAIN.Seedra.GantryXYZ.ProgramIdRequested])));
         // Konfiguracja głębokości (g) i mnożników prędkości (v)
         g1 := 3.5; g2 := 3.5; g3 := 1.5; g4 := 0.0; g5 := 0.0;
         v1 := 1.0; v2 := 1.0; v3 := 1.0; v4 := 1.0; v5 := 1.0;
@@ -59,7 +60,7 @@ CASE nStep OF
             _AxisZ.Velocity := localConfig.RapidSpeedZ;
 
             iCurrentSegment := 1;
-            iPass := 1; // STARTUJEMY OD 1 PRZEJAZDU
+            iPass := 4; // STARTUJEMY OD 1 PRZEJAZDU, tu zmienione do testów, no worries
             
             IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN
                 //Trace(Message := 'Step 5: Start sekwencji frezowania (Grooving).');
@@ -250,7 +251,9 @@ END_CASE]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorGrooveXY.CyclicLogic">
-      <LineId Id="481" Count="222" />
+      <LineId Id="481" Count="22" />
+      <LineId Id="716" Count="0" />
+      <LineId Id="504" Count="199" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>
