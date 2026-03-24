@@ -197,26 +197,15 @@ CastingHelper := _CurrentState;
 Machine_HMI.Status.PackMLState := CastingHelper;
 
 
-aRecipeNames[E_RecipeID.eNone]       := 'Brak programu';
+aRecipeNames[E_RecipeID.eNone]       := '-';
 aRecipeNames[E_RecipeID.eBorgoFlaps] := 'Borgo Flaps';
 aRecipeNames[E_RecipeID.eBorgoWings] := 'Borgo Wings';
-aRecipeNames[E_RecipeID.eArona]      := 'Profil Arona';
+aRecipeNames[E_RecipeID.eArona]      := 'Arona';
+
+sSelectedRecipeName := aRecipeNames[GantryXYZ.ProgramIdRequested];
 
 
 
-
-CASE GantryXYZ.ProgramIdRequested OF
-    E_RecipeID.eNone:
-        sSelectedRecipeName := 'Choose a Recipe';
-    E_RecipeID.eBorgoFlaps:
-        sSelectedRecipeName := 'Borgo Flaps';
-    E_RecipeID.eBorgoWings:
-        sSelectedRecipeName := 'Borgo Wings';
-    E_RecipeID.eArona:
-        sSelectedRecipeName := ' Arona';
-ELSE
-    sSelectedRecipeName := 'Unknown Recipe';
-END_CASE
 
 SUPER^.HMICommunication();]]></ST>
       </Implementation>
@@ -545,7 +534,7 @@ END_IF]]></ST>
       <LineId Id="62" Count="5" />
       <LineId Id="61" Count="0" />
       <LineId Id="22" Count="0" />
-      <LineId Id="40" Count="11" />
+      <LineId Id="40" Count="0" />
       <LineId Id="37" Count="0" />
       <LineId Id="10" Count="0" />
       <LineId Id="5" Count="0" />
