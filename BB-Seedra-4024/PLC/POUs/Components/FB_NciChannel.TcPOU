@@ -1,0 +1,284 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_NciChannel" Id="{08e0b468-709d-436d-9099-2993cda1a53a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NciChannel EXTENDS FB_ComponentBase IMPLEMENTS I_NciChannel
+VAR
+    // Zmienne zlinkowane bezpośrednio z hardwarem kanału NCI
+    stNciToPlc AT %I* : NCTOPLC_NCICHANNEL_REF; 
+    stPlcToNci AT %Q* : PLCTONC_NCICHANNEL_REF;
+
+    // Bloki systemowe Beckhoffa do obsługi grupy
+    fbBuildGroup    : CfgBuild3DGroup;
+    fbUngroup       : CfgReconfigGroup;
+    
+    // Bloki systemowe do obsługi programu i ruchu (nowe wersje Ex)
+    fbLoadProg      : ItpLoadProgEx;
+    fbStartStop     : ItpStartStopEx;
+    fbReset         : ItpResetEx2;
+    
+    _IsGrouped      : BOOL;
+    _IsProgLoaded   : BOOL;
+    _IsReady		:BOOL;
+	
+    _GroupId        : UDINT := 1; // ID Twojej grupy NCI
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="BuildGroup" Id="{66cae995-577f-4fd0-87b2-2377298b6c08}">
+      <Declaration><![CDATA[METHOD BuildGroup
+VAR_INPUT
+	nXAxisId : UDINT; nYAxisId : UDINT; nZAxisId : UDINT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_IsGrouped := FALSE;
+fbBuildGroup(
+    bExecute := TRUE,
+    nGroupId := _GroupId,
+    nXAxisId := nXAxisId,
+    nYAxisId := nYAxisId,
+    nZAxisId := nZAxisId
+);]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ChannelError" Id="{00e4bd1a-bf02-4d2b-946a-25a3bc45656f}">
+      <Declaration><![CDATA[PROPERTY ChannelError : BOOL]]></Declaration>
+      <Get Name="Get" Id="{f4ebe933-f7f9-435a-92ab-18b62f7e1f3b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ChannelError := _Error OR (stNciToPlc.ErrorCode <> 0);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ChannelErrorId" Id="{5eecb53c-95cd-4946-aa97-89be021e8fb6}">
+      <Declaration><![CDATA[PROPERTY ChannelErrorId : UDINT]]></Declaration>
+      <Get Name="Get" Id="{b56a0d9f-fbbe-4639-aa87-9f6a3e9935e4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF stNciToPlc.ErrorCode <> 0 THEN
+    ChannelErrorId := stNciToPlc.ErrorCode;
+ELSE
+    ChannelErrorId := _ErrorId;
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="CyclicLogic" Id="{06e1abcc-1131-428d-af2d-924cc3aee150}">
+      <Declaration><![CDATA[// This method serves as the entry point for all underlying FB logic
+METHOD PUBLIC CyclicLogic
+
+// This method should be called cyclically by descendant function blocks by invoking SUPER^.CyclicLogic().  Alternatively, the contents of this method could be reimplemented entirely in which case a call to this method would not be necessary.]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Wywołanie bazowe
+SUPER^.CyclicLogic();
+
+// --- ODŚWIEŻANIE BLOKÓW SYSTEMOWYCH ---
+fbBuildGroup(tTimeOut := T#2S);
+fbUngroup(tTimeOut := T#2S);
+
+
+fbLoadProg(
+    sNciToPlc := stNciToPlc, 
+    tTimeOut := T#2S
+);
+
+fbStartStop(
+    sNciToPlc := stNciToPlc, 
+    tTimeOut := T#2S
+);
+
+fbReset(
+    sNciToPlc := stNciToPlc, 
+    tTimeOut := T#2S
+);
+
+// --- AKTUALIZACJA STATUSÓW ---
+// Obsługa stanów dla tworzenia grupy
+IF fbBuildGroup.bErr THEN
+    _Error := TRUE;
+    _ErrorId := fbBuildGroup.nErrId;
+ELSIF fbBuildGroup.bBusy = FALSE AND fbBuildGroup.bExecute THEN
+    _IsGrouped := TRUE;
+    fbBuildGroup(bExecute := FALSE);
+END_IF
+
+// Podobnie dla ładowania programu
+IF fbLoadProg.bErr THEN
+    _Error := TRUE;
+    _ErrorId := fbLoadProg.nErrId;
+ELSIF fbLoadProg.bBusy = FALSE AND fbLoadProg.bExecute THEN
+    _IsProgLoaded := TRUE;
+	fbLoadProg(bExecute := FALSE, sNciToPlc := stNciToPlc);
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="IsGrouped" Id="{f6f0eca0-33a2-495f-820d-274c738b997a}">
+      <Declaration><![CDATA[PROPERTY IsGrouped : BOOL]]></Declaration>
+      <Get Name="Get" Id="{d1c66ce7-95a8-4d4e-be30-7abf09c06e2e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsGrouped := _IsGrouped;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsMoving" Id="{d2e008d1-a7d6-4d22-954d-244be66e8771}">
+      <Declaration><![CDATA[PROPERTY IsMoving : BOOL]]></Declaration>
+      <Get Name="Get" Id="{3e2ebb55-5f4f-4667-bd58-50412615786d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsMoving := (stNciToPlc.ItpState = 5);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsProgramLoaded" Id="{0b92f6bd-d666-452f-8e89-937b5dadb29a}">
+      <Declaration><![CDATA[PROPERTY IsProgramLoaded : BOOL]]></Declaration>
+      <Get Name="Get" Id="{d292bbc4-723c-4a6a-9853-4c75c2dbf160}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsProgramLoaded := _IsProgLoaded;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsReady" Id="{cf337947-e57f-47e4-be99-6e54e3f523cc}">
+      <Declaration><![CDATA[PROPERTY IsReady : BOOL]]></Declaration>
+      <Get Name="Get" Id="{23882524-4a9e-4cc6-9ca4-0c5f8369503c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsReady := (stNciToPlc.ItpState = 2);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="LoadProgram" Id="{8e5b758c-dd77-4196-8305-9ba935eedf73}">
+      <Declaration><![CDATA[METHOD LoadProgram
+VAR_INPUT
+	sProgramPath : STRING(255);
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_IsProgLoaded := FALSE;
+fbLoadProg(
+    bExecute := TRUE,
+    sPrg := sProgramPath,
+    nLength := INT_TO_UDINT(LEN(sProgramPath)),
+    sNciToPlc := stNciToPlc 
+);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ResetChannel" Id="{a5c8a5c9-f0bb-40f8-b374-213a9332f10f}">
+      <Declaration><![CDATA[METHOD ResetChannel
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbReset(
+    bExecute := TRUE,
+    sNciToPlc := stNciToPlc
+);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Start" Id="{4f54c653-5d61-4053-b4b3-0f559e72e12d}">
+      <Declaration><![CDATA[METHOD Start
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbStartStop(
+    bStart := TRUE, 
+    bStop := FALSE,
+    sNciToPlc := stNciToPlc 
+);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Stop" Id="{e02489bc-47d1-4068-b1f1-be7069b73cea}">
+      <Declaration><![CDATA[METHOD Stop
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbStartStop(
+    bStart := FALSE, 
+    bStop := TRUE,
+    sNciToPlc := stNciToPlc
+);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Ungroup" Id="{c18a5735-a574-4548-beb3-a5ca7ced70aa}">
+      <Declaration><![CDATA[METHOD Ungroup
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_IsGrouped := FALSE;
+fbUngroup(
+    bExecute := TRUE, 
+    nGroupId := _GroupId
+);]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_NciChannel">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.BuildGroup">
+      <LineId Id="7" Count="6" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.ChannelError.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.ChannelErrorId.Get">
+      <LineId Id="5" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.CyclicLogic">
+      <LineId Id="7" Count="3" />
+      <LineId Id="46" Count="16" />
+      <LineId Id="27" Count="18" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.IsGrouped.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.IsMoving.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.IsProgramLoaded.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.IsReady.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.LoadProgram">
+      <LineId Id="12" Count="5" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.ResetChannel">
+      <LineId Id="6" Count="2" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.Start">
+      <LineId Id="6" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.Stop">
+      <LineId Id="6" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannel.Ungroup">
+      <LineId Id="6" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -15,6 +15,8 @@ VAR
 	
 	ExecutorGrooveXY	: FB_ExecutorGrooveXY;
 	
+	ExecutorNCI : FB_ExecutorNCI;
+	
 	_Limits : ST_GantryXYZ_Limits;
 
 
@@ -30,6 +32,10 @@ VAR
     AxisX               : FB_Component_BasicAxis := (Name := 'AxisX');
     AxisY               : FB_Component_BasicAxis := (Name := 'AxisY');
     AxisZ               : FB_Component_BasicAxis := (Name := 'AxisZ');
+	
+	
+	NciChannel          : FB_NciChannel := (Name := 'NCI Channel 1');
+	
 	
 	
 	// [Typ osi: 1=X, 2=Y, 3=Z] , [Typ profilu z Enuma]
@@ -293,6 +299,8 @@ fbHomeStratX.CyclicLogic();
 fbHomeStratY.CyclicLogic();
 fbHomeStratZ.CyclicLogic();
 
+NciChannel.CyclicLogic();
+
 ExecutorCutX.CyclicLogic();
 ExecutorCutY.CyclicLogic();
 ExecutorGrooveXY.CyclicLogic();
@@ -548,6 +556,7 @@ CASE DescendantSequenceState OF
 		RegisterComponent(AxisZ);	
 		RegisterComponent(CylinderCuttingY);
 		RegisterComponent(CylinderCuttingX);
+		RegisterComponent(NciChannel);
         _LogModeChanges         := FALSE;
         _LogStateChanges        := FALSE;
 		
@@ -583,6 +592,13 @@ CASE DescendantSequenceState OF
 		ExecutorCutY.AxisZ          := AxisZ;
 		ExecutorCutY.Cylinder       := CylinderCuttingY; // Podpinamy siłownik Y!
 		ExecutorCutY.ConfigProvider := THIS^;
+		
+		// Wstrzykiwanie zależności do Executora NCI
+		ExecutorNCI.AxisX          := AxisX;
+		ExecutorNCI.AxisY          := AxisY;
+		ExecutorNCI.AxisZ          := AxisZ;
+		ExecutorNCI.NciChannel     := NciChannel; // Twój nowy kanał
+		ExecutorNCI.ConfigProvider := THIS^;
 
 		// Wstrzyknięcie strategii resetu sprzętowego
 		// Oś X
@@ -931,6 +947,7 @@ END_CASE]]></ST>
       <LineId Id="40" Count="0" />
       <LineId Id="35" Count="2" />
       <LineId Id="34" Count="0" />
+      <LineId Id="54" Count="1" />
       <LineId Id="47" Count="0" />
       <LineId Id="46" Count="0" />
       <LineId Id="48" Count="0" />
@@ -982,6 +999,7 @@ END_CASE]]></ST>
       <LineId Id="68" Count="0" />
       <LineId Id="8" Count="0" />
       <LineId Id="90" Count="0" />
+      <LineId Id="285" Count="0" />
       <LineId Id="10" Count="1" />
       <LineId Id="272" Count="0" />
       <LineId Id="275" Count="0" />
@@ -999,6 +1017,9 @@ END_CASE]]></ST>
       <LineId Id="262" Count="0" />
       <LineId Id="257" Count="3" />
       <LineId Id="235" Count="0" />
+      <LineId Id="286" Count="0" />
+      <LineId Id="288" Count="4" />
+      <LineId Id="287" Count="0" />
       <LineId Id="130" Count="0" />
       <LineId Id="220" Count="13" />
       <LineId Id="124" Count="0" />

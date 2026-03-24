@@ -13,6 +13,7 @@
     RequestedCopiesX: DINT;  
     RequestedCopiesY: DINT; 
 	IsValid			:BOOL; 
+	GCodePath : STRING(255); 
     END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

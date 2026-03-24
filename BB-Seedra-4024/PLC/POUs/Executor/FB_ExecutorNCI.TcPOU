@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_ExecutorNCI" Id="{1b4d4fb6-455b-439c-98a5-4fd2ee249483}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorNCI EXTENDS FB_ExecutorBase
+VAR
+    _NciChannel : I_NciChannel;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="CyclicLogic" Id="{60feeed8-57f4-4ce8-8845-e0e1d4967810}">
+      <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
+VAR_INST
+    // Zmienne pomocnicze (żeby zadowolić kompilator TwinCATa)
+    refX : Tc2_MC2.AXIS_REF;
+    refY : Tc2_MC2.AXIS_REF;
+    refZ : Tc2_MC2.AXIS_REF;
+    localConfig : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+// --- LOGIKA ---
+StepTimer();
+// Zabezpieczenie przed brakiem wstrzykniętych referencji
+IF _RecipeBuilder = 0 OR _ConfigProvider = 0 OR _NciChannel = 0 THEN RETURN; END_IF
+
+CASE nStep OF
+    0: // IDLE
+
+    5: // INIT
+        IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
+            _bBusy := TRUE;
+            nStep := 10;
+        END_IF
+
+    10: // 1. Zbudowanie grupy NCI z osi PTP
+        
+        // Kopiujemy właściwości (Properties) do lokalnych zmiennych pomocniczych
+        refX := _AxisX.Axis;
+        refY := _AxisY.Axis;
+        refZ := _AxisZ.Axis;
+        
+        // Teraz wyciągamy z nich ID osi
+        _NciChannel.BuildGroup(
+            nXAxisId := refX.NcToPlc.AxisId, 
+            nYAxisId := refY.NcToPlc.AxisId, 
+            nZAxisId := refZ.NcToPlc.AxisId
+        );
+        nStep := 20;
+
+    20: // Czekamy na spięcie osi
+        IF _NciChannel.ChannelError THEN nStep := 999;
+        ELSIF _NciChannel.IsGrouped THEN nStep := 30; END_IF
+
+    30: // 2. Załadowanie pliku G-Code wskazanego przez Recepturę
+        
+        // Znowu kopiujemy Property do zmiennej lokalnej
+        localConfig := _RecipeBuilder.Config;
+        
+        // Teraz bezpiecznie wyciągamy ścieżkę
+        _NciChannel.LoadProgram(localConfig.GCodePath);
+        nStep := 40;
+
+    40: // Czekamy na załadowanie do bufora
+        IF _NciChannel.ChannelError THEN nStep := 999;
+        ELSIF _NciChannel.IsProgramLoaded THEN nStep := 50; END_IF
+
+    50: // 3. START programu CNC!
+        _NciChannel.Start();
+        StepTimer(IN:=FALSE);
+        nStep := 60;
+
+    60: // Czekamy chwilkę na rozruch (żeby ItpState zdążyło wyjść ze stanu Ready)
+        StepTimer(IN:=TRUE, PT:=T#100MS);
+        IF StepTimer.Q THEN
+            StepTimer(IN:=FALSE);
+            nStep := 70;
+        END_IF
+
+    70: // 4. Czekamy na koniec programu (M30)
+        IF _NciChannel.ChannelError THEN 
+            nStep := 999;
+        ELSIF _NciChannel.IsReady THEN 
+            nStep := 80;
+        END_IF
+
+    80: // 5. Rozwiązanie grupy, uwalniamy osie z powrotem do trybu PTP
+        _NciChannel.Ungroup();
+        nStep := 90;
+
+    90:
+        IF NOT _NciChannel.IsGrouped THEN
+            nStep := 1000;
+        END_IF
+
+    999: // ERROR HANDLING
+        _bBusy := FALSE;
+        _bError := TRUE;
+        _bDone := FALSE;
+        _uErrorID := _NciChannel.ChannelErrorId;
+        _NciChannel.Ungroup(); // Zawsze próbujemy oddać osie przy błędzie
+        nStep := 0;
+
+    1000: // ZAKOŃCZONO SUKCESEM
+        _bBusy := FALSE;
+        _bDone := TRUE;
+        nStep := 0;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="NciChannel" Id="{d06ad842-31cb-498e-a612-e7975ef6dd36}">
+      <Declaration><![CDATA[PROPERTY NciChannel : I_NciChannel]]></Declaration>
+      <Get Name="Get" Id="{7d82ec04-7743-475d-8a17-fea2f6b0b25d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[NciChannel := _NciChannel;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{4d1188e0-723f-4954-ae2b-b115aa652685}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_NciChannel := NciChannel;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_ExecutorNCI">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorNCI.CyclicLogic">
+      <LineId Id="95" Count="87" />
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorNCI.NciChannel.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorNCI.NciChannel.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

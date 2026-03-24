@@ -70,6 +70,12 @@
     <Compile Include="POUs\Components\I_Cylinder.TcIO">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Components\I_NciChannel.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Components\FB_NciChannel.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Components\ST_Cylinder_Command.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -95,6 +101,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Executor\I_MachiningExecutor.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Executor\FB_ExecutorNCI.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\E_MachineProfile.TcDUT">
@@ -347,6 +356,9 @@
       <DefaultResolution>Tc2_MC2_Drive, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc2_MC2_Drive</Namespace>
     </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_NCI">
+      <DefaultResolution>Tc2_NCI, * (Beckhoff Automation GmbH)</DefaultResolution>
+    </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Standard">
       <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc2_Standard</Namespace>
@@ -373,6 +385,7 @@
     </PlaceholderReference>
     <PlaceholderReference Include="TcUnit">
       <DefaultResolution>TcUnit, * (www.tcunit.org)</DefaultResolution>
+      <Namespace>TcUnit</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="VisuDialogs">
       <DefaultResolution>VisuDialogs, * (System)</DefaultResolution>
