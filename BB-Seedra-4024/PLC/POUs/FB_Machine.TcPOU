@@ -167,7 +167,7 @@ END_IF]]></ST>
 					ChangeState(E_PMLCommand.ePMLCommand_Abort);
 				END_IF
 				
-10: 
+			10: 
                 // Czekamy, aż moduł Gantry zamelduje zakończenie obróbki
                 IF GantryXYZ.CurrentState = E_PMLState.ePMLState_Complete THEN
                     SequenceState := 20;

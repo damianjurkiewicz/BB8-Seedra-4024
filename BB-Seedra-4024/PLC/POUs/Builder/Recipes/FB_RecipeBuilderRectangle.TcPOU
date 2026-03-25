@@ -18,58 +18,48 @@ END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[Build := FALSE;
 
-
 CASE nBuildStep OF
     0:
-        // Logujemy sam początek procesu
-        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Rozpoczynam krok 0 - budowanie G-Code', '');
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Rozpoczynam krok 0 - budowanie G-Code kółka', '');
         
-        // 1. Zabezpieczenia
         THIS^.UpdateNestingLimits();
-		//      IF NOT _Config.IsValid THEN RETURN; END_IF
         
-		// ==========================================================
-        // 2. KÓŁKO G-CODE (Środek X500 Y500, Promień R300)
+        // ==========================================================
+        // KÓŁKO G-CODE (Środek X500 Y500, Promień R300)
+        // KAŻDA linia MUSI kończyć się znakiem $N (nowa linia)
         // ==========================================================
         
-        // G17 - wybór płaszczyzny XY, G90 - pozycjonowanie absolutne
-        _aGCodeBuffer[1] := 'G17 G90 G00 Z50';
+		// 1. Dojazd nad krawędź kółka (Start w punkcie X200.0 Y200.0) na bezpiecznej wysokości Z0.0
+        _aGCodeBuffer[1] := 'G01 X200.0 Y200.0 Z0.0 F2000$N';
         
-        // Dojazd "w powietrzu" nad prawą krawędź kółka (Środek X500 + R300)
-        _aGCodeBuffer[2] := 'G00 X800 Y500';
+        // 2. Spokojny zjazd w dół do pracy
+        _aGCodeBuffer[2] := 'G01 Z5.0 F500$N';
         
-        // Powolne wejście w materiał
-        _aGCodeBuffer[3] := 'G01 Z-10 F300';
+        // 3. Ruch po okręgu (360 stopni)
+        // I-100.0 oznacza środek okręgu oddalony o 100mm w osi X od punktu startu (promień 100)
+        _aGCodeBuffer[3] := 'G02 I-100.0 J0.0 F1000$N';
         
-        // WŁAŚCIWE CIĘCIE (Pełne koło)
-        // G161 - wymuszenie relatywnych środków I, J. BRAK wpisu X i Y!
-        _aGCodeBuffer[4] := 'G161 G02 I-300 J0 F1000';
+        // 4. Powrót osi Z na bezpieczną pozycję bazową Z0.0
+        _aGCodeBuffer[4] := 'G01 Z0.0 F600$N';
         
-        // Szybki wyjazd freza na bezpieczną wysokość
-        _aGCodeBuffer[5] := 'G00 Z50';
+        // 5. Koniec programu (M30 rozwiązuje grupę i czyści NCI)
+        _aGCodeBuffer[5] := 'M30$N'; 
+
+        // Czyszczenie szóstej linii (żeby nie zostało tam 'M30$N' z poprzednich testów)
+        _aGCodeBuffer[6] := '';
         
-        // Koniec programu
-        _aGCodeBuffer[6] := 'M30'; 
-        
-        _nLinesToWrite := 6;
+        _nLinesToWrite := 5; // Zapisujemy tylko 5 linii
         nBuildStep := 10;
         
     10:
-// ... reszta pozostaje bez zmian ...:
-        // 3. Wywołujemy generyczną metodę z klasy bazowej
-        // UWAGA: Logowanie dajemy wewnątrz IF'a. 
-        // Gdybyśmy dali je luźno w tym kroku, TwinCAT wysyłałby ten log 
-        // w każdym cyklu PLC, dopóki zapis pliku by trwał!
         IF THIS^.WriteGCodeFile('SafeTest.nc') THEN
-            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Krok 10 - Zapisano plik SafeTest.nc sukcesem', '');
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Krok 10 - Zapisano plik SafeTest.nc', '');
             nBuildStep := 1000;
         END_IF
 
     1000:
-        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Krok 1000 - Koniec pracy, Build := TRUE', '');
-        
         nBuildStep := 0;
-        Build := TRUE; // Koniec! Maszyna ruszy do ExecutoraNCI
+        Build := TRUE; 
         
 END_CASE]]></ST>
       </Implementation>
@@ -115,12 +105,10 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderRectangle.Build">
-      <LineId Id="802" Count="2" />
-      <LineId Id="924" Count="8" />
-      <LineId Id="962" Count="23" />
-      <LineId Id="959" Count="2" />
-      <LineId Id="875" Count="0" />
-      <LineId Id="823" Count="14" />
+      <LineId Id="802" Count="1" />
+      <LineId Id="1055" Count="10" />
+      <LineId Id="1114" Count="19" />
+      <LineId Id="1086" Count="11" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderRectangle.CalculateFootprint">
