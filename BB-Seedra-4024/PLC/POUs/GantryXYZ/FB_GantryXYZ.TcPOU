@@ -118,6 +118,7 @@ END_VAR
 			ExecutorCutX.Abort();
 			ExecutorCutY.Abort();
 			ExecutorGrooveXY.Abort();
+			ExecutorNCI.Abort();
 			
 			SequenceState := SequenceState + 10;
 	
@@ -304,6 +305,7 @@ NciChannel.CyclicLogic();
 ExecutorCutX.CyclicLogic();
 ExecutorCutY.CyclicLogic();
 ExecutorGrooveXY.CyclicLogic();
+ExecutorNCI.CyclicLogic();
 
 //Set the current alarm severity for this module
 _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentSeverity := _CurrentAlarmSeverity);
@@ -314,7 +316,9 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
     </Method>
     <Method Name="Execute" Id="{895d1ef9-5e85-47dd-a8bf-b32885837641}" FolderPath="States\">
       <Declaration><![CDATA[METHOD PROTECTED Execute
-]]></Declaration>
+VAR
+    localConfig : ST_RecipeBuilder_Config; // Zmienna pomocnicza dla kompilatora
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE _CurrentMode OF
 
@@ -323,53 +327,90 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
         CASE SequenceState OF
             0:
                 NoStateTasksToComplete := FALSE;
+                // LOG: Start sekwencji
+                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Rozpoczynam nowa sekwencje produkcyjna', '');
                 SequenceState := 10;
                 
             10: 
                 SequenceState := 20;
 
-			20: 
+            20: 
                 IF _RecipeBuilder <> 0 THEN
                     IF _RecipeBuilder.Build() THEN 
-                        SequenceState := 30;
+                        
+                        // Kopiujemy konfigurację do zmiennej lokalnej
+                        localConfig := _RecipeBuilder.Config;
+                        
+                        // ========================================================
+                        // ROZWIDLENIE LOGIKI: PTP vs NCI (G-Code)
+                        // ========================================================
+                        // Sprawdzamy pole ze zmiennej lokalnej!
+                        IF localConfig.GCodePath <> '' THEN
+                            // Jeśli Builder wypluł G-Code, idziemy ścieżką CNC (NCI)
+                            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Tryb NCI wybrany. Zaladuje plik: %s', localConfig.GCodePath);
+                            SequenceState := 200; 
+                        ELSE
+                            // Jeśli nie ma G-Code'u, lecimy starym procesem PTP
+                            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Tryb PTP (klasyczny) wybrany. Brak sciezki G-Code.', '');
+                            SequenceState := 30; 
+                        END_IF
                     END_IF
                 ELSE
+                    // Brak buildera = zły numer programu
+                    ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: BLAD KRYTYCZNY! Brak obiektu _RecipeBuilder. Wywoluje Abort.', '');
                     ChangeState(E_PMLCommand.ePMLCommand_Abort);
                 END_IF     
 
-			30: 
-				IF ExecutorGrooveXY.Execute() THEN 
-				   SequenceState := 40;
-				END_IF
-				
-			40: 
-				IF ExecutorGrooveXY.Done THEN 
-				   SequenceState := 50;
-				END_IF
-			
-			50: 
-				IF ExecutorCutY.Execute() THEN
-					SequenceState := 60;
-				END_IF
-			
-			60: 
-				IF ExecutorCutY.Done THEN
-					SequenceState := 70;
-				END_IF
-			
-			70: 
-				IF ExecutorCutX.Execute() THEN
-					SequenceState := 80;
-				END_IF
-			
-			80: 
-				IF ExecutorCutX.Done THEN
-					SequenceState := 1000;
-				END_IF
-	
-		  1000:			
-				StateTasksComplete := TRUE;
-				StateComplete();
+            // ========================================================
+            // ŚCIEŻKA 1: KLASYCZNE PTP (BorgoWings, BorgoFlaps, Arona)
+            // ========================================================
+            30: 
+                IF ExecutorGrooveXY.Execute() THEN 
+                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: PTP - Start operacji GrooveXY', '');
+                    SequenceState := 40; 
+                END_IF
+            40: 
+                IF ExecutorGrooveXY.Done THEN SequenceState := 50; END_IF
+            50: 
+                IF ExecutorCutY.Execute() THEN 
+                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: PTP - Start operacji CutY', '');
+                    SequenceState := 60; 
+                END_IF
+            60: 
+                IF ExecutorCutY.Done THEN SequenceState := 70; END_IF
+            70: 
+                IF ExecutorCutX.Execute() THEN 
+                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: PTP - Start operacji CutX', '');
+                    SequenceState := 80; 
+                END_IF
+            80: 
+                IF ExecutorCutX.Done THEN SequenceState := 1000; END_IF
+
+            // ========================================================
+            // ŚCIEŻKA 2: KANAŁ INTERPOLACYJNY NCI (Rectangle, Kółka itp.)
+            // ========================================================
+            200:
+                IF ExecutorNCI.Execute() THEN
+                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: NCI - Start ExecutorNCI', '');
+                    SequenceState := 210;
+                END_IF
+                
+            210:
+                IF ExecutorNCI.Done THEN
+                    SequenceState := 1000;
+                ELSIF ExecutorNCI.Error THEN
+                    // Jeśli NCI zgłosi błąd, przerywamy i logujemy
+                    ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: BLAD KRYTYCZNY w ExecutorNCI! Wywoluje Abort.', '');
+                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                END_IF
+    
+            // ========================================================
+            // KONIEC OBRÓBKI (WSPÓLNY DLA OBU ŚCIEŻEK)
+            // ========================================================
+            1000:            
+                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Sekwencja produkcyjna zakonczona sukcesem.', '');
+                StateTasksComplete := TRUE;
+                StateComplete();
 
         END_CASE
 
@@ -684,7 +725,8 @@ END_VAR
 
 ExecutorCutX.RecipeBuilder := _RecipeBuilder;
 ExecutorCutY.RecipeBuilder := _RecipeBuilder;
-ExecutorGrooveXY.RecipeBuilder := _RecipeBuilder;]]></ST>
+ExecutorGrooveXY.RecipeBuilder := _RecipeBuilder;
+ExecutorNCI.RecipeBuilder := _RecipeBuilder;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -881,6 +923,7 @@ END_CASE]]></ST>
       <LineId Id="272" Count="0" />
       <LineId Id="290" Count="1" />
       <LineId Id="299" Count="1" />
+      <LineId Id="319" Count="0" />
       <LineId Id="271" Count="0" />
       <LineId Id="114" Count="0" />
       <LineId Id="267" Count="0" />
@@ -952,26 +995,12 @@ END_CASE]]></ST>
       <LineId Id="46" Count="0" />
       <LineId Id="48" Count="0" />
       <LineId Id="51" Count="0" />
+      <LineId Id="58" Count="0" />
       <LineId Id="12" Count="4" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
-      <LineId Id="122" Count="9" />
-      <LineId Id="135" Count="1" />
-      <LineId Id="238" Count="0" />
-      <LineId Id="240" Count="5" />
-      <LineId Id="157" Count="1" />
-      <LineId Id="196" Count="3" />
-      <LineId Id="222" Count="0" />
-      <LineId Id="224" Count="0" />
-      <LineId Id="227" Count="1" />
-      <LineId Id="223" Count="0" />
-      <LineId Id="200" Count="1" />
-      <LineId Id="203" Count="4" />
-      <LineId Id="209" Count="11" />
-      <LineId Id="177" Count="2" />
-      <LineId Id="249" Count="0" />
-      <LineId Id="181" Count="6" />
+      <LineId Id="416" Count="96" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.FB_init">
@@ -1051,6 +1080,7 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
       <LineId Id="6" Count="2" />
       <LineId Id="5" Count="0" />
+      <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RefAxisX.Get">
       <LineId Id="2" Count="0" />

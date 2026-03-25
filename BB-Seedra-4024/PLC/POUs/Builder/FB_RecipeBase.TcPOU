@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_RecipeBase" Id="{da96ec31-8163-452f-a094-4558fa21ef5c}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBase IMPLEMENTS I_RecipeBuilder
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBase IMPLEMENTS I_RecipeBuilder 
 
 VAR
     _Config                 : ST_RecipeBuilder_Config;
@@ -29,6 +29,16 @@ VAR
 	_ActualCopiesY			:DINT;
 	_NominalX 				: REAL;
     _NominalY 				: REAL;
+	
+	// --- GENERYCZNY GENERATOR G-CODE (NCI) ---
+    fbCreateFile    : ItpPpgCreateMain;
+    fbAppendLine    : ItpPpgAppendGenericBlock;
+    fbCloseFile     : ItpPpgCloseMain;
+    
+    _aGCodeBuffer   : ARRAY[1..500] OF STRING(255); // Bufor dla Buildera (max 500 linii)
+    _nLinesToWrite  : INT;                          // Ile linii z bufora zapisać
+    _nFileWriteStep : INT := 0;                     // Krok maszyny stanów zapisu
+    _sGCodeFilePath : STRING(255);                  // Ścieżka pliku
 	
 	
 END_VAR
@@ -89,11 +99,18 @@ END_VAR
       </Get>
       <Set Name="Set" Id="{ea17f2c2-4fb3-4cd4-85eb-6bcadc1e2873}">
         <Declaration><![CDATA[VAR
+    sTempGCodePath : STRING(255);
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[_Config := Config;
+          <ST><![CDATA[// 1. NAJPIERW robimy kopię tego co mamy w pamięci sterownika
+sTempGCodePath := THIS^._Config.GCodePath; 
 
+// 2. TERAZ przyjmujemy nową strukturę z HMI
+_Config := Config;
+
+// 3. PRZYWRACAMY ścieżkę do pliku
+_Config.GCodePath := sTempGCodePath;
 
 _Config.PanelFrontLength     := LIMIT(_Limits.PanelFrontLength.MinVal, Config.PanelFrontLength, _Limits.PanelFrontLength.MaxVal);
 _Config.PanelFrontWidth      := LIMIT(_Limits.PanelFrontWidth.MinVal,  Config.PanelFrontWidth,  _Limits.PanelFrontWidth.MaxVal);
@@ -321,6 +338,106 @@ ELSE
 END_IF]]></ST>
       </Implementation>
     </Method>
+    <Method Name="WriteGCodeFile" Id="{b115e39c-0872-441f-a4ac-20c73a4f870f}">
+      <Declaration><![CDATA[METHOD PROTECTED WriteGCodeFile : BOOL
+VAR_INPUT
+    sFilePath : STRING(255);
+END_VAR
+VAR_INST
+	_iCurrentLine : INT := 1;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[WriteGCodeFile := FALSE;
+
+CASE _nFileWriteStep OF
+    0: // INIT
+        _iCurrentLine := 1; 
+        _sGCodeFilePath := sFilePath;
+        
+        // LOG: Start operacji - wstawiamy zmienną string w miejsce %s
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'WriteGCode: Rozpoczynam zapis do pliku %s', _sGCodeFilePath);
+        
+        _nFileWriteStep := 10;
+
+    10: // --- OTWIERANIE/TWORZENIE PLIKU ---
+        fbCreateFile(
+            bExecute := TRUE, 
+            sPathName := _sGCodeFilePath, 
+            tTimeOut := T#2S
+        );
+        
+        IF fbCreateFile.bErr THEN 
+            // LOG: Błąd tworzenia
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'WriteGCode: BLAD tworzenia pliku %s!', _sGCodeFilePath);
+            _nFileWriteStep := 999;
+            
+        ELSIF NOT fbCreateFile.bBusy THEN
+            fbCreateFile(bExecute := FALSE, sPathName := _sGCodeFilePath);
+            
+            // LOG: Sukces tworzenia
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'WriteGCode: Plik utworzony pomyslnie, przechodze do zapisu.', '');
+            _nFileWriteStep := 20;
+        END_IF
+
+    20: // --- ZAPISYWANIE LINII G-CODE W PĘTLI ---
+        fbAppendLine(
+            bExecute := TRUE, 
+            sPathName := _sGCodeFilePath, 
+            sBlock := _aGCodeBuffer[_iCurrentLine], 
+            tTimeOut := T#2S
+        );
+        
+        IF fbAppendLine.bErr THEN 
+            // LOG: Błąd zapisu konkretnej linii
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'WriteGCode: BLAD dopisywania linii G-Code!', '');
+            _nFileWriteStep := 999;
+            
+        ELSIF NOT fbAppendLine.bBusy THEN
+            fbAppendLine(bExecute := FALSE, sPathName := _sGCodeFilePath);
+            
+            _iCurrentLine := _iCurrentLine + 1;
+            IF _iCurrentLine > _nLinesToWrite THEN
+                // LOG: Koniec pętli zapisu
+                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'WriteGCode: Zapisano wszystkie linie G-Code.', '');
+                _nFileWriteStep := 30; // Zapisano wszystkie linie
+            END_IF
+        END_IF
+
+    30: // --- ZAMYKANIE PLIKU ---
+        fbCloseFile(
+            bExecute := TRUE, 
+            sPathName := _sGCodeFilePath, 
+            tTimeOut := T#2S
+        );
+        
+        IF fbCloseFile.bErr THEN 
+            // LOG: Błąd zamykania
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'WriteGCode: BLAD zamykania pliku!', '');
+            _nFileWriteStep := 999;
+            
+        ELSIF NOT fbCloseFile.bBusy THEN
+            fbCloseFile(bExecute := FALSE, sPathName := _sGCodeFilePath);
+            
+            // Zapisujemy ścieżkę do struktury Config, żeby Executor NCI wiedział co odpalić
+            _Config.GCodePath := _sGCodeFilePath; 
+            
+            // LOG: Pełny sukces
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'WriteGCode: Plik zamkniety pomyslnie.', '');
+            _nFileWriteStep := 1000;
+        END_IF
+
+    999: // --- BŁĄD ---
+        WriteGCodeFile := FALSE;
+        // W tym kroku nie dajemy loga, zeby nie zaspamować konsoli błędem co każdy cykl!
+        // Logi błędu wysłaliśmy tuż przed przejściem do kroku 999.
+
+    1000: // --- GOTOWE ---
+        _nFileWriteStep := 0; // Reset na przyszłość
+        WriteGCodeFile := TRUE;
+        
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="FB_RecipeBase">
       <LineId Id="9" Count="0" />
     </LineIds>
@@ -341,7 +458,8 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Config.Set">
-      <LineId Id="43" Count="12" />
+      <LineId Id="76" Count="6" />
+      <LineId Id="44" Count="11" />
       <LineId Id="57" Count="2" />
       <LineId Id="62" Count="1" />
       <LineId Id="39" Count="0" />
@@ -387,6 +505,10 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_RecipeBase.UpdateNestingLimits">
       <LineId Id="78" Count="53" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.WriteGCodeFile">
+      <LineId Id="84" Count="87" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

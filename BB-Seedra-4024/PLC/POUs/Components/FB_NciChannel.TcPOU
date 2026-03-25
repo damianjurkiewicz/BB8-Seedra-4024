@@ -6,6 +6,8 @@ VAR
     // Zmienne zlinkowane bezpośrednio z hardwarem kanału NCI
     stNciToPlc AT %I* : NCTOPLC_NCICHANNEL_REF; 
     stPlcToNci AT %Q* : PLCTONC_NCICHANNEL_REF;
+	
+
 
     // Bloki systemowe Beckhoffa do obsługi grupy
     fbBuildGroup    : CfgBuild3DGroup;
@@ -20,7 +22,7 @@ VAR
     _IsProgLoaded   : BOOL;
     _IsReady		:BOOL;
 	
-    _GroupId        : UDINT := 1; // ID Twojej grupy NCI
+    _GroupId        : UDINT := 4; // ID Twojej grupy NCI
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -28,11 +30,15 @@ END_VAR]]></Declaration>
     <Method Name="BuildGroup" Id="{66cae995-577f-4fd0-87b2-2377298b6c08}">
       <Declaration><![CDATA[METHOD BuildGroup
 VAR_INPUT
-	nXAxisId : UDINT; nYAxisId : UDINT; nZAxisId : UDINT;
-END_VAR
-]]></Declaration>
+    nXAxisId : UDINT;
+    nYAxisId : UDINT; nZAxisId : UDINT;
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_IsGrouped := FALSE;
+        <ST><![CDATA[// Resetujemy flagi i błędy przed nową próbą
+_IsGrouped := FALSE;
+_Error := FALSE; 
+_ErrorId := 0;
+
 fbBuildGroup(
     bExecute := TRUE,
     nGroupId := _GroupId,
@@ -76,6 +82,7 @@ METHOD PUBLIC CyclicLogic
       <Implementation>
         <ST><![CDATA[// Wywołanie bazowe
 SUPER^.CyclicLogic();
+
 
 // --- ODŚWIEŻANIE BLOKÓW SYSTEMOWYCH ---
 fbBuildGroup(tTimeOut := T#2S);
@@ -232,7 +239,7 @@ fbUngroup(
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.BuildGroup">
-      <LineId Id="7" Count="6" />
+      <LineId Id="24" Count="10" />
       <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.ChannelError.Get">
@@ -243,7 +250,9 @@ fbUngroup(
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.CyclicLogic">
-      <LineId Id="7" Count="3" />
+      <LineId Id="7" Count="1" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="9" Count="1" />
       <LineId Id="46" Count="16" />
       <LineId Id="27" Count="18" />
       <LineId Id="5" Count="0" />

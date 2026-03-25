@@ -3,7 +3,6 @@
   <POU Name="FB_RecipeBuilderRectangle" Id="{5dbcf7b2-1c2b-4fc5-ae62-5e1b9342eaeb}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderRectangle EXTENDS FB_RecipeBase
 
-
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -13,49 +12,47 @@
 VAR_INST
     TotalY          : REAL;
     TotalX          : REAL;
+	nBuildStep		: INT;
+	sDebugMsg : STRING(255);
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Pobierasz wymiary po korektach z klasy bazowej
-TotalX   := _NominalX;
-TotalY   := _NominalY;
+        <ST><![CDATA[Build := FALSE;
 
-// 1. Zlecenie przeliczenia gabarytów, footprintu i limitów klasie bazowej
-THIS^.UpdateNestingLimits();
+CASE nBuildStep OF
+    0:
+        // Logujemy sam początek procesu
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Rozpoczynam krok 0 - budowanie G-Code', '');
+        
+        // 1. Zabezpieczenia
+        THIS^.UpdateNestingLimits();
+//      IF NOT _Config.IsValid THEN RETURN; END_IF
+        
+        // ==========================================================
+        // 2. MAKSYMALNIE BEZPIECZNY G-CODE 
+        // ==========================================================
+        _aGCodeBuffer[1] := 'G01 X1000 Y1000 F10'; 
+        _aGCodeBuffer[2] := 'M30'; 
+        
+        _nLinesToWrite := 2;
+        nBuildStep := 10;
+        
+    10:
+        // 3. Wywołujemy generyczną metodę z klasy bazowej
+        // UWAGA: Logowanie dajemy wewnątrz IF'a. 
+        // Gdybyśmy dali je luźno w tym kroku, TwinCAT wysyłałby ten log 
+        // w każdym cyklu PLC, dopóki zapis pliku by trwał!
+        IF THIS^.WriteGCodeFile('SafeTest.nc') THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Krok 10 - Zapisano plik SafeTest.nc sukcesem', '');
+            nBuildStep := 1000;
+        END_IF
 
-// 2. Weryfikacja
-IF NOT _Config.IsValid THEN
-    Build := FALSE;
-    RETURN;
-END_IF
-
-
-_SegmentsToCutX := 2;
-
-_SegmentsCutX[1].Start.X := TotalX + _Config.CuttingOverpass;
-_SegmentsCutX[1].Stop.X  := -_Config.CuttingOverpass;
-_SegmentsCutX[1].Start.Y := TotalY;
-_SegmentsCutX[1].Stop.Y  := TotalY;
-
-_SegmentsCutX[2].Start.X := TotalX + _Config.CuttingOverpass;
-_SegmentsCutX[2].Stop.X  := -_Config.CuttingOverpass;
-_SegmentsCutX[2].Start.Y := 0;
-_SegmentsCutX[2].Stop.Y  := 0;
-
-
-_SegmentsToCutY := 2;
-
-_SegmentsCutY[1].Start.X := TotalX;
-_SegmentsCutY[1].Stop.X  := TotalX;
-_SegmentsCutY[1].Start.Y := TotalY + _Config.CuttingOverpass;
-_SegmentsCutY[1].Stop.Y  := -_Config.CuttingOverpass;
-
-_SegmentsCutY[2].Start.X := 0;
-_SegmentsCutY[2].Stop.X  := 0;
-_SegmentsCutY[2].Start.Y := TotalY + _Config.CuttingOverpass;
-_SegmentsCutY[2].Stop.Y  := -_Config.CuttingOverpass;
-
-
-Build := TRUE;]]></ST>
+    1000:
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Krok 1000 - Koniec pracy, Build := TRUE', '');
+        
+        nBuildStep := 0;
+        Build := TRUE; // Koniec! Maszyna ruszy do ExecutoraNCI
+        
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="CalculateFootprint" Id="{217dda2b-389d-4854-9c5e-efedd1d753ca}">
@@ -99,16 +96,7 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderRectangle.Build">
-      <LineId Id="625" Count="1" />
-      <LineId Id="607" Count="13" />
-      <LineId Id="643" Count="3" />
-      <LineId Id="651" Count="0" />
-      <LineId Id="648" Count="2" />
-      <LineId Id="641" Count="1" />
-      <LineId Id="630" Count="1" />
-      <LineId Id="652" Count="0" />
-      <LineId Id="633" Count="7" />
-      <LineId Id="621" Count="2" />
+      <LineId Id="728" Count="35" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderRectangle.CalculateFootprint">

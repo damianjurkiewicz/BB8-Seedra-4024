@@ -85,8 +85,7 @@ VAR
     CurrentBuilder : I_RecipeBuilder;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-// =========================================================
+        <ST><![CDATA[// =========================================================
 // 1. INICJALIZACJA
 // =========================================================
 IF NOT _InitComplete THEN
@@ -105,33 +104,36 @@ SUPER^.CyclicLogic();
 // Wyciągamy interfejs programu, który aktualnie jest wybrany na HMI
 CurrentBuilder := RecipeFactory.GetBuilder(GantryXYZ.ProgramIdRequested);
 
-IF CurrentBuilder <> 0 THEN
-    // A) Wrzucamy dane z HMI -> Wyzwala to limity i UpdateNestingLimits()!
-    CurrentBuilder.Config := RecipeConfig_HMI.Config;
-    
-    // B) Odczyt z powrotem na HMI
-    RecipeConfig_HMI.Config := CurrentBuilder.Config;
-    RecipeConfig_HMI.Limits := CurrentBuilder.Limits;
+// Synchronizujemy dane z HMI TYLKO gdy maszyna NIE produkuje detalu!
+// Zapobiega to wyzerowaniu ścieżki GCodePath przez HMI tuż po jej wygenerowaniu.
+IF _CurrentState = E_PMLState.ePMLState_Idle OR 
+   _CurrentState = E_PMLState.ePMLState_Stopped OR
+   _CurrentState = E_PMLState.ePMLState_Aborted THEN
 
-ELSE
-    // =========================================================
-    // === FALLBACK DLA PUSTYCH PROGRAMÓW (DUMMY BUTTONS) ===
-    // =========================================================
-    // Jeśli Fabryka zwróci 0 (brak buildera), a nie jesteśmy na ekranie głównym (eNone):
-    IF GantryXYZ.ProgramIdRequested <> E_RecipeID.eNone THEN
+    IF CurrentBuilder <> 0 THEN
+        // A) Wrzucamy dane z HMI -> Wyzwala to limity i UpdateNestingLimits() w Builderze!
+        CurrentBuilder.Config := RecipeConfig_HMI.Config;
         
-        // Zresetuj komendę (właściwość), co wymusi powrót HMI do ekranu powitalnego
-        GantryXYZ.ProgramIdRequested := E_RecipeID.eNone;
-        
+        // B) Odczyt z powrotem na HMI (aby wyświetlić przeliczone limity)
+        RecipeConfig_HMI.Config := CurrentBuilder.Config;
+        RecipeConfig_HMI.Limits := CurrentBuilder.Limits;
+    ELSE
+        // === FALLBACK DLA PUSTYCH PROGRAMÓW ===
+        IF GantryXYZ.ProgramIdRequested <> E_RecipeID.eNone THEN
+            GantryXYZ.ProgramIdRequested := E_RecipeID.eNone;
+        END_IF
     END_IF
-END_IF
 
-// =========================================================
-// 4. ZAPIS DO PERSISTENTÓW I FABRYKI 
-// =========================================================
-ConfigManager.GantryConfig := GantryXYZ.Config;
-ConfigManager.Config := RecipeConfig_HMI.Config;
-RecipeFactory.UpdateConfig(RecipeConfig_HMI.Config);
+    // =========================================================
+    // 4. ZAPIS DO PERSISTENTÓW I FABRYKI (Musi być wewnątrz IF)
+    // =========================================================
+    // Przeniesienie UpdateConfig tutaj gwarantuje, że Fabryka nie rozpropaguje 
+    // pustych pól (np. GCodePath) do builderów w trakcie trwania obróbki.
+    ConfigManager.GantryConfig := GantryXYZ.Config;
+    ConfigManager.Config := RecipeConfig_HMI.Config;
+    RecipeFactory.UpdateConfig(RecipeConfig_HMI.Config);
+
+END_IF
 
 // =========================================================
 // 5. OBSŁUGA BEZPIECZEŃSTWA (SAFETY)
@@ -518,9 +520,7 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.CyclicLogic">
-      <LineId Id="266" Count="13" />
-      <LineId Id="314" Count="24" />
-      <LineId Id="299" Count="14" />
+      <LineId Id="367" Count="55" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Execute">
