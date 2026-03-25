@@ -18,6 +18,7 @@ END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[Build := FALSE;
 
+
 CASE nBuildStep OF
     0:
         // Logujemy sam początek procesu
@@ -25,18 +26,36 @@ CASE nBuildStep OF
         
         // 1. Zabezpieczenia
         THIS^.UpdateNestingLimits();
-//      IF NOT _Config.IsValid THEN RETURN; END_IF
+		//      IF NOT _Config.IsValid THEN RETURN; END_IF
         
+		// ==========================================================
+        // 2. KÓŁKO G-CODE (Środek X500 Y500, Promień R300)
         // ==========================================================
-        // 2. MAKSYMALNIE BEZPIECZNY G-CODE 
-        // ==========================================================
-        _aGCodeBuffer[1] := 'G01 X1000 Y1000 F10'; 
-        _aGCodeBuffer[2] := 'M30'; 
         
-        _nLinesToWrite := 2;
+        // G17 - wybór płaszczyzny XY, G90 - pozycjonowanie absolutne
+        _aGCodeBuffer[1] := 'G17 G90 G00 Z50';
+        
+        // Dojazd "w powietrzu" nad prawą krawędź kółka (Środek X500 + R300)
+        _aGCodeBuffer[2] := 'G00 X800 Y500';
+        
+        // Powolne wejście w materiał
+        _aGCodeBuffer[3] := 'G01 Z-10 F300';
+        
+        // WŁAŚCIWE CIĘCIE (Pełne koło)
+        // G161 - wymuszenie relatywnych środków I, J. BRAK wpisu X i Y!
+        _aGCodeBuffer[4] := 'G161 G02 I-300 J0 F1000';
+        
+        // Szybki wyjazd freza na bezpieczną wysokość
+        _aGCodeBuffer[5] := 'G00 Z50';
+        
+        // Koniec programu
+        _aGCodeBuffer[6] := 'M30'; 
+        
+        _nLinesToWrite := 6;
         nBuildStep := 10;
         
     10:
+// ... reszta pozostaje bez zmian ...:
         // 3. Wywołujemy generyczną metodę z klasy bazowej
         // UWAGA: Logowanie dajemy wewnątrz IF'a. 
         // Gdybyśmy dali je luźno w tym kroku, TwinCAT wysyłałby ten log 
@@ -96,7 +115,12 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderRectangle.Build">
-      <LineId Id="728" Count="35" />
+      <LineId Id="802" Count="2" />
+      <LineId Id="924" Count="8" />
+      <LineId Id="962" Count="23" />
+      <LineId Id="959" Count="2" />
+      <LineId Id="875" Count="0" />
+      <LineId Id="823" Count="14" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderRectangle.CalculateFootprint">

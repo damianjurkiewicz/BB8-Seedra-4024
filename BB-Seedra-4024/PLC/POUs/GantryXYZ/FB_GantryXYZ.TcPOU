@@ -82,51 +82,69 @@ END_VAR]]></Declaration>
     <Folder Name="Properties" Id="{b05cc7e1-dc37-4910-986a-f085b4a0163d}" />
     <Folder Name="States" Id="{8df42c9b-c051-49f1-9767-900503632339}" />
     <Method Name="Aborting" Id="{5476dfef-6652-4e6b-8928-3724a50553de}" FolderPath="States\">
-      <Declaration><![CDATA[
-METHOD PROTECTED Aborting
+      <Declaration><![CDATA[METHOD PROTECTED Aborting
 VAR
-	i				: UDINT;
-	SubModulesReady : BOOL := TRUE;
+    i               : UDINT;
+    SubModulesReady : BOOL := TRUE;
 END_VAR
-
-]]></Declaration>
+VAR_INST
+    AbortStepTimer  : TON; 
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE _CurrentMode OF
 
 	//=================================PRODUCTION MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Production:
-	CASE SequenceState OF
-		0:
-			NoStateTasksToComplete := FALSE;
-			SequenceState          := SequenceState + 10;
+CASE SequenceState OF
+        0:
+            NoStateTasksToComplete := FALSE;
+            
+            // KROK 1: Resetujemy kanał NCI (zatrzymuje to ruch i czyści błędy interpolacji)
+            NciChannel.ResetChannel();
+            AbortStepTimer(IN:=FALSE);
+            SequenceState := 10;
 
-		10:
-			AxisX.Disable();
-			AxisY.Disable();
-			AxisZ.Disable();
-	
-			IO.SpindleEnable := FALSE;
-			IO.CoolingEnable := FALSE;
-			
-			CylinderCuttingX.Retract();
-			CylinderCuttingY.Retract();
-	
-			fbHomeStratX.Abort();
-			fbHomeStratY.Abort();
-			fbHomeStratZ.Abort();
-			
-			ExecutorCutX.Abort();
-			ExecutorCutY.Abort();
-			ExecutorGrooveXY.Abort();
-			ExecutorNCI.Abort();
-			
-			SequenceState := SequenceState + 10;
-	
-		20:
-	
-			StateTasksComplete := TRUE;
+        10:
+            // Dajemy kanałowi chwilę na przetworzenie resetu
+            AbortStepTimer(IN:=TRUE, PT:=T#200MS);
+            IF AbortStepTimer.Q THEN
+                AbortStepTimer(IN:=FALSE);
+                
+                // KROK 2: Nakazujemy rozpięcie grupy
+                NciChannel.Ungroup();
+                SequenceState := 20;
+            END_IF
 
-	END_CASE
+        20:
+            // KROK 3: Czekamy, aż flaga IsGrouped zniknie
+            IF NOT NciChannel.IsGrouped THEN
+            
+                // KROK 4: DOPIERO TERAZ zdejmujemy Enable z osi. Są już wolne.
+                AxisX.Disable();
+                AxisY.Disable();
+                AxisZ.Disable();
+        
+                IO.SpindleEnable := FALSE;
+                IO.CoolingEnable := FALSE;
+                
+                CylinderCuttingX.Retract();
+                CylinderCuttingY.Retract();
+        
+                fbHomeStratX.Abort();
+                fbHomeStratY.Abort();
+                fbHomeStratZ.Abort();
+                
+                ExecutorCutX.Abort();
+                ExecutorCutY.Abort();
+                ExecutorGrooveXY.Abort();
+                ExecutorNCI.Abort();
+                
+                SequenceState := 30;
+            END_IF
+    
+        30:
+            StateTasksComplete := TRUE;
+    END_CASE
 
 	//=================================MAINTENANCE & MANUAL MODE==================================
 	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
@@ -361,30 +379,47 @@ END_VAR]]></Declaration>
                     ChangeState(E_PMLCommand.ePMLCommand_Abort);
                 END_IF     
 
-            // ========================================================
+// ========================================================
             // ŚCIEŻKA 1: KLASYCZNE PTP (BorgoWings, BorgoFlaps, Arona)
             // ========================================================
             30: 
                 IF ExecutorGrooveXY.Execute() THEN 
                     ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: PTP - Start operacji GrooveXY', '');
-                    SequenceState := 40; 
+                    SequenceState := 40;
                 END_IF
             40: 
-                IF ExecutorGrooveXY.Done THEN SequenceState := 50; END_IF
+                IF ExecutorGrooveXY.Done THEN 
+                    SequenceState := 50;
+                ELSIF ExecutorGrooveXY.Error THEN
+                    RaiseAlarmWithStrings(GantryAlarms[1], 'Blad w GrooveXY', '');
+                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                END_IF
+                
             50: 
                 IF ExecutorCutY.Execute() THEN 
                     ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: PTP - Start operacji CutY', '');
                     SequenceState := 60; 
                 END_IF
             60: 
-                IF ExecutorCutY.Done THEN SequenceState := 70; END_IF
+                IF ExecutorCutY.Done THEN 
+                    SequenceState := 70;
+                ELSIF ExecutorCutY.Error THEN
+                    RaiseAlarmWithStrings(GantryAlarms[1], 'Blad w CutY', '');
+                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                END_IF
+                
             70: 
                 IF ExecutorCutX.Execute() THEN 
                     ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: PTP - Start operacji CutX', '');
                     SequenceState := 80; 
                 END_IF
             80: 
-                IF ExecutorCutX.Done THEN SequenceState := 1000; END_IF
+                IF ExecutorCutX.Done THEN 
+                    SequenceState := 1000;
+                ELSIF ExecutorCutX.Error THEN
+                    RaiseAlarmWithStrings(GantryAlarms[1], 'Blad w CutX', '');
+                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                END_IF
 
             // ========================================================
             // ŚCIEŻKA 2: KANAŁ INTERPOLACYJNY NCI (Rectangle, Kółka itp.)
@@ -395,14 +430,26 @@ END_VAR]]></Declaration>
                     SequenceState := 210;
                 END_IF
                 
-            210:
+          210:
                 IF ExecutorNCI.Done THEN
                     SequenceState := 1000;
                 ELSIF ExecutorNCI.Error THEN
-                    // Jeśli NCI zgłosi błąd, przerywamy i logujemy
                     ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: BLAD KRYTYCZNY w ExecutorNCI! Wywoluje Abort.', '');
+                    RaiseAlarmWithStrings(GantryAlarms[1], 'Krytyczny Blad NCI', '');
+                    
                     ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                    
+                    SequenceState := 999; // <--- KLUCZOWA ZMIANA: Uciekamy do martwego kroku!
                 END_IF
+                
+            // ========================================================
+            // MARTWY KROK DLA BŁĘDÓW
+            // ========================================================
+            999:
+                // Maszyna po prostu tu czeka. 
+                // W tle PackML przetworzy komendę ChangeState i brutalnie przerwie
+                // metodę Execute(), przeskakując do metody Aborting()!
+                ;
     
             // ========================================================
             // KONIEC OBRÓBKI (WSPÓLNY DLA OBU ŚCIEŻEK)
@@ -907,28 +954,7 @@ END_CASE]]></ST>
     <LineIds Name="FB_GantryXYZ.Aborting">
       <LineId Id="149" Count="2" />
       <LineId Id="148" Count="0" />
-      <LineId Id="105" Count="3" />
-      <LineId Id="308" Count="0" />
-      <LineId Id="109" Count="1" />
-      <LineId Id="123" Count="0" />
-      <LineId Id="111" Count="0" />
-      <LineId Id="132" Count="0" />
-      <LineId Id="124" Count="0" />
-      <LineId Id="140" Count="0" />
-      <LineId Id="247" Count="0" />
-      <LineId Id="257" Count="0" />
-      <LineId Id="259" Count="0" />
-      <LineId Id="270" Count="0" />
-      <LineId Id="273" Count="1" />
-      <LineId Id="272" Count="0" />
-      <LineId Id="290" Count="1" />
-      <LineId Id="299" Count="1" />
-      <LineId Id="319" Count="0" />
-      <LineId Id="271" Count="0" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="267" Count="0" />
-      <LineId Id="115" Count="2" />
-      <LineId Id="154" Count="0" />
+      <LineId Id="327" Count="48" />
       <LineId Id="118" Count="0" />
       <LineId Id="181" Count="2" />
       <LineId Id="198" Count="0" />
@@ -1000,7 +1026,10 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
-      <LineId Id="416" Count="96" />
+      <LineId Id="416" Count="40" />
+      <LineId Id="513" Count="50" />
+      <LineId Id="575" Count="18" />
+      <LineId Id="498" Count="14" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.FB_init">

@@ -83,6 +83,8 @@ METHOD PUBLIC CyclicLogic
         <ST><![CDATA[// Wywołanie bazowe
 SUPER^.CyclicLogic();
 
+// Odblokowanie posuwu kanału NCI (1000000 = 100%)
+stPlcToNci.ChnAxesOvr := 1000000;
 
 // --- ODŚWIEŻANIE BLOKÓW SYSTEMOWYCH ---
 fbBuildGroup(tTimeOut := T#2S);
@@ -106,6 +108,31 @@ fbReset(
 
 // --- AKTUALIZACJA STATUSÓW ---
 // Obsługa stanów dla tworzenia grupy
+IF fbStartStop.bErr THEN
+    _Error := TRUE;
+    _ErrorId := fbStartStop.nErrId;
+    fbStartStop(bStart := FALSE, bStop := FALSE, sNciToPlc := stNciToPlc);
+ELSIF fbStartStop.bBusy THEN
+    // Skoro kanał NCI przyjął komendę i jest zajęty, opuszczamy Start, 
+    // aby przygotować blok na kolejne uruchomienie w przyszłości
+    fbStartStop(bStart := FALSE, sNciToPlc := stNciToPlc);
+ELSIF NOT fbStartStop.bBusy AND fbStartStop.bStop THEN
+    // Jak się poprawnie zatrzymał, opuszczamy flagę Stop
+    fbStartStop(bStop := FALSE, sNciToPlc := stNciToPlc);
+END_IF
+
+// Obsługa stanów dla rozpinania grupy
+IF fbUngroup.bErr THEN
+    _Error := TRUE;
+    _ErrorId := fbUngroup.nErrId;
+    fbUngroup(bExecute := FALSE);
+    _IsGrouped := FALSE; // W razie błędu awaryjnie zdejmujemy flagę, żeby maszyna nie utknęła na zawsze
+ELSIF fbUngroup.bBusy = FALSE AND fbUngroup.bExecute THEN
+    _IsGrouped := FALSE; // Pomyślnie rozpięto!
+    fbUngroup(bExecute := FALSE);
+END_IF
+
+
 IF fbBuildGroup.bErr THEN
     _Error := TRUE;
     _ErrorId := fbBuildGroup.nErrId;
@@ -190,7 +217,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[fbReset(
+        <ST><![CDATA[// Najpierw bezwarunkowo ubijamy flagi ruchu
+fbStartStop(bStart := FALSE, bStop := FALSE, sNciToPlc := stNciToPlc);
+
+// Następnie resetujemy sam kanał NCI
+fbReset(
     bExecute := TRUE,
     sNciToPlc := stNciToPlc
 );]]></ST>
@@ -228,8 +259,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_IsGrouped := FALSE;
-fbUngroup(
+        <ST><![CDATA[fbUngroup(
     bExecute := TRUE, 
     nGroupId := _GroupId
 );]]></ST>
@@ -252,9 +282,18 @@ fbUngroup(
     <LineIds Name="FB_NciChannel.CyclicLogic">
       <LineId Id="7" Count="1" />
       <LineId Id="67" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="93" Count="0" />
       <LineId Id="9" Count="1" />
       <LineId Id="46" Count="16" />
-      <LineId Id="27" Count="18" />
+      <LineId Id="27" Count="3" />
+      <LineId Id="71" Count="10" />
+      <LineId Id="69" Count="0" />
+      <LineId Id="83" Count="9" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="70" Count="0" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="31" Count="14" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.IsGrouped.Get">
@@ -274,7 +313,7 @@ fbUngroup(
       <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.ResetChannel">
-      <LineId Id="6" Count="2" />
+      <LineId Id="12" Count="6" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.Start">
@@ -286,7 +325,7 @@ fbUngroup(
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.Ungroup">
-      <LineId Id="6" Count="3" />
+      <LineId Id="7" Count="2" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

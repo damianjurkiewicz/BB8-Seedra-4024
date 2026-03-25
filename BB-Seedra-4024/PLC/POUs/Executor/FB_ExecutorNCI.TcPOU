@@ -11,12 +11,20 @@ END_VAR]]></Declaration>
     <Method Name="Abort" Id="{892bab94-44de-43ce-b4a1-a34f01b2e250}">
       <Declaration><![CDATA[METHOD Abort]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// 1. Nakazujemy kanałowi rozpięcie grupy (jeśli jakaś jest)
+        <ST><![CDATA[// 1. Zatrzymujemy program NCI (jeśli jedzie)
+_NciChannel.Stop();
+
+// 2. Wymuszamy reset błędów na kanale interpolacyjnym
+_NciChannel.ResetChannel();
+
+// 3. Dopiero teraz bezpiecznie nakazujemy kanałowi rozpięcie grupy
 _NciChannel.Ungroup();
 
-// 2. Zerujemy resztę
+// 4. Zerujemy resztę lokalnych zmiennych Executora
 _bBusy := FALSE;
 _bDone := FALSE;
+_bError := FALSE;
+_uErrorID := 0;
 nStep := 0;
 iCurrentSegment := 1;
 StepTimer(IN := FALSE);]]></ST>
@@ -189,7 +197,7 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorNCI.Abort">
-      <LineId Id="5" Count="7" />
+      <LineId Id="13" Count="15" />
       <LineId Id="3" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorNCI.CyclicLogic">

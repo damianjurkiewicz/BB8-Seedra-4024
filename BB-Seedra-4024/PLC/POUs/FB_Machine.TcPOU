@@ -167,15 +167,25 @@ END_IF]]></ST>
 					ChangeState(E_PMLCommand.ePMLCommand_Abort);
 				END_IF
 				
-			10: 
+10: 
                 // Czekamy, aż moduł Gantry zamelduje zakończenie obróbki
-				IF GantryXYZ.CurrentState = E_PMLState.ePMLState_Complete THEN
-					SequenceState := 20;
-				END_IF	
-					
-			20:
-				StateTasksComplete := TRUE;
-				StateComplete();
+                IF GantryXYZ.CurrentState = E_PMLState.ePMLState_Complete THEN
+                    SequenceState := 20;
+                
+                // --- DODAJ TEN WARUNEK ---
+                ELSIF GantryXYZ.CurrentState = E_PMLState.ePMLState_Aborting OR GantryXYZ.CurrentState = E_PMLState.ePMLState_Aborted THEN
+                    // Jeśli submoduł Gantry uległ awarii, wymuś awarię całej maszyny!
+                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                    SequenceState := 999; 
+                END_IF  
+                    
+            20:
+                StateTasksComplete := TRUE;
+                StateComplete();
+                
+            999:
+                // Martwy krok dla awarii
+                ;
 				
 		END_CASE
 
@@ -525,7 +535,9 @@ END_IF]]></ST>
     </LineIds>
     <LineIds Name="FB_Machine.Execute">
       <LineId Id="24" Count="3" />
-      <LineId Id="98" Count="23" />
+      <LineId Id="98" Count="13" />
+      <LineId Id="124" Count="17" />
+      <LineId Id="120" Count="1" />
       <LineId Id="42" Count="4" />
       <LineId Id="23" Count="0" />
     </LineIds>
