@@ -3,23 +3,27 @@
   <DUT Name="ST_GantryXYZ_Limits" Id="{cba87eca-bf63-4a10-aeea-40c5885e9f39}">
     <Declaration><![CDATA[TYPE ST_GantryXYZ_Limits :
 STRUCT
-    CutterXOffsetX   : ST_LimitInfo;
-    CutterXOffsetY   : ST_LimitInfo;
-    CutterYOffsetX   : ST_LimitInfo;
-    CutterYOffsetY   : ST_LimitInfo;
-    CuttingSpeedX    : ST_LimitInfo;
-    CuttingSpeedY    : ST_LimitInfo;
-    CuttingIdleTime  : ST_LimitInfo;
-    GrooveDepthZ     : ST_LimitInfo;
-    GroovingSpeedX   : ST_LimitInfo;
-    GroovingSpeedY   : ST_LimitInfo;
-    GroovingSpeedZ   : ST_LimitInfo;
-    GroovingIdleTime : ST_LimitInfo;
-    RapidSpeedX      : ST_LimitInfo;
-    RapidSpeedY      : ST_LimitInfo;
-    RapidSpeedZ      : ST_LimitInfo;
-    GlobalOffsetX     : ST_LimitInfo;
-	GlobalOffsetY     : ST_LimitInfo;
+    CutterXOffsetX		: ST_LimitInfo;
+    CutterXOffsetY		: ST_LimitInfo;
+    CutterYOffsetX		: ST_LimitInfo;
+    CutterYOffsetY		: ST_LimitInfo;
+    CuttingSpeedX		: ST_LimitInfo;
+    CuttingSpeedY		: ST_LimitInfo;
+    CuttingIdleTime		: ST_LimitInfo;
+    GroovingSpeedX		: ST_LimitInfo;
+    GroovingSpeedY		: ST_LimitInfo;
+    GroovingSpeedZ		: ST_LimitInfo;
+    GroovingIdleTime	: ST_LimitInfo;
+    RapidSpeedX			: ST_LimitInfo;
+    RapidSpeedY			: ST_LimitInfo;
+    RapidSpeedZ			: ST_LimitInfo;
+    GlobalOffsetX		: ST_LimitInfo;
+	GlobalOffsetY		: ST_LimitInfo;
+	GlobalOffsetZ		: ST_LimitInfo; 
+    RawBoardX			: ST_LimitInfo; 
+    RawBoardY			: ST_LimitInfo; 
+	RawBoardZ			: ST_LimitInfo;
+	SafeClearanceZ		: ST_LimitInfo;
 END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

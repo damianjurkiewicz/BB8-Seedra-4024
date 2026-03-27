@@ -25,8 +25,6 @@ VAR
 	_FootprintY 			: REAL;
 	_MaxCopiesX				: DINT;
 	_MaxCopiesY				: DINT;
-	RAW_BOARD_X : REAL := 1200.0; 
-	RAW_BOARD_Y : REAL := 2400.0;
 	_ActualCopiesX			:DINT;
 	_ActualCopiesY			:DINT;
 	_NominalX 				: REAL;
@@ -311,17 +309,20 @@ MaxOverpass := MAX(_Config.CuttingOverpass, _Config.GroovingOverpass);
 _FootprintX := _NominalX + (2.0 * MaxOverpass);
 _FootprintY := _NominalY + (2.0 * MaxOverpass);
 
-// 2. Pobranie Global Offsetu maszyny
+// 2. Pobranie Global Offsetu ORAZ wymiarów płyty z maszyny
 IF _ConfigProvider <> 0 THEN
     MachineConfig := _ConfigProvider.Config;
 ELSE
+    // Awaryjny "fallback" jeśli Provider nie jest wstrzyknięty (np. w starych testach)
     MachineConfig.GlobalOffsetX := 0.0;
     MachineConfig.GlobalOffsetY := 0.0;
+    MachineConfig.RawBoardX := 1200.0; // Domyślna płyta 
+    MachineConfig.RawBoardY := 2400.0; // Domyślna płyta
 END_IF
 
-// 3. Efektywna wielkość płyty = Fizyczna płyta minus offset początkowy
-EffectiveBoardX := RAW_BOARD_X - MachineConfig.GlobalOffsetX;
-EffectiveBoardY := RAW_BOARD_Y - MachineConfig.GlobalOffsetY;
+// 3. Efektywna wielkość płyty = Fizyczna płyta (z maszyny) minus offset początkowy
+EffectiveBoardX := MachineConfig.RawBoardX - MachineConfig.GlobalOffsetX;
+EffectiveBoardY := MachineConfig.RawBoardY - MachineConfig.GlobalOffsetY;
 
 // 4. Przeliczanie kopii nestingu (zabezpieczenie na ujemne wymiary)
 IF _FootprintX > 0.0 AND EffectiveBoardX > 0.0 THEN
@@ -543,7 +544,9 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.UpdateNestingLimits">
-      <LineId Id="142" Count="28" />
+      <LineId Id="142" Count="5" />
+      <LineId Id="171" Count="12" />
+      <LineId Id="158" Count="12" />
       <LineId Id="100" Count="31" />
       <LineId Id="5" Count="0" />
     </LineIds>

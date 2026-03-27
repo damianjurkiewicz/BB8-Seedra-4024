@@ -326,6 +326,8 @@ CASE DescendantSequenceState OF
 //		RecipeConfig_HMI.Limits.RailHeightCorrection.MinVal := 12.0; 	 RecipeConfig_HMI.Limits.RailHeightCorrection.MaxVal := 1234.0;
 		RecipeConfig_HMI.Limits.CuttingOverpass.MinVal 		:= 0.0;      RecipeConfig_HMI.Limits.CuttingOverpass.MaxVal 	:= 50.0;
 		RecipeConfig_HMI.Limits.GroovingOverpass.MinVal 	:= 0.0;      RecipeConfig_HMI.Limits.GroovingOverpass.MaxVal 	:= 50.0;
+		RecipeConfig_HMI.Limits.GrooveDepthZ.MinVal := 0.0;
+		RecipeConfig_HMI.Limits.GrooveDepthZ.MaxVal := 100.0;
 		
 		IF RecipeConfig_HMI.Config.RequestedCopiesX < 1 THEN RecipeConfig_HMI.Config.RequestedCopiesX := 1; END_IF
 		IF RecipeConfig_HMI.Config.RequestedCopiesY < 1 THEN RecipeConfig_HMI.Config.RequestedCopiesY := 1; END_IF
@@ -616,6 +618,7 @@ END_IF]]></ST>
       <LineId Id="124" Count="0" />
       <LineId Id="126" Count="7" />
       <LineId Id="125" Count="0" />
+      <LineId Id="143" Count="1" />
       <LineId Id="123" Count="0" />
       <LineId Id="112" Count="0" />
       <LineId Id="136" Count="0" />

@@ -118,7 +118,10 @@ _Limits.CuttingOverpass.MinVal := 0.0;
 _Limits.CuttingOverpass.MaxVal := 50.0;
 
 _Limits.GroovingOverpass.MinVal := 0.0;
-_Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.GrooveDepthZ.MinVal := 0.0;
+_Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps">
@@ -154,6 +157,8 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.FB_init">
       <LineId Id="27" Count="15" />
       <LineId Id="24" Count="0" />
+      <LineId Id="49" Count="1" />
+      <LineId Id="48" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

@@ -16,7 +16,8 @@ Test_BorgoWings_Calculates_Coordinates();
 Test_BorgoWings_Calculates_Footprint();
 Test_BorgoWings_Calculates_MaxCopies();
 Test_BorgoWings_Calculates_Segments();
-Test_BoundaryValues_Are_Clamped();]]></ST>
+Test_BoundaryValues_Are_Clamped();
+Test_GlobalOffset_Reduces_MaxCopies();]]></ST>
     </Implementation>
     <Method Name="Test_Arona_Calculates_Segments" Id="{7a994464-7f61-40a8-a740-1b9398842f86}">
       <Declaration><![CDATA[METHOD Test_Arona_Calculates_Segments
@@ -376,6 +377,58 @@ AssertEquals_REAL(Expected := 0.0, // Założone minimum dla wysokości z Twojeg
 TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Test_GlobalOffset_Reduces_MaxCopies" Id="{593b9c31-c36d-4ad8-a81a-6167338e3125}">
+      <Declaration><![CDATA[METHOD Test_GlobalOffset_Reduces_MaxCopies
+VAR_INST 
+    LocalBuilder       : FB_RecipeBuilderBorgoWings;
+    MockConfigProvider : FB_MockConfigProvider;
+END_VAR
+VAR 
+    MachineConfig      : ST_GantryXYZ_Config;
+    TestConfig         : ST_RecipeBuilder_Config;
+    WasBuilt           : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_GlobalOffset_Reduces_MaxCopies');
+
+// 1. ARRANGE
+// Wymiary detalu: Szer=400, Dlug=400, Wys=100.
+// Gabaryt roboczy (Footprint) to Nominal + 2*Wysokosc -> 600x600 mm.
+TestConfig.PanelFrontWidth  := 400.0;
+TestConfig.PanelFrontLength := 400.0;
+TestConfig.PanelHeight      := 100.0;
+TestConfig.CuttingOverpass  := 0.0;
+TestConfig.GroovingOverpass := 0.0;
+
+// Konfiguracja maszyny: "Zjadamy" stół offsetami!
+// Surowa plyta ma 1200 x 2400 mm
+MachineConfig.RawBoardX := 1200.0; // <--- DODAJ TO
+MachineConfig.RawBoardY := 2400.0; // <--- DODAJ TO
+MachineConfig.GlobalOffsetX := 300.0;  // Zostaje 900 mm dla osi X
+MachineConfig.GlobalOffsetY := 1000.0; // Zostaje 1400 mm dla osi Y
+MockConfigProvider.Config := MachineConfig;
+
+// Wstrzykujemy zależności
+LocalBuilder.ConfigProvider := MockConfigProvider;
+LocalBuilder.Config := TestConfig;
+
+// 2. ACT
+WasBuilt := LocalBuilder.Build();
+
+// 3. ASSERT
+// Os X: Zostalo 900 mm. Detal zajmuje 600 mm. TRUNC(900/600) = 1 sztuka (zamiast dotychczasowych 2).
+AssertEquals_DINT(Expected := 1, 
+                  Actual := LocalBuilder.MaxCopiesX, 
+                  Message := 'GlobalOffsetX nie zmniejszyl poprawnie limitu MaxCopiesX!');
+                 
+// Os Y: Zostalo 1400 mm. Detal zajmuje 600 mm. TRUNC(1400/600) = 2 sztuki (zamiast dotychczasowych 4).
+AssertEquals_DINT(Expected := 2, 
+                  Actual := LocalBuilder.MaxCopiesY, 
+                  Message := 'GlobalOffsetY nie zmniejszyl poprawnie limitu MaxCopiesY!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="FB_RecipeBuilder_Test">
       <LineId Id="9" Count="0" />
       <LineId Id="25" Count="0" />
@@ -384,6 +437,7 @@ TEST_FINISHED();]]></ST>
       <LineId Id="53" Count="1" />
       <LineId Id="39" Count="0" />
       <LineId Id="46" Count="0" />
+      <LineId Id="63" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_Arona_Calculates_Segments">
       <LineId Id="78" Count="28" />
@@ -431,6 +485,13 @@ TEST_FINISHED();]]></ST>
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BoundaryValues_Are_Clamped">
       <LineId Id="10" Count="26" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_GlobalOffset_Reduces_MaxCopies">
+      <LineId Id="6" Count="12" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="19" Count="21" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

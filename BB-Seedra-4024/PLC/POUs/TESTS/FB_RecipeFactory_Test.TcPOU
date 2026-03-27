@@ -7,10 +7,58 @@ VAR
     Config  : ST_RecipeBuilder_Config;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[Test_ReturnsCorrectBuilder();
+      <ST><![CDATA[Test_InjectsConfigProviderToAllBuilders();
+Test_ReturnsCorrectBuilder();
 Test_ReturnsZeroOnInvalidID();
 Test_UpdatesConfigForAllBuilders();]]></ST>
     </Implementation>
+    <Method Name="Test_InjectsConfigProviderToAllBuilders" Id="{d6313cf3-d5c8-436b-ba90-e789f33521a7}">
+      <Declaration><![CDATA[METHOD Test_InjectsConfigProviderToAllBuilders
+VAR_INST
+    MockProvider : FB_MockConfigProvider;
+END_VAR
+VAR
+    TestConfig   : ST_RecipeBuilder_Config;
+    BuilderWings : I_RecipeBuilder;
+    BuilderFlaps : I_RecipeBuilder;
+    BuilderArona : I_RecipeBuilder;
+    BuilderRect  : I_RecipeBuilder;
+    
+    iMockProvider : I_GantryConfigProvider;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_InjectsConfigProviderToAllBuilders');
+
+// 1. ARRANGE
+// Rzutujemy instancję bloku na interfejs (aby kompilator wiedział, jak je porównywać)
+iMockProvider := MockProvider;
+
+// ACT
+Factory.InitializeFactory(Config := TestConfig, ConfigProvider := iMockProvider);
+
+// Wyciągamy instancje z fabryki
+BuilderWings := Factory.GetBuilder(E_RecipeID.eBorgoWings);
+BuilderFlaps := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
+BuilderArona := Factory.GetBuilder(E_RecipeID.eArona);
+BuilderRect  := Factory.GetBuilder(E_RecipeID.eRectangle);
+
+// 3. ASSERT
+// Teraz porównujemy interfejs z interfejsem - kompilator będzie zadowolony!
+AssertTrue(Condition := (BuilderWings.ConfigProvider = iMockProvider),
+           Message := 'BuilderWings nie otrzymal wstrzyknietego ConfigProvidera!');
+           
+AssertTrue(Condition := (BuilderFlaps.ConfigProvider = iMockProvider),
+           Message := 'BuilderFlaps nie otrzymal wstrzyknietego ConfigProvidera!');
+           
+AssertTrue(Condition := (BuilderArona.ConfigProvider = iMockProvider),
+           Message := 'BuilderArona nie otrzymal wstrzyknietego ConfigProvidera!');
+           
+AssertTrue(Condition := (BuilderRect.ConfigProvider = iMockProvider),
+           Message := 'BuilderRectangle nie otrzymal wstrzyknietego ConfigProvidera!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Test_ReturnsCorrectBuilder" Id="{f4d0cc26-5c2a-4ddf-b356-c729fd5c6098}">
       <Declaration><![CDATA[METHOD Test_ReturnsCorrectBuilder
 VAR
@@ -113,8 +161,13 @@ TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeFactory_Test">
+      <LineId Id="20" Count="0" />
       <LineId Id="14" Count="1" />
       <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeFactory_Test.Test_InjectsConfigProviderToAllBuilders">
+      <LineId Id="57" Count="28" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory_Test.Test_ReturnsCorrectBuilder">
       <LineId Id="28" Count="16" />

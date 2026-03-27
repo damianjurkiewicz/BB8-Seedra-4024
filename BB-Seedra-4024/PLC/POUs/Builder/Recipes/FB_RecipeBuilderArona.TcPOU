@@ -70,7 +70,10 @@ _Limits.CuttingOverpass.MinVal := 0.0;
 _Limits.CuttingOverpass.MaxVal := 50.0;
 
 _Limits.GroovingOverpass.MinVal := 0.0;
-_Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.GrooveDepthZ.MinVal := 0.0;
+_Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeBuilderArona">
@@ -88,6 +91,8 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
     <LineIds Name="FB_RecipeBuilderArona.FB_init">
       <LineId Id="31" Count="15" />
       <LineId Id="28" Count="0" />
+      <LineId Id="53" Count="1" />
+      <LineId Id="52" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>
