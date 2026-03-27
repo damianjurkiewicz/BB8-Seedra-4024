@@ -18,7 +18,8 @@ STRUCT
     RapidSpeedX      : ST_LimitInfo;
     RapidSpeedY      : ST_LimitInfo;
     RapidSpeedZ      : ST_LimitInfo;
-    GlobalOffset     : ST_LimitInfo;
+    GlobalOffsetX     : ST_LimitInfo;
+	GlobalOffsetY     : ST_LimitInfo;
 END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

@@ -110,25 +110,23 @@ IF _CurrentState = E_PMLState.ePMLState_Idle OR
    _CurrentState = E_PMLState.ePMLState_Stopped OR
    _CurrentState = E_PMLState.ePMLState_Aborted THEN
 
-    IF CurrentBuilder <> 0 THEN
-        // A) Wrzucamy dane z HMI -> Wyzwala to limity i UpdateNestingLimits() w Builderze!
-        CurrentBuilder.Config := RecipeConfig_HMI.Config;
+IF CurrentBuilder <> 0 THEN
+    // Wrzucamy dane z HMI -> Wyzwala to limity i UpdateNestingLimits() w Builderze!
+    // Builder wewnątrz tej metody sam pyta Gantry o GlobalOffset!
+    CurrentBuilder.Config := RecipeConfig_HMI.Config;
         
-        // B) Odczyt z powrotem na HMI (aby wyświetlić przeliczone limity)
-        RecipeConfig_HMI.Config := CurrentBuilder.Config;
-        RecipeConfig_HMI.Limits := CurrentBuilder.Limits;
-    ELSE
-        // === FALLBACK DLA PUSTYCH PROGRAMÓW ===
-        IF GantryXYZ.ProgramIdRequested <> E_RecipeID.eNone THEN
-            GantryXYZ.ProgramIdRequested := E_RecipeID.eNone;
-        END_IF
+    // Odczyt z powrotem na HMI (aby wyświetlić przeliczone limity sztuk)
+    RecipeConfig_HMI.Config := CurrentBuilder.Config;
+    RecipeConfig_HMI.Limits := CurrentBuilder.Limits;
+ELSE
+    IF GantryXYZ.ProgramIdRequested <> E_RecipeID.eNone THEN
+        GantryXYZ.ProgramIdRequested := E_RecipeID.eNone;
     END_IF
+END_IF
 
     // =========================================================
-    // 4. ZAPIS DO PERSISTENTÓW I FABRYKI (Musi być wewnątrz IF)
+    // 4. ZAPIS DO PERSISTENTÓW I FABRYKI 
     // =========================================================
-    // Przeniesienie UpdateConfig tutaj gwarantuje, że Fabryka nie rozpropaguje 
-    // pustych pól (np. GCodePath) do builderów w trakcie trwania obróbki.
     ConfigManager.GantryConfig := GantryXYZ.Config;
     ConfigManager.Config := RecipeConfig_HMI.Config;
     RecipeFactory.UpdateConfig(RecipeConfig_HMI.Config);
@@ -312,6 +310,9 @@ CASE DescendantSequenceState OF
 
 		// Przekazanie konfiguracji do Gantry
 		GantryXYZ.Config := ConfigManager.GantryConfig;
+		
+		// Przekazanie konfiguracji z Persistenta do Fabryki ORAZ wstrzyknięcie maszyny (GantryXYZ)
+		RecipeFactory.InitializeFactory(Config := ConfigManager.Config, ConfigProvider := GantryXYZ);
 	
 		// Przekazanie konfiguracji z Persistenta do HMI (żeby po restarcie na ekranie były dobre wartości)
 		RecipeConfig_HMI.Config := ConfigManager.Config;
@@ -530,7 +531,10 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.CyclicLogic">
-      <LineId Id="367" Count="55" />
+      <LineId Id="367" Count="24" />
+      <LineId Id="426" Count="11" />
+      <LineId Id="404" Count="4" />
+      <LineId Id="411" Count="11" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Execute">
@@ -604,7 +608,9 @@ END_IF]]></ST>
       <LineId Id="50" Count="1" />
       <LineId Id="75" Count="0" />
       <LineId Id="77" Count="0" />
-      <LineId Id="106" Count="3" />
+      <LineId Id="106" Count="2" />
+      <LineId Id="140" Count="2" />
+      <LineId Id="109" Count="0" />
       <LineId Id="119" Count="0" />
       <LineId Id="111" Count="0" />
       <LineId Id="124" Count="0" />

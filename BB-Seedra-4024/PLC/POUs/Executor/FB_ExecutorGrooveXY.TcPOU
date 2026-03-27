@@ -12,6 +12,7 @@ VAR_INST
     // Lokalne zmienne pomocnicze na czas trwania cyklu
     currentSeg          : ST_CutSegment;
     localConfig         : ST_GantryXYZ_Config;
+	recipeConfig : ST_RecipeBuilder_Config; // Zmienna tymczasowa
     
     // Zmienne sekwencyjne dla logiki frezowania
     iPass               : INT;
@@ -90,15 +91,17 @@ CASE nStep OF
 
     // -------- Wybor glebokosci dla 5 przejsc --------
     30:
-        CASE iPass OF
-            1: currentDepth := localConfig.GrooveDepthZ - g1;
-            2: currentDepth := localConfig.GrooveDepthZ - g2;
-            3: currentDepth := localConfig.GrooveDepthZ - g3;
-            4: currentDepth := localConfig.GrooveDepthZ - g4;
-            5: currentDepth := localConfig.GrooveDepthZ - g5;
-        ELSE
-            currentDepth := localConfig.GrooveDepthZ;
-        END_CASE;
+		recipeConfig := _RecipeBuilder.Config; // Pobranie configu receptury!
+		
+		CASE iPass OF
+			1: currentDepth := recipeConfig.GrooveDepthZ - g1;
+			2: currentDepth := recipeConfig.GrooveDepthZ - g2;
+			3: currentDepth := recipeConfig.GrooveDepthZ - g3;
+			4: currentDepth := recipeConfig.GrooveDepthZ - g4;
+			5: currentDepth := recipeConfig.GrooveDepthZ - g5;
+		ELSE
+			currentDepth := recipeConfig.GrooveDepthZ;
+		END_CASE;
 
         //Trace(Message := CONCAT('Step 30: Os Z w dol do glebokosci: ', TO_STRING(currentDepth)));
         _AxisZ.MoveAbsolute(currentDepth, 0);
@@ -253,7 +256,9 @@ END_CASE]]></ST>
     <LineIds Name="FB_ExecutorGrooveXY.CyclicLogic">
       <LineId Id="481" Count="22" />
       <LineId Id="716" Count="0" />
-      <LineId Id="504" Count="199" />
+      <LineId Id="504" Count="45" />
+      <LineId Id="729" Count="9" />
+      <LineId Id="558" Count="145" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>

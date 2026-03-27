@@ -39,12 +39,17 @@ END_CASE]]></ST>
       <Declaration><![CDATA[METHOD InitializeFactory
 VAR_INPUT
     Config : ST_RecipeBuilder_Config;
+	ConfigProvider : I_GantryConfigProvider;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[BuilderWings.Config := Config;
+BuilderWings.ConfigProvider := ConfigProvider; 
 BuilderFlaps.Config := Config;
+BuilderFlaps.ConfigProvider := ConfigProvider;
 BuilderArona.Config := Config;
-BuilderRectangle.Config := Config;]]></ST>
+BuilderArona.ConfigProvider := ConfigProvider;
+BuilderRectangle.Config := Config;
+BuilderRectangle.ConfigProvider := ConfigProvider;]]></ST>
       </Implementation>
     </Method>
     <Method Name="UpdateConfig" Id="{addb126c-7b31-4fe1-bab5-a92c30ad08f7}">
@@ -71,8 +76,7 @@ BuilderRectangle.Config := Config;]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.InitializeFactory">
-      <LineId Id="9" Count="1" />
-      <LineId Id="5" Count="0" />
+      <LineId Id="19" Count="6" />
       <LineId Id="14" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.UpdateConfig">

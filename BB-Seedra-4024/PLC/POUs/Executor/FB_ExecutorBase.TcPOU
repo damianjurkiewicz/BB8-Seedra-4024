@@ -226,8 +226,8 @@ NestingOffsetX := (iCurrentCopyX - 1) * _RecipeBuilder.FootprintX;
 NestingOffsetY := (iCurrentCopyY - 1) * _RecipeBuilder.FootprintY;
 
 // I dodajemy to do naszych wspaniałych komend jazdy:
-_AxisX.MoveAbsolute(TargetX + ToolOffsetX + NestingOffsetX, 0);
-_AxisY.MoveAbsolute(TargetY + ToolOffsetY + NestingOffsetY, 0);
+_AxisX.MoveAbsolute(TargetX + ToolOffsetX + NestingOffsetX + localConfig.GlobalOffsetX, 0);
+_AxisY.MoveAbsolute(TargetY + ToolOffsetY + NestingOffsetY + localConfig.GlobalOffsetY, 0);
 
 
 
@@ -313,7 +313,8 @@ END_VAR
     </LineIds>
     <LineIds Name="FB_ExecutorBase.MoveToXY">
       <LineId Id="15" Count="1" />
-      <LineId Id="35" Count="6" />
+      <LineId Id="35" Count="5" />
+      <LineId Id="53" Count="0" />
       <LineId Id="34" Count="0" />
       <LineId Id="17" Count="0" />
       <LineId Id="21" Count="1" />

@@ -255,7 +255,6 @@ GantryXYZ_HMI.Config.CutterXOffsetY   := LIMIT(_Limits.CutterXOffsetY.MinVal, Co
 GantryXYZ_HMI.Config.CutterYOffsetX   := LIMIT(_Limits.CutterYOffsetX.MinVal, Config.CutterYOffsetX, _Limits.CutterYOffsetX.MaxVal);
 GantryXYZ_HMI.Config.CutterYOffsetY   := LIMIT(_Limits.CutterYOffsetY.MinVal, Config.CutterYOffsetY, _Limits.CutterYOffsetY.MaxVal);
 
-GantryXYZ_HMI.Config.GlobalOffset     := LIMIT(_Limits.GlobalOffset.MinVal, Config.GlobalOffset, _Limits.GlobalOffset.MaxVal);
 
 GantryXYZ_HMI.Config.CuttingSpeedX    := LIMIT(_Limits.CuttingSpeedX.MinVal, Config.CuttingSpeedX, _Limits.CuttingSpeedX.MaxVal);
 GantryXYZ_HMI.Config.CuttingSpeedY    := LIMIT(_Limits.CuttingSpeedY.MinVal, Config.CuttingSpeedY, _Limits.CuttingSpeedY.MaxVal);
@@ -271,7 +270,7 @@ GantryXYZ_HMI.Config.RapidSpeedZ      := LIMIT(_Limits.RapidSpeedZ.MinVal, Confi
 GantryXYZ_HMI.Config.CuttingIdleTime  := LIMIT(_Limits.CuttingIdleTime.MinVal, Config.CuttingIdleTime, _Limits.CuttingIdleTime.MaxVal);
 GantryXYZ_HMI.Config.GroovingIdleTime := LIMIT(_Limits.GroovingIdleTime.MinVal, Config.GroovingIdleTime, _Limits.GroovingIdleTime.MaxVal);
 
-GantryXYZ_HMI.Config.GrooveDepthZ     := LIMIT(_Limits.GrooveDepthZ.MinVal, Config.GrooveDepthZ, _Limits.GrooveDepthZ.MaxVal);]]></ST>
+]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -479,7 +478,8 @@ END_VAR
 		_Limits.CutterXOffsetY.MinVal := -200.0;   _Limits.CutterXOffsetY.MaxVal := 200.0;
 		_Limits.CutterYOffsetX.MinVal := -200.0;   _Limits.CutterYOffsetX.MaxVal := 200.0;
 		_Limits.CutterYOffsetY.MinVal := -200.0;   _Limits.CutterYOffsetY.MaxVal := 200.0;
-		_Limits.GlobalOffset.MinVal   := -500.0;   _Limits.GlobalOffset.MaxVal   := 500.0;
+		_Limits.GlobalOffsetX.MinVal   := -500.0;   _Limits.GlobalOffsetX.MaxVal   := 500.0;
+		_Limits.GlobalOffsetY.MinVal   := -500.0;   _Limits.GlobalOffsetY.MaxVal   := 500.0;
 		
 		_Limits.CuttingSpeedX.MinVal  := 1.0;      _Limits.CuttingSpeedX.MaxVal  := 100.0;
 		_Limits.CuttingSpeedY.MinVal  := 1.0;      _Limits.CuttingSpeedY.MaxVal  := 100.0;
@@ -998,7 +998,8 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Config.Set">
       <LineId Id="45" Count="3" />
-      <LineId Id="50" Count="15" />
+      <LineId Id="50" Count="0" />
+      <LineId Id="52" Count="13" />
       <LineId Id="69" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -1033,7 +1034,9 @@ END_CASE]]></ST>
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.FB_init">
-      <LineId Id="8" Count="19" />
+      <LineId Id="8" Count="4" />
+      <LineId Id="138" Count="0" />
+      <LineId Id="13" Count="14" />
       <LineId Id="7" Count="0" />
       <LineId Id="31" Count="1" />
       <LineId Id="58" Count="74" />

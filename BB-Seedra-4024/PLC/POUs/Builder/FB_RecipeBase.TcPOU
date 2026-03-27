@@ -5,10 +5,12 @@
 
 VAR
     _Config                 : ST_RecipeBuilder_Config;
+	_ConfigProvider 		: I_GantryConfigProvider;
     _PanelFrontLength       : REAL;  
     _PanelFrontWidth        : REAL;      
     _PanelHeight            : REAL;    
     _RailHeightCorrection   : REAL;
+	
 	
 	_Limits : ST_Recipe_Limits;
 
@@ -116,6 +118,7 @@ _Config.PanelFrontLength     := LIMIT(_Limits.PanelFrontLength.MinVal, Config.Pa
 _Config.PanelFrontWidth      := LIMIT(_Limits.PanelFrontWidth.MinVal,  Config.PanelFrontWidth,  _Limits.PanelFrontWidth.MaxVal);
 _Config.PanelHeight          := LIMIT(_Limits.PanelHeight.MinVal,      Config.PanelHeight,      _Limits.PanelHeight.MaxVal);
 _Config.RailHeightCorrection := LIMIT(_Limits.RailHeightCorrection.MinVal, Config.RailHeightCorrection, _Limits.RailHeightCorrection.MaxVal);
+_Config.GrooveDepthZ		:=	LIMIT(_Limits.GrooveDepthZ.MinVal,	Config.GrooveDepthZ, _Limits.GrooveDepthZ.MaxVal);
 
 
 THIS^.UpdateNestingLimits();
@@ -128,6 +131,25 @@ ELSE
     _Config.RequestedCopiesX := LIMIT(1, _Config.RequestedCopiesX, _MaxCopiesX);
     _Config.RequestedCopiesY := LIMIT(1, _Config.RequestedCopiesY, _MaxCopiesY);
 END_IF]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="ConfigProvider" Id="{8b0de6b1-3957-44a3-88b0-341b09b0b39a}">
+      <Declaration><![CDATA[PROPERTY ConfigProvider : I_GantryConfigProvider]]></Declaration>
+      <Get Name="Get" Id="{2167364a-f1be-4cf1-9920-cef8a1292a7b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ConfigProvider := _ConfigProvider;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{2269ab13-305f-4ee2-8020-24ff434eedbe}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_ConfigProvider := ConfigProvider;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -277,30 +299,39 @@ END_VAR
     <Method Name="UpdateNestingLimits" Id="{b78c73fe-7983-4c8d-9c71-a0293b8dccf5}">
       <Declaration><![CDATA[METHOD PUBLIC UpdateNestingLimits
 VAR
-    MaxOverpass : REAL;
-END_VAR
-]]></Declaration>
+    MaxOverpass     : REAL;
+    MachineConfig   : ST_GantryXYZ_Config; // Zmienna do odczytu offsetu
+    EffectiveBoardX : REAL;
+    EffectiveBoardY : REAL;
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-// 1. POLIMORFIZM: Każda receptura liczy swój własny, unikalny wymiar "czysty"
+        <ST><![CDATA[// 1. Czysty gabaryt z logiki receptury
 THIS^.CalculateFootprint();
-
-// 2. Pobieramy największy wyjazd narzędzia (Overpass) Z WŁASNEJ KONFIGURACJI RECEPTURY!
 MaxOverpass := MAX(_Config.CuttingOverpass, _Config.GroovingOverpass);
-
-// 3. Gabaryt (Footprint) to nominalny wymiar + bezpieczna strefa (Overpass x2) z obu stron
 _FootprintX := _NominalX + (2.0 * MaxOverpass);
 _FootprintY := _NominalY + (2.0 * MaxOverpass);
 
-// 4. Wyliczenie maksymalnych kopii na płycie
-IF _FootprintX > 0.0 THEN
-    _MaxCopiesX := REAL_TO_DINT(TRUNC(RAW_BOARD_X / _FootprintX));
+// 2. Pobranie Global Offsetu maszyny
+IF _ConfigProvider <> 0 THEN
+    MachineConfig := _ConfigProvider.Config;
+ELSE
+    MachineConfig.GlobalOffsetX := 0.0;
+    MachineConfig.GlobalOffsetY := 0.0;
+END_IF
+
+// 3. Efektywna wielkość płyty = Fizyczna płyta minus offset początkowy
+EffectiveBoardX := RAW_BOARD_X - MachineConfig.GlobalOffsetX;
+EffectiveBoardY := RAW_BOARD_Y - MachineConfig.GlobalOffsetY;
+
+// 4. Przeliczanie kopii nestingu (zabezpieczenie na ujemne wymiary)
+IF _FootprintX > 0.0 AND EffectiveBoardX > 0.0 THEN
+    _MaxCopiesX := REAL_TO_DINT(TRUNC(EffectiveBoardX / _FootprintX));
 ELSE
     _MaxCopiesX := 0;
 END_IF
 
-IF _FootprintY > 0.0 THEN
-    _MaxCopiesY := REAL_TO_DINT(TRUNC(RAW_BOARD_Y / _FootprintY));
+IF _FootprintY > 0.0 AND EffectiveBoardY > 0.0 THEN
+    _MaxCopiesY := REAL_TO_DINT(TRUNC(EffectiveBoardY / _FootprintY));
 ELSE
     _MaxCopiesY := 0;
 END_IF
@@ -459,10 +490,18 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_RecipeBase.Config.Set">
       <LineId Id="76" Count="6" />
-      <LineId Id="44" Count="11" />
+      <LineId Id="44" Count="5" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="50" Count="5" />
       <LineId Id="57" Count="2" />
       <LineId Id="62" Count="1" />
       <LineId Id="39" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.ConfigProvider.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.ConfigProvider.Set">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.FootprintX.Get">
       <LineId Id="2" Count="0" />
@@ -504,7 +543,8 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.UpdateNestingLimits">
-      <LineId Id="78" Count="53" />
+      <LineId Id="142" Count="28" />
+      <LineId Id="100" Count="31" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.WriteGCodeFile">

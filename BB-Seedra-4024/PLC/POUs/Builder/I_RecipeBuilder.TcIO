@@ -27,6 +27,15 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Property Name="ConfigProvider" Id="{d69d8d19-57dd-41af-92cc-1dbb43000e55}">
+      <Declaration><![CDATA[PROPERTY ConfigProvider : I_GantryConfigProvider]]></Declaration>
+      <Get Name="Get" Id="{0f75a252-3e55-499a-815d-f787c9ce2267}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{db2e7971-1ba6-4a42-8104-1c956218d8fa}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="FootprintX" Id="{b2c0660e-2273-4d0b-a3ff-b3d685a837ce}">
       <Declaration><![CDATA[PROPERTY FootprintX : REAL]]></Declaration>
       <Get Name="Get" Id="{1c249b0f-2c24-4249-828f-a42f5a98a347}">
