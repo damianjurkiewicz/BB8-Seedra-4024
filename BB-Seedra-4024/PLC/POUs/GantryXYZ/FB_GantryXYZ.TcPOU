@@ -574,7 +574,7 @@ END_VAR
 
     // --- OŚ Y ---
     ProfilesY[E_MachineProfile.eManual].SoftLimitMin := -100.0;
-    ProfilesY[E_MachineProfile.eManual].SoftLimitMax := 2300.0;
+    ProfilesY[E_MachineProfile.eManual].SoftLimitMax := 2500.0;
     ProfilesY[E_MachineProfile.eManual].Acceleration := 500.0;
     ProfilesY[E_MachineProfile.eManual].Deceleration := 1000.0;
     ProfilesY[E_MachineProfile.eManual].Jerk         := 2000.0;

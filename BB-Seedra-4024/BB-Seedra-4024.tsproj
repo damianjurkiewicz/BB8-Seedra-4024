@@ -1957,7 +1957,7 @@ External Setpoint Generation:
 						<EncPara ScaleFactorNumerator="4" ScaleFactorDenominator="1048576" Inverse="true" MaxCount="#xffffffff">
 							<SoftEndMinControl Enable="true" Range="-300"/>
 							<SoftEndMaxControl Range="300"/>
-							<Inc RefMode="1"/>
+							<Inc RefPosition="72" RefMode="1"/>
 						</EncPara>
 						<Vars VarGrpType="1">
 							<Name>Inputs</Name>
@@ -2094,12 +2094,12 @@ External Setpoint Generation:
 				<Axis Id="2" CreateSymbols="true" AxisType="1">
 					<Name>Axis Y</Name>
 					<AxisPara>
-						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14"/>
-						<Velo RefSearch="100" RefSync="10" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
+						<Dynamic Acceleration="671.1495" Deceleration="671.1495" Jerk="2013.4485"/>
+						<Velo RefSearch="4.47433" RefSync="4.47433" SlowManual="22.37165" FastManual="134.2299" Fast="447.433" Maximum="447.433"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="6" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
+						<EncPara ScaleFactorNumerator="5" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
 							<SoftEndMinControl Enable="true" Range="-3000"/>
 							<SoftEndMaxControl Enable="true" Range="3000"/>
 							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
@@ -2162,7 +2162,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="590.612" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="492.1763" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -2444,7 +2444,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{27AD6704-77E0-BF7E-ABDF-F2D583B1BC70}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{54B073A1-040A-A73F-56E0-1FFD14694D1F}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -4662,7 +4662,6 @@ Bit 8 - 15 : reserved]]></Comment>
 								<Inverter>
 									<Device>
 										<Name>DMInverterTypeDevice</Name>
-										<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 										<Parameter>
 											<PropertyName>MaxAllowedMainVoltage</PropertyName>
 											<Value>48</Value>
@@ -5083,14 +5082,13 @@ Bit 8 - 15 : reserved]]></Comment>
 											<Load MoveStyle="Linear">
 												<IsMotorRotary>true</IsMotorRotary>
 												<Name>InverterChannelTypeBlockLoad</Name>
-												<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 												<Parameter>
 													<PropertyName>FeedConstantUnit</PropertyName>
 													<Value>mm</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>6</Value>
+													<Value>5</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
@@ -5128,7 +5126,6 @@ Bit 8 - 15 : reserved]]></Comment>
 											<Controller>
 												<Filter Id="0">
 													<Name>ControllerFilter</Name>
-													<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 													<Parameter>
 														<PropertyName>Filter_Type</PropertyName>
 														<Value>1</Value>
