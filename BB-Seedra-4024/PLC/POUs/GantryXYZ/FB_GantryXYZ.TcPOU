@@ -496,16 +496,16 @@ END_VAR
 		_Limits.GroovingSpeedY.MinVal := 1.0;      _Limits.GroovingSpeedY.MaxVal := 100.0;
 		_Limits.GroovingSpeedZ.MinVal := 1.0;      _Limits.GroovingSpeedZ.MaxVal := 100.0;
 		
-		_Limits.RapidSpeedX.MinVal    := 1.0;      _Limits.RapidSpeedX.MaxVal    := 500.0;
-		_Limits.RapidSpeedY.MinVal    := 1.0;      _Limits.RapidSpeedY.MaxVal    := 500.0;
+		_Limits.RapidSpeedX.MinVal    := 1.0;      _Limits.RapidSpeedX.MaxVal    := 200.0;
+		_Limits.RapidSpeedY.MinVal    := 1.0;      _Limits.RapidSpeedY.MaxVal    := 200.0;
 		_Limits.RapidSpeedZ.MinVal    := 1.0;      _Limits.RapidSpeedZ.MaxVal    := 20.0;
 		
 		_Limits.CuttingIdleTime.MinVal  := 0.0;    _Limits.CuttingIdleTime.MaxVal  := 10.0;
 		_Limits.GroovingIdleTime.MinVal := 0.0;    _Limits.GroovingIdleTime.MaxVal := 10.0;
 		
-		_Limits.RawBoardX.MinVal     := 200.0;    _Limits.RawBoardX.MaxVal     := 1300.0; 
-		_Limits.RawBoardY.MinVal     := 200.0;    _Limits.RawBoardY.MaxVal     := 2500.0; 
-		_Limits.RawBoardZ.MinVal      := 1.0;     _Limits.RawBoardZ.MaxVal      := 200.0; // Grubość płyty
+		_Limits.RawBoardX.MinVal     := 200.0;    _Limits.RawBoardX.MaxVal     := 1220.0; 
+		_Limits.RawBoardY.MinVal     := 200.0;    _Limits.RawBoardY.MaxVal     := 2440.0; 
+		_Limits.RawBoardZ.MinVal      := 1.0;     _Limits.RawBoardZ.MaxVal      := 12.0; // Grubość płyty
 		_Limits.SafeClearanceZ.MinVal := 1.0;     _Limits.SafeClearanceZ.MaxVal := 100.0; // Prześwit
 		
 		

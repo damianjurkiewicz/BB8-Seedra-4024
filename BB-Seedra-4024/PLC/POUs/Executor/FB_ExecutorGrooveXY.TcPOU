@@ -12,8 +12,12 @@ VAR_INST
     // Lokalne zmienne pomocnicze na czas trwania cyklu
     currentSeg          : ST_CutSegment;
     localConfig         : ST_GantryXYZ_Config;
-	recipeConfig : ST_RecipeBuilder_Config; // Zmienna tymczasowa
+    recipeConfig        : ST_RecipeBuilder_Config; 
     
+    MaterialTopZ        : REAL;
+    SafeZ               : REAL;
+    TargetZ             : REAL;
+
     // Zmienne sekwencyjne dla logiki frezowania
     iPass               : INT;
     currentDepth        : LREAL;
@@ -22,6 +26,7 @@ VAR_INST
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[StepTimer();
+
 // Zabezpieczenie na wypadek braku wstrzykniętych referencji!
 IF _RecipeBuilder = 0 OR _ConfigProvider = 0 THEN
     RETURN;
@@ -29,8 +34,6 @@ END_IF
 
 // Pobieramy konfigurację do pamięci podręcznej 
 localConfig := _ConfigProvider.Config;
-// Zrzut tablicy segmentów
-
 
 IF iCurrentSegment < 1 THEN iCurrentSegment := 1; END_IF
 IF iCurrentSegment > 32 THEN iCurrentSegment := 32; END_IF
@@ -38,20 +41,27 @@ IF iCurrentSegment > 32 THEN iCurrentSegment := 32; END_IF
 // Wyciągnięcie konkretnego segmentu dla aktualnego kroku
 currentSeg := _RecipeBuilder.SegmentsGroove[iCurrentSegment];
 
+// 1. Z=0 to stół. 
+// Dodajemy podkład (GlobalOffsetZ) i grubość deski (RawBoardZ).
+// To daje nam absolutną pozycję górnej krawędzi płyty w układzie maszyny.
+MaterialTopZ := localConfig.GlobalOffsetZ + localConfig.RawBoardZ;
+
+// 2. Pozycja bezpieczna to wierzch płyty + prześwit (np. 10 mm).
+// Na tej wysokości możemy latać na parametrze RapidSpeedZ.
+SafeZ := MaterialTopZ + localConfig.SafeClearanceZ;
+
 CASE nStep OF
     
     0: // IDLE - maszyna czeka na wywołanie Execute()
 
     // -------- Inicjalizacja procesu --------
     5:
-		Trace(Message := CONCAT('WYBRANY PROGRAM: ', TO_STRING(MAIN.Seedra.aRecipeNames[MAIN.Seedra.GantryXYZ.ProgramIdRequested])));
         // Konfiguracja głębokości (g) i mnożników prędkości (v)
         g1 := 3.5; g2 := 3.5; g3 := 1.5; g4 := 0.0; g5 := 0.0;
         v1 := 1.0; v2 := 1.0; v3 := 1.0; v4 := 1.0; v5 := 1.0;
 
         IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
             IF _RecipeBuilder.SegmentsToGroove <= 0 THEN
-                //Trace(Message := 'Step 5: Brak segmentow frezowania. Koniec (1000).');
                 nStep := 1000;
                 RETURN;
             END_IF;
@@ -61,55 +71,49 @@ CASE nStep OF
             _AxisZ.Velocity := localConfig.RapidSpeedZ;
 
             iCurrentSegment := 1;
-            iPass := 4; // STARTUJEMY OD 1 PRZEJAZDU, tu zmienione do testów, no worries
+            iPass := 4; // Zgodnie z oryginalnym plikiem testowym
             
             IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN
-                //Trace(Message := 'Step 5: Start sekwencji frezowania (Grooving).');
                 nStep := 10;
             END_IF     
         END_IF
 
     // -------- Dojazd XY do poczatku (Start) --------
     10:
-        //Trace(Message := CONCAT('Step 10: Dojazd XY do START. Segment: ', TO_STRING(iCurrentSegment)));
-        //Trace(Message := CONCAT('--- Kopia X: ', TO_STRING(iCurrentCopyX)));
-        //Trace(Message := CONCAT('--- Kopia Y: ', TO_STRING(iCurrentCopyY)));
-        //Trace(Message := CONCAT('--- Przejazd (Pass): ', TO_STRING(iPass)));
-        
         MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, 0.0, 0.0);
         nStep := 20;
 
     20: // Czekamy na pozycje XY
         IF _AxisX.Error OR _AxisY.Error THEN 
-            //Trace(Message := 'Step 20: BLAD OSI X LUB Y!');
             nStep := 999;
         ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN 
-            // UWAGA: Tu w przyszłości można odpalić IO.SpindleEnable := TRUE;
             _AxisZ.Velocity := localConfig.GroovingSpeedZ;
             nStep := 30;
         END_IF
 
-    // -------- Wybor glebokosci dla 5 przejsc --------
+    // -------- Wybor glebokosci dla przejsc --------
     30:
-		recipeConfig := _RecipeBuilder.Config; // Pobranie configu receptury!
-		
-		CASE iPass OF
-			1: currentDepth := recipeConfig.GrooveDepthZ - g1;
-			2: currentDepth := recipeConfig.GrooveDepthZ - g2;
-			3: currentDepth := recipeConfig.GrooveDepthZ - g3;
-			4: currentDepth := recipeConfig.GrooveDepthZ - g4;
-			5: currentDepth := recipeConfig.GrooveDepthZ - g5;
-		ELSE
-			currentDepth := recipeConfig.GrooveDepthZ;
-		END_CASE;
+        recipeConfig := _RecipeBuilder.Config;
+        
+        CASE iPass OF
+            1: currentDepth := recipeConfig.GrooveDepthZ - g1;
+            2: currentDepth := recipeConfig.GrooveDepthZ - g2;
+            3: currentDepth := recipeConfig.GrooveDepthZ - g3;
+            4: currentDepth := recipeConfig.GrooveDepthZ - g4;
+            5: currentDepth := recipeConfig.GrooveDepthZ - g5;
+        ELSE
+            currentDepth := recipeConfig.GrooveDepthZ;
+        END_CASE;
 
-        //Trace(Message := CONCAT('Step 30: Os Z w dol do glebokosci: ', TO_STRING(currentDepth)));
-        _AxisZ.MoveAbsolute(currentDepth, 0);
+        // 3. OBLICZENIE ABSOLUTNEGO CELU DLA OSI Z
+        // Skoro MaterialTopZ to góra płyty, a currentDepth to to głębokość,
+        // na jaką musimy się w nią zanurzyć - TargetZ = MaterialTopZ - currentDepth.
+        TargetZ := MaterialTopZ - currentDepth;
+        _AxisZ.MoveAbsolute(TargetZ, 0);
         nStep := 40;
 
     40: // Czekamy az os Z zjedzie
         IF _AxisZ.Error THEN 
-            //Trace(Message := 'Step 40: BLAD OSI Z!');
             nStep := 999;
         ELSIF _AxisZ.InPosition THEN
             // Wybor predkosci posuwu roboczego w zaleznosci od przejscia
@@ -133,20 +137,16 @@ CASE nStep OF
 
     // -------- Frezowanie do punktu koncowego --------
     60:
-        //Trace(Message := CONCAT('Step 60: FREZOWANIE DO STOP. Segment: ', TO_STRING(iCurrentSegment)));
-        MoveToXY(currentSeg.Stop.X, currentSeg.Stop.Y, 0.0, 0.0); // ZMIENIONO NA STOP.X i STOP.Y!
+        MoveToXY(currentSeg.Stop.X, currentSeg.Stop.Y, 0.0, 0.0);
         nStep := 70;
 
     70: // Czekamy na koniec cięcia
         IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error THEN 
-            //Trace(Message := 'Step 70: BLAD OSI podczas frezowania!');
             nStep := 999;
         ELSIF _AxisX.InPosition AND _AxisY.InPosition AND _AxisZ.InPosition THEN
             IF iPass = 5 THEN
-                //Trace(Message := 'Step 70: Koniec 5. przejazdu -> Czyszczenie (powrot)');
                 nStep := 74;
             ELSE
-                //Trace(Message := 'Step 70: Koniec posredniego przejazdu -> Podnoszenie osi Z');
                 _AxisZ.Velocity := localConfig.RapidSpeedZ;
                 nStep := 80;
             END_IF
@@ -161,10 +161,9 @@ CASE nStep OF
         END_IF
 
     75: 
-        //Trace(Message := 'Step 75: Powrot po sciezce (czyszczenie rowka z Z w dole)');
-        MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, 0.0, 0.0); // Tu poprawnie wracamy do START
+        MoveToXY(currentSeg.Start.X, currentSeg.Start.Y, 0.0, 0.0);
         nStep := 76;
-        
+
     76: 
         IF _AxisX.Error OR _AxisY.Error THEN 
             nStep := 999;
@@ -175,13 +174,13 @@ CASE nStep OF
 
     // -------- Podnoszenie osi Z na pozycję bezpieczną --------
     80:
-        //Trace(Message := 'Step 80: Podnoszenie osi Z na bezpieczna wysokosc (0)');
-        _AxisZ.MoveAbsolute(0, 0);
+        // 4. UŻYCIE POZYCJI BEZPIECZNEJ SafeZ 
+        // Wcześniej było to sztywne `0`, co stanowiło ryzyko kolizji z materiałem.
+        _AxisZ.MoveAbsolute(SafeZ, 0);
         nStep := 90;
 
     90: 
         IF _AxisZ.Error THEN 
-            //Trace(Message := 'Step 90: BLAD OSI Z przy podnoszeniu!');
             nStep := 999;
         ELSIF _AxisZ.InPosition THEN
             nStep := 100;
@@ -191,6 +190,7 @@ CASE nStep OF
         StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.GroovingIdleTime * 1000.0));
         IF StepTimer.Q THEN
             StepTimer(IN := FALSE);
+            
             // Powrot predkosci X/Y na rapid
             _AxisX.Velocity := localConfig.RapidSpeedX;
             _AxisY.Velocity := localConfig.RapidSpeedY;
@@ -203,11 +203,7 @@ CASE nStep OF
                     iCurrentSegment := 1;
                     nStep := 10;
                 ELSE
-                    // =======================================================
                     // CZYSTA PĘTLA NESTINGU (Zrobiono wszystkie 5 passów)
-                    // =======================================================
-                    //Trace(Message := CONCAT('Step 100: Zrobiono wszystkie segmenty i przejazdy dla kopii. Kopia X: ', TO_STRING(iCurrentCopyX)));
-                    
                     iCurrentCopyX := iCurrentCopyX + 1;
                     
                     IF iCurrentCopyX > _RecipeBuilder.ActualCopiesX THEN
@@ -215,16 +211,13 @@ CASE nStep OF
                         iCurrentCopyY := iCurrentCopyY + 1;
                         
                         IF iCurrentCopyY > _RecipeBuilder.ActualCopiesY THEN
-                            //Trace(Message := 'Step 100: ZAKONCZONO WSZYSTKIE KOPIE (Groove Nesting gotowy). Skok do 1000.');
                             nStep := 1000;
                         ELSE
-                            //Trace(Message := CONCAT('Step 100: Skok do nastepnego rzedu (Kopia Y): ', TO_STRING(iCurrentCopyY)));
                             iPass := 1;
                             iCurrentSegment := 1;
                             nStep := 10;
                         END_IF
                     ELSE
-                        //Trace(Message := CONCAT('Step 100: Skok do nastepnego detalu w rzedzie (Kopia X): ', TO_STRING(iCurrentCopyX)));
                         iPass := 1;
                         iCurrentSegment := 1;
                         nStep := 10;
@@ -236,14 +229,12 @@ CASE nStep OF
         END_IF
 
     999: // Błąd którejkolwiek osi
-        //Trace(Message := 'Step 999: FATAL ERROR w GrooveXY - Aborting');
         _bBusy  := FALSE;
         _bError := TRUE; 
         _bDone  := FALSE;
         nStep   := 0;
-        
-    1000:
-        //Trace(Message := 'Step 1000: ZAKONCZONO CALA OPERACJE FREZOWANIA.');
+
+    1000: // Zakonczenie operacji frezowania
         _bBusy := FALSE;
         _bDone := TRUE;
         nStep := 0;
@@ -254,11 +245,7 @@ END_CASE]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorGrooveXY.CyclicLogic">
-      <LineId Id="481" Count="22" />
-      <LineId Id="716" Count="0" />
-      <LineId Id="504" Count="45" />
-      <LineId Id="729" Count="9" />
-      <LineId Id="558" Count="145" />
+      <LineId Id="771" Count="212" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>

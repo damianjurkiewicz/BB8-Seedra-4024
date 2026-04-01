@@ -316,8 +316,9 @@ ELSE
     // Awaryjny "fallback" jeśli Provider nie jest wstrzyknięty (np. w starych testach)
     MachineConfig.GlobalOffsetX := 0.0;
     MachineConfig.GlobalOffsetY := 0.0;
-    MachineConfig.RawBoardX := 1200.0; // Domyślna płyta 
-    MachineConfig.RawBoardY := 2400.0; // Domyślna płyta
+    MachineConfig.RawBoardX := 1220.0; // Domyślna płyta 
+    MachineConfig.RawBoardY := 2440.0; // Domyślna płyta
+	MachineConfig.RawBoardZ := 9.0;
 END_IF
 
 // 3. Efektywna wielkość płyty = Fizyczna płyta (z maszyny) minus offset początkowy
@@ -345,6 +346,12 @@ _Config.IsValid := (_MaxCopiesX > 0) AND (_MaxCopiesY > 0) AND (_NominalX > 0) A
 // =========================================================
 // 6. AUTO-KOREKTA KOPII I LIMITÓW DLA HMI
 // =========================================================
+
+// ZABEZPIECZENIE Z: Głębokość frezowania nie może przekroczyć grubości płyty!
+_Limits.GrooveDepthZ.MaxVal := MachineConfig.RawBoardZ;
+// Bezlitosne obcięcie (clamping) wpisanej wartości do nowego limitu
+_Config.GrooveDepthZ := LIMIT(_Limits.GrooveDepthZ.MinVal, _Config.GrooveDepthZ, _Limits.GrooveDepthZ.MaxVal);
+
 IF _Config.IsValid THEN
     _Limits.RequestedCopiesX.MinVal := 1.0;
     _Limits.RequestedCopiesX.MaxVal := DINT_TO_REAL(_MaxCopiesX);
@@ -545,9 +552,16 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_RecipeBase.UpdateNestingLimits">
       <LineId Id="142" Count="5" />
-      <LineId Id="171" Count="12" />
+      <LineId Id="171" Count="8" />
+      <LineId Id="190" Count="0" />
+      <LineId Id="180" Count="3" />
       <LineId Id="158" Count="12" />
-      <LineId Id="100" Count="31" />
+      <LineId Id="100" Count="9" />
+      <LineId Id="192" Count="0" />
+      <LineId Id="194" Count="2" />
+      <LineId Id="193" Count="0" />
+      <LineId Id="191" Count="0" />
+      <LineId Id="110" Count="21" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.WriteGCodeFile">
