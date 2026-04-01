@@ -11,26 +11,72 @@
     <Method Name="Build" Id="{888409fe-0b8e-46d6-8abb-5ebdab25e661}">
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR_INST
-    // Zmienne zostaną dodane w trakcie cyklu TDD
+    TotalY          : REAL;
+    TotalX          : REAL;
+    ShorterY        : REAL;
+    ShorterX        : REAL;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ==========================================================
-//  PLACEHOLDER / WYDMUSZKA - KOD DO ROZWOJU W TDD
-// ==========================================================
+        <ST><![CDATA[// 1. Zlecenie przeliczenia gabarytów, footrpintu i limitów klasie bazowej
+THIS^.UpdateNestingLimits();
 
-// 1. Zabezpieczenie: Ustawiamy liczby segmentów na -1.
-// Ponieważ 0 jest legalną wartością (np. program tylko do frezowania), 
-// używamy -1 jako jednoznacznej flagi "brak implementacji".
+// 2. Jeśli detal wystaje poza maszynę - przerywamy od razu!
+IF NOT _Config.IsValid THEN
+    Build := FALSE;
+    RETURN;
+END_IF
+
+// 3. Pobieramy wyliczone gabaryty nominalne do lokalnych zmiennych roboczych
+TotalX   := _NominalX;
+TotalY   := _NominalY; 
+
+// ------------------------------------
+// 1. Segregracja frezowania (Grooving)
+// ------------------------------------
 _SegmentsToGroove := 2;
-_SegmentsToCutX   := 2;
-_SegmentsToCutY   := 2;
 
-// TODO: Tutaj w TDD zaimplementujesz wyliczanie współrzędnych
+_SegmentsGroove[1].Start.X := _Config.PanelHeight;
+_SegmentsGroove[1].Stop.X  := _Config.PanelHeight;
+_SegmentsGroove[1].Start.Y := TotalY;
+_SegmentsGroove[1].Stop.Y  := 0;
 
-// 2. Blokada przed uruchomieniem.
-// W teście jednostkowym Twoja pierwsza asercja powinna sprawdzać 
-// właśnie to, czy Builder.Build() zwrócił TRUE.
+_SegmentsGroove[2].Start.X :=  _Config.PanelHeight + 40;    
+_SegmentsGroove[2].Stop.X  :=  _Config.PanelHeight + 40;    
+_SegmentsGroove[2].Start.Y :=  TotalY;
+_SegmentsGroove[2].Stop.Y  :=  0;                      
 
+
+// ------------------------------------
+// 2. Cięcie w osi X (Cut X)
+// ------------------------------------+ 
+_SegmentsToCutX := 2;
+
+// Short Box Segments
+_SegmentsCutX[1].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[1].Stop.X  := -_Config.CuttingOverpass;
+_SegmentsCutX[1].Start.Y := 0;
+_SegmentsCutX[1].Stop.Y  := 0;        
+
+_SegmentsCutX[2].Start.X := TotalX + _Config.CuttingOverpass;                         
+_SegmentsCutX[2].Stop.X  := - _Config.CuttingOverpass;                          
+_SegmentsCutX[2].Start.Y := TotalY;
+_SegmentsCutX[2].Stop.Y  := TotalY;        
+
+// ------------------------------------
+// 3. Cięcie w osi Y (Cut Y)
+// ------------------------------------
+_SegmentsToCutY := 2;
+
+// Short Box Segments
+_SegmentsCutY[1].Start.X := 0;                               
+_SegmentsCutY[1].Stop.X  := 0;                               
+_SegmentsCutY[1].Start.Y := TotalY +_Config.CuttingOverpass; 
+_SegmentsCutY[1].Stop.Y  := -_Config.CuttingOverpass;        
+
+_SegmentsCutY[2].Start.X := TotalX;                          
+_SegmentsCutY[2].Stop.X  := TotalX;                          
+_SegmentsCutY[2].Start.Y := TotalY +_Config.CuttingOverpass; 
+_SegmentsCutY[2].Stop.Y  := -_Config.CuttingOverpass;        
 
 Build := TRUE;]]></ST>
       </Implementation>
@@ -42,8 +88,8 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// BorgoWings wie, że jego wymiar powiększa się o ścianki zagięcia:
-_NominalX := _Config.PanelFrontWidth  + 2.0 * _Config.PanelHeight; 
-_NominalY := _Config.PanelFrontLength + 2.0 * _Config.PanelHeight;]]></ST>
+_NominalX := (2.0 * _Config.PanelHeight) + 40.0; 
+_NominalY := _Config.PanelFrontLength;]]></ST>
       </Implementation>
     </Method>
     <Method Name="FB_init" Id="{fc78a4c1-f2de-4ec3-8288-cc1bf83cb800}">
@@ -80,8 +126,11 @@ _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderArona.Build">
-      <LineId Id="581" Count="15" />
-      <LineId Id="600" Count="1" />
+      <LineId Id="605" Count="11" />
+      <LineId Id="620" Count="15" />
+      <LineId Id="645" Count="15" />
+      <LineId Id="682" Count="15" />
+      <LineId Id="720" Count="0" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderArona.CalculateFootprint">
