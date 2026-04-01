@@ -19,6 +19,15 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="DUTs\ST_Recipe_Limits.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\ST_LimitInfo.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\E_CutDirection.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="DUTs\E_PMLStateForHMI.TcTLEO">
       <SubType>Code</SubType>
     </Compile>
@@ -43,13 +52,31 @@
     <Compile Include="PlcTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\FB_CylinderCutY.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderArona.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\FB_CylinderCutX.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_NCIBuilderCircle.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderRectangle.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderBorgoFlaps.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderBorgoWings.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Components\FB_Cylinder.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Components\I_Cylinder.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Components\I_NciChannel.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Components\FB_NciChannel.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Components\ST_Cylinder_Command.TcDUT">
@@ -64,6 +91,9 @@
     <Compile Include="POUs\Components\ST_Cylinder_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Executor\FB_ExecutorCut.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Executor\FB_ExecutorGrooveXY.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -73,13 +103,19 @@
     <Compile Include="POUs\Executor\FB_ExecutorBase.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Executor\FB_ExecutorCutX.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\Executor\FB_ExecutorCutY.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="POUs\Executor\I_MachiningExecutor.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Executor\FB_ExecutorNCI.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\E_MachineProfile.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\ST_AxisProfile.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_Limits.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\E_RecipeID.TcDUT">
@@ -124,15 +160,6 @@
     <Compile Include="POUs\Builder\FB_RecipeBase.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\FB_RecipeBuilderArona.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\Builder\FB_RecipeBuilderFlaps.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\Builder\FB_RecipeBuilderWings.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="POUs\Builder\FB_RecipeFactory.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -151,13 +178,56 @@
     <Compile Include="POUs\Builder\ST_RecipeBuilder_HMI.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\TESTS.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\FB_Cylinder_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\FB_GantryXYZ_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\FB_ExecutorCut_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\FB_ExecutorGrooveXY_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\FB_RecipeBuilder_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\FB_RecipeFactory_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\Mocks\FB_MockAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\Mocks\FB_MockCylinder.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\Mocks\FB_MockConfigProvider.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="SafetyTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Visualization Manager.TcVMO">
       <SubType>Code</SubType>
+      <ExcludeFromBuild>false</ExcludeFromBuild>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_Builders.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
     <Compile Include="VISUs\Modes\ProductionMode\V_ProductionArona.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionRectangle.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionNCICircle.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
@@ -204,10 +274,13 @@
   <ItemGroup>
     <Folder Include="DUTs" />
     <Folder Include="GVLs" />
+    <Folder Include="POUs\Builder\Recipes" />
     <Folder Include="POUs\Components" />
     <Folder Include="POUs\GantryXYZ" />
     <Folder Include="POUs\Executor" />
     <Folder Include="POUs\Builder" />
+    <Folder Include="POUs\TESTS" />
+    <Folder Include="POUs\TESTS\Mocks" />
     <Folder Include="VISUs" />
     <Folder Include="POUs" />
     <Folder Include="VISUs\Modes" />
@@ -290,6 +363,9 @@
       <DefaultResolution>Tc2_MC2_Drive, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc2_MC2_Drive</Namespace>
     </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_NCI">
+      <DefaultResolution>Tc2_NCI, * (Beckhoff Automation GmbH)</DefaultResolution>
+    </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Standard">
       <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc2_Standard</Namespace>
@@ -300,6 +376,7 @@
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Utilities">
       <DefaultResolution>Tc2_Utilities, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Utilities</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc3_EventLogger">
       <DefaultResolution>Tc3_EventLogger, * (Beckhoff Automation GmbH)</DefaultResolution>
@@ -312,6 +389,10 @@
     <PlaceholderReference Include="Tc3_PackML_V2">
       <DefaultResolution>Tc3_PackML_V2, * (Beckhoff Automation GmbH)</DefaultResolution>
       <Namespace>Tc3_PackML_V2</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="TcUnit">
+      <DefaultResolution>TcUnit, * (www.tcunit.org)</DefaultResolution>
+      <Namespace>TcUnit</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="VisuDialogs">
       <DefaultResolution>VisuDialogs, * (System)</DefaultResolution>

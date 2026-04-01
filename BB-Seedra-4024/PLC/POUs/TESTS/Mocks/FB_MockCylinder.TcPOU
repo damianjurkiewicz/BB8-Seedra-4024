@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_MockCylinder" Id="{f01286c1-7ad8-4665-be6d-b1d10066815f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MockCylinder IMPLEMENTS I_Cylinder
+VAR
+    _Extended  : BOOL;
+    _Retracted : BOOL := TRUE;
+    
+    ExtendCallCount  : INT := 0;
+    RetractCallCount : INT := 0;
+	
+
+    _Error            : BOOL := FALSE;
+END_VAR
+
+VAR_INPUT
+	FailOnExtendCount : INT := 0; 
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="Error" Id="{aebed462-05fe-47fa-b552-ed6c86490bff}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{b2411117-a462-474d-9b73-dcc94739b54b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := _Error;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Extend" Id="{98721f0e-fbdf-498b-aff3-c02e8b40e405}">
+      <Declaration><![CDATA[METHOD Extend
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[ExtendCallCount := ExtendCallCount + 1;
+
+// Symulacja awarii, jeśli dotarliśmy do wyznaczonego limitu
+IF FailOnExtendCount > 0 AND ExtendCallCount = FailOnExtendCount THEN
+    _Error := TRUE;
+    _Extended := FALSE;
+ELSE
+    _Extended := TRUE;
+    _Retracted := FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Extended" Id="{9f1d5f9b-9529-4cf8-a7f5-73c380daae19}">
+      <Declaration><![CDATA[PROPERTY Extended : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{10bdb286-10e9-4dac-9a5d-643bc99f0abd}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Extended := _Extended;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="Retract" Id="{c0a20e65-920a-4182-9765-19b79d027175}">
+      <Declaration><![CDATA[METHOD Retract
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Extended := FALSE; 
+_Retracted := TRUE; 
+RetractCallCount := RetractCallCount + 1;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Retracted" Id="{791cb054-55f7-4508-83e6-e7878573b647}">
+      <Declaration><![CDATA[PROPERTY Retracted : BOOL
+]]></Declaration>
+      <Get Name="Get" Id="{dac08ce4-8457-48b3-91ba-217cf6badbfd}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Retracted := _Retracted;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_MockCylinder">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockCylinder.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockCylinder.Extend">
+      <LineId Id="8" Count="8" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockCylinder.Extended.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockCylinder.Retract">
+      <LineId Id="4" Count="2" />
+    </LineIds>
+    <LineIds Name="FB_MockCylinder.Retracted.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

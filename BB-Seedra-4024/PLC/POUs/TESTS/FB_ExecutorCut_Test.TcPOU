@@ -1,0 +1,447 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_ExecutorCut_Test" Id="{7df5cf70-cbe1-43ae-a8be-81dbfb352aaf}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCut_Test EXTENDS TcUnit.FB_TestSuite 
+VAR
+    Executor : FB_ExecutorCut;
+	Executor_Unhappy     : FB_ExecutorCut;
+	
+	MockConfigProvider : FB_MockConfigProvider;
+
+    MockCylinder : FB_MockCylinder;
+	MockCylinder_Unhappy : FB_MockCylinder;
+    MockAxisX    : FB_MockAxis := (Name := 'MockX');
+    MockAxisY    : FB_MockAxis := (Name := 'MockY');
+    MockAxisZ    : FB_MockAxis := (Name := 'MockZ');
+    
+    TestRecipe   : FB_RecipeBuilderBorgoWings;
+
+	
+	Executor_Zero       : FB_ExecutorCut;
+    MockCylinder_Zero   : FB_MockCylinder;
+    BuilderArona        : FB_RecipeBuilderArona; // Arona to nasza wydmuszka, zwraca 0 segmentów!
+
+    Executor_AxisErr    : FB_ExecutorCut;
+    MockAxisX_Err       : FB_MockAxis;
+
+    Executor_CutY       : FB_ExecutorCut;
+    MockCylinder_CutY   : FB_MockCylinder;
+	
+	Executor_Nesting : FB_ExecutorCut;
+    MockCylinder_Nesting : FB_MockCylinder;
+	
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_AxisError_AbortsSequence();
+Test_Executes_CutY_Direction();
+Test_Executes_Nesting_Copies();
+Test_Sequence_AbortsOnCylinderError();
+Test_Sequence_ExecutesCutsCorrectly();
+Test_ZeroSegments_FinishesImmediately();
+
+]]></ST>
+    </Implementation>
+    <Method Name="Test_AxisError_AbortsSequence" Id="{68197cf1-00a4-4603-8849-1889629904d7}">
+      <Declaration><![CDATA[METHOD Test_AxisError_AbortsSequence
+VAR_INST
+    i : INT;
+    RecipeConfig : ST_RecipeBuilder_Config; 
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+TEST('Test_AxisError_AbortsSequence');
+
+// 1. ARRANGE - Używamy poprawnej receptury (BorgoWings)
+RecipeConfig.PanelFrontLength := 1000.0;  
+TestRecipe.Config := RecipeConfig;        
+TestRecipe.Build();                       
+Executor_AxisErr.RecipeBuilder  := TestRecipe; 
+Executor_AxisErr.ConfigProvider := MockConfigProvider; // Poprawiona nazwa
+Executor_AxisErr.Cylinder       := MockCylinder;
+Executor_AxisErr.AxisX          := MockAxisX_Err; // Podpinamy złośliwą oś
+Executor_AxisErr.AxisY          := MockAxisY;
+Executor_AxisErr.AxisZ          := MockAxisZ;
+Executor_AxisErr.CutDirection   := E_CutDirection.eCutX;
+
+MockAxisX_Err.ForceError := TRUE; // Zmuszamy oś do błędu!
+
+// 2. ACT
+Executor_AxisErr.Execute();
+
+// Puszczamy maszynę stanów. Wpadnie do kroku 10 (dojazd), potem 20 i od razu zobaczy błąd osi (skok do 999).
+FOR i := 1 TO 10 DO
+    Executor_AxisErr.CyclicLogic();
+END_FOR
+
+// 3. ASSERT
+AssertTrue(Condition := Executor_AxisErr.Error, 
+           Message := 'Executor nie zglosil bledu, gdy os ulegla awarii!');
+
+AssertFalse(Condition := Executor_AxisErr.Done, 
+            Message := 'Executor zglosil sukces (Done), pomimo bledu osi!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Executes_CutY_Direction" Id="{5c79781a-f063-4958-9a0e-9af1fc0ec531}">
+      <Declaration><![CDATA[METHOD Test_Executes_CutY_Direction
+VAR_INST
+    Step : INT := 0;
+    RecipeConfig : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Executes_CutY_Direction');
+
+Executor_CutY.CyclicLogic();
+
+CASE Step OF
+    0:
+        // 1. ARRANGE - Receptura BorgoWings ma dokładnie 6 cięć Y
+        RecipeConfig.PanelFrontLength := 1000.0;
+        TestRecipe.Config := RecipeConfig;
+        TestRecipe.Build(); 
+        
+        Executor_CutY.RecipeBuilder  := TestRecipe;
+		Executor_CutY.ConfigProvider := MockConfigProvider;
+        Executor_CutY.Cylinder       := MockCylinder_CutY;
+        Executor_CutY.AxisX          := MockAxisX;
+        Executor_CutY.AxisY          := MockAxisY;
+        Executor_CutY.AxisZ          := MockAxisZ;
+        
+        // Ustawiamy cięcie wzdłuż osi Y!
+        Executor_CutY.CutDirection   := E_CutDirection.eCutY; 
+        
+        Step := 10;
+        
+    10:
+        // 2. ACT
+        Executor_CutY.Execute();
+        Step := 20;
+        
+    20:
+        // Czekamy na koniec asynchronicznej sekwencji
+        IF Executor_CutY.Done THEN
+            Step := 30;
+        ELSIF Executor_CutY.Error THEN
+            AssertTrue(FALSE, 'Wyrzucono blad podczas ciecia Y!');
+            TEST_FINISHED();
+        END_IF
+        
+    30:
+        // 3. ASSERT - Weryfikujemy ilość cięć (BorgoWings = 6)
+        AssertEquals_INT(Expected := 6, 
+                         Actual := MockCylinder_CutY.ExtendCallCount, 
+                         Message := 'Zla liczba wysuniec cylindra przy cieciu Y!');
+                         
+        TEST_FINISHED();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Executes_Nesting_Copies" Id="{01a7270f-9558-482c-a7d7-86830ca1db72}">
+      <Declaration><![CDATA[METHOD Test_Executes_Nesting_Copies
+VAR_INST
+    Step         : INT := 0;
+    RecipeConfig : ST_RecipeBuilder_Config;
+    TestConfig   : ST_GantryXYZ_Config;
+    
+
+    LocalTestRecipe : FB_RecipeBuilderBorgoWings;
+    LocalConfigProvider : FB_MockConfigProvider;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Executes_Nesting_Copies');
+Executor_Nesting.CyclicLogic(); 
+
+CASE Step OF
+    0:
+        // 1. ARRANGE
+        // Wykorzystujemy BorgoWings, które domyślnie posiada 6 segmentów CutX
+        RecipeConfig.PanelFrontLength := 300.0;
+        RecipeConfig.PanelHeight := 100.0;
+        RecipeConfig.PanelFrontWidth := 300.0;
+        
+        // Wymuszamy 2 kopie w X i 2 kopie w Y
+        RecipeConfig.FillAll := FALSE;
+        RecipeConfig.RequestedCopiesX := 2;
+        RecipeConfig.RequestedCopiesY := 2;
+        
+        LocalTestRecipe.Config := RecipeConfig;
+        LocalTestRecipe.Build(); 
+        
+        TestConfig.CuttingSpeedX := 100;
+        TestConfig.RapidSpeedX := 100;
+        TestConfig.CuttingIdleTime := 0.0;
+        // Szybki test
+        
+        // Podpinamy wyizolowane zależności
+        LocalConfigProvider.Config := TestConfig;
+        Executor_Nesting.RecipeBuilder  := LocalTestRecipe;
+        Executor_Nesting.ConfigProvider := LocalConfigProvider;
+        Executor_Nesting.Cylinder       := MockCylinder_Nesting;
+        Executor_Nesting.AxisX          := MockAxisX;
+        Executor_Nesting.AxisY          := MockAxisY;
+        Executor_Nesting.AxisZ          := MockAxisZ;
+        Executor_Nesting.CutDirection   := E_CutDirection.eCutX; 
+        
+        Step := 10;
+        
+    10:
+        // 2. ACT
+        Executor_Nesting.Execute();
+        Step := 20;
+        
+    20:
+        IF Executor_Nesting.Done THEN
+            Step := 30;
+        ELSIF Executor_Nesting.Error THEN
+            AssertTrue(FALSE, 'Executor zwrocil Error zamiast Done przy Nestingu!');
+            TEST_FINISHED();
+        END_IF
+        
+    30:
+        // 3. ASSERT
+        // BorgoWings ma 6 cięć X na jedną sztukę.
+        // 2 kopie X * 2 kopie Y = 4 sztuki.
+        // 4 sztuki * 6 cięć = 24 wysunięcia siłownika!
+        AssertEquals_INT(Expected := 24, 
+                         Actual := MockCylinder_Nesting.ExtendCallCount, 
+                         Message := 'Zla liczba ciec przy multiplexowaniu (Nestingu)!');
+        TEST_FINISHED();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Sequence_AbortsOnCylinderError" Id="{9a19ee42-2643-46ec-8532-5c6d8bc6c677}">
+      <Declaration><![CDATA[METHOD Test_Sequence_AbortsOnCylinderError
+VAR_INST
+    Step : INT := 0;
+    RecipeConfig : ST_RecipeBuilder_Config;
+	TestConfig : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+TEST('Test_Sequence_AbortsOnCylinderError');
+
+Executor_Unhappy.CyclicLogic();
+
+CASE Step OF
+    0:
+        // 1. ARRANGE - Przygotowanie receptury BorgoWings (6 cięć)
+        RecipeConfig.PanelFrontLength := 1000.0;
+        TestRecipe.Config := RecipeConfig;
+        TestRecipe.Build(); 
+		
+		TestConfig.CuttingSpeedX := 10;    
+		TestConfig.GroovingSpeedX := 10;
+		TestConfig.RapidSpeedX := 10;
+		TestConfig.CuttingSpeedY := 10;
+		TestConfig.GroovingSpeedY := 10;
+		TestConfig.RapidSpeedY := 10;
+	
+        
+        TestConfig.CuttingIdleTime := 0.0; 
+        
+        // ZMUSZAMY MOCK DO AWARII PRZY 3. PRÓBIE WYSUNIĘCIA
+        MockCylinder_Unhappy.FailOnExtendCount := 3;
+        
+        // Wstrzykujemy zależności do Executora "Unhappy"
+		MockConfigProvider.Config := TestConfig; 
+		Executor_Unhappy.RecipeBuilder  := TestRecipe;
+		Executor_Unhappy.ConfigProvider := MockConfigProvider; 
+        Executor_Unhappy.Cylinder       := MockCylinder_Unhappy;
+        Executor_Unhappy.AxisX          := MockAxisX;
+        Executor_Unhappy.AxisY          := MockAxisY;
+        Executor_Unhappy.AxisZ          := MockAxisZ;
+        
+        Step := 10;
+        
+    10:
+        // 2. ACT - Start maszyny
+        Executor_Unhappy.Execute();
+        Step := 20;
+        
+    20:
+        // 3. ASSERT - Oczekujemy BŁĘDU, a nie zakończenia sukcesem!
+        IF Executor_Unhappy.Error THEN
+            Step := 30; // Sukces testu - Executor wyrzucił błąd
+        ELSIF Executor_Unhappy.Done THEN
+            AssertTrue(FALSE, 'Cylinder zglosil blad, a Executor zignorowal to i zakonczyl sukcesem!');
+            TEST_FINISHED();
+        END_IF
+        
+    30:
+        // 4. ASSERT - Weryfikacja dokładnego zachowania podczas awarii
+        
+        // Oczekujemy, że wysunięcie zostało wywołane dokładnie 3 razy i ani razu więcej
+        AssertEquals_INT(Expected := 3, 
+                         Actual := MockCylinder_Unhappy.ExtendCallCount, 
+                         Message := 'Executor nie zatrzymal sie po bledzie na 3. cieciu!');
+                         
+        // Oczekujemy, że wsunięcie zostało wywołane tylko 2 razy 
+        // (bo przy trzecim wysunięciu był błąd, więc sekwencja spadła z rowerka przed chowaniem!)
+        AssertEquals_INT(Expected := 2, 
+                         Actual := MockCylinder_Unhappy.RetractCallCount, 
+                         Message := 'Bledna liczba wsuniec przed awaria!');
+                         
+        TEST_FINISHED();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Sequence_ExecutesCutsCorrectly" Id="{c2729daa-46da-4e16-8826-64d5d470ee9f}">
+      <Declaration><![CDATA[METHOD Test_Sequence_ExecutesCutsCorrectly
+VAR_INST
+    Step : INT := 0;
+    RecipeConfig : ST_RecipeBuilder_Config;
+	TestConfig : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Sequence_ExecutesCutsCorrectly');
+
+// Wywołujemy CyclicLogic dla Executora (Mocki nie potrzebują, bo nic w nich w tle nie tyka)
+Executor.CyclicLogic();
+
+CASE Step OF
+    0:
+        // 1. ARRANGE - Przygotowanie receptury Arona (ma 2 cięcia X)
+        RecipeConfig.PanelFrontLength := 1000.0;
+        TestRecipe.Config := RecipeConfig;
+        TestRecipe.Build(); 
+		TestConfig.CuttingSpeedX := 10;
+		TestConfig.GroovingSpeedX := 10;
+		TestConfig.RapidSpeedX := 10;
+		TestConfig.CuttingSpeedY := 10;
+		TestConfig.GroovingSpeedY := 10;
+		TestConfig.RapidSpeedY := 10;
+	
+
+        // Czas stabilizacji dla testu ucinamy do zera
+        TestConfig.CuttingIdleTime := 0.0; 
+        
+        // 2. DEPENDENCY INJECTION - Wstrzykujemy nasze Zaślepki!
+		MockConfigProvider.Config := TestConfig; 
+		Executor.RecipeBuilder  := TestRecipe;
+		Executor.ConfigProvider := MockConfigProvider;
+        Executor.Cylinder       := MockCylinder;
+        Executor.AxisX          := MockAxisX;
+        Executor.AxisY          := MockAxisY;
+        Executor.AxisZ          := MockAxisZ;
+        
+        Step := 10;
+        
+    10:
+        // 3. ACT - Start maszyny
+        Executor.Execute();
+        Step := 20;
+        
+    20:
+        // 4. Czekamy na koniec sekwencji (dzięki mockom to potrwa ułamki sekund)
+        IF Executor.Done THEN
+            Step := 30;
+        ELSIF Executor.Error THEN
+            AssertTrue(FALSE, 'Executor zwrocil Error zamiast Done!');
+            TEST_FINISHED();
+        END_IF
+        
+    30:
+        // 5. ASSERT - Testujemy Logikę Executora szpiegując Siłownik
+        // Arona ma 2 cięcia, więc siłownik musi zostać użyty 2 razy
+        AssertEquals_INT(Expected := 6, 
+                         Actual := MockCylinder.ExtendCallCount, 
+                         Message := 'Bledna liczba wysuniec ostrza!');
+                         
+        AssertEquals_INT(Expected := 6, 
+                         Actual := MockCylinder.RetractCallCount, 
+                         Message := 'Bledna liczba wsuniec ostrza!');
+                         
+        TEST_FINISHED();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_ZeroSegments_FinishesImmediately" Id="{241556ad-43c9-49d0-97c2-63ca60296571}">
+      <Declaration><![CDATA[METHOD Test_ZeroSegments_FinishesImmediately
+VAR_INST
+    i : INT;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+TEST('Test_ZeroSegments_FinishesImmediately');
+
+// 1. ARRANGE - Arona aktualnie zwraca 0 segmentów (wydmuszka)
+Executor_Zero.RecipeBuilder  := BuilderArona;
+Executor_Zero.ConfigProvider := MockConfigProvider; 
+Executor_Zero.Cylinder       := MockCylinder_Zero;
+Executor_Zero.AxisX          := MockAxisX;
+Executor_Zero.AxisY          := MockAxisY;
+Executor_Zero.AxisZ          := MockAxisZ;
+Executor_Zero.CutDirection   := E_CutDirection.eCutX;
+
+// 2. ACT
+Executor_Zero.Execute();
+
+// Maszyna stanów potrzebuje dokładnie 3 cykli, aby z kroku 0 wejść w 5, potem w 1000 i zakończyć.
+// Puszczamy pętlę na wszelki wypadek np. 5 razy.
+FOR i := 1 TO 5 DO
+    Executor_Zero.CyclicLogic();
+END_FOR
+
+// 3. ASSERT
+AssertTrue(Condition := Executor_Zero.Done, 
+           Message := 'Executor nie zwrocil Done przy 0 segmentow!');
+           
+AssertEquals_INT(Expected := 0, 
+                 Actual := MockCylinder_Zero.ExtendCallCount, 
+                 Message := 'Silownik zostal uruchomiony, chociaz nie bylo ciec!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_ExecutorCut_Test">
+      <LineId Id="117" Count="1" />
+      <LineId Id="149" Count="0" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="89" Count="1" />
+      <LineId Id="37" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCut_Test.Test_AxisError_AbortsSequence">
+      <LineId Id="9" Count="4" />
+      <LineId Id="47" Count="1" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="14" Count="24" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCut_Test.Test_Executes_CutY_Direction">
+      <LineId Id="12" Count="43" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCut_Test.Test_Executes_Nesting_Copies">
+      <LineId Id="79" Count="57" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCut_Test.Test_Sequence_AbortsOnCylinderError">
+      <LineId Id="10" Count="2" />
+      <LineId Id="69" Count="1" />
+      <LineId Id="13" Count="6" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="73" Count="5" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="20" Count="6" />
+      <LineId Id="85" Count="1" />
+      <LineId Id="28" Count="36" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCut_Test.Test_Sequence_ExecutesCutsCorrectly">
+      <LineId Id="84" Count="22" />
+      <LineId Id="142" Count="1" />
+      <LineId Id="108" Count="33" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorCut_Test.Test_ZeroSegments_FinishesImmediately">
+      <LineId Id="9" Count="29" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -355,7 +355,6 @@
       <Inverter>
         <Device>
           <Name>DMInverterTypeDevice</Name>
-          <ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
           <Parameter>
             <PropertyName>MaxAllowedMainVoltage</PropertyName>
             <Value>48</Value>
@@ -776,14 +775,13 @@
             <Load MoveStyle="Linear">
               <IsMotorRotary>true</IsMotorRotary>
               <Name>InverterChannelTypeBlockLoad</Name>
-              <ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
               <Parameter>
                 <PropertyName>FeedConstantUnit</PropertyName>
                 <Value>mm</Value>
               </Parameter>
               <Parameter>
                 <PropertyName>FeedConstant</PropertyName>
-                <Value>6</Value>
+                <Value>5.9375</Value>
               </Parameter>
               <Parameter>
                 <PropertyName>GearRatioMotorSide</PropertyName>
@@ -821,7 +819,6 @@
             <Controller>
               <Filter Id="0">
                 <Name>ControllerFilter</Name>
-                <ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
                 <Parameter>
                   <PropertyName>Filter_Type</PropertyName>
                   <Value>1</Value>
@@ -1613,7 +1610,7 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>32784</Index>
               <SubIndex>21</SubIndex>
-              <Data>e0000000</Data>
+              <Data>bc020000</Data>
             </InitCmd>
             <InitCmd>
               <Transition>PS</Transition>
@@ -1622,7 +1619,7 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>32784</Index>
               <SubIndex>20</SubIndex>
-              <Data>96000000</Data>
+              <Data>50000000</Data>
             </InitCmd>
             <InitCmd>
               <Transition>PS</Transition>
@@ -1641,6 +1638,15 @@ Bit 8 - 15 : reserved</Comment>
               <Index>28688</Index>
               <SubIndex>3</SubIndex>
               <Data>08</Data>
+            </InitCmd>
+            <InitCmd>
+              <Transition>PS</Transition>
+              <Comment><![CDATA[DRV Amplifier Settings / Position loop proportional gain]]></Comment>
+              <Timeout>0</Timeout>
+              <Ccs>1</Ccs>
+              <Index>32784</Index>
+              <SubIndex>23</SubIndex>
+              <Data>e8030000</Data>
             </InitCmd>
           </InitCmds>
           <CanOpenType>39</CanOpenType>

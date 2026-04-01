@@ -1,0 +1,498 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_RecipeBuilder_Test" Id="{ede2b717-c9c9-439b-9f45-ba86089b083e}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilder_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+    BuilderArona : FB_RecipeBuilderArona;
+	BuilderBorgoFlaps : FB_RecipeBuilderBorgoFlaps;
+	BuilderBorgoWings : FB_RecipeBuilderBorgoWings; 
+    Config  : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_Arona_Calculates_Segments();
+Test_BorgoFlaps_Calculates_Segments();
+Test_BorgoWings_Calculates_ActualCopies();
+Test_BorgoWings_Calculates_Coordinates();
+Test_BorgoWings_Calculates_Footprint();
+Test_BorgoWings_Calculates_MaxCopies();
+Test_BorgoWings_Calculates_Segments();
+Test_BoundaryValues_Are_Clamped();
+Test_GlobalOffset_Reduces_MaxCopies();]]></ST>
+    </Implementation>
+    <Method Name="Test_Arona_Calculates_Segments" Id="{7a994464-7f61-40a8-a740-1b9398842f86}">
+      <Declaration><![CDATA[METHOD Test_Arona_Calculates_Segments
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Arona_Calculates_Segments');
+
+// 1. Arrange - podajemy przykładowe dane wejściowe
+Config.PanelFrontLength := 1000.0;
+Config.PanelHeight := 100.0;
+Config.PanelFrontWidth := 500.0;
+Config.RailHeightCorrection := 13.0;
+BuilderArona.Config := Config;
+
+// 2. Act - odpalamy wydmuszkę
+WasBuilt := BuilderArona.Build();
+
+// 3. Assert - Czy w ogóle przepuścił zabezpieczenie?
+AssertTrue(Condition := WasBuilt, 
+           Message := 'Przepis zwrocil FALSE - brak implementacji!');
+
+// 4. Assert - Sprawdzamy konkretne wartości dla Arony (po 2 z każdego)
+AssertEquals_INT(Expected := 2, 
+                 Actual := BuilderArona.SegmentsToCutX, 
+                 Message := 'Zla liczba ciec X dla profilu Arona');
+                 
+AssertEquals_INT(Expected := 2, 
+                 Actual := BuilderArona.SegmentsToCutY, 
+                 Message := 'Zla liczba ciec Y dla profilu Arona');
+                 
+AssertEquals_INT(Expected := 2, 
+                 Actual := BuilderArona.SegmentsToGroove, 
+                 Message := 'Zla liczba frezowan dla profilu Arona');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_BorgoFlaps_Calculates_Segments" Id="{3f507375-dcc0-4bda-9a42-3515b40b3a6c}">
+      <Declaration><![CDATA[METHOD Test_BorgoFlaps_Calculates_Segments
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BorgoFlaps_Calculates_Segments');
+
+// 1. Arrange - podajemy przykładowe dane wejściowe
+Config.PanelFrontLength := 1000.0;
+Config.PanelHeight := 100.0;
+Config.PanelFrontWidth := 500.0;
+Config.RailHeightCorrection := 13.0;
+BuilderBorgoFlaps.Config := Config;
+
+// 2. Act - odpalamy wydmuszkę
+WasBuilt := BuilderBorgoFlaps.Build();
+
+// 3. Assert - Czy w ogóle przepuścił zabezpieczenie?
+AssertTrue(Condition := WasBuilt, 
+           Message := 'Przepis zwrocil FALSE - brak implementacji!');
+
+// 4. Assert - Sprawdzamy konkretne wartości dla Arony (po 2 z każdego)
+AssertEquals_INT(Expected := 6, 
+                 Actual := BuilderBorgoFlaps.SegmentsToCutX, 
+                 Message := 'Zla liczba ciec X dla profilu Borgo Flaps');
+                 
+AssertEquals_INT(Expected := 6, 
+                 Actual := BuilderBorgoFlaps.SegmentsToCutY, 
+                 Message := 'Zla liczba ciec Y dla profilu Borgo Flaps');
+                 
+AssertEquals_INT(Expected := 4, 
+                 Actual := BuilderBorgoFlaps.SegmentsToGroove, 
+                 Message := 'Zla liczba frezowan dla profilu Borgo Flaps');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_BorgoWings_Calculates_ActualCopies" Id="{8e114aa5-44a1-432a-ba0a-6d383b7a8031}">
+      <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_ActualCopies
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BorgoWings_Calculates_ActualCopies');
+
+// ARRANGE - Ustawiamy gabaryty (Wiemy z poprzedniego testu, że Max to 4 w X i 2 w Y)
+Config.PanelFrontWidth  := 400.0;
+Config.PanelFrontLength := 400.0;
+Config.PanelHeight      := 100.0;
+Config.CuttingOverpass  := 0.0;
+Config.GroovingOverpass := 0.0;
+
+// =========================================================================
+// SCENARIUSZ 1: Użytkownik chce wpisać za dużo (np. 10 sztuk), FillAll = FALSE
+// =========================================================================
+Config.FillAll := FALSE;
+Config.RequestedCopiesX := 10; // Kosmos, na płycie wejdą tylko 4
+Config.RequestedCopiesY := 10; // Kosmos, na płycie wejdą tylko 2
+BuilderBorgoWings.Config := Config;
+
+// ACT 1
+WasBuilt := BuilderBorgoWings.Build(); 
+
+// ASSERT 1
+AssertEquals_DINT(Expected := 2, 
+                 Actual := BuilderBorgoWings.ActualCopiesX, 
+                 Message := 'Nie obcieto ActualCopiesX do maksimum przy przekroczeniu!');
+                 
+AssertEquals_DINT(Expected := 4, 
+                 Actual := BuilderBorgoWings.ActualCopiesY, 
+                 Message := 'Nie obcieto ActualCopiesY do maksimum przy przekroczeniu!');
+
+// =========================================================================
+// SCENARIUSZ 2: Wypełnij całość (FillAll = TRUE)
+// =========================================================================
+Config.FillAll := TRUE;
+Config.RequestedCopiesX := 1; // Operator zostawił 1, ale kliknął "Wypełnij"
+Config.RequestedCopiesY := 1;
+BuilderBorgoWings.Config := Config;
+
+// ACT 2
+WasBuilt := BuilderBorgoWings.Build();
+
+// ASSERT 2
+AssertEquals_DINT(Expected := 2, 
+                 Actual := BuilderBorgoWings.ActualCopiesX, 
+                 Message := 'FillAll=TRUE nie ustawilo ActualCopiesX na Max!');
+                 
+AssertEquals_DINT(Expected := 4, 
+                 Actual := BuilderBorgoWings.ActualCopiesY, 
+                 Message := 'FillAll=TRUE nie ustawilo ActualCopiesY na Max!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_BorgoWings_Calculates_Coordinates" Id="{f3f6458e-fd2a-4cc3-8897-e56c4b46d59b}">
+      <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_Coordinates
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+TEST('Test_BorgoWings_Calculates_Coordinates');
+
+// 1. Arrange - wprowadzamy dane
+Config.PanelFrontLength := 1000.0;
+Config.PanelHeight := 100.0;
+Config.PanelFrontWidth := 500.0;
+Config.RailHeightCorrection := 13.0;
+Config.CuttingOverpass := 20.0;
+BuilderBorgoWings.Config := Config;
+
+
+
+// 2. Act - budujemy
+WasBuilt := BuilderBorgoWings.Build();
+
+AssertTrue(WasBuilt, 'Builder zwrocil FALSE');
+
+// ==========================================
+// 3. Assert - SEGMENT CUT X [1] (Zwykłe cięcie)
+// ==========================================
+AssertEquals_REAL(Expected := 720.0, // TotalX + 20
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Start.X, Delta := 0.01, Message := 'Zly punkt Start.X dla SegmentsCutX[1]');
+AssertEquals_REAL(Expected := 600.0, // ShorterX
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Stop.X,  Delta := 0.01, Message := 'Zly punkt Stop.X dla SegmentsCutX[1]');
+AssertEquals_REAL(Expected := 1100.0, // ShorterY
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Start.Y, Delta := 0.01, Message := 'Zly punkt Start.Y dla SegmentsCutX[1]');
+AssertEquals_REAL(Expected := 1100.0, // ShorterY
+                  Actual := BuilderBorgoWings.SegmentsCutX[1].Stop.Y,  Delta := 0.01, Message := 'Zly punkt Stop.Y dla SegmentsCutX[1]');
+
+// ==========================================
+// 4. Assert - SEGMENT CUT X [5] i [6] (Korekta o RailHeightCorrection = 13.0)
+// ==========================================
+// Start.Y dla segmentu 5 to (TotalY - RailHeightCorrection) -> 1200 - 13 = 1187.0
+AssertEquals_REAL(Expected := 1187.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutX[5].Start.Y, Delta := 0.01, Message := 'Zly punkt Start.Y dla SegmentsCutX[5] (Rail correction)');
+// Stop.X dla segmentu 5 to (-CuttingOverpass) -> -20.0
+AssertEquals_REAL(Expected := -20.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutX[5].Stop.X, Delta := 0.01, Message := 'Zly punkt Stop.X dla SegmentsCutX[5]');
+
+// Start.Y dla segmentu 6 to po prostu RailHeightCorrection -> 13.0
+AssertEquals_REAL(Expected := 13.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutX[6].Start.Y, Delta := 0.01, Message := 'Zly punkt Start.Y dla SegmentsCutX[6] (Rail correction)');
+
+// ==========================================
+// 5. Assert - SEGMENT CUT Y [1] i [5]
+// ==========================================
+// Segment 1 - Start.Y to (TotalY + CuttingOverpass) -> 1200 + 20 = 1220.0
+AssertEquals_REAL(Expected := 1220.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutY[1].Start.Y, Delta := 0.01, Message := 'Zly punkt Start.Y dla SegmentsCutY[1]');
+// Segment 1 - Start.X to ShorterX -> 600.0
+AssertEquals_REAL(Expected := 600.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutY[1].Start.X, Delta := 0.01, Message := 'Zly punkt Start.X dla SegmentsCutY[1]');
+
+// Segment 5 - Stop.Y to (-CuttingOverpass) -> -20.0
+AssertEquals_REAL(Expected := -20.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutY[5].Stop.Y, Delta := 0.01, Message := 'Zly punkt Stop.Y dla SegmentsCutY[5]');
+// Segment 5 - Start.X to TotalX -> 700.0
+AssertEquals_REAL(Expected := 700.0, 
+                  Actual := BuilderBorgoWings.SegmentsCutY[5].Start.X, Delta := 0.01, Message := 'Zly punkt Start.X dla SegmentsCutY[5]');
+
+// ==========================================
+// 6. Assert - SEGMENT GROOVE [1]
+// ==========================================
+// Start.X to TotalX -> 700.0
+AssertEquals_REAL(Expected := 700.0, 
+                  Actual := BuilderBorgoWings.SegmentsGroove[1].Start.X, Delta := 0.01, Message := 'Zly punkt Start.X dla SegmentsGroove[1]');
+// Stop.X to 0
+AssertEquals_REAL(Expected := 0.0, 
+                  Actual := BuilderBorgoWings.SegmentsGroove[1].Stop.X, Delta := 0.01, Message := 'Zly punkt Stop.X dla SegmentsGroove[1]');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_BorgoWings_Calculates_Footprint" Id="{ed00ac38-c444-4894-ad76-3a4bb1d8321f}">
+      <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_Footprint
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BorgoWings_Calculates_Footprint');
+
+// 1. Arrange - Wymiary z Twojego HMI
+Config.PanelFrontWidth  := 400.0;
+Config.PanelFrontLength := 400.0;
+Config.PanelHeight      := 100.0;
+Config.CuttingOverpass  := 0.0;
+Config.GroovingOverpass := 0.0;
+
+BuilderBorgoWings.Config := Config;
+
+// 2. Act
+WasBuilt := BuilderBorgoWings.Build();
+
+// 3. Assert - Całkowity wymiar cięcia na płycie
+// TotalX = PanelFrontWidth (400) + 2 * PanelHeight (200) = 600.0
+AssertEquals_REAL(Expected := 600.0, 
+                  Actual := BuilderBorgoWings.FootprintX, 
+                  Delta := 0.01, 
+                  Message := 'Zle wyliczony gabaryt X (FootprintX) dla BorgoWings!');
+
+// TotalY = PanelFrontLength (400) + 2 * PanelHeight (200) = 600.0
+AssertEquals_REAL(Expected := 600.0, 
+                  Actual := BuilderBorgoWings.FootprintY, 
+                  Delta := 0.01, 
+                  Message := 'Zle wyliczony gabaryt Y (FootprintY) dla BorgoWings!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_BorgoWings_Calculates_MaxCopies" Id="{7e637d7e-3dcd-44e6-a0cd-b3ae4944a9b4}">
+      <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_MaxCopies
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BorgoWings_Calculates_MaxCopies');
+
+// 1. Arrange
+Config.PanelFrontWidth  := 400.0;
+Config.PanelFrontLength := 400.0;
+Config.PanelHeight      := 100.0;
+Config.CuttingOverpass  := 0.0;
+Config.GroovingOverpass := 0.0;
+BuilderBorgoWings.Config := Config;
+
+// 2. Act
+WasBuilt := BuilderBorgoWings.Build();
+
+// 3. Assert
+AssertEquals_DINT(Expected := 2, 
+                 Actual := BuilderBorgoWings.MaxCopiesX, 
+                 Message := 'Zle wyliczona maksymalna liczba sztuk w osi X!');
+
+
+AssertEquals_DINT(Expected := 4, 
+                 Actual := BuilderBorgoWings.MaxCopiesY, 
+                 Message := 'Zle wyliczona maksymalna liczba sztuk w osi Y!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_BorgoWings_Calculates_Segments" Id="{4f99f096-b258-4dd7-ae67-c8bae6dcb49d}">
+      <Declaration><![CDATA[METHOD Test_BorgoWings_Calculates_Segments
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BorgoWings_Calculates_Segments');
+
+// 1. Arrange - podajemy przykładowe dane wejściowe
+Config.PanelFrontLength := 1000.0;
+Config.PanelHeight := 100.0;
+Config.PanelFrontWidth := 500.0;
+Config.RailHeightCorrection := 13.0;
+BuilderBorgoWings.Config := Config;
+
+// 2. Act - odpalamy wydmuszkę
+WasBuilt := BuilderBorgoWings.Build();
+
+// 3. Assert - Czy w ogóle przepuścił zabezpieczenie?
+AssertTrue(Condition := WasBuilt, 
+           Message := 'Przepis zwrocil FALSE - brak implementacji!');
+
+// 4. Assert - Sprawdzamy konkretne wartości dla Arony (po 2 z każdego)
+AssertEquals_INT(Expected := 6, 
+                 Actual := BuilderBorgoWings.SegmentsToCutX, 
+                 Message := 'Zla liczba ciec X dla profilu Borgo Wings');
+                 
+AssertEquals_INT(Expected := 6, 
+                 Actual := BuilderBorgoWings.SegmentsToCutY, 
+                 Message := 'Zla liczba ciec Y dla profilu Borgo Wings');
+                 
+AssertEquals_INT(Expected := 4, 
+                 Actual := BuilderBorgoWings.SegmentsToGroove, 
+                 Message := 'Zla liczba frezowan dla profilu Borgo Wings');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_BoundaryValues_Are_Clamped" Id="{42790018-0df2-45af-a897-5bb318a46d46}">
+      <Declaration><![CDATA[METHOD Test_BoundaryValues_Are_Clamped
+VAR
+    TestConfig : ST_RecipeBuilder_Config;
+    ActualConfig : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BoundaryValues_Are_Clamped');
+
+// 1. ARRANGE - Ekstremalnie złe wartości z "HMI"
+TestConfig.PanelFrontLength := -500.0;     // Ujemna długość!
+TestConfig.PanelFrontWidth  := 999999.0;   // Kosmiczna szerokość!
+TestConfig.PanelHeight      := 0.0;        // Zerowa wysokość (grozi dzieleniem przez 0!)
+
+// 2. ACT - Próba wstrzyknięcia złych danych do Buildera
+BuilderBorgoWings.Config := TestConfig; 
+ActualConfig := BuilderBorgoWings.Config; // Odczytujemy to, co Builder fizycznie zapisał
+
+// 3. ASSERT - Sprawdzamy czy Builder użył funkcji LIMIT
+AssertEquals_REAL(Expected := 100.0, // Założone minimum dla długości
+                  Actual := ActualConfig.PanelFrontLength, 
+                  Delta := 0.01, 
+                  Message := 'Ujemna dlugosc nie zostala przycieta do minimum!');
+
+AssertEquals_REAL(Expected := 1234.0, // Założone maximum dla szerokości z Twojego HMI
+                  Actual := ActualConfig.PanelFrontWidth, 
+                  Delta := 0.01, 
+                  Message := 'Kosmiczna szerokosc nie zostala przycieta do maximum!');
+
+AssertEquals_REAL(Expected := 0.0, // Założone minimum dla wysokości z Twojego HMI
+                  Actual := ActualConfig.PanelHeight, 
+                  Delta := 0.01, 
+                  Message := 'Zerowa wysokosc nie zostala bezpiecznie ograniczona!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_GlobalOffset_Reduces_MaxCopies" Id="{593b9c31-c36d-4ad8-a81a-6167338e3125}">
+      <Declaration><![CDATA[METHOD Test_GlobalOffset_Reduces_MaxCopies
+VAR_INST 
+    LocalBuilder       : FB_RecipeBuilderBorgoWings;
+    MockConfigProvider : FB_MockConfigProvider;
+END_VAR
+VAR 
+    MachineConfig      : ST_GantryXYZ_Config;
+    TestConfig         : ST_RecipeBuilder_Config;
+    WasBuilt           : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_GlobalOffset_Reduces_MaxCopies');
+
+// 1. ARRANGE
+// Wymiary detalu: Szer=400, Dlug=400, Wys=100.
+// Gabaryt roboczy (Footprint) to Nominal + 2*Wysokosc -> 600x600 mm.
+TestConfig.PanelFrontWidth  := 400.0;
+TestConfig.PanelFrontLength := 400.0;
+TestConfig.PanelHeight      := 100.0;
+TestConfig.CuttingOverpass  := 0.0;
+TestConfig.GroovingOverpass := 0.0;
+
+// Konfiguracja maszyny: "Zjadamy" stół offsetami!
+// Surowa plyta ma 1200 x 2400 mm
+MachineConfig.RawBoardX := 1200.0; // <--- DODAJ TO
+MachineConfig.RawBoardY := 2400.0; // <--- DODAJ TO
+MachineConfig.GlobalOffsetX := 300.0;  // Zostaje 900 mm dla osi X
+MachineConfig.GlobalOffsetY := 1000.0; // Zostaje 1400 mm dla osi Y
+MockConfigProvider.Config := MachineConfig;
+
+// Wstrzykujemy zależności
+LocalBuilder.ConfigProvider := MockConfigProvider;
+LocalBuilder.Config := TestConfig;
+
+// 2. ACT
+WasBuilt := LocalBuilder.Build();
+
+// 3. ASSERT
+// Os X: Zostalo 900 mm. Detal zajmuje 600 mm. TRUNC(900/600) = 1 sztuka (zamiast dotychczasowych 2).
+AssertEquals_DINT(Expected := 1, 
+                  Actual := LocalBuilder.MaxCopiesX, 
+                  Message := 'GlobalOffsetX nie zmniejszyl poprawnie limitu MaxCopiesX!');
+                 
+// Os Y: Zostalo 1400 mm. Detal zajmuje 600 mm. TRUNC(1400/600) = 2 sztuki (zamiast dotychczasowych 4).
+AssertEquals_DINT(Expected := 2, 
+                  Actual := LocalBuilder.MaxCopiesY, 
+                  Message := 'GlobalOffsetY nie zmniejszyl poprawnie limitu MaxCopiesY!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_RecipeBuilder_Test">
+      <LineId Id="9" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="55" Count="0" />
+      <LineId Id="53" Count="1" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="63" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_Arona_Calculates_Segments">
+      <LineId Id="78" Count="28" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoFlaps_Calculates_Segments">
+      <LineId Id="78" Count="28" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_ActualCopies">
+      <LineId Id="9" Count="5" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="15" Count="41" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Coordinates">
+      <LineId Id="173" Count="8" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="182" Count="0" />
+      <LineId Id="246" Count="0" />
+      <LineId Id="245" Count="0" />
+      <LineId Id="183" Count="58" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Footprint">
+      <LineId Id="9" Count="5" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="16" Count="16" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_MaxCopies">
+      <LineId Id="9" Count="5" />
+      <LineId Id="36" Count="0" />
+      <LineId Id="35" Count="0" />
+      <LineId Id="16" Count="5" />
+      <LineId Id="23" Count="8" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BorgoWings_Calculates_Segments">
+      <LineId Id="78" Count="28" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_BoundaryValues_Are_Clamped">
+      <LineId Id="10" Count="26" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_GlobalOffset_Reduces_MaxCopies">
+      <LineId Id="6" Count="12" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="19" Count="21" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

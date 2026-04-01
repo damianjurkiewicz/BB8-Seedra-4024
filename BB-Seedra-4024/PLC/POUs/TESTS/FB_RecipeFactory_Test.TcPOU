@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_RecipeFactory_Test" Id="{f26615a6-c66a-43dc-9573-a459ce1aeaeb}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeFactory_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+    Factory : FB_RecipeFactory;
+    Config  : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_InjectsConfigProviderToAllBuilders();
+Test_ReturnsCorrectBuilder();
+Test_ReturnsZeroOnInvalidID();
+Test_UpdatesConfigForAllBuilders();]]></ST>
+    </Implementation>
+    <Method Name="Test_InjectsConfigProviderToAllBuilders" Id="{d6313cf3-d5c8-436b-ba90-e789f33521a7}">
+      <Declaration><![CDATA[METHOD Test_InjectsConfigProviderToAllBuilders
+VAR_INST
+    MockProvider : FB_MockConfigProvider;
+END_VAR
+VAR
+    TestConfig   : ST_RecipeBuilder_Config;
+    BuilderWings : I_RecipeBuilder;
+    BuilderFlaps : I_RecipeBuilder;
+    BuilderArona : I_RecipeBuilder;
+    BuilderRect  : I_RecipeBuilder;
+    
+    iMockProvider : I_GantryConfigProvider;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_InjectsConfigProviderToAllBuilders');
+
+// 1. ARRANGE
+// Rzutujemy instancję bloku na interfejs (aby kompilator wiedział, jak je porównywać)
+iMockProvider := MockProvider;
+
+// ACT
+Factory.InitializeFactory(Config := TestConfig, ConfigProvider := iMockProvider);
+
+// Wyciągamy instancje z fabryki
+BuilderWings := Factory.GetBuilder(E_RecipeID.eBorgoWings);
+BuilderFlaps := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
+BuilderArona := Factory.GetBuilder(E_RecipeID.eArona);
+BuilderRect  := Factory.GetBuilder(E_RecipeID.eCircle);
+
+// 3. ASSERT
+// Teraz porównujemy interfejs z interfejsem - kompilator będzie zadowolony!
+AssertTrue(Condition := (BuilderWings.ConfigProvider = iMockProvider),
+           Message := 'BuilderWings nie otrzymal wstrzyknietego ConfigProvidera!');
+           
+AssertTrue(Condition := (BuilderFlaps.ConfigProvider = iMockProvider),
+           Message := 'BuilderFlaps nie otrzymal wstrzyknietego ConfigProvidera!');
+           
+AssertTrue(Condition := (BuilderArona.ConfigProvider = iMockProvider),
+           Message := 'BuilderArona nie otrzymal wstrzyknietego ConfigProvidera!');
+           
+AssertTrue(Condition := (BuilderRect.ConfigProvider = iMockProvider),
+           Message := 'BuilderRectangle nie otrzymal wstrzyknietego ConfigProvidera!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_ReturnsCorrectBuilder" Id="{f4d0cc26-5c2a-4ddf-b356-c729fd5c6098}">
+      <Declaration><![CDATA[METHOD Test_ReturnsCorrectBuilder
+VAR
+    BuilderWings : I_RecipeBuilder;
+    BuilderFlaps : I_RecipeBuilder;
+    BuilderArona : I_RecipeBuilder;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_ReturnsCorrectBuilder');
+
+// 1. ACT - Prosimy fabrykę o wszystkie wspierane przepisy
+BuilderWings := Factory.GetBuilder(E_RecipeID.eBorgoWings);
+BuilderFlaps := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
+BuilderArona := Factory.GetBuilder(E_RecipeID.eArona);
+
+// 2. ASSERT - Sprawdzamy, czy żaden z nich nie jest pusty (0)
+AssertTrue(Condition := (BuilderWings <> 0), 
+           Message := 'Fabryka zwrocila 0 dla eBorgoWings!');
+           
+AssertTrue(Condition := (BuilderFlaps <> 0), 
+           Message := 'Fabryka zwrocila 0 dla eBorgoFlaps!');
+           
+AssertTrue(Condition := (BuilderArona <> 0), 
+           Message := 'Fabryka zwrocila 0 dla eArona!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_ReturnsZeroOnInvalidID" Id="{91b039b9-1372-48cc-8530-52ca18dfee07}">
+      <Declaration><![CDATA[METHOD Test_ReturnsZeroOnInvalidID
+VAR
+    ReturnedBuilder : I_RecipeBuilder;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+TEST('Test_ReturnsZeroOnInvalidID');
+
+// Act - prosimy o eNone (ekran powitalny, bez wybranego programu)
+ReturnedBuilder := Factory.GetBuilder(E_RecipeID.eNone);
+
+// Assert - fabryka musi zwrócić 0
+AssertTrue(Condition := (ReturnedBuilder = 0), 
+           Message := 'Fabryka zwrocila interfejs zamiast 0 dla eNone!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_UpdatesConfigForAllBuilders" Id="{4b2fa050-c8b8-4151-9cc7-69d180105cac}">
+      <Declaration><![CDATA[METHOD Test_UpdatesConfigForAllBuilders
+VAR
+    TestConfig : ST_RecipeBuilder_Config;
+    
+    BuilderWings : I_RecipeBuilder;
+    BuilderFlaps : I_RecipeBuilder;
+    BuilderArona : I_RecipeBuilder;
+    
+    // Zmienne pomocnicze, żeby obejść błąd kompilatora (odczyt właściwości)
+    ActualConfigWings : ST_RecipeBuilder_Config;
+    ActualConfigFlaps : ST_RecipeBuilder_Config;
+    ActualConfigArona : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_UpdatesConfigForAllBuilders');
+
+// 1. ARRANGE - Tworzymy unikalną, testową konfigurację
+TestConfig.PanelFrontLength := 999.0;
+TestConfig.PanelHeight := 111.0;
+
+// 2. ACT - Wrzucamy ją do fabryki, żeby rozesłała dalej
+Factory.UpdateConfig(TestConfig);
+
+// 3. Wyciągamy instancje z fabryki
+BuilderWings := Factory.GetBuilder(E_RecipeID.eBorgoWings);
+BuilderFlaps := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
+BuilderArona := Factory.GetBuilder(E_RecipeID.eArona);
+
+// Zgrywamy konfigurację z właściwości interfejsów do zmiennych lokalnych
+ActualConfigWings := BuilderWings.Config;
+ActualConfigFlaps := BuilderFlaps.Config;
+ActualConfigArona := BuilderArona.Config;
+
+// 4. ASSERT - Sprawdzamy, czy wszyscy mają tę samą wartość
+AssertEquals_REAL(Expected := 999.0, 
+                  Actual := ActualConfigWings.PanelFrontLength, 
+                  Delta := 0.01, 
+                  Message := 'BuilderWings nie dostal nowej konfiguracji!');
+                  
+AssertEquals_REAL(Expected := 999.0, 
+                  Actual := ActualConfigFlaps.PanelFrontLength, 
+                  Delta := 0.01, 
+                  Message := 'BuilderFlaps nie dostal nowej konfiguracji!');
+                  
+AssertEquals_REAL(Expected := 999.0, 
+                  Actual := ActualConfigArona.PanelFrontLength, 
+                  Delta := 0.01, 
+                  Message := 'BuilderArona nie dostal nowej konfiguracji!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_RecipeFactory_Test">
+      <LineId Id="20" Count="0" />
+      <LineId Id="14" Count="1" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeFactory_Test.Test_InjectsConfigProviderToAllBuilders">
+      <LineId Id="57" Count="28" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeFactory_Test.Test_ReturnsCorrectBuilder">
+      <LineId Id="28" Count="16" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeFactory_Test.Test_ReturnsZeroOnInvalidID">
+      <LineId Id="9" Count="10" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeFactory_Test.Test_UpdatesConfigForAllBuilders">
+      <LineId Id="101" Count="34" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

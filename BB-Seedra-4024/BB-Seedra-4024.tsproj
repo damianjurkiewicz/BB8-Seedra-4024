@@ -1424,6 +1424,399 @@ External Setpoint Generation:
 			</Relations>
 		</DataType>
 		<DataType>
+			<Name GUID="{48415C2A-E750-483B-A619-8655B2BEA4B8}" Namespace="MC" TcBaseType="true">PLCTONC_NCICHANNEL_REF</Name>
+			<BitSize>1024</BitSize>
+			<SubItem>
+				<Name>SkipLine</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000004}">WORD</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>0</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>ItpMode</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000004}">WORD</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>16</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>MFuncGranted</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000004}">WORD</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>32</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>ChnAxesOvr</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000008}">UDINT</Type>
+				<BitSize>32</BitSize>
+				<BitOffs>64</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>ChnSpindleOvr</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000008}">UDINT</Type>
+				<BitSize>32</BitSize>
+				<BitOffs>96</BitOffs>
+			</SubItem>
+		</DataType>
+		<DataType>
+			<Name GUID="{A7A2B360-6FEB-435D-9FFA-611F383A8CEF}" Namespace="MC" TcBaseType="true" HideType="true" IecDeclaration="DWORD;">NCTOPLC_NCICHANNEL_REF_CHN_STATE</Name>
+			<BitSize>32</BitSize>
+			<SubItem>
+				<Name>bIsInterpolationChannel</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>0</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bIsKinematicChannel</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>1</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit2</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>2</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit3</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>3</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit4</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>4</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit5</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>5</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit6</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>6</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit7</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>7</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bIsEStopRequested</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>8</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit9</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>9</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bIsFeedFromBackupList</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>10</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bIsMovingBackward</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>11</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bRetraceStartPosReached</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>12</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit13</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>13</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit14</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>14</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit15</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>15</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit16</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>16</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit17</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>17</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit18</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>18</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit19</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>19</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit20</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>20</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit21</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>21</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit22</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>22</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit23</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>23</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit24</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>24</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit25</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>25</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit26</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>26</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit27</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>27</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit28</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>28</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit29</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>29</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit30</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>30</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>bBit31</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000010}">BIT</Type>
+				<BitSize>1</BitSize>
+				<BitOffs>31</BitOffs>
+			</SubItem>
+		</DataType>
+		<DataType>
+			<Name GUID="{56354211-98EF-4057-9322-975DEAD0E29D}" Namespace="MC" TcBaseType="true">NCTOPLC_NCICHANNEL_REF</Name>
+			<BitSize>1280</BitSize>
+			<SubItem>
+				<Name>BlockNo</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000008}">UDINT</Type>
+				<BitSize>32</BitSize>
+				<BitOffs>0</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>FastMFuncMask</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000007}">DWORD</Type>
+				<ArrayInfo>
+					<LBound>1</LBound>
+					<Elements>5</Elements>
+				</ArrayInfo>
+				<BitSize>160</BitSize>
+				<BitOffs>32</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>HskMFuncNo</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000005}">UINT</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>192</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>HskMFuncReq</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000004}">WORD</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>208</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>HFuncValue</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000008}">UDINT</Type>
+				<BitSize>32</BitSize>
+				<BitOffs>224</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>SpindleRpm</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000005}">UINT</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>256</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>Tool</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000005}">UINT</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>272</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>ChnState</Name>
+				<Type GUID="{A7A2B360-6FEB-435D-9FFA-611F383A8CEF}" Namespace="MC">NCTOPLC_NCICHANNEL_REF_CHN_STATE</Type>
+				<BitSize>32</BitSize>
+				<BitOffs>288</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>IntParams</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000008}">UDINT</Type>
+				<ArrayInfo>
+					<LBound>0</LBound>
+					<Elements>4</Elements>
+				</ArrayInfo>
+				<BitSize>128</BitSize>
+				<BitOffs>320</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>DoubleParams</Name>
+				<Type GUID="{18071995-0000-0000-0000-00000000000E}">LREAL</Type>
+				<ArrayInfo>
+					<LBound>0</LBound>
+					<Elements>4</Elements>
+				</ArrayInfo>
+				<BitSize>256</BitSize>
+				<BitOffs>448</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>PathVelo</Name>
+				<Type GUID="{18071995-0000-0000-0000-00000000000E}">LREAL</Type>
+				<BitSize>64</BitSize>
+				<BitOffs>704</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>LoadedProg</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000008}">UDINT</Type>
+				<BitSize>32</BitSize>
+				<BitOffs>768</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>ItpMode</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000004}">WORD</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>800</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>ItpState</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000005}">UINT</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>816</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>ErrorCode</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000008}">UDINT</Type>
+				<BitSize>32</BitSize>
+				<BitOffs>832</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>ChnId</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000005}">UINT</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>864</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>GrpId</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000005}">UINT</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>880</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>ItfVersion</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000005}">UINT</Type>
+				<BitSize>16</BitSize>
+				<BitOffs>896</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>ChnOperationState</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000008}">UDINT</Type>
+				<BitSize>32</BitSize>
+				<BitOffs>928</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>McsAxisIDs</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000002}">USINT</Type>
+				<ArrayInfo>
+					<LBound>0</LBound>
+					<Elements>8</Elements>
+				</ArrayInfo>
+				<BitSize>64</BitSize>
+				<BitOffs>960</BitOffs>
+			</SubItem>
+			<SubItem>
+				<Name>AcsAxisIDs</Name>
+				<Type GUID="{18071995-0000-0000-0000-000000000002}">USINT</Type>
+				<ArrayInfo>
+					<LBound>0</LBound>
+					<Elements>8</Elements>
+				</ArrayInfo>
+				<BitSize>64</BitSize>
+				<BitOffs>1024</BitOffs>
+			</SubItem>
+			<Relations>
+				<Relation Priority="100">
+					<Type GUID="{FBAD2F64-68D5-4C75-B9FC-E1AF58AFD97C}"></Type>
+					<MapEntry>
+						<BitSize>704</BitSize>
+					</MapEntry>
+					<MapEntry>
+						<BitOffsOwn>768</BitOffsOwn>
+						<BitOffsType>1056</BitOffsType>
+						<BitSize>144</BitSize>
+					</MapEntry>
+				</Relation>
+			</Relations>
+		</DataType>
+		<DataType>
 			<Name GUID="{18071995-0000-0000-0000-002000000004}" IecBaseType="true" BitType="true" AutoDeleteType="true" HideSubItems="true">ARRAY [0..3] OF BIT</Name>
 			<BitSize>4</BitSize>
 			<BaseType GUID="{18071995-0000-0000-0000-000000000010}">BIT</BaseType>
@@ -1519,6 +1912,11 @@ External Setpoint Generation:
 	</ImageDatas>
 	<Project ProjectGUID="{92C1A8B7-D820-4544-891C-65FDF8A5BC46}" TargetNetId="5.141.80.204.1.1" RelativeTargetNetId="true" RelativeIpAddresses="true" ShowHideConfigurations="#x6">
 		<System>
+			<Licenses>
+				<Target BkhfOrder="01783799">
+					<ManualSelect>{DEA72F0A-9EA0-48F4-ABB5-766516202B8E}</ManualSelect>
+				</Target>
+			</Licenses>
 			<Tasks>
 				<Task Id="5" Priority="20" CycleTime="100000" AmsPort="350" AdtTasks="true">
 					<Name>PlcTask</Name>
@@ -1556,10 +1954,10 @@ External Setpoint Generation:
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="4" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
+						<EncPara ScaleFactorNumerator="4" ScaleFactorDenominator="1048576" Inverse="true" MaxCount="#xffffffff">
 							<SoftEndMinControl Enable="true" Range="-300"/>
 							<SoftEndMaxControl Range="300"/>
-							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
+							<Inc RefPosition="72" RefMode="1"/>
 						</EncPara>
 						<Vars VarGrpType="1">
 							<Name>Inputs</Name>
@@ -1618,7 +2016,7 @@ External Setpoint Generation:
 						</Vars>
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
-						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
+						<DrvPara Inverse="true" MaxCount="#xffffffff" DriveControlDWord="#x00020100">
 							<Analog VeloReferenz="393.7406" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
@@ -1696,12 +2094,12 @@ External Setpoint Generation:
 				<Axis Id="2" CreateSymbols="true" AxisType="1">
 					<Name>Axis Y</Name>
 					<AxisPara>
-						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14"/>
-						<Velo RefSearch="100" RefSync="10" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
+						<Dynamic Acceleration="637.5915" Deceleration="637.5915" Jerk="1912.7745"/>
+						<Velo RefSearch="80" RefSync="10" SlowManual="21.25305" FastManual="127.5183" Fast="425.061" Maximum="425.061"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="6" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
+						<EncPara ScaleFactorNumerator="4.75" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
 							<SoftEndMinControl Enable="true" Range="-3000"/>
 							<SoftEndMaxControl Enable="true" Range="3000"/>
 							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
@@ -1764,7 +2162,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="590.612" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="467.5671" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -1841,12 +2239,12 @@ External Setpoint Generation:
 				<Axis Id="3" CreateSymbols="true" AxisType="1">
 					<Name>Axis X</Name>
 					<AxisPara>
-						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14"/>
-						<Velo RefSearch="100" RefSync="10" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
+						<Dynamic Acceleration="796.9905" Deceleration="796.9905" Jerk="2390.9715"/>
+						<Velo RefSearch="100" RefSync="10" SlowManual="26.56635" FastManual="159.3981" Fast="531.327" Maximum="531.327"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="6" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
+						<EncPara ScaleFactorNumerator="5.9375" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
 							<SoftEndMinControl Enable="true" Range="-2000"/>
 							<SoftEndMaxControl Enable="true" Range="2000"/>
 							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
@@ -1909,7 +2307,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="590.612" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="584.4597" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -1983,11 +2381,70 @@ External Setpoint Generation:
 						</Var>
 					</Vars>
 				</Axis>
+				<Channel Id="2" ChannelType="2" InterpreterType="2" LoadBufSize="65536" AxesColumns="#x3f">
+					<Name>NC-Channel</Name>
+					<Vars VarGrpType="1">
+						<Name>Inputs</Name>
+						<Var>
+							<Name>FromPlc</Name>
+							<Type GUID="{48415C2A-E750-483B-A619-8655B2BEA4B8}" Namespace="MC">PLCTONC_NCICHANNEL_REF</Type>
+						</Var>
+					</Vars>
+					<Vars VarGrpType="2">
+						<Name>Outputs</Name>
+						<Var>
+							<Name>ToPlc</Name>
+							<Type GUID="{56354211-98EF-4057-9322-975DEAD0E29D}" Namespace="MC">NCTOPLC_NCICHANNEL_REF</Type>
+							<SubVar>
+								<Name>ItpMode</Name>
+								<Comment><![CDATA[0x0000 = Default (deactivates the other modes)
+0x0001 = Single Block Mode NC Kernel (SAF)
+0x4000 = Single Block Mode Interpreter
+]]></Comment>
+							</SubVar>
+							<SubVar>
+								<Name>ItpState</Name>
+								<Comment><![CDATA[Interpreter Operation State:
+0  = Init failed
+1  = Idle
+2  = Ready
+3  = Started
+4  = Scanning
+5  = Running
+6  = Stay running
+7  = Write table
+8  = Search line
+9  = End
+10 = Single Step
+11 = Aborting
+12 = Aborted
+13 = Fault
+14 = Reset
+15 = Stop
+16 = Wait function
+17 = Flush buffers
+]]></Comment>
+							</SubVar>
+						</Var>
+					</Vars>
+					<Group Id="4" CreateSymbols="true" GroupType="4" SetpointGeneratorType="1">
+						<Name>Group 4</Name>
+						<Parameter ChannelId="2">
+							<Dxd EnableSoftPositionLimits="true" VeloVertexFactorC0="0.1" VeloVertexFactorC1="1" CriticalVertexAngleLow="10" CriticalVertexAngleHigh="75"/>
+							<Encoder NoMotionWindow="1" NoMotionFilterTime="0.01"/>
+							<Fifo FifoDimension="1" FifoLength="1000" FifoOverrideType="2" FifoOverrideChangeTime="1" TimeUnitFifo="0.01"/>
+							<Kinematic/>
+						</Parameter>
+					</Group>
+					<Interpreter>
+						<Name>Interpreter</Name>
+					</Interpreter>
+				</Channel>
 			</NC>
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{DA2177BF-CCC4-F046-2358-ABD304DE25A1}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{6F846D0B-A182-FBAB-EC24-2C08AA247C9F}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2037,12 +2494,16 @@ External Setpoint Generation:
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderSensorCutX</Name>
+							<Name>MAIN.Seedra.GantryXYZ.NciChannel.stNciToPlc</Name>
+							<Comment><![CDATA[ Zmienne zlinkowane bezpośrednio z hardwarem kanału NCI]]></Comment>
+							<Type GUID="{56354211-98EF-4057-9322-975DEAD0E29D}" Namespace="MC">NCTOPLC_NCICHANNEL_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.Sensor</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderSensorCutY</Name>
-							<Comment><![CDATA[Output]]></Comment>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Sensor</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -2081,16 +2542,40 @@ External Setpoint Generation:
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderValveCutX</Name>
+							<Name>MAIN.Seedra.GantryXYZ.NciChannel.stPlcToNci</Name>
+							<Type GUID="{48415C2A-E750-483B-A619-8655B2BEA4B8}" Namespace="MC">PLCTONC_NCICHANNEL_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingX.Valve</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderValveCutY</Name>
+							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Valve</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>SafetyTask Inputs</Name>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_ExtendHappy.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_RetractHappy.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_ExtendTime.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_RetractTime.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Reset.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
 						<Var>
 							<Name>GVL_Safety.SafetyPermissionI</Name>
 							<Type>BOOL</Type>
@@ -2128,11 +2613,192 @@ External Setpoint Generation:
 							<Name>IO.DI8</Name>
 							<Type>BOOL</Type>
 						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFX.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFY.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFZ.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisX.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisY.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisZ.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisX_Err.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisX.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisY.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisZ.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisZ_Err.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFX.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFY.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFZ.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisX.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisY.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisZ.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.NciChannel.stNciToPlc</Name>
+							<Comment><![CDATA[ Zmienne zlinkowane bezpośrednio z hardwarem kanału NCI]]></Comment>
+							<Type GUID="{56354211-98EF-4057-9322-975DEAD0E29D}" Namespace="MC">NCTOPLC_NCICHANNEL_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingX.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingY.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
 						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_ExtendHappy.Valve</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_RetractHappy.Valve</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_ExtendTime.Valve</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_RetractTime.Valve</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Reset.Valve</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
 							<Name>GVL_Safety.SafetyPermissionQ</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFX.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFY.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFZ.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisX.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisY.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisZ.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_MockedExecutor.MockAxisX_Err.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisX.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisY.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisZ.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisZ_Err.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFX.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFY.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORNCI__CYCLICLOGIC__REFZ.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisX.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisY.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisZ.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.NciChannel.stPlcToNci</Name>
+							<Type GUID="{48415C2A-E750-483B-A619-8655B2BEA4B8}" Namespace="MC">PLCTONC_NCICHANNEL_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingX.Valve</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingY.Valve</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>
@@ -2140,6 +2806,18 @@ External Setpoint Generation:
 						<OwnerA Name="OutputSrc" Prefix="TIPC^PLC^PLC Instance" Type="2">
 							<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 4 (EL2008)">
 								<Link VarA="MAIN.Seedra.GantryXYZ.CylinderCuttingY.PistonValveCutX" TypeA="BOOL" InOutA="1" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="Channel 6^Output" Size="1" RestoreInfo="ANotFound"/>
+							</OwnerB>
+						</OwnerA>
+					</UnrestoredVarLinks>
+					<UnrestoredVarLinks ImportTime="2026-03-12T13:32:57">
+						<OwnerA Name="InputDst" Prefix="TIPC^PLC^PLC Instance" Type="1">
+							<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 2 (EL1008)">
+								<Link VarA="MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderSensorCutY" TypeA="BOOL" InOutA="0" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="Channel 7^Input" Size="1" RestoreInfo="ANotFound"/>
+							</OwnerB>
+						</OwnerA>
+						<OwnerA Name="OutputSrc" Prefix="TIPC^PLC^PLC Instance" Type="2">
+							<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 4 (EL2008)">
+								<Link VarA="MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderValveCutY" TypeA="BOOL" InOutA="1" GuidA="{18071995-0000-0000-0000-000000000030}" VarB="Channel 5^Output" Size="1" RestoreInfo="ANotFound"/>
 							</OwnerB>
 						</OwnerA>
 					</UnrestoredVarLinks>
@@ -3435,7 +4113,7 @@ External Setpoint Generation:
 							<MBoxUserCmdData>020003000c00000034000000000000000000000000000000000000000000000020108014040000002800000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000900000027000000000000000000000000000000000000000000000020008001010000000046422053657474696e6773202f20496e7665727420666565646261636b20646972656374696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>0200030009000000200000000000000000000000000000000000000000000000201070030100000008445256204f757470757473202f204d6f646573206f66206f7065726174696f6e00</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c0000003800000000000000000000000000000000000000000000002010801704000000b004000044525620416d706c69666965722053657474696e6773202f20506f736974696f6e206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c0000003800000000000000000000000000000000000000000000002010801704000000c800000044525620416d706c69666965722053657474696e6773202f20506f736974696f6e206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
 							<Pdo Name="FB Position" Index="#x1a00" Flags="#x0010" SyncMan="3">
 								<Entry Name="Position" BitLen="32" Index="#x6000" Sub="#x11">
 									<Type>UDINT</Type>
@@ -3984,7 +4662,6 @@ Bit 8 - 15 : reserved]]></Comment>
 								<Inverter>
 									<Device>
 										<Name>DMInverterTypeDevice</Name>
-										<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 										<Parameter>
 											<PropertyName>MaxAllowedMainVoltage</PropertyName>
 											<Value>48</Value>
@@ -4405,14 +5082,13 @@ Bit 8 - 15 : reserved]]></Comment>
 											<Load MoveStyle="Linear">
 												<IsMotorRotary>true</IsMotorRotary>
 												<Name>InverterChannelTypeBlockLoad</Name>
-												<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 												<Parameter>
 													<PropertyName>FeedConstantUnit</PropertyName>
 													<Value>mm</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>6</Value>
+													<Value>4.75</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
@@ -4450,7 +5126,6 @@ Bit 8 - 15 : reserved]]></Comment>
 											<Controller>
 												<Filter Id="0">
 													<Name>ControllerFilter</Name>
-													<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 													<Parameter>
 														<PropertyName>Filter_Type</PropertyName>
 														<Value>1</Value>
@@ -5073,7 +5748,6 @@ Bit 8 - 15 : reserved]]></Comment>
 								<Inverter>
 									<Device>
 										<Name>DMInverterTypeDevice</Name>
-										<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 										<Parameter>
 											<PropertyName>MaxAllowedMainVoltage</PropertyName>
 											<Value>48</Value>
@@ -5494,14 +6168,13 @@ Bit 8 - 15 : reserved]]></Comment>
 											<Load MoveStyle="Linear">
 												<IsMotorRotary>true</IsMotorRotary>
 												<Name>InverterChannelTypeBlockLoad</Name>
-												<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 												<Parameter>
 													<PropertyName>FeedConstantUnit</PropertyName>
 													<Value>mm</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>6</Value>
+													<Value>5.9375</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
@@ -5539,7 +6212,6 @@ Bit 8 - 15 : reserved]]></Comment>
 											<Controller>
 												<Filter Id="0">
 													<Name>ControllerFilter</Name>
-													<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 													<Parameter>
 														<PropertyName>Filter_Type</PropertyName>
 														<Value>1</Value>
@@ -6103,11 +6775,11 @@ Bit 8 - 15 : reserved]]></Comment>
 	</Project>
 	<Mappings>
 		<MappingInfo Identifier="{00000000-2001-0850-0020-500841000403}" Id="#x02030020"/>
-		<MappingInfo Identifier="{00000000-2001-0850-0020-500852000403}" Id="#x02030050"/>
+		<MappingInfo Identifier="{00000000-2001-0850-0020-500852000403}" Id="#x02030040"/>
 		<MappingInfo Identifier="{00000000-0020-0304-1000-040320000403}" Id="#x02030010"/>
-		<MappingInfo Identifier="{00000000-0030-0304-1000-040333000403}" Id="#x02030060"/>
-		<MappingInfo Identifier="{05000010-2001-0850-1000-040300205008}" Id="#x02030030" Watchdog="14000000040000000400000004000000"/>
-		<MappingInfo Identifier="{03040050-0050-0304-5000-040350000403}" Id="#x02030040" Watchdog="04000000040000000400000004000000"/>
+		<MappingInfo Identifier="{00000000-0030-0304-1000-040333000403}" Id="#x02030050"/>
+		<MappingInfo Identifier="{05000010-2001-0850-1000-040300205008}" Id="#x02030060" Watchdog="14000000040000000400000004000000"/>
+		<MappingInfo Identifier="{03040050-0050-0304-5000-040350000403}" Id="#x02030030" Watchdog="04000000040000000400000004000000"/>
 		<OwnerA Name="TIID^Device 3 (EtherCAT)">
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 10 (EL2904)">
 				<Link VarA="Term 1 (EK1100)^Term 8 (EL6900)^ConnectionInputs^TwinSafeGroup1.Term 10 (EL2904) - Module 1 (FSOES)_3 TxPDO" VarB="Module 1 (FSOES)^RxPDO^FSOE"/>
@@ -6115,9 +6787,7 @@ Bit 8 - 15 : reserved]]></Comment>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 8 (EL6900)">
 				<Link VarA="Term 1 (EK1100)^Term 10 (EL2904)^Module 1 (FSOES)^TxPDO^FSOE" VarB="ConnectionOutputs^TwinSafeGroup1.Term 10 (EL2904) - Module 1 (FSOES)_3 RxPDO"/>
 				<Link VarA="Term 1 (EK1100)^Term 9 (EL1904)^Module 1 (FSOES)^RxPDO^FSOE" VarB="ConnectionInputs^TwinSafeGroup1.Term 9 (EL1904) - Module 1 (FSOES)_2 TxPDO"/>
-			</OwnerB>
-			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 9 (EL1904)">
-				<Link VarA="Term 1 (EK1100)^Term 8 (EL6900)^ConnectionOutputs^TwinSafeGroup1.Term 9 (EL1904) - Module 1 (FSOES)_2 RxPDO" VarB="Module 1 (FSOES)^TxPDO^FSOE"/>
+				<Link VarA="Term 1 (EK1100)^Term 9 (EL1904)^Module 1 (FSOES)^TxPDO^FSOE" VarB="ConnectionOutputs^TwinSafeGroup1.Term 9 (EL1904) - Module 1 (FSOES)_2 RxPDO"/>
 			</OwnerB>
 		</OwnerA>
 		<OwnerA Name="TINC^NC-Task 1 SAF^Axes^Axis X">
@@ -6179,14 +6849,14 @@ Bit 8 - 15 : reserved]]></Comment>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorX" VarB="Channel 4^Input"/>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorY" VarB="Channel 5^Input"/>
 				<Link VarA="PlcTask Inputs^IO.ProximitySensorZ" VarB="Channel 6^Input"/>
-				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderSensorCutX" VarB="Channel 8^Input"/>
-				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderSensorCutY" VarB="Channel 7^Input"/>
+				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.CylinderCuttingX.Sensor" VarB="Channel 8^Input"/>
+				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.CylinderCuttingY.Sensor" VarB="Channel 7^Input"/>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 4 (EL2008)">
 				<Link VarA="PlcTask Outputs^IO.CoolingEnable" VarB="Channel 4^Output"/>
 				<Link VarA="PlcTask Outputs^IO.SpindleEnable" VarB="Channel 3^Output"/>
-				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.CylinderCuttingX.CylinderValveCutX" VarB="Channel 6^Output"/>
-				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.CylinderCuttingY.CylinderValveCutY" VarB="Channel 5^Output"/>
+				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.CylinderCuttingX.Valve" VarB="Channel 6^Output"/>
+				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.CylinderCuttingY.Valve" VarB="Channel 5^Output"/>
 			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 8 (EL6900)">
 				<Link VarA="PlcTask Inputs^GVL_Safety.ComError" VarB="StandardInputs^TwinSafeGroup1.GVL_Safety.ComError_8"/>
@@ -6211,6 +6881,10 @@ Bit 8 - 15 : reserved]]></Comment>
 			<OwnerB Name="TINC^NC-Task 1 SAF^Axes^Axis Z">
 				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.AxisZ.BasicAxis._Axis.NcToPlc" VarB="Outputs^ToPlc"/>
 				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.AxisZ.BasicAxis._Axis.PlcToNc" VarB="Inputs^FromPlc"/>
+			</OwnerB>
+			<OwnerB Name="TINC^NC-Task 1 SAF^NC-Channel">
+				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.NciChannel.stNciToPlc" VarB="Outputs^ToPlc"/>
+				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.NciChannel.stPlcToNci" VarB="Inputs^FromPlc"/>
 			</OwnerB>
 		</OwnerA>
 	</Mappings>

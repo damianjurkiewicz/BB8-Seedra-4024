@@ -2,6 +2,18 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <Itf Name="I_RecipeBuilder" Id="{a1b2c3d4-1111-4222-b333-c4d5e6f7a8b9}">
     <Declaration><![CDATA[INTERFACE I_RecipeBuilder]]></Declaration>
+    <Property Name="ActualCopiesX" Id="{93f98e6b-9908-4fa8-90b8-6d20c29c4d3d}">
+      <Declaration><![CDATA[PROPERTY ActualCopiesX : DINT]]></Declaration>
+      <Get Name="Get" Id="{86d8b705-994d-4916-92a6-238c5db62e3d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="ActualCopiesY" Id="{7e141ee8-6e54-4135-beeb-8538b9a6f573}">
+      <Declaration><![CDATA[PROPERTY ActualCopiesY : DINT]]></Declaration>
+      <Get Name="Get" Id="{2f0ec9ec-a180-44b4-8a35-98706e68099d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Method Name="Build" Id="{b2c3d4e5-2222-4333-c444-d5e6f7a8b9c0}">
       <Declaration><![CDATA[METHOD Build : BOOL
 ]]></Declaration>
@@ -14,6 +26,51 @@
       <Set Name="Set" Id="{e3c0a41f-b8d2-4dbf-bb3c-74c7ca0bddef}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
+    </Property>
+    <Property Name="ConfigProvider" Id="{d69d8d19-57dd-41af-92cc-1dbb43000e55}">
+      <Declaration><![CDATA[PROPERTY ConfigProvider : I_GantryConfigProvider]]></Declaration>
+      <Get Name="Get" Id="{0f75a252-3e55-499a-815d-f787c9ce2267}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{db2e7971-1ba6-4a42-8104-1c956218d8fa}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="FootprintX" Id="{b2c0660e-2273-4d0b-a3ff-b3d685a837ce}">
+      <Declaration><![CDATA[PROPERTY FootprintX : REAL]]></Declaration>
+      <Get Name="Get" Id="{1c249b0f-2c24-4249-828f-a42f5a98a347}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{69901a39-3c4a-43c9-9774-7abb6f456824}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="FootprintY" Id="{2613b715-d424-4985-974e-570c5f3a3a3a}">
+      <Declaration><![CDATA[PROPERTY FootprintY : REAL]]></Declaration>
+      <Get Name="Get" Id="{0c30c23d-b3d9-441f-89eb-313480456f50}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{0a3a18d1-13c3-4727-bb69-a7fa42e8a244}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="Limits" Id="{cb52d8bb-7c49-4fc2-8442-7c9db617c87d}">
+      <Declaration><![CDATA[PROPERTY Limits : ST_Recipe_Limits]]></Declaration>
+      <Get Name="Get" Id="{b51051d6-7967-4941-b388-23830aee7422}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="MaxCopiesX" Id="{80561300-5824-4fdd-b673-c3b63715f9cc}">
+      <Declaration><![CDATA[PROPERTY MaxCopiesX : DINT]]></Declaration>
+      <Get Name="Get" Id="{c3b2298d-4a22-4272-b922-207a37d98bca}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="MaxCopiesY" Id="{3d171b71-8d34-4596-a820-b575dcc06d2f}">
+      <Declaration><![CDATA[PROPERTY MaxCopiesY : DINT]]></Declaration>
+      <Get Name="Get" Id="{e36b60ee-0613-460f-b3fe-fc821a59a2b1}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
     </Property>
     <Property Name="SegmentsCutX" Id="{a7b8c9d0-7777-4888-b999-c0d1e2f3a4b5}">
       <Declaration><![CDATA[PROPERTY SegmentsCutX : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>

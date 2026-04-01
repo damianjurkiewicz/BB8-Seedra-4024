@@ -1,0 +1,136 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_RecipeBuilderRectangle" Id="{6c4812e0-2124-4ebf-9425-648a799633b0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderRectangle EXTENDS FB_RecipeBase
+
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{383e92b6-e22e-4900-a8ba-78049e770f6e}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+VAR_INST
+    TotalY          : REAL;
+    TotalX          : REAL;
+    ShorterY        : REAL;
+    ShorterX        : REAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// 1. Zlecenie przeliczenia gabarytów, footrpintu i limitów klasie bazowej
+THIS^.UpdateNestingLimits();
+
+// 2. Jeśli detal wystaje poza maszynę - przerywamy od razu!
+IF NOT _Config.IsValid THEN
+    Build := FALSE;
+    RETURN;
+END_IF
+
+// 3. Pobieramy wyliczone gabaryty nominalne do lokalnych zmiennych roboczych
+TotalX   := _NominalX;
+TotalY   := _NominalY; 
+
+// ------------------------------------
+// 1. Segregracja frezowania (Grooving)
+// ------------------------------------
+_SegmentsToGroove := 0;
+     
+// ------------------------------------
+// 2. Cięcie w osi X (Cut X)
+// ------------------------------------+ 
+_SegmentsToCutX := 2;
+
+// Short Box Segments
+_SegmentsCutX[1].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[1].Stop.X  := -_Config.CuttingOverpass;
+_SegmentsCutX[1].Start.Y := 0;
+_SegmentsCutX[1].Stop.Y  := 0;        
+
+_SegmentsCutX[2].Start.X := TotalX + _Config.CuttingOverpass;                         
+_SegmentsCutX[2].Stop.X  := - _Config.CuttingOverpass;                          
+_SegmentsCutX[2].Start.Y := TotalY;
+_SegmentsCutX[2].Stop.Y  := TotalY;        
+
+// ------------------------------------
+// 3. Cięcie w osi Y (Cut Y)
+// ------------------------------------
+_SegmentsToCutY := 2;
+
+// Short Box Segments
+_SegmentsCutY[1].Start.X := 0;                               
+_SegmentsCutY[1].Stop.X  := 0;                               
+_SegmentsCutY[1].Start.Y := TotalY +_Config.CuttingOverpass; 
+_SegmentsCutY[1].Stop.Y  := -_Config.CuttingOverpass;        
+
+_SegmentsCutY[2].Start.X := TotalX;                          
+_SegmentsCutY[2].Stop.X  := TotalX;                          
+_SegmentsCutY[2].Start.Y := TotalY +_Config.CuttingOverpass; 
+_SegmentsCutY[2].Stop.Y  := -_Config.CuttingOverpass;        
+
+Build := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CalculateFootprint" Id="{b115e399-8fb8-44ec-a54a-a3f7957f2856}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_NominalX := _Config.PanelFrontWidth;
+_NominalY := _Config.PanelFrontLength;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_init" Id="{ee63f777-622f-4528-bf37-252b5ad994fe}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 12.0;
+_Limits.PanelFrontLength.MaxVal := 2400.0;
+
+_Limits.PanelFrontWidth.MinVal  := 12.0;
+_Limits.PanelFrontWidth.MaxVal  := 1200.0;
+
+_Limits.PanelHeight.MinVal      := 12.0;
+_Limits.PanelHeight.MaxVal      := 1234.0;
+
+_Limits.RailHeightCorrection.MinVal := 12.0;
+_Limits.RailHeightCorrection.MaxVal := 13.0;
+
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.GrooveDepthZ.MinVal := 0.0;
+_Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_RecipeBuilderRectangle">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderRectangle.Build">
+      <LineId Id="605" Count="11" />
+      <LineId Id="620" Count="4" />
+      <LineId Id="634" Count="0" />
+      <LineId Id="646" Count="14" />
+      <LineId Id="682" Count="15" />
+      <LineId Id="720" Count="0" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderRectangle.CalculateFootprint">
+      <LineId Id="7" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderRectangle.FB_init">
+      <LineId Id="31" Count="15" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="53" Count="1" />
+      <LineId Id="52" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

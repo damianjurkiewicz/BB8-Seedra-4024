@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <Task Name="VISU_TASK" Id="{30a709af-6e20-48ed-bc40-e1d11a76ac71}">
+  <Task Name="VISU_TASK" Id="{4a7611a6-2404-4ab2-a94c-b4146d93e856}">
     <!--CycleTime in micro seconds.-->
     <CycleTime>200000</CycleTime>
     <Priority>30</Priority>
     <PouCall>
       <Name>VisuElems.Visu_Prg</Name>
     </PouCall>
-    <TaskFBGuid>{29c6d887-a2de-4267-8513-4e4798e579e4}</TaskFBGuid>
-    <Fb_init>{828b0485-5ee9-41cb-9847-c09dcbb0e702}</Fb_init>
-    <Fb_exit>{519a26a1-708a-42fa-b09c-2f66b16f0ba0}</Fb_exit>
-    <CycleUpdate>{a447b583-f3c8-4ef8-920d-10a00af33bbd}</CycleUpdate>
-    <PostCycleUpdate>{1b3bcfe1-3802-46b9-b6d6-e9d111de6249}</PostCycleUpdate>
+    <TaskFBGuid>{da55a27f-cfb8-4fc7-a001-80ab3e58c6bf}</TaskFBGuid>
+    <Fb_init>{2292b17a-a235-41a8-8256-e5f79e02ff6b}</Fb_init>
+    <Fb_exit>{ef4e4134-f991-4730-9781-32493a00f20b}</Fb_exit>
+    <CycleUpdate>{f9641a51-82b1-401c-9b62-655bdedc58b6}</CycleUpdate>
+    <PostCycleUpdate>{7d097bc8-8407-4ded-8437-6e8c2ad9a431}</PostCycleUpdate>
   </Task>
 </TcPlcObject>

@@ -1,14 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_RecipeBase" Id="{da96ec31-8163-452f-a094-4558fa21ef5c}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBase IMPLEMENTS I_RecipeBuilder
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBase IMPLEMENTS I_RecipeBuilder 
 
 VAR
     _Config                 : ST_RecipeBuilder_Config;
+	_ConfigProvider 		: I_GantryConfigProvider;
     _PanelFrontLength       : REAL;  
     _PanelFrontWidth        : REAL;      
     _PanelHeight            : REAL;    
     _RailHeightCorrection   : REAL;
+	
+	
+	_Limits : ST_Recipe_Limits;
 
     // --- NOWE ZMIENNE DO PRZECHOWYWANIA SEGMENTÓW ---
     _SegmentsCutX           : ARRAY [1..32] OF ST_CutSegment;
@@ -17,17 +21,70 @@ VAR
     _SegmentsToCutX         : INT;
     _SegmentsToCutY         : INT;
     _SegmentsToGroove       : INT;
+	_FootprintX 			: REAL;
+	_FootprintY 			: REAL;
+	_MaxCopiesX				: DINT;
+	_MaxCopiesY				: DINT;
+	_ActualCopiesX			:DINT;
+	_ActualCopiesY			:DINT;
+	_NominalX 				: REAL;
+    _NominalY 				: REAL;
+	
+	// --- GENERYCZNY GENERATOR G-CODE (NCI) ---
+    fbCreateFile    : ItpPpgCreateMain;
+    fbAppendLine    : ItpPpgAppendGenericBlock;
+    fbCloseFile     : ItpPpgCloseMain;
+    
+    _aGCodeBuffer   : ARRAY[1..500] OF STRING(255); // Bufor dla Buildera (max 500 linii)
+    _nLinesToWrite  : INT;                          // Ile linii z bufora zapisać
+    _nFileWriteStep : INT := 0;                     // Krok maszyny stanów zapisu
+    _sGCodeFilePath : STRING(255);                  // Ścieżka pliku
+	
+	
 END_VAR
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
+    <Property Name="ActualCopiesX" Id="{f6bb53f7-fe6a-4e43-854b-3965a8a4a1af}">
+      <Declaration><![CDATA[PROPERTY ActualCopiesX : DINT]]></Declaration>
+      <Get Name="Get" Id="{acf86470-a159-4078-98de-d4ec1d0fe9ea}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ActualCopiesX := _Config.RequestedCopiesX;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ActualCopiesY" Id="{28c47b7e-b948-4a5e-8a09-4953e885c928}">
+      <Declaration><![CDATA[PROPERTY ActualCopiesY : DINT]]></Declaration>
+      <Get Name="Get" Id="{0f5cef6e-b24f-4a80-ae1b-1e315e1a7393}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ActualCopiesY := _Config.RequestedCopiesY;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="Build" Id="{47409b61-265d-42e6-ab22-9bedebae5b88}">
       <Declaration><![CDATA[METHOD Build : BOOL
 
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[Build := FALSE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CalculateFootprint" Id="{b5903cf0-35f3-4a36-9bbd-0a6781b9e2f5}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Domyślny wymiar detalu (bez dodatków)
+_NominalX := _Config.PanelFrontWidth;
+_NominalY := _Config.PanelFrontLength;]]></ST>
       </Implementation>
     </Method>
     <Property Name="Config" Id="{cc8b22ea-aed1-438f-8cdd-5e3e5f7b2e90}">
@@ -42,13 +99,128 @@ END_VAR
       </Get>
       <Set Name="Set" Id="{ea17f2c2-4fb3-4cd4-85eb-6bcadc1e2873}">
         <Declaration><![CDATA[VAR
+    sTempGCodePath : STRING(255);
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[_Config := Config;
-]]></ST>
+          <ST><![CDATA[// 1. NAJPIERW robimy kopię tego co mamy w pamięci sterownika
+sTempGCodePath := THIS^._Config.GCodePath; 
+
+// 2. TERAZ przyjmujemy nową strukturę z HMI
+_Config := Config;
+
+// 3. PRZYWRACAMY ścieżkę do pliku
+_Config.GCodePath := sTempGCodePath;
+
+_Config.PanelFrontLength     := LIMIT(_Limits.PanelFrontLength.MinVal, Config.PanelFrontLength, _Limits.PanelFrontLength.MaxVal);
+_Config.PanelFrontWidth      := LIMIT(_Limits.PanelFrontWidth.MinVal,  Config.PanelFrontWidth,  _Limits.PanelFrontWidth.MaxVal);
+_Config.PanelHeight          := LIMIT(_Limits.PanelHeight.MinVal,      Config.PanelHeight,      _Limits.PanelHeight.MaxVal);
+_Config.RailHeightCorrection := LIMIT(_Limits.RailHeightCorrection.MinVal, Config.RailHeightCorrection, _Limits.RailHeightCorrection.MaxVal);
+_Config.GrooveDepthZ		:=	LIMIT(_Limits.GrooveDepthZ.MinVal,	Config.GrooveDepthZ, _Limits.GrooveDepthZ.MaxVal);
+
+
+THIS^.UpdateNestingLimits();
+
+
+IF _Config.FillAll THEN
+    _Config.RequestedCopiesX := _MaxCopiesX;
+    _Config.RequestedCopiesY := _MaxCopiesY;
+ELSE
+    _Config.RequestedCopiesX := LIMIT(1, _Config.RequestedCopiesX, _MaxCopiesX);
+    _Config.RequestedCopiesY := LIMIT(1, _Config.RequestedCopiesY, _MaxCopiesY);
+END_IF]]></ST>
         </Implementation>
       </Set>
+    </Property>
+    <Property Name="ConfigProvider" Id="{8b0de6b1-3957-44a3-88b0-341b09b0b39a}">
+      <Declaration><![CDATA[PROPERTY ConfigProvider : I_GantryConfigProvider]]></Declaration>
+      <Get Name="Get" Id="{2167364a-f1be-4cf1-9920-cef8a1292a7b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ConfigProvider := _ConfigProvider;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{2269ab13-305f-4ee2-8020-24ff434eedbe}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_ConfigProvider := ConfigProvider;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="FootprintX" Id="{31cc2579-4943-4072-adcb-7298a1ade9ce}">
+      <Declaration><![CDATA[PROPERTY FootprintX : REAL]]></Declaration>
+      <Get Name="Get" Id="{e9997c45-4a9f-41c6-91e6-e1fa92e42836}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[FootprintX := _FootprintX;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{4b7b29b6-122d-49af-a98f-be17039311b8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_FootprintX := FootprintX;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="FootprintY" Id="{ff2a3b37-b1bb-44a6-b5de-6e4f50f25550}">
+      <Declaration><![CDATA[PROPERTY FootprintY : REAL]]></Declaration>
+      <Get Name="Get" Id="{7db99de3-36d4-4fef-ac1d-4a0b509bbfca}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[FootprintY := _FootprintY;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{28566d1d-285b-4a14-82b8-bb0c44370488}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_FootprintY := FootprintY;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Limits" Id="{d6f83e87-8dd7-4840-949b-411b575caaa2}">
+      <Declaration><![CDATA[PROPERTY Limits : ST_Recipe_Limits]]></Declaration>
+      <Get Name="Get" Id="{ec01404a-7a39-4271-9193-9e9005040333}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Limits := _Limits;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="MaxCopiesX" Id="{141e0a02-d648-49f9-a7cf-0bb7a2866c40}">
+      <Declaration><![CDATA[PROPERTY MaxCopiesX : DINT]]></Declaration>
+      <Get Name="Get" Id="{01ae6afa-0069-4c7f-a7d7-529c551d837a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[MaxCopiesX := _MaxCopiesX;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="MaxCopiesY" Id="{020d58bf-374a-498a-a7f1-941fa55b76a6}">
+      <Declaration><![CDATA[PROPERTY MaxCopiesY : DINT]]></Declaration>
+      <Get Name="Get" Id="{34530db3-9b5f-4311-bde6-21781e13e93c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[MaxCopiesY := _MaxCopiesY ;]]></ST>
+        </Implementation>
+      </Get>
     </Property>
     <Property Name="SegmentsCutX" Id="{3184be54-f03a-4975-8cf1-db07c128d253}">
       <Declaration><![CDATA[PROPERTY SegmentsCutX : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
@@ -122,17 +294,242 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
+    <Method Name="UpdateNestingLimits" Id="{b78c73fe-7983-4c8d-9c71-a0293b8dccf5}">
+      <Declaration><![CDATA[METHOD PUBLIC UpdateNestingLimits
+VAR
+    MaxOverpass     : REAL;
+    MachineConfig   : ST_GantryXYZ_Config; // Zmienna do odczytu offsetu
+    EffectiveBoardX : REAL;
+    EffectiveBoardY : REAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// 1. Czysty gabaryt z logiki receptury
+THIS^.CalculateFootprint();
+MaxOverpass := MAX(_Config.CuttingOverpass, _Config.GroovingOverpass);
+_FootprintX := _NominalX + (2.0 * MaxOverpass);
+_FootprintY := _NominalY + (2.0 * MaxOverpass);
+
+// 2. Pobranie Global Offsetu ORAZ wymiarów płyty z maszyny
+IF _ConfigProvider <> 0 THEN
+    MachineConfig := _ConfigProvider.Config;
+ELSE
+    // Awaryjny "fallback" jeśli Provider nie jest wstrzyknięty (np. w starych testach)
+    MachineConfig.GlobalOffsetX := 0.0;
+    MachineConfig.GlobalOffsetY := 0.0;
+    MachineConfig.RawBoardX := 1220.0; // Domyślna płyta 
+    MachineConfig.RawBoardY := 2440.0; // Domyślna płyta
+	MachineConfig.RawBoardZ := 9.0;
+END_IF
+
+// 3. Efektywna wielkość płyty = Fizyczna płyta (z maszyny) minus offset początkowy
+EffectiveBoardX := MachineConfig.RawBoardX - MachineConfig.GlobalOffsetX;
+EffectiveBoardY := MachineConfig.RawBoardY - MachineConfig.GlobalOffsetY;
+
+// 4. Przeliczanie kopii nestingu (zabezpieczenie na ujemne wymiary)
+IF _FootprintX > 0.0 AND EffectiveBoardX > 0.0 THEN
+    _MaxCopiesX := REAL_TO_DINT(TRUNC(EffectiveBoardX / _FootprintX));
+ELSE
+    _MaxCopiesX := 0;
+END_IF
+
+IF _FootprintY > 0.0 AND EffectiveBoardY > 0.0 THEN
+    _MaxCopiesY := REAL_TO_DINT(TRUNC(EffectiveBoardY / _FootprintY));
+ELSE
+    _MaxCopiesY := 0;
+END_IF
+
+// =========================================================
+// 5. WERYFIKACJA GABARYTÓW (Zabezpieczenie przed za dużym detalem)
+// =========================================================
+_Config.IsValid := (_MaxCopiesX > 0) AND (_MaxCopiesY > 0) AND (_NominalX > 0) AND (_NominalY > 0);
+
+// =========================================================
+// 6. AUTO-KOREKTA KOPII I LIMITÓW DLA HMI
+// =========================================================
+
+// ZABEZPIECZENIE Z: Głębokość frezowania nie może przekroczyć grubości płyty!
+_Limits.GrooveDepthZ.MaxVal := MachineConfig.RawBoardZ;
+// Bezlitosne obcięcie (clamping) wpisanej wartości do nowego limitu
+_Config.GrooveDepthZ := LIMIT(_Limits.GrooveDepthZ.MinVal, _Config.GrooveDepthZ, _Limits.GrooveDepthZ.MaxVal);
+
+IF _Config.IsValid THEN
+    _Limits.RequestedCopiesX.MinVal := 1.0;
+    _Limits.RequestedCopiesX.MaxVal := DINT_TO_REAL(_MaxCopiesX);
+    _Limits.RequestedCopiesY.MinVal := 1.0;
+    _Limits.RequestedCopiesY.MaxVal := DINT_TO_REAL(_MaxCopiesY);
+
+    IF _Config.FillAll THEN
+        _Config.RequestedCopiesX := _MaxCopiesX;
+        _Config.RequestedCopiesY := _MaxCopiesY;
+    ELSE
+        _Config.RequestedCopiesX := LIMIT(1, _Config.RequestedCopiesX, _MaxCopiesX);
+        _Config.RequestedCopiesY := LIMIT(1, _Config.RequestedCopiesY, _MaxCopiesY);
+    END_IF
+ELSE
+    // Blokada całkowita jeśli detal się nie mieści
+    _Limits.RequestedCopiesX.MinVal := 0.0;
+    _Limits.RequestedCopiesX.MaxVal := 0.0;
+    _Limits.RequestedCopiesY.MinVal := 0.0;
+    _Limits.RequestedCopiesY.MaxVal := 0.0;
+    
+    _Config.RequestedCopiesX := 0;
+    _Config.RequestedCopiesY := 0;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="WriteGCodeFile" Id="{b115e39c-0872-441f-a4ac-20c73a4f870f}">
+      <Declaration><![CDATA[METHOD PROTECTED WriteGCodeFile : BOOL
+VAR_INPUT
+    sFilePath : STRING(255);
+END_VAR
+VAR_INST
+	_iCurrentLine : INT := 1;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[WriteGCodeFile := FALSE;
+
+CASE _nFileWriteStep OF
+    0: // INIT
+        _iCurrentLine := 1; 
+        _sGCodeFilePath := sFilePath;
+        
+        // LOG: Start operacji - wstawiamy zmienną string w miejsce %s
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'WriteGCode: Rozpoczynam zapis do pliku %s', _sGCodeFilePath);
+        
+        _nFileWriteStep := 10;
+
+    10: // --- OTWIERANIE/TWORZENIE PLIKU ---
+        fbCreateFile(
+            bExecute := TRUE, 
+            sPathName := _sGCodeFilePath, 
+            tTimeOut := T#2S
+        );
+        
+        IF fbCreateFile.bErr THEN 
+            // LOG: Błąd tworzenia
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'WriteGCode: BLAD tworzenia pliku %s!', _sGCodeFilePath);
+            _nFileWriteStep := 999;
+            
+        ELSIF NOT fbCreateFile.bBusy THEN
+            fbCreateFile(bExecute := FALSE, sPathName := _sGCodeFilePath);
+            
+            // LOG: Sukces tworzenia
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'WriteGCode: Plik utworzony pomyslnie, przechodze do zapisu.', '');
+            _nFileWriteStep := 20;
+        END_IF
+
+    20: // --- ZAPISYWANIE LINII G-CODE W PĘTLI ---
+        fbAppendLine(
+            bExecute := TRUE, 
+            sPathName := _sGCodeFilePath, 
+            sBlock := _aGCodeBuffer[_iCurrentLine], 
+            tTimeOut := T#2S
+        );
+        
+        IF fbAppendLine.bErr THEN 
+            // LOG: Błąd zapisu konkretnej linii
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'WriteGCode: BLAD dopisywania linii G-Code!', '');
+            _nFileWriteStep := 999;
+            
+        ELSIF NOT fbAppendLine.bBusy THEN
+            fbAppendLine(bExecute := FALSE, sPathName := _sGCodeFilePath);
+            
+            _iCurrentLine := _iCurrentLine + 1;
+            IF _iCurrentLine > _nLinesToWrite THEN
+                // LOG: Koniec pętli zapisu
+                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'WriteGCode: Zapisano wszystkie linie G-Code.', '');
+                _nFileWriteStep := 30; // Zapisano wszystkie linie
+            END_IF
+        END_IF
+
+    30: // --- ZAMYKANIE PLIKU ---
+        fbCloseFile(
+            bExecute := TRUE, 
+            sPathName := _sGCodeFilePath, 
+            tTimeOut := T#2S
+        );
+        
+        IF fbCloseFile.bErr THEN 
+            // LOG: Błąd zamykania
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'WriteGCode: BLAD zamykania pliku!', '');
+            _nFileWriteStep := 999;
+            
+        ELSIF NOT fbCloseFile.bBusy THEN
+            fbCloseFile(bExecute := FALSE, sPathName := _sGCodeFilePath);
+            
+            // Zapisujemy ścieżkę do struktury Config, żeby Executor NCI wiedział co odpalić
+            _Config.GCodePath := _sGCodeFilePath; 
+            
+            // LOG: Pełny sukces
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'WriteGCode: Plik zamkniety pomyslnie.', '');
+            _nFileWriteStep := 1000;
+        END_IF
+
+    999: // --- BŁĄD ---
+        WriteGCodeFile := FALSE;
+        // W tym kroku nie dajemy loga, zeby nie zaspamować konsoli błędem co każdy cykl!
+        // Logi błędu wysłaliśmy tuż przed przejściem do kroku 999.
+
+    1000: // --- GOTOWE ---
+        _nFileWriteStep := 0; // Reset na przyszłość
+        WriteGCodeFile := TRUE;
+        
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
     <LineIds Name="FB_RecipeBase">
       <LineId Id="9" Count="0" />
     </LineIds>
+    <LineIds Name="FB_RecipeBase.ActualCopiesX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.ActualCopiesY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_RecipeBase.Build">
       <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.CalculateFootprint">
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Config.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Config.Set">
-      <LineId Id="5" Count="0" />
+      <LineId Id="76" Count="6" />
+      <LineId Id="44" Count="5" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="50" Count="5" />
+      <LineId Id="57" Count="2" />
+      <LineId Id="62" Count="1" />
+      <LineId Id="39" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.ConfigProvider.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.ConfigProvider.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.FootprintX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.FootprintX.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.FootprintY.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.FootprintY.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.Limits.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.MaxCopiesX.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.MaxCopiesY.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.SegmentsCutX.Get">
@@ -152,6 +549,24 @@ END_VAR
     </LineIds>
     <LineIds Name="FB_RecipeBase.SegmentsToGroove.Get">
       <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.UpdateNestingLimits">
+      <LineId Id="142" Count="5" />
+      <LineId Id="171" Count="8" />
+      <LineId Id="190" Count="0" />
+      <LineId Id="180" Count="3" />
+      <LineId Id="158" Count="12" />
+      <LineId Id="100" Count="9" />
+      <LineId Id="192" Count="0" />
+      <LineId Id="194" Count="2" />
+      <LineId Id="193" Count="0" />
+      <LineId Id="191" Count="0" />
+      <LineId Id="110" Count="21" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.WriteGCodeFile">
+      <LineId Id="84" Count="87" />
+      <LineId Id="5" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_NCIBuilderCircle" Id="{5dbcf7b2-1c2b-4fc5-ae62-5e1b9342eaeb}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NCIBuilderCircle EXTENDS FB_RecipeBase
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{407edc7d-7aef-4048-8a91-20c5a7ce9a3f}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+VAR_INST
+    TotalY          : REAL;
+    TotalX          : REAL;
+	nBuildStep		: INT;
+	sDebugMsg : STRING(255);
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Build := FALSE;
+
+CASE nBuildStep OF
+    0:
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Rozpoczynam krok 0 - budowanie G-Code kółka', '');
+        
+        THIS^.UpdateNestingLimits();
+        
+        // ==========================================================
+        // KÓŁKO G-CODE (Środek X500 Y500, Promień R300)
+        // KAŻDA linia MUSI kończyć się znakiem $N (nowa linia)
+        // ==========================================================
+        
+		// 1. Dojazd nad krawędź kółka (Start w punkcie X200.0 Y200.0) na bezpiecznej wysokości Z0.0
+        _aGCodeBuffer[1] := 'G01 X200.0 Y200.0 Z0.0 F2000$N';
+        
+        // 2. Spokojny zjazd w dół do pracy
+        _aGCodeBuffer[2] := 'G01 Z5.0 F500$N';
+        
+        // 3. Ruch po okręgu (360 stopni)
+        // I-100.0 oznacza środek okręgu oddalony o 100mm w osi X od punktu startu (promień 100)
+        _aGCodeBuffer[3] := 'G02 I-100.0 J0.0 F1000$N';
+        
+        // 4. Powrót osi Z na bezpieczną pozycję bazową Z0.0
+        _aGCodeBuffer[4] := 'G01 Z0.0 F600$N';
+        
+        // 5. Koniec programu (M30 rozwiązuje grupę i czyści NCI)
+        _aGCodeBuffer[5] := 'M30$N'; 
+
+        // Czyszczenie szóstej linii (żeby nie zostało tam 'M30$N' z poprzednich testów)
+        _aGCodeBuffer[6] := '';
+        
+        _nLinesToWrite := 5; // Zapisujemy tylko 5 linii
+        nBuildStep := 10;
+        
+    10:
+        IF THIS^.WriteGCodeFile('SafeTest.nc') THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Krok 10 - Zapisano plik SafeTest.nc', '');
+            nBuildStep := 1000;
+        END_IF
+
+    1000:
+        nBuildStep := 0;
+        Build := TRUE; 
+        
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CalculateFootprint" Id="{217dda2b-389d-4854-9c5e-efedd1d753ca}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_NominalX := 200;
+_NominalY := 200;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_init" Id="{f956be1b-85b3-48f2-beba-5361384ead49}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
+_Limits.PanelFrontLength.MaxVal := 2400.0;
+
+_Limits.PanelFrontWidth.MinVal  := 100.0;
+_Limits.PanelFrontWidth.MaxVal  := 1200.0;
+
+_Limits.PanelHeight.MinVal      := 0.0;
+_Limits.PanelHeight.MaxVal      := 0.0;
+
+_Limits.RailHeightCorrection.MinVal := 0.0;
+_Limits.RailHeightCorrection.MaxVal := 0.0;
+
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.GrooveDepthZ.MinVal := 0.0;
+_Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_NCIBuilderCircle">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NCIBuilderCircle.Build">
+      <LineId Id="802" Count="1" />
+      <LineId Id="1055" Count="10" />
+      <LineId Id="1114" Count="19" />
+      <LineId Id="1086" Count="11" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NCIBuilderCircle.CalculateFootprint">
+      <LineId Id="7" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NCIBuilderCircle.FB_init">
+      <LineId Id="31" Count="15" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="53" Count="1" />
+      <LineId Id="52" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,217 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_MockAxis" Id="{f3603fea-aa28-47ef-b114-9fa5d52e454a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MockAxis EXTENDS SPT_Components.FB_Component_BasicAxis
+VAR
+    _MockInPosition : BOOL := TRUE;
+    _MockBusy       : BOOL := FALSE;
+	_Enabled		: BOOL := FALSE;
+	
+	_MockVelocity     : LREAL;
+    _MockAcceleration : LREAL;
+    _MockDeceleration : LREAL;
+	
+	_ForceError	:	BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="Acceleration" Id="{4529bab4-5550-4fd8-abc2-12f7d8de5ee8}">
+      <Declaration><![CDATA[PROPERTY Acceleration : LREAL]]></Declaration>
+      <Get Name="Get" Id="{8ee77a36-e672-4aa0-a539-e039d94b43c9}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Acceleration := _MockAcceleration;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{a622e71e-9153-487b-963e-b8f7aa8d052d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_MockAcceleration := Acceleration;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Busy" Id="{25ee96b4-f935-48d1-85b2-42045a8b8f79}">
+      <Declaration><![CDATA[PROPERTY Busy : BOOL]]></Declaration>
+      <Get Name="Get" Id="{2073e439-15b7-4d8e-a4dd-8977881cdaca}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Busy := _MockBusy;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="CyclicLogic" Id="{102391e4-3a92-4a49-bde0-8864cda47509}">
+      <Declaration><![CDATA[METHOD CyclicLogic]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Deceleration" Id="{8113da0f-9094-45e4-bad9-b871668a9a1d}">
+      <Declaration><![CDATA[PROPERTY Deceleration : LREAL]]></Declaration>
+      <Get Name="Get" Id="{94057be7-3171-4cf5-8e34-8ffafd5b09d3}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Deceleration := _MockDeceleration;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{fbeb719d-44c9-4af6-bb65-c91cf785f30c}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_MockDeceleration := Deceleration;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="Enable" Id="{9481627a-d7cd-4736-ba69-511ff810e00c}">
+      <Declaration><![CDATA[METHOD Enable : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Enabled := TRUE;
+Enable := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Enabled" Id="{f38a9161-cb22-4c87-a85a-6e4ede124720}">
+      <Declaration><![CDATA[PROPERTY Enabled : BOOL]]></Declaration>
+      <Get Name="Get" Id="{8455ef28-d601-480d-94b2-053ea389c0b8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Enabled := _Enabled;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="Error" Id="{52e1f837-5dd1-4291-8f40-b3ee3120995e}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1890e02-b63b-4e19-846d-4413c1d29782}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := _Error;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ForceError" Id="{f514eeb6-a551-4e27-aaab-28fe692ebd49}">
+      <Declaration><![CDATA[PROPERTY ForceError : BOOL]]></Declaration>
+      <Get Name="Get" Id="{fc5c6a10-59c0-4789-bf2a-b69856585819}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ForceError := _Error;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{7413eff3-becf-420b-af74-357405558ce4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Error := ForceError;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="InPosition" Id="{899ba792-f147-4840-9190-c11ac913d37c}">
+      <Declaration><![CDATA[PROPERTY InPosition : BOOL]]></Declaration>
+      <Get Name="Get" Id="{f5f86ed6-a8c0-44cb-80db-e88896583828}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[InPosition := _MockInPosition;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="MoveAbsolute" Id="{ce2fcb65-7db9-4fdb-91ae-b88cee0c9fe3}">
+      <Declaration><![CDATA[METHOD MoveAbsolute : BOOL
+VAR_INPUT
+	Position	  : LREAL;
+	AbortPrevious : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_MockBusy := FALSE;
+_MockInPosition := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Velocity" Id="{5d262761-a250-4ecf-8080-ed7ad47ce2c5}">
+      <Declaration><![CDATA[PROPERTY Velocity : LREAL]]></Declaration>
+      <Get Name="Get" Id="{1e946a62-63be-4d85-a4e0-84bc5dbea986}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Velocity := _MockVelocity;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{7aab2df8-526d-4296-9bb7-a6987dea05a6}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_MockVelocity := Velocity;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_MockAxis">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Acceleration.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Acceleration.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Busy.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.CyclicLogic">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Deceleration.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Deceleration.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Enable">
+      <LineId Id="5" Count="0" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Enabled.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.ForceError.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.ForceError.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.InPosition.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.MoveAbsolute">
+      <LineId Id="8" Count="0" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Velocity.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_MockAxis.Velocity.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

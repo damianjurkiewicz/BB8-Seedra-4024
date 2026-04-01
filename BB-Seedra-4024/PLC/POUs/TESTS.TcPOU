@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="TESTS" Id="{0938b2ab-3336-43f1-a2aa-780b5d2a82ee}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM TESTS
+VAR
+	Test_RecipeBuilder : FB_RecipeBuilder_Test;
+	Test_RecipeFactory : FB_RecipeFactory_Test;
+	Test_Extend_TurnsOnValve_And_ReportsExtended : FB_Cylinder_Test;
+	Test_MockedExecutor : FB_ExecutorCut_Test; 
+	Test_GrooveExecutor : FB_ExecutorGrooveXY_Test;
+	Test_GantryXYZ		: FB_GantryXYZ_Test;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[TcUnit.RUN();]]></ST>
+    </Implementation>
+    <LineIds Name="TESTS">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

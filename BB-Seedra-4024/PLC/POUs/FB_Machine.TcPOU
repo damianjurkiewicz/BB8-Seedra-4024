@@ -18,6 +18,9 @@ VAR
     RecipeConfig_HMI : ST_RecipeBuilder_HMI; 
 
 	Machine_HMI : ST_Machine_HMI;
+	
+	sSelectedRecipeName : STRING(50);
+	aRecipeNames : ARRAY[0..10] OF STRING(50);
 
 
 END_VAR
@@ -78,40 +81,65 @@ SUPER^.CreateEvents();]]></ST>
     </Method>
     <Method Name="CyclicLogic" Id="{340a2930-ae35-0e59-083f-71f30be69564}">
       <Declaration><![CDATA[METHOD CyclicLogic
-VAR_INPUT
+VAR
+    CurrentBuilder : I_RecipeBuilder;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
+        <ST><![CDATA[// =========================================================
+// 1. INICJALIZACJA
+// =========================================================
 IF NOT _InitComplete THEN
     _InitComplete := Initialize();
     RETURN;
 END_IF
 
+// =========================================================
+// 2. LOGIKA BAZOWA (Maszyna Stanów, Submoduły)
+// =========================================================
 SUPER^.CyclicLogic();
 
+// =========================================================
+// 3. OOP ACTIVE CLAMPING & LIMITS (Single Source of Truth)
+// =========================================================
+// Wyciągamy interfejs programu, który aktualnie jest wybrany na HMI
+CurrentBuilder := RecipeFactory.GetBuilder(GantryXYZ.ProgramIdRequested);
 
+// Synchronizujemy dane z HMI TYLKO gdy maszyna NIE produkuje detalu!
+// Zapobiega to wyzerowaniu ścieżki GCodePath przez HMI tuż po jej wygenerowaniu.
+IF _CurrentState = E_PMLState.ePMLState_Idle OR 
+   _CurrentState = E_PMLState.ePMLState_Stopped OR
+   _CurrentState = E_PMLState.ePMLState_Aborted THEN
 
-// 1. Zapis konfiguracji Gantry do persistentów (bez zmian)
-ConfigManager.GantryConfig := GantryXYZ.Config;
+IF CurrentBuilder <> 0 THEN
+    // Wrzucamy dane z HMI -> Wyzwala to limity i UpdateNestingLimits() w Builderze!
+    // Builder wewnątrz tej metody sam pyta Gantry o GlobalOffset!
+    CurrentBuilder.Config := RecipeConfig_HMI.Config;
+        
+    // Odczyt z powrotem na HMI (aby wyświetlić przeliczone limity sztuk)
+    RecipeConfig_HMI.Config := CurrentBuilder.Config;
+    RecipeConfig_HMI.Limits := CurrentBuilder.Limits;
+ELSE
+    IF GantryXYZ.ProgramIdRequested <> E_RecipeID.eNone THEN
+        GantryXYZ.ProgramIdRequested := E_RecipeID.eNone;
+    END_IF
+END_IF
 
-// 2. Zapis aktualnych wymiarów z uniwersalnego HMI do persistentów
-ConfigManager.Config := RecipeConfig_HMI.Config;
-
-// 3. Rozesłanie aktualnej konfiguracji z HMI do wszystkich builderów w Fabryce
-RecipeFactory.UpdateConfig(RecipeConfig_HMI.Config);
-  
-IF (GVL_Safety.eStopHMI OR NOT GVL_Safety.eStopButton) AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
-	THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
-	RaiseAlarmWithStrings(MachineAlarms[E_Seedra.EmergencyStop],'','');
-//	ELSIF NOT SafetyGlobalVariableList.eStop THEN
-//	MachineAlarms[E_Seedra.EmergencyStop].Clear(0, 0);
+    // =========================================================
+    // 4. ZAPIS DO PERSISTENTÓW I FABRYKI 
+    // =========================================================
+    ConfigManager.GantryConfig := GantryXYZ.Config;
+    ConfigManager.Config := RecipeConfig_HMI.Config;
+    RecipeFactory.UpdateConfig(RecipeConfig_HMI.Config);
 
 END_IF
 
-
-
-
-]]></ST>
+// =========================================================
+// 5. OBSŁUGA BEZPIECZEŃSTWA (SAFETY)
+// =========================================================
+IF (GVL_Safety.eStopHMI OR NOT GVL_Safety.eStopButton) AND NOT MachineAlarms[E_Seedra.EmergencyStop].bRaised THEN
+    THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
+    RaiseAlarmWithStrings(MachineAlarms[E_Seedra.EmergencyStop],'','');
+END_IF]]></ST>
       </Implementation>
     </Method>
     <Method Name="Execute" Id="{729254ca-03f3-4bb9-98a5-84b797a61e6c}" FolderPath="States\">
@@ -139,13 +167,23 @@ END_IF
 				
 			10: 
                 // Czekamy, aż moduł Gantry zamelduje zakończenie obróbki
-				IF GantryXYZ.CurrentState = E_PMLState.ePMLState_Complete THEN
-					SequenceState := 20;
-				END_IF	
-					
-			20:
-				StateTasksComplete := TRUE;
-				StateComplete();
+                IF GantryXYZ.CurrentState = E_PMLState.ePMLState_Complete THEN
+                    SequenceState := 20;
+                
+                // --- DODAJ TEN WARUNEK ---
+                ELSIF GantryXYZ.CurrentState = E_PMLState.ePMLState_Aborting OR GantryXYZ.CurrentState = E_PMLState.ePMLState_Aborted THEN
+                    // Jeśli submoduł Gantry uległ awarii, wymuś awarię całej maszyny!
+                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                    SequenceState := 999; 
+                END_IF  
+                    
+            20:
+                StateTasksComplete := TRUE;
+                StateComplete();
+                
+            999:
+                // Martwy krok dla awarii
+                ;
 				
 		END_CASE
 
@@ -159,7 +197,11 @@ END_CASE]]></ST>
       <Declaration><![CDATA[//! @summary Provides interlocks for HMI control and updates HMI status information for this module
 METHOD PROTECTED HMICommunication
 
-//! @description This method is called cyclically by <c>CyclicLogic()</c>]]></Declaration>
+//! @description This method is called cyclically by <c>CyclicLogic()</c>
+VAR
+// Just to get rid of annoing warring 
+CastingHelper : DINT; 
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[
 IF GVL_Safety.eStopHMI THEN
@@ -167,8 +209,17 @@ IF GVL_Safety.eStopHMI THEN
 	THIS^._Error := TRUE;
 END_IF
 
-Machine_HMI.Status.PackMLState :=_CurrentState;
+CastingHelper := _CurrentState;
+Machine_HMI.Status.PackMLState := CastingHelper;
 
+aRecipeNames[E_RecipeID.eNone]       	:= '-';
+aRecipeNames[E_RecipeID.eBorgoFlaps] 	:= 'Borgo Flaps';
+aRecipeNames[E_RecipeID.eBorgoWings] 	:= 'Borgo Wings';
+aRecipeNames[E_RecipeID.eArona]      	:= 'Arona';
+aRecipeNames[E_RecipeID.eCircle]  		:= 'NCI Circle';
+aRecipeNames[E_RecipeID.eRectangle]		:= 'Rectangle';
+
+sSelectedRecipeName := aRecipeNames[GantryXYZ.ProgramIdRequested];
 
 SUPER^.HMICommunication();]]></ST>
       </Implementation>
@@ -194,10 +245,10 @@ CASE _CurrentMode OF
             E_PMLState.ePMLState_Suspended:
          		AllowHMIControl(ThisModuleOnly := FALSE);
             E_PMLState.ePMLState_Execute:
-				GVL_HMI.ShowProductionPopup := 1;
+				GVL_HMI.PopupToDisplay := 1;
             	AllowHMIControl(ThisModuleOnly := FALSE); 
 			  E_PMLState.ePMLState_Aborting:
-				GVL_HMI.ShowProductionPopup := 0;
+				GVL_HMI.PopupToDisplay := 0;
 				AllowHMIControl(ThisModuleOnly := FALSE); 
             E_PMLState.ePMLState_Aborted:
 				GVL_HMI.MenuToDisplay := 0;
@@ -205,7 +256,7 @@ CASE _CurrentMode OF
             E_PMLState.ePMLState_Held:
                 AllowHMIControl(ThisModuleOnly := FALSE); 
             E_PMLState.ePMLState_Complete:
-				GVL_HMI.ShowProductionPopup := 0;
+				GVL_HMI.PopupToDisplay := 0;
           		AllowHMIControl(ThisModuleOnly := FALSE); 
 				
         END_CASE
@@ -256,10 +307,29 @@ CASE DescendantSequenceState OF
 
 		// Przekazanie konfiguracji do Gantry
 		GantryXYZ.Config := ConfigManager.GantryConfig;
+		
+		// Przekazanie konfiguracji z Persistenta do Fabryki ORAZ wstrzyknięcie maszyny (GantryXYZ)
+		RecipeFactory.InitializeFactory(Config := ConfigManager.Config, ConfigProvider := GantryXYZ);
 	
 		// Przekazanie konfiguracji z Persistenta do HMI (żeby po restarcie na ekranie były dobre wartości)
 		RecipeConfig_HMI.Config := ConfigManager.Config;
-	
+		
+		// =================================================================================
+		// DOMYŚLNE LIMITY FIZYCZNE MASZYNY (Zabezpieczenie Numpadów na ekranie powitalnym)
+		// =================================================================================
+//		RecipeConfig_HMI.Limits.PanelFrontLength.MinVal 	:= 12.0;     RecipeConfig_HMI.Limits.PanelFrontLength.MaxVal 	:= 1234.0;
+//		RecipeConfig_HMI.Limits.PanelFrontWidth.MinVal  	:= 12.0;     RecipeConfig_HMI.Limits.PanelFrontWidth.MaxVal  	:= 1234.0;
+//		RecipeConfig_HMI.Limits.PanelHeight.MinVal      	:= 12.0;     RecipeConfig_HMI.Limits.PanelHeight.MaxVal      	:= 1234.0;
+//		RecipeConfig_HMI.Limits.RailHeightCorrection.MinVal := 12.0; 	 RecipeConfig_HMI.Limits.RailHeightCorrection.MaxVal := 1234.0;
+		RecipeConfig_HMI.Limits.CuttingOverpass.MinVal 		:= 0.0;      RecipeConfig_HMI.Limits.CuttingOverpass.MaxVal 	:= 50.0;
+		RecipeConfig_HMI.Limits.GroovingOverpass.MinVal 	:= 0.0;      RecipeConfig_HMI.Limits.GroovingOverpass.MaxVal 	:= 50.0;
+		RecipeConfig_HMI.Limits.GrooveDepthZ.MinVal := 0.0;
+		RecipeConfig_HMI.Limits.GrooveDepthZ.MaxVal := 100.0;
+		
+		IF RecipeConfig_HMI.Config.RequestedCopiesX < 1 THEN RecipeConfig_HMI.Config.RequestedCopiesX := 1; END_IF
+		IF RecipeConfig_HMI.Config.RequestedCopiesY < 1 THEN RecipeConfig_HMI.Config.RequestedCopiesY := 1; END_IF
+		
+		
 		// Przekazanie konfiguracji z Persistenta do Fabryki (Fabryka rozda to builderom)
 		RecipeFactory.UpdateConfig(ConfigManager.Config);
 	
@@ -274,16 +344,6 @@ CASE DescendantSequenceState OF
     60:
         Initialize := TRUE;
 END_CASE]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="ModeChanged" Id="{5bfe65a8-d51c-4624-a0bd-49f22428c940}">
-      <Declaration><![CDATA[// Called one Cycle on State Change
-METHOD PROTECTED ModeChanged
-VAR_INPUT
-END_VAR]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[//Trace('Mode was changed - ABORTING');
-//ChangeState(E_PMLCommand.ePMLCommand_Abort);]]></ST>
       </Implementation>
     </Method>
     <Method Name="ResetSafety" Id="{6bac4035-16f4-4bf2-95a7-9f0b204a82b7}">
@@ -378,7 +438,6 @@ END_VAR
 			0:
 				NoStateTasksToComplete := FALSE;
 
-				//Advance Gantry to Resetting (Homing)
 				GantryXYZ.ChangeState(E_PMLCommand.ePMLCommand_Reset);
 				
 				SequenceState := SequenceState + 10;
@@ -393,7 +452,8 @@ END_VAR
 	E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
 ;
 END_CASE
-		SUPER^.Resetting();]]></ST>
+
+SUPER^.Resetting();]]></ST>
       </Implementation>
     </Method>
     <Method Name="SubModuleMonitor" Id="{05824ff8-f244-497a-8a5d-923cd9a5fc87}">
@@ -470,28 +530,17 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.CyclicLogic">
-      <LineId Id="18" Count="0" />
-      <LineId Id="3" Count="4" />
-      <LineId Id="61" Count="2" />
-      <LineId Id="74" Count="3" />
-      <LineId Id="85" Count="3" />
-      <LineId Id="36" Count="0" />
-      <LineId Id="40" Count="0" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="32" Count="0" />
-      <LineId Id="24" Count="0" />
-      <LineId Id="22" Count="1" />
-      <LineId Id="29" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="44" Count="0" />
-      <LineId Id="43" Count="0" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="14" Count="0" />
+      <LineId Id="367" Count="24" />
+      <LineId Id="426" Count="11" />
+      <LineId Id="404" Count="4" />
+      <LineId Id="411" Count="11" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Execute">
       <LineId Id="24" Count="3" />
-      <LineId Id="98" Count="23" />
+      <LineId Id="98" Count="13" />
+      <LineId Id="124" Count="17" />
+      <LineId Id="120" Count="1" />
       <LineId Id="42" Count="4" />
       <LineId Id="23" Count="0" />
     </LineIds>
@@ -500,9 +549,14 @@ END_IF]]></ST>
       <LineId Id="6" Count="0" />
       <LineId Id="13" Count="0" />
       <LineId Id="7" Count="0" />
+      <LineId Id="29" Count="0" />
       <LineId Id="12" Count="0" />
       <LineId Id="17" Count="0" />
-      <LineId Id="22" Count="0" />
+      <LineId Id="62" Count="4" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="67" Count="0" />
+      <LineId Id="61" Count="0" />
       <LineId Id="10" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -550,9 +604,21 @@ END_IF]]></ST>
       <LineId Id="50" Count="1" />
       <LineId Id="75" Count="0" />
       <LineId Id="77" Count="0" />
-      <LineId Id="106" Count="3" />
+      <LineId Id="106" Count="2" />
+      <LineId Id="140" Count="2" />
+      <LineId Id="109" Count="0" />
       <LineId Id="119" Count="0" />
-      <LineId Id="111" Count="4" />
+      <LineId Id="111" Count="0" />
+      <LineId Id="124" Count="0" />
+      <LineId Id="126" Count="7" />
+      <LineId Id="125" Count="0" />
+      <LineId Id="143" Count="1" />
+      <LineId Id="123" Count="0" />
+      <LineId Id="112" Count="0" />
+      <LineId Id="136" Count="0" />
+      <LineId Id="135" Count="0" />
+      <LineId Id="134" Count="0" />
+      <LineId Id="113" Count="2" />
       <LineId Id="78" Count="0" />
       <LineId Id="76" Count="0" />
       <LineId Id="52" Count="4" />
@@ -560,24 +626,19 @@ END_IF]]></ST>
       <LineId Id="57" Count="1" />
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Machine.ModeChanged">
-      <LineId Id="6" Count="0" />
-      <LineId Id="5" Count="0" />
-    </LineIds>
     <LineIds Name="FB_Machine.ResetSafety">
       <LineId Id="258" Count="62" />
       <LineId Id="111" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Resetting">
-      <LineId Id="28" Count="6" />
-      <LineId Id="71" Count="0" />
-      <LineId Id="35" Count="4" />
+      <LineId Id="28" Count="11" />
       <LineId Id="46" Count="0" />
       <LineId Id="57" Count="0" />
       <LineId Id="64" Count="0" />
       <LineId Id="61" Count="0" />
       <LineId Id="52" Count="4" />
       <LineId Id="27" Count="0" />
+      <LineId Id="78" Count="0" />
       <LineId Id="62" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.SubModuleMonitor">

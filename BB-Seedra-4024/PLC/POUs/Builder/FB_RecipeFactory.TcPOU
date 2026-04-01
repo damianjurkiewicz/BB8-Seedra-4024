@@ -3,9 +3,11 @@
   <POU Name="FB_RecipeFactory" Id="{eb67f754-8d88-44c2-acf6-733dd105dd46}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeFactory
 VAR
-    BuilderWings : FB_RecipeBuilderWings;
-    BuilderFlaps : FB_RecipeBuilderFlaps;
+    BuilderWings : FB_RecipeBuilderBorgoWings;
+    BuilderFlaps : FB_RecipeBuilderBorgoFlaps;
     BuilderArona : FB_RecipeBuilderArona;
+	BuilderCircle : FB_NCIBuilderCircle;
+	BuilderRectangle : FB_RecipeBuilderRectangle;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -25,9 +27,14 @@ END_VAR]]></Declaration>
         
     E_RecipeID.eArona:
         GetBuilder := BuilderArona;
+		
+	E_RecipeID.eCircle:
+        GetBuilder := BuilderCircle;
+		
+	E_RecipeID.eRectangle:                            
+        GetBuilder := BuilderRectangle;              
         
 ELSE
-    // Jeśli ktoś poda złe ID, zwracamy "nic" (0)
     GetBuilder := 0; 
 END_CASE]]></ST>
       </Implementation>
@@ -36,11 +43,19 @@ END_CASE]]></ST>
       <Declaration><![CDATA[METHOD InitializeFactory
 VAR_INPUT
     Config : ST_RecipeBuilder_Config;
+	ConfigProvider : I_GantryConfigProvider;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[BuilderWings.Config := Config;
+BuilderWings.ConfigProvider := ConfigProvider; 
 BuilderFlaps.Config := Config;
-BuilderArona.Config := Config;]]></ST>
+BuilderFlaps.ConfigProvider := ConfigProvider;
+BuilderArona.Config := Config;
+BuilderArona.ConfigProvider := ConfigProvider;
+BuilderCircle.Config := Config;
+BuilderCircle.ConfigProvider := ConfigProvider;
+BuilderRectangle.Config := Config;                    
+BuilderRectangle.ConfigProvider := ConfigProvider;    ]]></ST>
       </Implementation>
     </Method>
     <Method Name="UpdateConfig" Id="{addb126c-7b31-4fe1-bab5-a92c30ad08f7}">
@@ -52,23 +67,33 @@ END_VAR]]></Declaration>
         <ST><![CDATA[// Fabryka rozsyła nową konfigurację do wszystkich swoich "dzieci"
 BuilderWings.Config := Config;
 BuilderFlaps.Config := Config;
-BuilderArona.Config := Config;]]></ST>
+BuilderArona.Config := Config;
+BuilderCircle.Config := Config;
+BuilderRectangle.Config := Config;                    ]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeFactory">
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.GetBuilder">
-      <LineId Id="9" Count="12" />
+      <LineId Id="31" Count="11" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="43" Count="2" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.InitializeFactory">
-      <LineId Id="9" Count="1" />
-      <LineId Id="5" Count="0" />
+      <LineId Id="19" Count="6" />
+      <LineId Id="14" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="30" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.UpdateConfig">
       <LineId Id="6" Count="2" />
       <LineId Id="5" Count="0" />
+      <LineId Id="12" Count="0" />
+      <LineId Id="16" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

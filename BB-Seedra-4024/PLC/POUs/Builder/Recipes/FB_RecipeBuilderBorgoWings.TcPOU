@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_RecipeBuilderBorgoWings" Id="{3f83a514-1f2f-4e3d-921c-ca7c0b60e17f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderBorgoWings EXTENDS FB_RecipeBase
+
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{c08ade7c-db75-4c50-8457-5bb392619adf}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+VAR_INST
+    TotalY          : REAL;
+    TotalX          : REAL;
+    ShorterY        : REAL;
+    ShorterX        : REAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// 1. Zlecenie przeliczenia gabarytów, footrpintu i limitów klasie bazowej
+THIS^.UpdateNestingLimits();
+
+// 2. Jeśli detal wystaje poza maszynę - przerywamy od razu!
+IF NOT _Config.IsValid THEN
+    Build := FALSE;
+    RETURN;
+END_IF
+
+// 3. Pobieramy wyliczone gabaryty nominalne do lokalnych zmiennych roboczych
+TotalX   := _NominalX;
+TotalY   := _NominalY; 
+ShorterY := TotalY - _Config.PanelHeight;
+ShorterX := TotalX - _Config.PanelHeight;
+
+
+// ------------------------------------
+// 1. Segregracja frezowania (Grooving)
+// ------------------------------------
+_SegmentsToGroove := 4;
+
+_SegmentsGroove[1].Start.X := TotalX;
+_SegmentsGroove[1].Stop.X  := 0;
+_SegmentsGroove[1].Start.Y := ShorterY;
+_SegmentsGroove[1].Stop.Y  := ShorterY;
+
+_SegmentsGroove[2].Start.X := TotalX;
+_SegmentsGroove[2].Stop.X  := 0; 
+_SegmentsGroove[2].Start.Y := _Config.PanelHeight;
+_SegmentsGroove[2].Stop.Y  := _Config.PanelHeight;
+
+_SegmentsGroove[3].Start.X := ShorterX;
+_SegmentsGroove[3].Stop.X  := ShorterX;
+_SegmentsGroove[3].Start.Y := TotalY;
+_SegmentsGroove[3].Stop.Y  := 0;
+
+_SegmentsGroove[4].Start.Y := TotalY;
+_SegmentsGroove[4].Stop.Y  := 0;
+_SegmentsGroove[4].Start.X := _Config.PanelHeight;
+_SegmentsGroove[4].Stop.X  := _Config.PanelHeight;
+
+// ------------------------------------
+// 2. Cięcie w osi X (Cut X)
+// ------------------------------------
+_SegmentsToCutX := 6;
+
+// Short Box Segments
+_SegmentsCutX[1].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[1].Stop.X  := ShorterX;
+_SegmentsCutX[1].Start.Y := ShorterY;
+_SegmentsCutX[1].Stop.Y  := ShorterY;
+
+_SegmentsCutX[2].Start.X := _Config.PanelHeight;
+_SegmentsCutX[2].Stop.X  := -_Config.CuttingOverpass;
+_SegmentsCutX[2].Start.Y := ShorterY;
+_SegmentsCutX[2].Stop.Y  := ShorterY;
+
+_SegmentsCutX[3].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[3].Stop.X  := ShorterX;
+_SegmentsCutX[3].Start.Y := _Config.PanelHeight;
+_SegmentsCutX[3].Stop.Y  := _Config.PanelHeight;
+
+_SegmentsCutX[4].Start.X := _Config.PanelHeight;
+_SegmentsCutX[4].Stop.X  := -_Config.CuttingOverpass;
+_SegmentsCutX[4].Start.Y := _Config.PanelHeight;
+_SegmentsCutX[4].Stop.Y  := _Config.PanelHeight;
+
+// Panel Dimensions Shorter Flaps
+_SegmentsCutX[5].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[5].Stop.X  := -_Config.CuttingOverpass;
+_SegmentsCutX[5].Start.Y := TotalY - _Config.RailHeightCorrection;
+_SegmentsCutX[5].Stop.Y  := TotalY - _Config.RailHeightCorrection;
+
+_SegmentsCutX[6].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[6].Stop.X  := -_Config.CuttingOverpass;
+_SegmentsCutX[6].Start.Y := _Config.RailHeightCorrection;
+_SegmentsCutX[6].Stop.Y  := _Config.RailHeightCorrection;
+
+// ------------------------------------
+// 3. Cięcie w osi Y (Cut Y)
+// ------------------------------------
+_SegmentsToCutY := 6;
+
+// Short Box Segments
+_SegmentsCutY[1].Start.X := ShorterX;
+_SegmentsCutY[1].Stop.X  := ShorterX;
+_SegmentsCutY[1].Start.Y := TotalY + _Config.CuttingOverpass;
+_SegmentsCutY[1].Stop.Y  := ShorterY;
+
+_SegmentsCutY[2].Start.X := _Config.PanelHeight;
+_SegmentsCutY[2].Stop.X  := _Config.PanelHeight;
+_SegmentsCutY[2].Start.Y := TotalY + _Config.CuttingOverpass;
+_SegmentsCutY[2].Stop.Y  := ShorterY;
+
+_SegmentsCutY[3].Start.X := ShorterX;
+_SegmentsCutY[3].Stop.X  := ShorterX;
+_SegmentsCutY[3].Start.Y := _Config.PanelHeight;
+_SegmentsCutY[3].Stop.Y  := -_Config.CuttingOverpass;
+
+_SegmentsCutY[4].Start.X := _Config.PanelHeight;
+_SegmentsCutY[4].Stop.X  := _Config.PanelHeight;
+_SegmentsCutY[4].Start.Y := _Config.PanelHeight;
+_SegmentsCutY[4].Stop.Y  := -_Config.CuttingOverpass;
+
+// Panel Dimensions
+_SegmentsCutY[5].Start.X := TotalX;
+_SegmentsCutY[5].Stop.X  := TotalX;
+_SegmentsCutY[5].Start.Y := TotalY + _Config.CuttingOverpass;
+_SegmentsCutY[5].Stop.Y  := -_Config.CuttingOverpass;
+
+_SegmentsCutY[6].Start.X := 0;
+_SegmentsCutY[6].Stop.X  := 0;
+_SegmentsCutY[6].Start.Y := TotalY + _Config.CuttingOverpass;
+_SegmentsCutY[6].Stop.Y  := -_Config.CuttingOverpass;
+
+
+Build := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CalculateFootprint" Id="{d0703fd7-54d2-42a5-810a-5faa421e709f}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// BorgoWings wie, że jego wymiar powiększa się o ścianki zagięcia:
+_NominalX := _Config.PanelFrontWidth  + 2.0 * _Config.PanelHeight;
+_NominalY := _Config.PanelFrontLength + 2.0 * _Config.PanelHeight;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_init" Id="{166bcf26-5e69-4b30-9881-84478d8b0138}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
+_Limits.PanelFrontLength.MaxVal := 1234.0;
+
+_Limits.PanelFrontWidth.MinVal  := 100.0;
+_Limits.PanelFrontWidth.MaxVal  := 1234.0;
+
+_Limits.PanelHeight.MinVal      := 0.0;
+_Limits.PanelHeight.MaxVal      := 1234.0;
+
+_Limits.RailHeightCorrection.MinVal := 12.0;
+_Limits.RailHeightCorrection.MaxVal := 14.0;
+
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.GrooveDepthZ.MinVal := 0.0;
+_Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_RecipeBuilderBorgoWings">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderBorgoWings.Build">
+      <LineId Id="702" Count="12" />
+      <LineId Id="685" Count="0" />
+      <LineId Id="683" Count="0" />
+      <LineId Id="681" Count="0" />
+      <LineId Id="569" Count="99" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderBorgoWings.CalculateFootprint">
+      <LineId Id="9" Count="1" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderBorgoWings.FB_init">
+      <LineId Id="9" Count="9" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="27" Count="3" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="37" Count="1" />
+      <LineId Id="36" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
