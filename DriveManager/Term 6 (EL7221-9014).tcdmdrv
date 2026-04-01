@@ -785,7 +785,7 @@
               </Parameter>
               <Parameter>
                 <PropertyName>FeedConstant</PropertyName>
-                <Value>6</Value>
+                <Value>4.75</Value>
               </Parameter>
               <Parameter>
                 <PropertyName>GearRatioMotorSide</PropertyName>
@@ -890,11 +890,11 @@
       </Info>
       <ProcessData>
         <Send>
-          <BitStart>12576</BitStart>
+          <BitStart>648</BitStart>
           <BitLength>80</BitLength>
         </Send>
         <Recv>
-          <BitStart>12576</BitStart>
+          <BitStart>648</BitStart>
           <BitLength>80</BitLength>
         </Recv>
         <Sm2>
@@ -930,8 +930,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593856</IndexGroup>
-              <IndexOffset>-2147483612</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-2147483567</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -963,8 +963,8 @@ Bit 14 - 15 : reserved</Comment>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593856</IndexGroup>
-              <IndexOffset>-2147483608</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-2147483563</IndexOffset>
               <Length>2</Length>
             </AdsInfo>
           </Entry>
@@ -1026,8 +1026,8 @@ Bit 14 - 15 : reserved</Comment>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593856</IndexGroup>
-              <IndexOffset>-2147483606</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-2147483561</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -1189,8 +1189,8 @@ Bit 8 - 15 : reserved</Comment>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593856</IndexGroup>
-              <IndexOffset>-2130706396</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-2130706351</IndexOffset>
               <Length>2</Length>
             </AdsInfo>
           </Entry>
@@ -1208,8 +1208,8 @@ Bit 8 - 15 : reserved</Comment>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593856</IndexGroup>
-              <IndexOffset>-2130706394</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-2130706349</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -1271,8 +1271,8 @@ Bit 8 - 15 : reserved</Comment>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593856</IndexGroup>
-              <IndexOffset>-2130706390</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-2130706345</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -1923,7 +1923,7 @@ Bit 8 - 15 : reserved</Comment>
           <Cmd>5</Cmd>
           <Adp>1006</Adp>
           <Ado>2464</Ado>
-          <Data>80969800e8030000</Data>
+          <Data>80841e00e8030000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -2021,7 +2021,7 @@ Bit 8 - 15 : reserved</Comment>
           <Cmd>5</Cmd>
           <Adp>1006</Adp>
           <Ado>1536</Ado>
-          <Data>0a0000020a0000070011000201000000</Data>
+          <Data>0a0000010a0000070011000201000000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -2031,7 +2031,7 @@ Bit 8 - 15 : reserved</Comment>
           <Cmd>5</Cmd>
           <Adp>1006</Adp>
           <Ado>1552</Ado>
-          <Data>0a0000020a0000078011000101000000</Data>
+          <Data>0a0000010a0000078011000101000000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -2289,7 +2289,7 @@ Bit 8 - 15 : reserved</Comment>
         <PotentialReferenceClock>false</PotentialReferenceClock>
         <TimeLoopControlOnly>false</TimeLoopControlOnly>
         <ReferenceClock>false</ReferenceClock>
-        <CycleTime0>10000000</CycleTime0>
+        <CycleTime0>2000000</CycleTime0>
         <CycleTime1>1000</CycleTime1>
         <ShiftTime>30000</ShiftTime>
         <OpMode Selected="true">

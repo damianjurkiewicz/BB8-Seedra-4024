@@ -1949,7 +1949,7 @@ External Setpoint Generation:
 				<Axis Id="1" CreateSymbols="true" AxisType="1">
 					<Name>Axis Z</Name>
 					<AxisPara>
-						<Dynamic Acceleration="536.919" Deceleration="536.919" Jerk="1610.76"/>
+						<Dynamic Acceleration="536.919" Deceleration="536.919" Jerk="1610.757"/>
 						<Velo RefSync="10" SlowManual="17.8973" FastManual="107.3838" Fast="357.946" Maximum="357.946"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
@@ -2094,12 +2094,12 @@ External Setpoint Generation:
 				<Axis Id="2" CreateSymbols="true" AxisType="1">
 					<Name>Axis Y</Name>
 					<AxisPara>
-						<Dynamic Acceleration="671.1495" Deceleration="671.1495" Jerk="2013.4485"/>
-						<Velo RefSearch="4.47433" RefSync="4.47433" SlowManual="22.37165" FastManual="134.2299" Fast="447.433" Maximum="447.433"/>
+						<Dynamic Acceleration="637.5915" Deceleration="637.5915" Jerk="1912.7745"/>
+						<Velo RefSearch="80" RefSync="10" SlowManual="21.25305" FastManual="127.5183" Fast="425.061" Maximum="425.061"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="5" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
+						<EncPara ScaleFactorNumerator="4.75" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
 							<SoftEndMinControl Enable="true" Range="-3000"/>
 							<SoftEndMaxControl Enable="true" Range="3000"/>
 							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
@@ -2162,7 +2162,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="492.1763" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="467.5671" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -2239,12 +2239,12 @@ External Setpoint Generation:
 				<Axis Id="3" CreateSymbols="true" AxisType="1">
 					<Name>Axis X</Name>
 					<AxisPara>
-						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14"/>
-						<Velo RefSearch="100" RefSync="10" SlowManual="26.846" FastManual="161.076" Fast="536.92" Maximum="536.92"/>
+						<Dynamic Acceleration="796.9905" Deceleration="796.9905" Jerk="2390.9715"/>
+						<Velo RefSearch="100" RefSync="10" SlowManual="26.56635" FastManual="159.3981" Fast="531.327" Maximum="531.327"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="6" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
+						<EncPara ScaleFactorNumerator="5.9375" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
 							<SoftEndMinControl Enable="true" Range="-2000"/>
 							<SoftEndMaxControl Enable="true" Range="2000"/>
 							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
@@ -2307,7 +2307,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="590.612" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="584.4597" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -2444,7 +2444,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{54B073A1-040A-A73F-56E0-1FFD14694D1F}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{7527BC26-BFEA-BAEA-ABDA-EAAB05AD0FAB}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -4113,7 +4113,7 @@ External Setpoint Generation:
 							<MBoxUserCmdData>020003000c00000034000000000000000000000000000000000000000000000020108014040000002800000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000900000027000000000000000000000000000000000000000000000020008001010000000046422053657474696e6773202f20496e7665727420666565646261636b20646972656374696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>0200030009000000200000000000000000000000000000000000000000000000201070030100000008445256204f757470757473202f204d6f646573206f66206f7065726174696f6e00</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c0000003800000000000000000000000000000000000000000000002010801704000000b004000044525620416d706c69666965722053657474696e6773202f20506f736974696f6e206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c0000003800000000000000000000000000000000000000000000002010801704000000c800000044525620416d706c69666965722053657474696e6773202f20506f736974696f6e206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
 							<Pdo Name="FB Position" Index="#x1a00" Flags="#x0010" SyncMan="3">
 								<Entry Name="Position" BitLen="32" Index="#x6000" Sub="#x11">
 									<Type>UDINT</Type>
@@ -5088,7 +5088,7 @@ Bit 8 - 15 : reserved]]></Comment>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>5</Value>
+													<Value>4.75</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
@@ -5748,7 +5748,6 @@ Bit 8 - 15 : reserved]]></Comment>
 								<Inverter>
 									<Device>
 										<Name>DMInverterTypeDevice</Name>
-										<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 										<Parameter>
 											<PropertyName>MaxAllowedMainVoltage</PropertyName>
 											<Value>48</Value>
@@ -6169,14 +6168,13 @@ Bit 8 - 15 : reserved]]></Comment>
 											<Load MoveStyle="Linear">
 												<IsMotorRotary>true</IsMotorRotary>
 												<Name>InverterChannelTypeBlockLoad</Name>
-												<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 												<Parameter>
 													<PropertyName>FeedConstantUnit</PropertyName>
 													<Value>mm</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>6</Value>
+													<Value>5.9375</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
@@ -6214,7 +6212,6 @@ Bit 8 - 15 : reserved]]></Comment>
 											<Controller>
 												<Filter Id="0">
 													<Name>ControllerFilter</Name>
-													<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 													<Parameter>
 														<PropertyName>Filter_Type</PropertyName>
 														<Value>1</Value>
