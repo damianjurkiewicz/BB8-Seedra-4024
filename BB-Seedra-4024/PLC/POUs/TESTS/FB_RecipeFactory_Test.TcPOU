@@ -40,7 +40,7 @@ Factory.InitializeFactory(Config := TestConfig, ConfigProvider := iMockProvider)
 BuilderWings := Factory.GetBuilder(E_RecipeID.eBorgoWings);
 BuilderFlaps := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
 BuilderArona := Factory.GetBuilder(E_RecipeID.eArona);
-BuilderRect  := Factory.GetBuilder(E_RecipeID.eRectangle);
+BuilderRect  := Factory.GetBuilder(E_RecipeID.eCircle);
 
 // 3. ASSERT
 // Teraz porównujemy interfejs z interfejsem - kompilator będzie zadowolony!

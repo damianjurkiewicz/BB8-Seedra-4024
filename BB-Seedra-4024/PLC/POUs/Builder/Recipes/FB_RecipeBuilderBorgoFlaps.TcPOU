@@ -32,52 +32,105 @@ TotalY   := _NominalY;
 ShorterY := TotalY - _Config.PanelHeight;
 ShorterX := TotalX - _Config.PanelHeight;
 
+
+// ------------------------------------
+// 1. Segregracja frezowania (Grooving)
+// ------------------------------------
 _SegmentsToGroove := 4;
 
-_SegmentsGroove[1].Start.X := TotalX + _Config.CuttingOverpass;
-_SegmentsGroove[1].Stop.X  := -_Config.CuttingOverpass;
-_SegmentsGroove[1].Start.Y := TotalY - _Config.RailHeightCorrection;
-_SegmentsGroove[1].Stop.Y  := TotalY - _Config.RailHeightCorrection;
+_SegmentsGroove[1].Start.X := TotalX;
+_SegmentsGroove[1].Stop.X  := 0;
+_SegmentsGroove[1].Start.Y := ShorterY;
+_SegmentsGroove[1].Stop.Y  := ShorterY;
 
-_SegmentsGroove[2].Start.X := TotalX + _Config.CuttingOverpass;
-_SegmentsGroove[2].Stop.X  := -_Config.CuttingOverpass;
-_SegmentsGroove[2].Start.Y := _Config.RailHeightCorrection;
-_SegmentsGroove[2].Stop.Y  := _Config.RailHeightCorrection;
+_SegmentsGroove[2].Start.X := TotalX;
+_SegmentsGroove[2].Stop.X  := 0; 
+_SegmentsGroove[2].Start.Y := _Config.PanelHeight;
+_SegmentsGroove[2].Stop.Y  := _Config.PanelHeight;
 
+_SegmentsGroove[3].Start.X := ShorterX;
+_SegmentsGroove[3].Stop.X  := ShorterX;
+_SegmentsGroove[3].Start.Y := TotalY;
+_SegmentsGroove[3].Stop.Y  := 0;
 
-_SegmentsGroove[3].Start.X := TotalX;
-_SegmentsGroove[3].Stop.X  := TotalX;
-_SegmentsGroove[3].Start.Y := TotalY + _Config.CuttingOverpass;
-_SegmentsGroove[3].Stop.Y  := -_Config.CuttingOverpass;
+_SegmentsGroove[4].Start.Y := TotalY;
+_SegmentsGroove[4].Stop.Y  := 0;
+_SegmentsGroove[4].Start.X := _Config.PanelHeight;
+_SegmentsGroove[4].Stop.X  := _Config.PanelHeight;
 
-_SegmentsGroove[4].Start.X := 0;
-_SegmentsGroove[4].Stop.X  := 0;
-_SegmentsGroove[4].Start.Y := TotalY + _Config.CuttingOverpass;
-_SegmentsGroove[4].Stop.Y  := -_Config.CuttingOverpass;
+// ------------------------------------
+// 2. Cięcie w osi X (Cut X)
+// ------------------------------------
+_SegmentsToCutX := 6;
 
-_SegmentsToCutX   := 2;
-
+// Short Box Segments
 _SegmentsCutX[1].Start.X := TotalX + _Config.CuttingOverpass;
-_SegmentsCutX[1].Stop.X  := -_Config.CuttingOverpass;
-_SegmentsCutX[1].Start.Y := TotalY - _Config.RailHeightCorrection;
-_SegmentsCutX[1].Stop.Y  := TotalY - _Config.RailHeightCorrection;
+_SegmentsCutX[1].Stop.X  := ShorterX;
+_SegmentsCutX[1].Start.Y := ShorterY;
+_SegmentsCutX[1].Stop.Y  := ShorterY;
 
-_SegmentsCutX[2].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[2].Start.X := _Config.PanelHeight;
 _SegmentsCutX[2].Stop.X  := -_Config.CuttingOverpass;
-_SegmentsCutX[2].Start.Y := _Config.RailHeightCorrection;
-_SegmentsCutX[2].Stop.Y  := _Config.RailHeightCorrection;
+_SegmentsCutX[2].Start.Y := ShorterY;
+_SegmentsCutX[2].Stop.Y  := ShorterY;
 
-_SegmentsToCutY   := 2;
+_SegmentsCutX[3].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[3].Stop.X  := ShorterX;
+_SegmentsCutX[3].Start.Y := _Config.PanelHeight;
+_SegmentsCutX[3].Stop.Y  := _Config.PanelHeight;
 
-_SegmentsCutY[1].Start.X := TotalX;
-_SegmentsCutY[1].Stop.X  := TotalX;
+_SegmentsCutX[4].Start.X := _Config.PanelHeight;
+_SegmentsCutX[4].Stop.X  := -_Config.CuttingOverpass;
+_SegmentsCutX[4].Start.Y := _Config.PanelHeight;
+_SegmentsCutX[4].Stop.Y  := _Config.PanelHeight;
+
+// Panel Dimensions 
+_SegmentsCutX[5].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[5].Stop.X  := -_Config.CuttingOverpass;
+_SegmentsCutX[5].Start.Y := TotalY;
+_SegmentsCutX[5].Stop.Y  := TotalY;
+
+_SegmentsCutX[6].Start.X := TotalX + _Config.CuttingOverpass;
+_SegmentsCutX[6].Stop.X  := -_Config.CuttingOverpass;
+_SegmentsCutX[6].Start.Y := 0;
+_SegmentsCutX[6].Stop.Y  := 0;
+
+// ------------------------------------
+// 3. Cięcie w osi Y (Cut Y)
+// ------------------------------------
+_SegmentsToCutY := 6;
+
+// Short Box Segments
+_SegmentsCutY[1].Start.X := ShorterX;
+_SegmentsCutY[1].Stop.X  := ShorterX;
 _SegmentsCutY[1].Start.Y := TotalY + _Config.CuttingOverpass;
-_SegmentsCutY[1].Stop.Y  := -_Config.CuttingOverpass;
+_SegmentsCutY[1].Stop.Y  := ShorterY;
 
-_SegmentsCutY[2].Start.X := 0;
-_SegmentsCutY[2].Stop.X  := 0;
+_SegmentsCutY[2].Start.X := _Config.PanelHeight;
+_SegmentsCutY[2].Stop.X  := _Config.PanelHeight;
 _SegmentsCutY[2].Start.Y := TotalY + _Config.CuttingOverpass;
-_SegmentsCutY[2].Stop.Y  := -_Config.CuttingOverpass;
+_SegmentsCutY[2].Stop.Y  := ShorterY;
+
+_SegmentsCutY[3].Start.X := ShorterX;
+_SegmentsCutY[3].Stop.X  := ShorterX;
+_SegmentsCutY[3].Start.Y := _Config.PanelHeight;
+_SegmentsCutY[3].Stop.Y  := -_Config.CuttingOverpass;
+
+_SegmentsCutY[4].Start.X := _Config.PanelHeight;
+_SegmentsCutY[4].Stop.X  := _Config.PanelHeight;
+_SegmentsCutY[4].Start.Y := _Config.PanelHeight;
+_SegmentsCutY[4].Stop.Y  := -_Config.CuttingOverpass;
+
+// Panel Dimensions Shorter Wings
+_SegmentsCutY[5].Start.X := TotalX - _Config.RailHeightCorrection;
+_SegmentsCutY[5].Stop.X  := TotalX - _Config.RailHeightCorrection;
+_SegmentsCutY[5].Start.Y := TotalY + _Config.CuttingOverpass;
+_SegmentsCutY[5].Stop.Y  := -_Config.CuttingOverpass;
+
+_SegmentsCutY[6].Start.X := _Config.RailHeightCorrection;
+_SegmentsCutY[6].Stop.X  := _Config.RailHeightCorrection;
+_SegmentsCutY[6].Start.Y := TotalY + _Config.CuttingOverpass;
+_SegmentsCutY[6].Stop.Y  := -_Config.CuttingOverpass;
 
 
 Build := TRUE;]]></ST>
@@ -128,26 +181,7 @@ _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.Build">
-      <LineId Id="673" Count="12" />
-      <LineId Id="634" Count="0" />
-      <LineId Id="591" Count="1" />
-      <LineId Id="687" Count="0" />
-      <LineId Id="696" Count="7" />
-      <LineId Id="686" Count="0" />
-      <LineId Id="705" Count="9" />
-      <LineId Id="704" Count="0" />
-      <LineId Id="632" Count="0" />
-      <LineId Id="593" Count="0" />
-      <LineId Id="606" Count="0" />
-      <LineId Id="665" Count="7" />
-      <LineId Id="605" Count="0" />
-      <LineId Id="604" Count="0" />
-      <LineId Id="594" Count="0" />
-      <LineId Id="616" Count="0" />
-      <LineId Id="657" Count="7" />
-      <LineId Id="625" Count="0" />
-      <LineId Id="615" Count="0" />
-      <LineId Id="600" Count="0" />
+      <LineId Id="721" Count="115" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.CalculateFootprint">

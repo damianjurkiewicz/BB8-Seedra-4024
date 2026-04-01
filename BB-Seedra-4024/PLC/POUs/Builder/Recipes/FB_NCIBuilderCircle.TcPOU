@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_RecipeBuilderRectangle" Id="{5dbcf7b2-1c2b-4fc5-ae62-5e1b9342eaeb}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderRectangle EXTENDS FB_RecipeBase
+  <POU Name="FB_NCIBuilderCircle" Id="{5dbcf7b2-1c2b-4fc5-ae62-5e1b9342eaeb}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NCIBuilderCircle EXTENDS FB_RecipeBase
 
 ]]></Declaration>
     <Implementation>
@@ -70,8 +70,8 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_NominalX := _Config.PanelFrontWidth; 
-_NominalY := _Config.PanelFrontLength;]]></ST>
+        <ST><![CDATA[_NominalX := 200;
+_NominalY := 200;]]></ST>
       </Implementation>
     </Method>
     <Method Name="FB_init" Id="{f956be1b-85b3-48f2-beba-5361384ead49}">
@@ -82,7 +82,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 69.0;
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
 _Limits.PanelFrontLength.MaxVal := 2400.0;
 
 _Limits.PanelFrontWidth.MinVal  := 100.0;
@@ -104,21 +104,21 @@ _Limits.GrooveDepthZ.MinVal := 0.0;
 _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_RecipeBuilderRectangle">
+    <LineIds Name="FB_NCIBuilderCircle">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderRectangle.Build">
+    <LineIds Name="FB_NCIBuilderCircle.Build">
       <LineId Id="802" Count="1" />
       <LineId Id="1055" Count="10" />
       <LineId Id="1114" Count="19" />
       <LineId Id="1086" Count="11" />
       <LineId Id="11" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderRectangle.CalculateFootprint">
+    <LineIds Name="FB_NCIBuilderCircle.CalculateFootprint">
       <LineId Id="7" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderRectangle.FB_init">
+    <LineIds Name="FB_NCIBuilderCircle.FB_init">
       <LineId Id="31" Count="15" />
       <LineId Id="28" Count="0" />
       <LineId Id="53" Count="1" />

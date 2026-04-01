@@ -55,7 +55,7 @@
     <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderArona.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderRectangle.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_NCIBuilderCircle.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderBorgoFlaps.TcPOU">
@@ -220,7 +220,7 @@
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
-    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionRectangle.TcVIS">
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionNCICircle.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
