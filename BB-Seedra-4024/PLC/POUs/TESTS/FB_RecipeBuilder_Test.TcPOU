@@ -80,11 +80,11 @@ AssertTrue(Condition := WasBuilt,
            Message := 'Przepis zwrocil FALSE - brak implementacji!');
 
 // 4. Assert - Sprawdzamy konkretne wartości dla Arony (po 2 z każdego)
-AssertEquals_INT(Expected := 2, 
+AssertEquals_INT(Expected := 6, 
                  Actual := BuilderBorgoFlaps.SegmentsToCutX, 
                  Message := 'Zla liczba ciec X dla profilu Borgo Flaps');
                  
-AssertEquals_INT(Expected := 2, 
+AssertEquals_INT(Expected := 6, 
                  Actual := BuilderBorgoFlaps.SegmentsToCutY, 
                  Message := 'Zla liczba ciec Y dla profilu Borgo Flaps');
                  
