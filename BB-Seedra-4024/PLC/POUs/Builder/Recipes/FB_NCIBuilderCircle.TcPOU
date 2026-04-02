@@ -41,56 +41,53 @@ CASE nBuildStep OF
             Build := FALSE;
             RETURN;
         END_IF
+// 2. Obliczenia geometryczne
+        Diameter := _Config.Diameter;
+        Radius   := Diameter / 2.0; 
         
-        // 2. Obliczenia geometryczne
-        Diameter := _Config.PanelFrontLength;
-        Radius   := Diameter / 2.0;
-        
+        // --- DEKLARUJEMY OPTYMALNY START PTP W CENTRUM KÓŁKA ---
+        _Config.NciStartX := Radius;
+        _Config.NciStartY := Radius;
+        // -------------------------------------------------------
+
         // Zabezpieczenie przed brakiem wstrzykniętego ConfigProvidera
         IF _ConfigProvider <> 0 THEN
-            // Zjeżdżamy w dół o prześwit + zadaną głębokość
             PlungeDist := machineConfig.SafeClearanceZ + _Config.GrooveDepthZ;
         ELSE
-            PlungeDist := _Config.GrooveDepthZ; // Wartość awaryjna
+            PlungeDist := _Config.GrooveDepthZ;
         END_IF
 
-        // 3. Konwersja na stringi dla szybkiego klejenia (CONCAT)
-        sDiameter := REAL_TO_STRING(Diameter);
-        sDiamNeg  := REAL_TO_STRING(-Diameter);
+        // 3. Konwersja na stringi 
         sRadius   := REAL_TO_STRING(Radius);
         sRadNeg   := REAL_TO_STRING(-Radius);
         sPlunge   := REAL_TO_STRING(-PlungeDist);
         sRetract  := REAL_TO_STRING(PlungeDist);
 
         // ==========================================================
-        // TWORZENIE PLIKU NCI
+        // TWORZENIE PLIKU NCI (Ścieżka od środka do środka)
         // ==========================================================
         
-        _aGCodeBuffer[1] := 'G91$N'; // TRYB INKREMENTALNY (Relatywny)
+        _aGCodeBuffer[1] := 'G91$N'; // TRYB INKREMENTALNY
         
-        // Dojazd XY z lewego-dolnego rogu detalu (pozycja PTP) do prawej krawędzi kółka
-        _aGCodeBuffer[2] := CONCAT('G01 X', sDiameter);
-        _aGCodeBuffer[2] := CONCAT(_aGCodeBuffer[2], ' Y');
-        _aGCodeBuffer[2] := CONCAT(_aGCodeBuffer[2], sRadius);
-        _aGCodeBuffer[2] := CONCAT(_aGCodeBuffer[2], ' F2000$N');
+        // 1. Wyjazd ze środka do prawej krawędzi kółka (tylko w osi X)
+        _aGCodeBuffer[2] := CONCAT('G01 X', sRadius);
+        _aGCodeBuffer[2] := CONCAT(_aGCodeBuffer[2], ' Y0.0 F2000$N');
         
-        // Wejście frezem w materiał (Oś Z w dół)
+        // 2. Wjazd frezem w materiał (Oś Z w dół)
         _aGCodeBuffer[3] := CONCAT('G01 Z', sPlunge);
         _aGCodeBuffer[3] := CONCAT(_aGCodeBuffer[3], ' F500$N');
         
-        // Pełen okrąg 360 stopni wokół środka (Wartość I to dystans w osi X do środka kółka)
+        // 3. Pełen okrąg 360 stopni wokół środka
         _aGCodeBuffer[4] := CONCAT('G02 I', sRadNeg);
         _aGCodeBuffer[4] := CONCAT(_aGCodeBuffer[4], ' J0.0 F1000$N');
         
-        // Wycofanie freza nad materiał
+        // 4. Wycofanie freza nad materiał
         _aGCodeBuffer[5] := CONCAT('G01 Z', sRetract);
         _aGCodeBuffer[5] := CONCAT(_aGCodeBuffer[5], ' F2000$N');
         
-        // Powrót do punktu startowego detalu (0,0 wymiaru detalu)
-        _aGCodeBuffer[6] := CONCAT('G01 X', sDiamNeg);
-        _aGCodeBuffer[6] := CONCAT(_aGCodeBuffer[6], ' Y');
-        _aGCodeBuffer[6] := CONCAT(_aGCodeBuffer[6], sRadNeg);
-        _aGCodeBuffer[6] := CONCAT(_aGCodeBuffer[6], ' F2000$N');
+        // 5. Powrót do centrum kółka!
+        _aGCodeBuffer[6] := CONCAT('G01 X', sRadNeg);
+        _aGCodeBuffer[6] := CONCAT(_aGCodeBuffer[6], ' Y0.0 F2000$N');
         
         _aGCodeBuffer[7] := 'G90$N'; // Powrót do trybu absolutnego dla PTP
         _aGCodeBuffer[8] := 'M30$N'; // Koniec programu
@@ -124,8 +121,8 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_NominalX := _Config.PanelFrontLength;
-_NominalY := _Config.PanelFrontLength;]]></ST>
+        <ST><![CDATA[_NominalX := _Config.Diameter;
+_NominalY := _Config.Diameter;]]></ST>
       </Implementation>
     </Method>
     <Method Name="FB_init" Id="{f956be1b-85b3-48f2-beba-5361384ead49}">
@@ -155,18 +152,23 @@ _Limits.GroovingOverpass.MinVal := 0.0;
 _Limits.GroovingOverpass.MaxVal := 50.0;
 
 _Limits.GrooveDepthZ.MinVal := 0.0;
-_Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
+_Limits.GrooveDepthZ.MaxVal := 9.0; 
+
+_Limits.Diameter.MinVal := 10;
+_Limits.Diameter.MaxVal := 600;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_NCIBuilderCircle">
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIBuilderCircle.Build">
-      <LineId Id="1344" Count="86" />
+      <LineId Id="1344" Count="12" />
+      <LineId Id="1450" Count="50" />
+      <LineId Id="1411" Count="19" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIBuilderCircle.CalculateFootprint">
-      <LineId Id="11" Count="0" />
+      <LineId Id="15" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIBuilderCircle.FB_init">
@@ -174,6 +176,9 @@ _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       <LineId Id="28" Count="0" />
       <LineId Id="53" Count="1" />
       <LineId Id="52" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="63" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

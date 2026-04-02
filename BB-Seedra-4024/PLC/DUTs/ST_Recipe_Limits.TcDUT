@@ -3,15 +3,17 @@
   <DUT Name="ST_Recipe_Limits" Id="{e9557e3a-2e2c-44a7-9c23-7c9c3970c6f4}">
     <Declaration><![CDATA[TYPE ST_Recipe_Limits :
 STRUCT
-    PanelFrontLength     : ST_LimitInfo;
-    PanelFrontWidth      : ST_LimitInfo;
-    PanelHeight          : ST_LimitInfo;
-    RailHeightCorrection : ST_LimitInfo;
-	CuttingOverpass 	 : ST_LimitInfo;
-	GroovingOverpass 	 : ST_LimitInfo;
-	RequestedCopiesX 	 : ST_LimitInfo;
-	RequestedCopiesY 	 : ST_LimitInfo;
-	GrooveDepthZ		 : ST_LimitInfo;
+    PanelFrontLength     	: ST_LimitInfo;
+    PanelFrontWidth      	: ST_LimitInfo;
+    PanelHeight          	: ST_LimitInfo;
+    RailHeightCorrection 	: ST_LimitInfo;
+	CuttingOverpass 	 	: ST_LimitInfo;
+	GroovingOverpass 	 	: ST_LimitInfo;
+	RequestedCopiesX 	 	: ST_LimitInfo;
+	RequestedCopiesY 	 	: ST_LimitInfo;
+	GrooveDepthZ		 	: ST_LimitInfo;
+	Radius					: ST_LimitInfo;
+	Diameter				: ST_LimitInfo;
 END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

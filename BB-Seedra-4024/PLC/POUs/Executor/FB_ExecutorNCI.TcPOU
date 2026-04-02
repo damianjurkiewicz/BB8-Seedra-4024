@@ -86,14 +86,15 @@ CASE nStep OF
     // ==========================================================
     // PĘTLA NESTINGU - START
     // ==========================================================
-    8: // 1. Dojazd PTP do "Lokalnego Zera" dla danej kopii
-        MoveToXY(0.0, 0.0, 0.0, 0.0);
+	8: // 1. Dojazd PTP do punktu startowego NCI dla danej kopii
+        // PTP automatycznie doda offsety nestingu do tego punktu!
+        MoveToXY(recipeConfig.NciStartX, recipeConfig.NciStartY, 0.0, 0.0);
         nStep := 9;
 
    	9: // Czekamy na dojazd osi XY
         IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error THEN
             nStep := 999;
-        ELSIF _AxisX.InPosition AND _AxisY.InPosition AND _AxisZ.InPosition THEN
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN
             
             machineConfig := _ConfigProvider.Config;
             
@@ -149,33 +150,37 @@ CASE nStep OF
         StepTimer(IN:=FALSE);
         nStep := 70;
 
-    70: // Czekamy chwilkę na rozruch stanu Itp
-        StepTimer(IN:=TRUE, PT:=T#100MS);
-        IF StepTimer.Q THEN
-            StepTimer(IN:=FALSE);
-            nStep := 80;
-        END_IF
-
-    80: // 5. Czekamy na koniec programu (M30)
+	70: // 4. Czekamy na koniec programu (M30)
         IF _NciChannel.ChannelError THEN 
             nStep := 999;
         ELSIF _NciChannel.IsReady THEN 
-            nStep := 90;
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Executor: Program NCI zakonczony (M30). Resetowanie kanalu...', '');
+            
+            // --- POPRAWKA: NAJPIERW CZYŚCIMY KANAŁ ---
+            _NciChannel.ResetChannel(); 
+            // -----------------------------------------
+            
+            nStep := 80;
         END_IF
 
-    90: // 6. Rozwiązanie grupy, uwalniamy osie z powrotem do trybu PTP
+	80: // 5. Rozwiązanie grupy, uwalniamy osie z powrotem do trybu PTP
         _NciChannel.Ungroup();
-        nStep := 100;
+        nStep := 90;
 
-    100: // Czekamy na rozpięcie
+    90: // Czekamy na potwierdzenie od NC (rozpięcie)
         IF NOT _NciChannel.IsGrouped THEN
-            nStep := 110;
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Executor: Osie uwolnione do trybu PTP. Przechodze do Nestingu.', '');
+            
+            // --- TUTAJ JEST KLUCZ! ---
+            nStep := 110; // Idziemy do logiki nestingu zamiast kończyć program!
+            // -------------------------
         END_IF
 
     // ==========================================================
     // MULTIPLEXOWANIE (PRZESKOK DO KOLEJNEJ KOPII)
     // ==========================================================
     110: 
+		 ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Zaczynam Nesting', '');
         iCurrentCopyX := iCurrentCopyX + 1;
         
         IF iCurrentCopyX > _RecipeBuilder.ActualCopiesX THEN
@@ -183,15 +188,15 @@ CASE nStep OF
             iCurrentCopyY := iCurrentCopyY + 1;
             
             IF iCurrentCopyY > _RecipeBuilder.ActualCopiesY THEN
-                // Zrobiono wszystkie kopie na płycie
+                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Zrobiono wszystkie kopie na płycie', '');
                 nStep := 1000;
             ELSE
-                // Nowy rząd (Y), wracamy do dojazdu PTP
+                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Nowy rząd (Y), wracamy do dojazdu PTP', '');
                 nStep := 8; 
             END_IF
         ELSE
-            // Kolejny detal w rzędzie (X), wracamy do dojazdu PTP
-            nStep := 8; 
+             	ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Kolejny detal w rzędzie (X), wracamy do dojazdu PTP', '');	
+            	nStep := 8; 
         END_IF
 
 
@@ -240,9 +245,18 @@ END_VAR
       <LineId Id="3" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorNCI.CyclicLogic">
-      <LineId Id="615" Count="44" />
+      <LineId Id="615" Count="40" />
+      <LineId Id="851" Count="1" />
+      <LineId Id="657" Count="2" />
       <LineId Id="776" Count="13" />
-      <LineId Id="668" Count="105" />
+      <LineId Id="668" Count="44" />
+      <LineId Id="813" Count="12" />
+      <LineId Id="838" Count="12" />
+      <LineId Id="736" Count="3" />
+      <LineId Id="836" Count="0" />
+      <LineId Id="740" Count="10" />
+      <LineId Id="835" Count="0" />
+      <LineId Id="752" Count="21" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorNCI.NciChannel.Get">
