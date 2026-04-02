@@ -117,12 +117,13 @@ CASE nStep OF
             nStep := 999;
         ELSIF _AxisZ.InPosition THEN
             // Wybor predkosci posuwu roboczego w zaleznosci od przejscia
+			// Wybor predkosci posuwu roboczego w zaleznosci od przejscia
             CASE iPass OF
-                1: _AxisX.Velocity := localConfig.GroovingSpeedX * v1; _AxisY.Velocity := localConfig.GroovingSpeedY * v1;
-                2: _AxisX.Velocity := localConfig.GroovingSpeedX * v2; _AxisY.Velocity := localConfig.GroovingSpeedY * v2;
-                3: _AxisX.Velocity := localConfig.GroovingSpeedX * v3; _AxisY.Velocity := localConfig.GroovingSpeedY * v3;
-                4: _AxisX.Velocity := localConfig.GroovingSpeedX * v4; _AxisY.Velocity := localConfig.GroovingSpeedY * v4;
-                5: _AxisX.Velocity := localConfig.GroovingSpeedX * v5; _AxisY.Velocity := localConfig.GroovingSpeedY * v5;
+                1: _AxisX.Velocity := localConfig.GroovingSpeedXY * v1; _AxisY.Velocity := localConfig.GroovingSpeedXY * v1;
+                2: _AxisX.Velocity := localConfig.GroovingSpeedXY * v2; _AxisY.Velocity := localConfig.GroovingSpeedXY * v2;
+                3: _AxisX.Velocity := localConfig.GroovingSpeedXY * v3; _AxisY.Velocity := localConfig.GroovingSpeedXY * v3;
+                4: _AxisX.Velocity := localConfig.GroovingSpeedXY * v4; _AxisY.Velocity := localConfig.GroovingSpeedXY * v4;
+                5: _AxisX.Velocity := localConfig.GroovingSpeedXY * v5; _AxisY.Velocity := localConfig.GroovingSpeedXY * v5;
             END_CASE;
             
             nStep := 50;
@@ -245,7 +246,9 @@ END_CASE]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorGrooveXY.CyclicLogic">
-      <LineId Id="771" Count="212" />
+      <LineId Id="771" Count="91" />
+      <LineId Id="1000" Count="6" />
+      <LineId Id="869" Count="114" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>

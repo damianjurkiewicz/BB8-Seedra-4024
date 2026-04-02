@@ -20,6 +20,10 @@ VAR
     sDiamNeg   : STRING;
     sPlunge    : STRING;
     sRetract   : STRING;
+	
+	sFeedXY    : STRING;
+    sFeedZ     : STRING;
+    sFeedRapid : STRING;
     
     i          : INT;
 END_VAR
@@ -41,7 +45,7 @@ CASE nBuildStep OF
             Build := FALSE;
             RETURN;
         END_IF
-// 2. Obliczenia geometryczne
+		// 2. Obliczenia geometryczne
         Diameter := _Config.Diameter;
         Radius   := Diameter / 2.0; 
         
@@ -50,11 +54,27 @@ CASE nBuildStep OF
         _Config.NciStartY := Radius;
         // -------------------------------------------------------
 
-        // Zabezpieczenie przed brakiem wstrzykniętego ConfigProvidera
-        IF _ConfigProvider <> 0 THEN
+		IF _ConfigProvider <> 0 THEN
+            
+            // 1. ZACIĄGAMY AKTUALNĄ KONFIGURACJĘ MASZYNY Z HMI!
+            machineConfig := _ConfigProvider.Config;
+            
+            // Zjeżdżamy w dół o prześwit + zadaną głębokość
             PlungeDist := machineConfig.SafeClearanceZ + _Config.GrooveDepthZ;
+            
+            // 2. TŁUMACZENIE PRĘDKOŚCI Z HMI NA G-CODE (mm/s -> mm/min)
+            // Używamy GroovingSpeed dla obróbki kółka, a RapidSpeed do dojazdów
+            sFeedXY    := REAL_TO_STRING(machineConfig.GroovingSpeedXY * 60.0);
+            sFeedZ     := REAL_TO_STRING(machineConfig.GroovingSpeedZ * 60.0);
+            sFeedRapid := REAL_TO_STRING(machineConfig.RapidSpeedX * 60.0);
+            
         ELSE
             PlungeDist := _Config.GrooveDepthZ;
+            
+            // Wartości awaryjne (fallback) jeśli referencja nie została wstrzyknięta
+            sFeedXY    := '1000';
+            sFeedZ     := '500';
+            sFeedRapid := '2000';
         END_IF
 
         // 3. Konwersja na stringi 
@@ -67,32 +87,41 @@ CASE nBuildStep OF
         // TWORZENIE PLIKU NCI (Ścieżka od środka do środka)
         // ==========================================================
         
+// ==========================================================
+        // TWORZENIE PLIKU NCI 
+        // ==========================================================
+        
         _aGCodeBuffer[1] := 'G91$N'; // TRYB INKREMENTALNY
         
         // 1. Wyjazd ze środka do prawej krawędzi kółka (tylko w osi X)
         _aGCodeBuffer[2] := CONCAT('G01 X', sRadius);
-        _aGCodeBuffer[2] := CONCAT(_aGCodeBuffer[2], ' Y0.0 F2000$N');
+        _aGCodeBuffer[2] := CONCAT(_aGCodeBuffer[2], ' Y0.0 F');
+        _aGCodeBuffer[2] := CONCAT(_aGCodeBuffer[2], sFeedRapid);
+        _aGCodeBuffer[2] := CONCAT(_aGCodeBuffer[2], '$N');
         
         // 2. Wjazd frezem w materiał (Oś Z w dół)
         _aGCodeBuffer[3] := CONCAT('G01 Z', sPlunge);
-        _aGCodeBuffer[3] := CONCAT(_aGCodeBuffer[3], ' F500$N');
+        _aGCodeBuffer[3] := CONCAT(_aGCodeBuffer[3], ' F');
+        _aGCodeBuffer[3] := CONCAT(_aGCodeBuffer[3], sFeedZ);
+        _aGCodeBuffer[3] := CONCAT(_aGCodeBuffer[3], '$N');
         
         // 3. Pełen okrąg 360 stopni wokół środka
         _aGCodeBuffer[4] := CONCAT('G02 I', sRadNeg);
-        _aGCodeBuffer[4] := CONCAT(_aGCodeBuffer[4], ' J0.0 F1000$N');
+        _aGCodeBuffer[4] := CONCAT(_aGCodeBuffer[4], ' J0.0 F');
+        _aGCodeBuffer[4] := CONCAT(_aGCodeBuffer[4], sFeedXY);
+        _aGCodeBuffer[4] := CONCAT(_aGCodeBuffer[4], '$N');
         
         // 4. Wycofanie freza nad materiał
         _aGCodeBuffer[5] := CONCAT('G01 Z', sRetract);
-        _aGCodeBuffer[5] := CONCAT(_aGCodeBuffer[5], ' F2000$N');
+        _aGCodeBuffer[5] := CONCAT(_aGCodeBuffer[5], ' F');
+        _aGCodeBuffer[5] := CONCAT(_aGCodeBuffer[5], sFeedRapid);
+        _aGCodeBuffer[5] := CONCAT(_aGCodeBuffer[5], '$N');
         
-        // 5. Powrót do centrum kółka!
-        _aGCodeBuffer[6] := CONCAT('G01 X', sRadNeg);
-        _aGCodeBuffer[6] := CONCAT(_aGCodeBuffer[6], ' Y0.0 F2000$N');
+        // Zakończenie
+        _aGCodeBuffer[6] := 'G90$N'; // Powrót do trybu absolutnego dla PTP
+        _aGCodeBuffer[7] := 'M30$N'; // Koniec programu
         
-        _aGCodeBuffer[7] := 'G90$N'; // Powrót do trybu absolutnego dla PTP
-        _aGCodeBuffer[8] := 'M30$N'; // Koniec programu
-        
-        _nLinesToWrite := 8;
+        _nLinesToWrite := 7;
         
         // Wyczyszczenie reszty bufora (zabezpieczenie przed pozostałościami z innych testów)
         FOR i := (_nLinesToWrite + 1) TO 20 DO
@@ -163,7 +192,11 @@ _Limits.Diameter.MaxVal := 600;]]></ST>
     </LineIds>
     <LineIds Name="FB_NCIBuilderCircle.Build">
       <LineId Id="1344" Count="12" />
-      <LineId Id="1450" Count="50" />
+      <LineId Id="1450" Count="8" />
+      <LineId Id="1505" Count="20" />
+      <LineId Id="1464" Count="11" />
+      <LineId Id="1526" Count="31" />
+      <LineId Id="1499" Count="1" />
       <LineId Id="1411" Count="19" />
       <LineId Id="11" Count="0" />
     </LineIds>

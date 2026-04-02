@@ -118,8 +118,8 @@ CASE nStep OF
     40: 
         IF _Cylinder.Extended THEN
             //Trace(Message := 'Step 40: Cylinder wysuniety. Ustawianie predkosci roboczej.');
-            _AxisX.Velocity := localConfig.CuttingSpeedX;
-            _AxisY.Velocity := localConfig.CuttingSpeedY;
+			_AxisX.Velocity := localConfig.CuttingSpeedXY;
+            _AxisY.Velocity := localConfig.CuttingSpeedXY;
             nStep := 50;
         ELSIF _Cylinder.Error THEN 
             //Trace(Message := 'Step 40: BLAD CYLINDRA (Wysuw)!');
@@ -218,7 +218,9 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCut.CyclicLogic">
-      <LineId Id="244" Count="163" />
+      <LineId Id="244" Count="76" />
+      <LineId Id="418" Count="0" />
+      <LineId Id="322" Count="85" />
       <LineId Id="4" Count="0" />
     </LineIds>
   </POU>

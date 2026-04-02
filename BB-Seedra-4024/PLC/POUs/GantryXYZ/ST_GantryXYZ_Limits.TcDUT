@@ -7,15 +7,13 @@ STRUCT
     CutterXOffsetY		: ST_LimitInfo;
     CutterYOffsetX		: ST_LimitInfo;
     CutterYOffsetY		: ST_LimitInfo;
-    CuttingSpeedX		: ST_LimitInfo;
-    CuttingSpeedY		: ST_LimitInfo;
+    CuttingSpeedXY		: ST_LimitInfo;
     CuttingIdleTime		: ST_LimitInfo;
-    GroovingSpeedX		: ST_LimitInfo;
-    GroovingSpeedY		: ST_LimitInfo;
+    GroovingSpeedXY		: ST_LimitInfo;
     GroovingSpeedZ		: ST_LimitInfo;
     GroovingIdleTime	: ST_LimitInfo;
     RapidSpeedX			: ST_LimitInfo;
-    RapidSpeedY			: ST_LimitInfo;
+	RapidSpeedY			: ST_LimitInfo;
     RapidSpeedZ			: ST_LimitInfo;
     GlobalOffsetX		: ST_LimitInfo;
 	GlobalOffsetY		: ST_LimitInfo;

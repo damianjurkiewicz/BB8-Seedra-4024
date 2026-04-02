@@ -169,7 +169,7 @@ CASE Step OF
         LocalTestRecipe.Config := RecipeConfig;
         LocalTestRecipe.Build(); 
         
-        TestConfig.CuttingSpeedX := 100;
+        TestConfig.CuttingSpeedXY := 100;
         TestConfig.RapidSpeedX := 100;
         TestConfig.CuttingIdleTime := 0.0;
         // Szybki test
@@ -232,11 +232,9 @@ CASE Step OF
         TestRecipe.Config := RecipeConfig;
         TestRecipe.Build(); 
 		
-		TestConfig.CuttingSpeedX := 10;    
-		TestConfig.GroovingSpeedX := 10;
+		TestConfig.CuttingSpeedXY := 10;    
+		TestConfig.GroovingSpeedXY := 10;
 		TestConfig.RapidSpeedX := 10;
-		TestConfig.CuttingSpeedY := 10;
-		TestConfig.GroovingSpeedY := 10;
 		TestConfig.RapidSpeedY := 10;
 	
         
@@ -307,11 +305,9 @@ CASE Step OF
         RecipeConfig.PanelFrontLength := 1000.0;
         TestRecipe.Config := RecipeConfig;
         TestRecipe.Build(); 
-		TestConfig.CuttingSpeedX := 10;
-		TestConfig.GroovingSpeedX := 10;
+		TestConfig.CuttingSpeedXY := 10;
+		TestConfig.GroovingSpeedXY := 10;
 		TestConfig.RapidSpeedX := 10;
-		TestConfig.CuttingSpeedY := 10;
-		TestConfig.GroovingSpeedY := 10;
 		TestConfig.RapidSpeedY := 10;
 	
 
@@ -426,7 +422,8 @@ TEST_FINISHED();]]></ST>
       <LineId Id="69" Count="1" />
       <LineId Id="13" Count="6" />
       <LineId Id="71" Count="0" />
-      <LineId Id="73" Count="5" />
+      <LineId Id="73" Count="2" />
+      <LineId Id="78" Count="0" />
       <LineId Id="72" Count="0" />
       <LineId Id="20" Count="6" />
       <LineId Id="85" Count="1" />
@@ -434,7 +431,8 @@ TEST_FINISHED();]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorCut_Test.Test_Sequence_ExecutesCutsCorrectly">
-      <LineId Id="84" Count="22" />
+      <LineId Id="84" Count="13" />
+      <LineId Id="100" Count="6" />
       <LineId Id="142" Count="1" />
       <LineId Id="108" Count="33" />
       <LineId Id="5" Count="0" />

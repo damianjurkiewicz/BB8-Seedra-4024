@@ -90,8 +90,7 @@ CASE Step OF
         TestRecipe.Config := RecipeConfig;
         TestRecipe.Build(); 
         
-        TestConfig.GroovingSpeedX := 10;
-        TestConfig.GroovingSpeedY := 10;
+        TestConfig.GroovingSpeedXY := 10;
         TestConfig.GroovingSpeedZ := 10;
         TestConfig.RapidSpeedX := 10;
         TestConfig.RapidSpeedY := 10;
@@ -173,7 +172,8 @@ TEST_FINISHED();]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorGrooveXY_Test.Test_Sequence_ExecutesGroovesCorrectly">
-      <LineId Id="3" Count="52" />
+      <LineId Id="3" Count="12" />
+      <LineId Id="17" Count="38" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorGrooveXY_Test.Test_ZeroSegments_FinishesImmediately">

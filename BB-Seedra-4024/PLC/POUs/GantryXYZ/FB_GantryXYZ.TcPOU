@@ -254,12 +254,10 @@ END_VAR
 GantryXYZ_HMI.Config.CutterXOffsetY   := LIMIT(_Limits.CutterXOffsetY.MinVal, Config.CutterXOffsetY, _Limits.CutterXOffsetY.MaxVal);
 GantryXYZ_HMI.Config.CutterYOffsetX   := LIMIT(_Limits.CutterYOffsetX.MinVal, Config.CutterYOffsetX, _Limits.CutterYOffsetX.MaxVal);
 GantryXYZ_HMI.Config.CutterYOffsetY   := LIMIT(_Limits.CutterYOffsetY.MinVal, Config.CutterYOffsetY, _Limits.CutterYOffsetY.MaxVal);
+GantryXYZ_HMI.Config.CuttingSpeedXY  := LIMIT(_Limits.CuttingSpeedXY.MinVal, Config.CuttingSpeedXY, _Limits.CuttingSpeedXY.MaxVal);
 
-GantryXYZ_HMI.Config.CuttingSpeedX    := LIMIT(_Limits.CuttingSpeedX.MinVal, Config.CuttingSpeedX, _Limits.CuttingSpeedX.MaxVal);
-GantryXYZ_HMI.Config.CuttingSpeedY    := LIMIT(_Limits.CuttingSpeedY.MinVal, Config.CuttingSpeedY, _Limits.CuttingSpeedY.MaxVal);
-
-GantryXYZ_HMI.Config.GroovingSpeedX   := LIMIT(_Limits.GroovingSpeedX.MinVal, Config.GroovingSpeedX, _Limits.GroovingSpeedX.MaxVal);
-GantryXYZ_HMI.Config.GroovingSpeedY   := LIMIT(_Limits.GroovingSpeedY.MinVal, Config.GroovingSpeedY, _Limits.GroovingSpeedY.MaxVal);
+GantryXYZ_HMI.Config.GroovingSpeedXY := LIMIT(_Limits.GroovingSpeedXY.MinVal, Config.GroovingSpeedXY, _Limits.GroovingSpeedXY.MaxVal);
+GantryXYZ_HMI.Config.GroovingSpeedZ  := LIMIT(_Limits.GroovingSpeedZ.MinVal, Config.GroovingSpeedZ, _Limits.GroovingSpeedZ.MaxVal);
 GantryXYZ_HMI.Config.GroovingSpeedZ   := LIMIT(_Limits.GroovingSpeedZ.MinVal, Config.GroovingSpeedZ, _Limits.GroovingSpeedZ.MaxVal);
 
 GantryXYZ_HMI.Config.RapidSpeedX      := LIMIT(_Limits.RapidSpeedX.MinVal, Config.RapidSpeedX, _Limits.RapidSpeedX.MaxVal);
@@ -489,11 +487,11 @@ END_VAR
 		_Limits.GlobalOffsetY.MinVal   := -500.0;   _Limits.GlobalOffsetY.MaxVal   := 500.0;
 		_Limits.GlobalOffsetZ.MinVal   := -5.0;   _Limits.GlobalOffsetZ.MaxVal   := 5.0;
 		
-		_Limits.CuttingSpeedX.MinVal  := 1.0;      _Limits.CuttingSpeedX.MaxVal  := 100.0;
-		_Limits.CuttingSpeedY.MinVal  := 1.0;      _Limits.CuttingSpeedY.MaxVal  := 100.0;
+		_Limits.CuttingSpeedXY.MinVal  := 1.0;      _Limits.CuttingSpeedXY.MaxVal  := 100.0;
+
 		
-		_Limits.GroovingSpeedX.MinVal := 1.0;      _Limits.GroovingSpeedX.MaxVal := 100.0;
-		_Limits.GroovingSpeedY.MinVal := 1.0;      _Limits.GroovingSpeedY.MaxVal := 100.0;
+		_Limits.GroovingSpeedXY.MinVal := 1.0;      _Limits.GroovingSpeedXY.MaxVal := 100.0;
+
 		_Limits.GroovingSpeedZ.MinVal := 1.0;      _Limits.GroovingSpeedZ.MaxVal := 100.0;
 		
 		_Limits.RapidSpeedX.MinVal    := 1.0;      _Limits.RapidSpeedX.MaxVal    := 200.0;
@@ -1009,7 +1007,11 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Config.Set">
       <LineId Id="45" Count="3" />
-      <LineId Id="52" Count="13" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="58" Count="7" />
       <LineId Id="76" Count="2" />
       <LineId Id="74" Count="1" />
       <LineId Id="72" Count="0" />
