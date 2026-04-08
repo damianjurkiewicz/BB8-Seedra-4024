@@ -3,7 +3,36 @@
   <POU Name="FB_ExecutorNCI" Id="{1b4d4fb6-455b-439c-98a5-4fd2ee249483}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorNCI EXTENDS FB_ExecutorBase
 VAR
+    // Zostawiamy, żeby FB_Machine się nie burzył
     _NciChannel : I_NciChannel;
+
+    // ========================================================
+    // --- ZMIENNE DO TESTU NOŻA STYCZNEGO (FEED TABLES) ---
+    // ========================================================
+    stNciToPlc AT %I* : NCTOPLC_NCICHANNEL_REF;
+    stPlcToNci AT %Q* : PLCTONC_NCICHANNEL_REF;
+
+    fbBuildExtGroup   : CfgBuildExt3DGroup;
+    fbUngroup         : CfgReconfigGroup;
+    
+    fbFeedTablePrep   : FB_NciFeedTablePreparation;
+    fbFeedTable       : FB_NciFeedTable;
+    stFeedGroupTable  : ST_NciFeedGroupTable;
+
+    stGeoStart        : ST_NciGeoStart;
+    stTangential      : ST_NciTangentialFollowingDesc;
+    stLine            : ST_NciGeoLine;
+    stArc             : ST_NciGeoCirclePlane;
+    stEndOfTables     : ST_NciEndOfTables;
+    
+    nFilledRows       : INT;
+    bPrepError        : BOOL;
+    nPrepErrorId      : UDINT;
+    
+    // Konfiguracja naszego testowego kształtu
+    TestSize          : LREAL := 100.0; // Bok kwadratu
+    CornerR           : LREAL := 20.0;  // Promień zaokrąglenia rogu
+    TestVelo          : LREAL := 1500.0;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -11,210 +40,195 @@ END_VAR]]></Declaration>
     <Method Name="Abort" Id="{892bab94-44de-43ce-b4a1-a34f01b2e250}">
       <Declaration><![CDATA[METHOD Abort]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// 1. Zatrzymujemy program NCI (jeśli jedzie)
-_NciChannel.Stop();
-
-// 2. Wymuszamy reset błędów na kanale interpolacyjnym
-_NciChannel.ResetChannel();
-
-// 3. Dopiero teraz bezpiecznie nakazujemy kanałowi rozpięcie grupy
-_NciChannel.Ungroup();
-
-// 4. Zerujemy resztę lokalnych zmiennych Executora
+        <ST><![CDATA[
+// Wymuszone rozpięcie na wypadek przerwania
+fbUngroup(bExecute := TRUE, nGroupId := 4);
 _bBusy := FALSE;
 _bDone := FALSE;
 _bError := FALSE;
 _uErrorID := 0;
 nStep := 0;
-iCurrentSegment := 1;
 StepTimer(IN := FALSE);]]></ST>
       </Implementation>
     </Method>
     <Method Name="CyclicLogic" Id="{60feeed8-57f4-4ce8-8845-e0e1d4967810}">
-      <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
-VAR_INST
-
-    refX : Tc2_MC2.AXIS_REF;
-    refY : Tc2_MC2.AXIS_REF;
-    refZ : Tc2_MC2.AXIS_REF;
-    
-	MaterialTopZ : REAL;
-    SafeZ        : REAL;
-
-    recipeConfig  : ST_RecipeBuilder_Config;
-    machineConfig : ST_GantryXYZ_Config;
-END_VAR]]></Declaration>
+      <Declaration><![CDATA[METHOD PUBLIC CyclicLogic]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// --- LOGIKA ---
-StepTimer();
+        <ST><![CDATA[
 
-// Zabezpieczenie przed brakiem wstrzykniętych referencji
-IF nStep > 0 THEN
-    IF _RecipeBuilder = 0 OR _ConfigProvider = 0 OR _NciChannel = 0 THEN
-        ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'ExecutorNCI: BRAK REFERENCJI (Builder/Provider/NCI)!', '');
-        nStep := 999;
-    END_IF
-END_IF
+StepTimer();
+// Override kanału na 100%
+stPlcToNci.ChnAxesOvr := 1000000;
+
+// Cykliczne odświeżanie bloków konfiguracyjnych
+fbBuildExtGroup(tTimeOut := T#2S);
+fbUngroup(tTimeOut := T#2S);
 
 CASE nStep OF
     0: // IDLE
-
-    5: // INIT - Załączanie osi i start pętli
+    
+5: // INIT - Zwykły dojazd PTP na początek (X=CornerR, Y=0)
         IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
-            IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error THEN
-                nStep := 999;
-            ELSIF _AxisX.Enabled AND _AxisY.Enabled AND _AxisZ.Enabled THEN
-                _bBusy := TRUE;
-                
-                // Odczyt właściwości (Properties) do lokalnych zmiennych pomocniczych!
-                machineConfig := _ConfigProvider.Config;
-                recipeConfig  := _RecipeBuilder.Config;
-                
-                // Upewniamy się, że startujemy od pierwszej kopii
-                iCurrentCopyX := 1;
-                iCurrentCopyY := 1;
-                
-                // Bezpieczne użycie zmiennych lokalnych
-                _AxisX.Velocity := machineConfig.RapidSpeedX;
-                _AxisY.Velocity := machineConfig.RapidSpeedY;
-                _AxisZ.Velocity := machineConfig.RapidSpeedZ;
-                
-                nStep := 8;
-            END_IF
-        END_IF
-
-    // ==========================================================
-    // PĘTLA NESTINGU - START
-    // ==========================================================
-	8: // 1. Dojazd PTP do punktu startowego NCI dla danej kopii
-        // PTP automatycznie doda offsety nestingu do tego punktu!
-        MoveToXY(recipeConfig.NciStartX, recipeConfig.NciStartY, 0.0, 0.0);
-        nStep := 9;
-
-   	9: // Czekamy na dojazd osi XY
-        IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error THEN
-            nStep := 999;
-        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN
-            
-            machineConfig := _ConfigProvider.Config;
-            
-            // OBLICZAMY ABSOLUTNĄ POZYCJĘ GÓRY MATERIAŁU I BEZPIECZNĄ WYSOKOŚĆ
-            MaterialTopZ := machineConfig.GlobalOffsetZ + machineConfig.RawBoardZ;
-            SafeZ := MaterialTopZ + machineConfig.SafeClearanceZ;
-            
-            // Podnosimy / Ustawiamy Z na bezpieczną pozycję absolutną
-            _AxisZ.MoveAbsolute(SafeZ, 0);
+            MoveToXY(TargetX := LREAL_TO_REAL(CornerR), TargetY := 0.0, ToolOffsetX := 0.0, ToolOffsetY := 0.0);
             nStep := 10;
         END_IF
-        
-    10: // Czekamy aż podniesie się Z
-        IF _AxisZ.Error THEN
-            nStep := 999;
-        ELSIF _AxisZ.InPosition THEN
+
+    10: // Czekamy na dojazd PTP
+        IF _AxisX.InPosition AND _AxisY.InPosition THEN
             nStep := 20;
         END_IF
 
-    20: // 2. Zbudowanie grupy NCI z osi PTP w obecnej pozycji
-        refX := _AxisX.Axis;
-        refY := _AxisY.Axis;
-        refZ := _AxisZ.Axis;
-        
-        _NciChannel.BuildGroup(
-            nXAxisId := refX.NcToPlc.AxisId, 
-            nYAxisId := refY.NcToPlc.AxisId, 
-            nZAxisId := refZ.NcToPlc.AxisId
+    20: // ZBUDOWANIE GRUPY - Oś Z staje się nożem (Q1)
+        fbBuildExtGroup(
+            bExecute  := TRUE,
+            nGroupId  := 4, // <--- UPEWNIJ SIĘ ŻE TO JEST ID TWOJEGO KANAŁU NCI Z SYSTEM MANAGERA!
+            nXAxisId  := _AxisX.Axis.NcToPlc.AxisId,
+            nYAxisId  := _AxisY.Axis.NcToPlc.AxisId,
+            nZAxisId  := 0, 
+            nQ1AxisId := _AxisZ.Axis.NcToPlc.AxisId, // To podpina Twoje zdemontowane Z jako Q1
+            nQ2AxisId := 0, nQ3AxisId := 0, nQ4AxisId := 0, nQ5AxisId := 0
         );
-        nStep := 30;
+        nStep := 25;
 
-    30: // Czekamy na spięcie osi
-        IF _NciChannel.ChannelError THEN 
+    25:
+        fbBuildExtGroup(bExecute := FALSE);
+        IF NOT fbBuildExtGroup.bBusy AND NOT fbBuildExtGroup.bErr THEN
+            nStep := 30;
+        ELSIF fbBuildExtGroup.bErr THEN
+            _bError := TRUE;
+            _uErrorID := fbBuildExtGroup.nErrId;
             nStep := 999;
-        ELSIF _NciChannel.IsGrouped THEN 
+        END_IF
+
+    30: // ===================================================================
+        // WYPEŁNIANIE TABELI (ZAOKRĄGLONY KWADRAT)
+        // ===================================================================
+        
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeNone, pEntry := 0, bResetAll := TRUE, stFeedGroupTable := stFeedGroupTable);
+        
+        // 1. START
+        stGeoStart.fPosX  := CornerR; 
+        stGeoStart.fPosY  := 0.0;
+        stGeoStart.fPosZ  := 0.0;
+        stGeoStart.fPosQ1 := 0.0; // Nóż patrzy w kierunku +X na starcie
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeGeoStart, pEntry := ADR(stGeoStart), bResetTable := FALSE, stFeedGroupTable := stFeedGroupTable, bError => bPrepError, nErrorId => nPrepErrorId);
+        
+        // 2. TANGENTIAL ON (Włączenie śledzenia przez Kernel)
+        stTangential.bTangOn         := TRUE;
+        stTangential.nTangAxis       := E_NciAxesInGroup.Q1Axis;
+        stTangential.nPathAxis1      := E_NciAxesInGroup.XAxis;
+        stTangential.nPathAxis2      := E_NciAxesInGroup.YAxis;
+        stTangential.fCriticalAngle1 := 45.0; 
+        stTangential.nTfBehavior     := E_TangentialFollowingBehavior.E_TfErrorOnCritical1;
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeTfDesc, pEntry := ADR(stTangential), bResetTable := FALSE, stFeedGroupTable := stFeedGroupTable, bError => bPrepError, nErrorId => nPrepErrorId);
+        
+        stLine.fVelo := TestVelo;
+        stArc.fVelo  := TestVelo;
+
+        // Seg 1: Dolna linia
+        stLine.fEndPosX := TestSize - CornerR;
+        stLine.fEndPosY := 0.0;
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeGeoLine, pEntry := ADR(stLine), bResetTable:=FALSE, stFeedGroupTable := stFeedGroupTable);
+        
+        // Seg 2: Łuk prawy-dół
+        stArc.fEndPosX := TestSize;
+        stArc.fEndPosY := CornerR;
+        stArc.fCenterX := TestSize - CornerR;
+        stArc.fCenterY := CornerR;
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeGeoCirclePlane, pEntry := ADR(stArc), bResetTable:=FALSE, stFeedGroupTable := stFeedGroupTable);
+        
+        // Seg 3: Prawa linia
+        stLine.fEndPosX := TestSize;
+        stLine.fEndPosY := TestSize - CornerR;
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeGeoLine, pEntry := ADR(stLine), bResetTable:=FALSE, stFeedGroupTable := stFeedGroupTable);
+
+        // Seg 4: Łuk prawy-góra
+        stArc.fEndPosX := TestSize - CornerR;
+        stArc.fEndPosY := TestSize;
+        stArc.fCenterX := TestSize - CornerR;
+        stArc.fCenterY := TestSize - CornerR;
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeGeoCirclePlane, pEntry := ADR(stArc), bResetTable:=FALSE, stFeedGroupTable := stFeedGroupTable);
+
+        // Seg 5: Górna linia
+        stLine.fEndPosX := CornerR;
+        stLine.fEndPosY := TestSize;
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeGeoLine, pEntry := ADR(stLine), bResetTable:=FALSE, stFeedGroupTable := stFeedGroupTable);
+
+        // Seg 6: Łuk lewy-góra
+        stArc.fEndPosX := 0.0;
+        stArc.fEndPosY := TestSize - CornerR;
+        stArc.fCenterX := CornerR;
+        stArc.fCenterY := TestSize - CornerR;
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeGeoCirclePlane, pEntry := ADR(stArc), bResetTable:=FALSE, stFeedGroupTable := stFeedGroupTable);
+
+        // Seg 7: Lewa linia
+        stLine.fEndPosX := 0.0;
+        stLine.fEndPosY := CornerR;
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeGeoLine, pEntry := ADR(stLine), bResetTable:=FALSE, stFeedGroupTable := stFeedGroupTable);
+
+        // Seg 8: Łuk lewy-dół (powrót do startu)
+        stArc.fEndPosX := CornerR;
+        stArc.fEndPosY := 0.0;
+        stArc.fCenterX := CornerR;
+        stArc.fCenterY := CornerR;
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeGeoCirclePlane, pEntry := ADR(stArc), bResetTable:=FALSE, stFeedGroupTable := stFeedGroupTable);
+
+        // 3. TANGENTIAL OFF
+        stTangential.bTangOn := FALSE;
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeTfDesc, pEntry := ADR(stTangential), bResetTable:=FALSE, stFeedGroupTable := stFeedGroupTable);
+
+        // 4. END OF TABLES
+        fbFeedTablePrep(nEntryType := E_NciEntryTypeEndOfTables, pEntry := ADR(stEndOfTables), bResetTable:=FALSE, stFeedGroupTable := stFeedGroupTable, bError => bPrepError, nErrorId => nPrepErrorId);
+
+        IF bPrepError THEN
+            _bError := TRUE;
+            _uErrorID := nPrepErrorId;
+            nStep := 999;
+        ELSE
             nStep := 40; 
         END_IF
 
-    40: // 3. Załadowanie pliku G-Code
-        recipeConfig := _RecipeBuilder.Config;
-        _NciChannel.LoadProgram(recipeConfig.GCodePath);
+    40: // WYSŁANIE DO KANAŁU NCI
+        fbFeedTable(
+            bExecute         := TRUE,
+            stFeedGroupTable := stFeedGroupTable,
+            stNciToPlc       := stNciToPlc     // <--- ZMIANA z sNciToPlc na stNciToPlc
+        );
         nStep := 50;
 
-    50: // Czekamy na załadowanie do bufora
-        IF _NciChannel.ChannelError THEN 
-            nStep := 999;
-        ELSIF _NciChannel.IsProgramLoaded THEN 
-            nStep := 60;
-        END_IF
-
-    60: // 4. START programu CNC!
-        _NciChannel.Start();
-        StepTimer(IN:=FALSE);
-        nStep := 70;
-
-	70: // 4. Czekamy na koniec programu (M30)
-        IF _NciChannel.ChannelError THEN 
-            nStep := 999;
-        ELSIF _NciChannel.IsReady THEN 
-            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Executor: Program NCI zakonczony (M30). Resetowanie kanalu...', '');
-            
-            // --- POPRAWKA: NAJPIERW CZYŚCIMY KANAŁ ---
-            _NciChannel.ResetChannel(); 
-            // -----------------------------------------
-            
-            nStep := 80;
-        END_IF
-
-	80: // 5. Rozwiązanie grupy, uwalniamy osie z powrotem do trybu PTP
-        _NciChannel.Ungroup();
-        nStep := 90;
-
-    90: // Czekamy na potwierdzenie od NC (rozpięcie)
-        IF NOT _NciChannel.IsGrouped THEN
-            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Executor: Osie uwolnione do trybu PTP. Przechodze do Nestingu.', '');
-            
-            // --- TUTAJ JEST KLUCZ! ---
-            nStep := 110; // Idziemy do logiki nestingu zamiast kończyć program!
-            // -------------------------
-        END_IF
-
-    // ==========================================================
-    // MULTIPLEXOWANIE (PRZESKOK DO KOLEJNEJ KOPII)
-    // ==========================================================
-    110: 
-		 ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Zaczynam Nesting', '');
-        iCurrentCopyX := iCurrentCopyX + 1;
+    50: // OCZEKIWANIE NA KONIEC
+        fbFeedTable(
+            bExecute         := FALSE, 
+            stFeedGroupTable := stFeedGroupTable, 
+            stNciToPlc       := stNciToPlc     // <--- ZMIANA z sNciToPlc na stNciToPlc
+        );
         
-        IF iCurrentCopyX > _RecipeBuilder.ActualCopiesX THEN
-            iCurrentCopyX := 1;
-            iCurrentCopyY := iCurrentCopyY + 1;
-            
-            IF iCurrentCopyY > _RecipeBuilder.ActualCopiesY THEN
-                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Zrobiono wszystkie kopie na płycie', '');
-                nStep := 1000;
-            ELSE
-                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Nowy rząd (Y), wracamy do dojazdu PTP', '');
-                nStep := 8; 
-            END_IF
-        ELSE
-             	ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Kolejny detal w rzędzie (X), wracamy do dojazdu PTP', '');	
-            	nStep := 8; 
+        IF fbFeedTable.bChannelDone THEN
+            nStep := 60; 
+        ELSIF fbFeedTable.bError THEN
+            _bError := TRUE;
+            _uErrorID := fbFeedTable.nErrorId;
+            nStep := 999;
         END_IF
 
+    60: // ROZPIĘCIE GRUPY
+        fbUngroup(bExecute := TRUE, nGroupId := 4); 
+        nStep := 65;
 
-    999: // ERROR HANDLING
+    65:
+        fbUngroup(bExecute := FALSE);
+        IF NOT fbUngroup.bBusy THEN
+            _bDone := TRUE;
+            _bBusy := FALSE;
+            nStep := 1000;
+        END_IF
+
+    999: // Błąd
+        fbUngroup(bExecute := TRUE, nGroupId := 4);
         _bBusy := FALSE;
-        _bError := TRUE;
-        _bDone := FALSE;
-        _uErrorID := _NciChannel.ChannelErrorId;
-        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'Executor: BLAD KRYTYCZNY NCI! Kod bledu: %d', UDINT_TO_DINT(_uErrorID));
-        _NciChannel.Ungroup();
-        nStep := 0;
-
-    1000: // ZAKOŃCZONO SUKCESEM
-        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecutorNCI: Wszystkie kopie wykonane pomyslnie.', '');
-        _bBusy := FALSE;
-        _bDone := TRUE;
-        nStep := 0;
-
+        
+    1000: // Koniec
+        ;
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -241,22 +255,15 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorNCI.Abort">
-      <LineId Id="13" Count="15" />
+      <LineId Id="29" Count="7" />
       <LineId Id="3" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorNCI.CyclicLogic">
-      <LineId Id="615" Count="40" />
-      <LineId Id="851" Count="1" />
-      <LineId Id="657" Count="2" />
-      <LineId Id="776" Count="13" />
-      <LineId Id="668" Count="44" />
-      <LineId Id="813" Count="12" />
-      <LineId Id="838" Count="12" />
-      <LineId Id="736" Count="3" />
-      <LineId Id="836" Count="0" />
-      <LineId Id="740" Count="10" />
-      <LineId Id="835" Count="0" />
-      <LineId Id="752" Count="21" />
+      <LineId Id="865" Count="12" />
+      <LineId Id="1036" Count="3" />
+      <LineId Id="882" Count="116" />
+      <LineId Id="1040" Count="20" />
+      <LineId Id="1016" Count="19" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorNCI.NciChannel.Get">
