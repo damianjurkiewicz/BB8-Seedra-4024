@@ -8,6 +8,7 @@ VAR
     BuilderArona : FB_RecipeBuilderArona;
 	BuilderCircle : FB_NCIBuilderCircle;
 	BuilderRectangle : FB_RecipeBuilderRectangle;
+	BuilderTangentialCircle : FB_NCITangentialCircle;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -32,8 +33,10 @@ END_VAR]]></Declaration>
         GetBuilder := BuilderCircle;
 		
 	E_RecipeID.eRectangle:                            
-        GetBuilder := BuilderRectangle;              
-        
+        GetBuilder := BuilderRectangle;
+    
+	E_RecipeID.eTangentialCircle:                            
+        GetBuilder := BuilderTangentialCircle; 
 ELSE
     GetBuilder := 0; 
 END_CASE]]></ST>
@@ -55,7 +58,9 @@ BuilderArona.ConfigProvider := ConfigProvider;
 BuilderCircle.Config := Config;
 BuilderCircle.ConfigProvider := ConfigProvider;
 BuilderRectangle.Config := Config;                    
-BuilderRectangle.ConfigProvider := ConfigProvider;    ]]></ST>
+BuilderRectangle.ConfigProvider := ConfigProvider;    
+BuilderTangentialCircle.Config := Config;                 
+BuilderTangentialCircle.ConfigProvider := ConfigProvider; ]]></ST>
       </Implementation>
     </Method>
     <Method Name="UpdateConfig" Id="{addb126c-7b31-4fe1-bab5-a92c30ad08f7}">
@@ -69,7 +74,9 @@ BuilderWings.Config := Config;
 BuilderFlaps.Config := Config;
 BuilderArona.Config := Config;
 BuilderCircle.Config := Config;
-BuilderRectangle.Config := Config;                    ]]></ST>
+BuilderRectangle.Config := Config;       
+BuilderRectangle.Config := Config;
+BuilderTangentialCircle.Config := Config;              ]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeFactory">
@@ -80,7 +87,10 @@ BuilderRectangle.Config := Config;                    ]]></ST>
       <LineId Id="46" Count="0" />
       <LineId Id="49" Count="0" />
       <LineId Id="48" Count="0" />
-      <LineId Id="43" Count="2" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="44" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.InitializeFactory">
@@ -88,12 +98,16 @@ BuilderRectangle.Config := Config;                    ]]></ST>
       <LineId Id="14" Count="0" />
       <LineId Id="31" Count="0" />
       <LineId Id="30" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="36" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.UpdateConfig">
       <LineId Id="6" Count="2" />
       <LineId Id="5" Count="0" />
       <LineId Id="12" Count="0" />
       <LineId Id="16" Count="0" />
+      <LineId Id="21" Count="0" />
+      <LineId Id="20" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

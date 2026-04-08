@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_NCITangentialCircle" Id="{5a4b479e-c99f-4849-978a-ea032cf5210f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NCITangentialCircle EXTENDS FB_RecipeBase
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{7f9f21ac-4247-44b5-bcc1-c2317909300e}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+VAR
+    Radius     : REAL;
+    Diameter   : REAL;
+    
+    sRadius    : STRING;
+    sRadNeg    : STRING;
+	
+    sFeedXY    : STRING;
+    sFeedRapid : STRING;
+    
+    i          : INT;
+END_VAR
+VAR_INST
+    nBuildStep : INT;
+    machineConfig : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Build := FALSE;
+
+CASE nBuildStep OF
+    0:
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Rozpoczynam budowanie czystego G-Code (tylko XY) dla kółka', '');
+
+        // 1. Zlecenie przeliczenia limitów klasie bazowej
+        THIS^.UpdateNestingLimits();
+        IF NOT _Config.IsValid THEN
+            Build := FALSE;
+            RETURN;
+        END_IF
+        
+        // 2. Obliczenia geometryczne
+        Diameter := _Config.Diameter;
+        Radius   := Diameter / 2.0; 
+        
+        // --- DEKLARUJEMY OPTYMALNY START PTP W CENTRUM KÓŁKA ---
+        _Config.NciStartX := Radius;
+        _Config.NciStartY := Radius;
+        // -------------------------------------------------------
+
+        IF _ConfigProvider <> 0 THEN
+            // 1. ZACIĄGAMY AKTUALNĄ KONFIGURACJĘ MASZYNY
+            machineConfig := _ConfigProvider.Config;
+            
+            // 2. TŁUMACZENIE PRĘDKOŚCI NA G-CODE (mm/s -> mm/min)
+            sFeedXY    := REAL_TO_STRING(machineConfig.GroovingSpeedXY * 60.0);
+            sFeedRapid := REAL_TO_STRING(machineConfig.RapidSpeedX * 60.0);
+        ELSE
+            // Wartości awaryjne
+            sFeedXY    := '1000';
+            sFeedRapid := '2000';
+        END_IF
+
+        // 3. Konwersja na stringi 
+        sRadius   := REAL_TO_STRING(Radius);
+        sRadNeg   := REAL_TO_STRING(-Radius);
+
+        // ==========================================================
+        // TWORZENIE PLIKU NCI (CZYSTE X i Y)
+        // ==========================================================
+        
+        _aGCodeBuffer[1] := 'G91$N'; // TRYB INKREMENTALNY
+        
+        // 1. Wyjazd ze środka do prawej krawędzi kółka (tylko w osi X)
+        _aGCodeBuffer[2] := CONCAT('G01 X', sRadius);
+        _aGCodeBuffer[2] := CONCAT(_aGCodeBuffer[2], ' Y0.0 F');
+        _aGCodeBuffer[2] := CONCAT(_aGCodeBuffer[2], sFeedRapid);
+        _aGCodeBuffer[2] := CONCAT(_aGCodeBuffer[2], '$N');
+        
+        // 2. Pełen okrąg 360 stopni wokół środka (Interpolacja kołowa w płaszczyźnie XY)
+        _aGCodeBuffer[3] := CONCAT('G02 I', sRadNeg);
+        _aGCodeBuffer[3] := CONCAT(_aGCodeBuffer[3], ' J0.0 F');
+        _aGCodeBuffer[3] := CONCAT(_aGCodeBuffer[3], sFeedXY);
+        _aGCodeBuffer[3] := CONCAT(_aGCodeBuffer[3], '$N');
+        
+        // 3. Zakończenie
+        _aGCodeBuffer[4] := 'G90$N'; // Powrót do trybu absolutnego dla PTP
+        _aGCodeBuffer[5] := 'M30$N'; // Koniec programu
+        
+        _nLinesToWrite := 5;
+
+        // Wyczyszczenie reszty bufora
+        FOR i := (_nLinesToWrite + 1) TO 20 DO
+            _aGCodeBuffer[i] := '';
+        END_FOR
+        
+        nBuildStep := 10;
+
+    10:
+        // Zapis do pliku
+        IF THIS^.WriteGCodeFile('TangentialCircle.nc') THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Zapisano plik TangentialCircle.nc', '');
+            nBuildStep := 1000;
+        END_IF
+
+    1000:
+        nBuildStep := 0;
+        Build := TRUE; 
+        
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CalculateFootprint" Id="{a928b038-84dd-4c30-b6eb-0b0100fb197e}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_NominalX := _Config.Diameter;
+_NominalY := _Config.Diameter;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="FB_init" Id="{e608d1fa-2d06-43fe-b4a5-98596f2c3124}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
+_Limits.PanelFrontLength.MaxVal := 2400.0;
+
+_Limits.PanelFrontWidth.MinVal  := 100.0;
+_Limits.PanelFrontWidth.MaxVal  := 1200.0;
+
+_Limits.PanelHeight.MinVal      := 0.0;
+_Limits.PanelHeight.MaxVal      := 0.0;
+
+_Limits.RailHeightCorrection.MinVal := 0.0;
+_Limits.RailHeightCorrection.MaxVal := 0.0;
+
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.GrooveDepthZ.MinVal := 0.0;
+_Limits.GrooveDepthZ.MaxVal := 0.0; 
+
+_Limits.Diameter.MinVal := 10;
+_Limits.Diameter.MaxVal := 600;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_NCITangentialCircle">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NCITangentialCircle.Build">
+      <LineId Id="1599" Count="80" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NCITangentialCircle.CalculateFootprint">
+      <LineId Id="15" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NCITangentialCircle.FB_init">
+      <LineId Id="31" Count="15" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="53" Count="1" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="63" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

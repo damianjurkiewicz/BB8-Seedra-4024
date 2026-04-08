@@ -2444,7 +2444,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{ABD16A1A-21CE-74E3-62B4-02F942BB8300}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{E1CC72D6-A94F-907E-C8F5-68567A43C369}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2510,10 +2510,6 @@ External Setpoint Generation:
 					<Vars VarGrpType="2" AreaNo="1">
 						<Name>PlcTask Outputs</Name>
 						<Var>
-							<Name>GVL_Safety.RunStop</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
@@ -2535,6 +2531,10 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Valve</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.RunStop</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
@@ -2586,43 +2586,6 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Reset.Sensor</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.SafetyPermissionI</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI1</Name>
-							<Comment><![CDATA[Terminal EL1008]]></Comment>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI2</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI3</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI4</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI5</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI6</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI7</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI8</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
@@ -2694,6 +2657,43 @@ External Setpoint Generation:
 							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingY.Sensor</Name>
 							<Type>BOOL</Type>
 						</Var>
+						<Var>
+							<Name>GVL_Safety.SafetyPermissionI</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI1</Name>
+							<Comment><![CDATA[Terminal EL1008]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI2</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI3</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI4</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI5</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI6</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI7</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI8</Name>
+							<Type>BOOL</Type>
+						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
@@ -2727,10 +2727,6 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Reset.Valve</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.SafetyPermissionQ</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
@@ -2799,6 +2795,10 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingY.Valve</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.SafetyPermissionQ</Name>
 							<Type>BOOL</Type>
 						</Var>
 					</Vars>

@@ -52,6 +52,9 @@
     <Compile Include="PlcTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_NCITangentialCircle.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderArona.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -220,6 +223,10 @@
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
     <Compile Include="VISUs\Modes\ProductionMode\V_ProductionArona.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionTangentialCircle.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
