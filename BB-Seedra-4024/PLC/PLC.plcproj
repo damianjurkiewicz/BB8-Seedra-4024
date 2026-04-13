@@ -70,13 +70,25 @@
     <Compile Include="POUs\Components\FB_Cylinder.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Components\I_Channel\ST_NciAxisIds.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Components\I_Channel\I_NciChannelBase.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Components\I_Channel\I_NciChannel_FeedTable.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Components\I_Channel\I_NciChannel_GCode.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Components\I_Cylinder.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\I_NciChannel.TcIO">
+    <Compile Include="POUs\Components\FB_NciChannel.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\FB_NciChannel.TcPOU">
+    <Compile Include="POUs\Components\FB_NciChannelTangential.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Components\ST_Cylinder_Command.TcDUT">
@@ -276,6 +288,7 @@
     <Folder Include="GVLs" />
     <Folder Include="POUs\Builder\Recipes" />
     <Folder Include="POUs\Components" />
+    <Folder Include="POUs\Components\I_Channel" />
     <Folder Include="POUs\GantryXYZ" />
     <Folder Include="POUs\Executor" />
     <Folder Include="POUs\Builder" />
@@ -365,6 +378,10 @@
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_NCI">
       <DefaultResolution>Tc2_NCI, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_NCI</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_PlcInterpolation">
+      <DefaultResolution>Tc2_PlcInterpolation, * (Beckhoff Automation GmbH)</DefaultResolution>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Standard">
       <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>

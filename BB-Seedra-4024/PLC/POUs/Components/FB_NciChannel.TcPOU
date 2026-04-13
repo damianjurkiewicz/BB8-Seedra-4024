@@ -1,13 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_NciChannel" Id="{08e0b468-709d-436d-9099-2993cda1a53a}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_NciChannel EXTENDS FB_ComponentBase IMPLEMENTS I_NciChannel
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NciChannel EXTENDS FB_ComponentBase IMPLEMENTS I_NciChannel_GCode
+
+VAR_INPUT
+    stAxisIds : ST_NciAxisIds;
+END_VAR
+
 VAR
     // Zmienne zlinkowane bezpośrednio z hardwarem kanału NCI
     stNciToPlc AT %I* : NCTOPLC_NCICHANNEL_REF; 
     stPlcToNci AT %Q* : PLCTONC_NCICHANNEL_REF;
-	
-
 
     // Bloki systemowe Beckhoffa do obsługi grupy
     fbBuildGroup    : CfgBuild3DGroup;
@@ -29,22 +32,18 @@ END_VAR]]></Declaration>
     </Implementation>
     <Method Name="BuildGroup" Id="{66cae995-577f-4fd0-87b2-2377298b6c08}">
       <Declaration><![CDATA[METHOD BuildGroup
-VAR_INPUT
-    nXAxisId : UDINT;
-    nYAxisId : UDINT; nZAxisId : UDINT;
-END_VAR]]></Declaration>
+]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Resetujemy flagi i błędy przed nową próbą
-_IsGrouped := FALSE;
+        <ST><![CDATA[_IsGrouped := FALSE;
 _Error := FALSE; 
 _ErrorId := 0;
 
 fbBuildGroup(
     bExecute := TRUE,
     nGroupId := _GroupId,
-    nXAxisId := nXAxisId,
-    nYAxisId := nYAxisId,
-    nZAxisId := nZAxisId
+    nXAxisId := stAxisIds.nX,
+    nYAxisId := stAxisIds.nY,
+    nZAxisId := stAxisIds.nZ
 );]]></ST>
       </Implementation>
     </Method>
@@ -224,7 +223,10 @@ fbStartStop(bStart := FALSE, bStop := FALSE, sNciToPlc := stNciToPlc);
 fbReset(
     bExecute := TRUE,
     sNciToPlc := stNciToPlc
-);]]></ST>
+);
+
+_Error := FALSE;
+_ErrorId := 0;]]></ST>
       </Implementation>
     </Method>
     <Method Name="Start" Id="{4f54c653-5d61-4053-b4b3-0f559e72e12d}">
@@ -269,7 +271,7 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.BuildGroup">
-      <LineId Id="24" Count="10" />
+      <LineId Id="61" Count="9" />
       <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.ChannelError.Get">
@@ -315,6 +317,8 @@ END_VAR
     <LineIds Name="FB_NciChannel.ResetChannel">
       <LineId Id="12" Count="6" />
       <LineId Id="5" Count="0" />
+      <LineId Id="23" Count="1" />
+      <LineId Id="22" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.Start">
       <LineId Id="6" Count="3" />

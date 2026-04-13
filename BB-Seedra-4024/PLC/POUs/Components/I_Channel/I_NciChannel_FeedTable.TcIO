@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <Itf Name="I_NciChannel_FeedTable" Id="{bdf92831-2e75-4c35-a24c-4989ea99c8c4}">
+    <Declaration><![CDATA[INTERFACE I_NciChannel_FeedTable EXTENDS I_NciChannelBase
+]]></Declaration>
+    <Property Name="IsChannelDone" Id="{4ead269f-09ad-4df7-8f7f-00024060bb5a}">
+      <Declaration><![CDATA[PROPERTY IsChannelDone : BOOL]]></Declaration>
+      <Get Name="Get" Id="{13cf23f8-6eeb-4112-a6fb-3a44675097ea}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="IsFeedingDone" Id="{1ecd186c-8ec0-4aba-b014-9bd66a0385e4}">
+      <Declaration><![CDATA[PROPERTY IsFeedingDone : BOOL]]></Declaration>
+      <Get Name="Get" Id="{f380b1a1-b2ef-4290-b619-22396bb326ad}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="StartFeedTable" Id="{8ce29da5-6094-4383-a319-46ff66acdd31}">
+      <Declaration><![CDATA[METHOD StartFeedTable
+VAR_IN_OUT
+    stTable : ST_NciFeedGroupTable;
+END_VAR]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

@@ -3,7 +3,7 @@
   <POU Name="FB_ExecutorGCode" Id="{1b4d4fb6-455b-439c-98a5-4fd2ee249483}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorGCode EXTENDS FB_ExecutorBase
 VAR
-    _NciChannel : I_NciChannel;
+    _NciChannel : I_NciChannel_GCode;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -114,17 +114,9 @@ CASE nStep OF
             nStep := 20;
         END_IF
 
-    20: // 2. Zbudowanie grupy NCI z osi PTP w obecnej pozycji
-        refX := _AxisX.Axis;
-        refY := _AxisY.Axis;
-        refZ := _AxisZ.Axis;
-        
-        _NciChannel.BuildGroup(
-            nXAxisId := refX.NcToPlc.AxisId, 
-            nYAxisId := refY.NcToPlc.AxisId, 
-            nZAxisId := refZ.NcToPlc.AxisId
-        );
-        nStep := 30;
+	20: // 2. Zbudowanie grupy NCI
+		_NciChannel.BuildGroup();
+		nStep := 30;
 
     30: // Czekamy na spięcie osi
         IF _NciChannel.ChannelError THEN 
@@ -219,7 +211,7 @@ END_CASE]]></ST>
       </Implementation>
     </Method>
     <Property Name="NciChannel" Id="{d06ad842-31cb-498e-a612-e7975ef6dd36}">
-      <Declaration><![CDATA[PROPERTY NciChannel : I_NciChannel]]></Declaration>
+      <Declaration><![CDATA[PROPERTY NciChannel : I_NciChannel_GCode]]></Declaration>
       <Get Name="Get" Id="{7d82ec04-7743-475d-8a17-fea2f6b0b25d}">
         <Declaration><![CDATA[VAR
 END_VAR
@@ -249,7 +241,9 @@ END_VAR
       <LineId Id="851" Count="1" />
       <LineId Id="657" Count="2" />
       <LineId Id="776" Count="13" />
-      <LineId Id="668" Count="44" />
+      <LineId Id="668" Count="8" />
+      <LineId Id="865" Count="1" />
+      <LineId Id="687" Count="25" />
       <LineId Id="813" Count="12" />
       <LineId Id="838" Count="12" />
       <LineId Id="736" Count="3" />

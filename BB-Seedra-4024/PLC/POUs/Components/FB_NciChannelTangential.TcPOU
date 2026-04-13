@@ -1,0 +1,276 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_NciChannelTangential" Id="{e0b2b8c9-715d-4f01-9a7c-12345678abcd}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NciChannelTangential EXTENDS FB_ComponentBase IMPLEMENTS I_NciChannel_FeedTable
+
+VAR_INPUT
+    stAxisIds : ST_NciAxisIds;
+END_VAR
+
+VAR
+    stNciToPlc AT %I* : NCTOPLC_NCICHANNEL_REF;
+    stPlcToNci AT %Q* : PLCTONC_NCICHANNEL_REF;
+	
+    // ZMIANA: Blok Ext3DGroup pozwala dodać osie Q1..Q5
+    fbBuildExtGroup : CfgBuildExt3DGroup;
+    fbUngroup       : CfgReconfigGroup;
+    
+    // Obsługa Resetu / Start / Stop
+    fbStartStop     : ItpStartStopEx;
+    fbReset         : ItpResetEx2;
+
+    // --- NOWOŚĆ: Blok do przesyłania tabel z RAMu ---
+    fbFeedTable     : FB_NciFeedTable;
+    refFeedTable    : REFERENCE TO ST_NciFeedGroupTable; // Przechowuje wskaźnik do tabeli z Executora
+    _bExecuteFeed   : BOOL;
+    _IsFeedingDone  : BOOL;
+    _IsChannelDone  : BOOL;
+
+    _IsGrouped      : BOOL;
+    _IsReady		: BOOL;
+
+    _GroupId        : UDINT := 5; 
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="BuildGroup" Id="{c51e0640-5bb9-4b6a-9a99-b1411b933d1c}">
+      <Declaration><![CDATA[METHOD BuildGroup
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_IsGrouped := FALSE;
+_Error := FALSE; 
+_ErrorId := 0;
+
+fbBuildExtGroup(
+    bExecute := TRUE,
+    nGroupId := _GroupId,
+    nXAxisId := stAxisIds.nX,
+    nYAxisId := stAxisIds.nY,
+    nZAxisId := stAxisIds.nZ,
+    nQ1AxisId := stAxisIds.nQ1 // <--- Tu podpinamy Q1 ze struktury
+);]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ChannelError" Id="{1584ea0b-bc17-48f8-b7eb-d4cfd96c92d5}">
+      <Declaration><![CDATA[PROPERTY ChannelError : BOOL]]></Declaration>
+      <Get Name="Get" Id="{f5d21a52-b886-4f4f-b673-d56b6a070eb3}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ChannelError := _Error OR (stNciToPlc.ErrorCode <> 0);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ChannelErrorId" Id="{f3d3283f-df3d-4cba-a15d-85ad21c97a55}">
+      <Declaration><![CDATA[PROPERTY ChannelErrorId : UDINT]]></Declaration>
+      <Get Name="Get" Id="{6263884b-dfa8-4c28-bb7e-f55bc8120468}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IF stNciToPlc.ErrorCode <> 0 THEN
+    ChannelErrorId := stNciToPlc.ErrorCode;
+ELSE
+    ChannelErrorId := _ErrorId;
+END_IF]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="CyclicLogic" Id="{45df0f02-a1b4-4bca-86ff-90a8a65b06a0}">
+      <Declaration><![CDATA[METHOD PUBLIC CyclicLogic]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.CyclicLogic();
+
+// Odblokowanie override (100%)
+stPlcToNci.ChnAxesOvr := 1000000;
+
+// --- ODŚWIEŻANIE BLOKÓW SYSTEMOWYCH ---
+fbBuildExtGroup(tTimeOut := T#2S);
+fbUngroup(tTimeOut := T#2S);
+fbStartStop(sNciToPlc := stNciToPlc, tTimeOut := T#2S);
+fbReset(sNciToPlc := stNciToPlc, tTimeOut := T#2S);
+
+// --- CYKLICZNA OBSŁUGA FEED TABLE ---
+IF __ISVALIDREF(refFeedTable) THEN
+    fbFeedTable(
+        bExecute := _bExecuteFeed,
+        stFeedGroupTable := refFeedTable,
+        stNciToPlc := stNciToPlc,
+        bFeedingDone => _IsFeedingDone,
+        bChannelDone => _IsChannelDone
+    );
+    _bExecuteFeed := FALSE; // Reset impulsu po jednym cyklu
+    
+    IF fbFeedTable.bError THEN
+        _Error := TRUE;
+        _ErrorId := fbFeedTable.nErrorId;
+    END_IF
+END_IF
+
+// --- AKTUALIZACJA STATUSÓW START/STOP ---
+IF fbStartStop.bErr THEN
+    _Error := TRUE;
+    _ErrorId := fbStartStop.nErrId;
+    fbStartStop(bStart := FALSE, bStop := FALSE, sNciToPlc := stNciToPlc);
+ELSIF fbStartStop.bBusy THEN
+    fbStartStop(bStart := FALSE, sNciToPlc := stNciToPlc);
+ELSIF NOT fbStartStop.bBusy AND fbStartStop.bStop THEN
+    fbStartStop(bStop := FALSE, sNciToPlc := stNciToPlc);
+END_IF
+
+// --- STATUSY GRUPY ---
+IF fbUngroup.bErr THEN
+    _Error := TRUE;
+    _ErrorId := fbUngroup.nErrId;
+    fbUngroup(bExecute := FALSE);
+    _IsGrouped := FALSE;
+ELSIF fbUngroup.bBusy = FALSE AND fbUngroup.bExecute THEN
+    _IsGrouped := FALSE;
+    fbUngroup(bExecute := FALSE);
+END_IF
+
+IF fbBuildExtGroup.bErr THEN
+    _Error := TRUE;
+    _ErrorId := fbBuildExtGroup.nErrId;
+ELSIF fbBuildExtGroup.bBusy = FALSE AND fbBuildExtGroup.bExecute THEN
+    _IsGrouped := TRUE;
+    fbBuildExtGroup(bExecute := FALSE);
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="IsChannelDone" Id="{b2c3d4e5-f6a7-5890-1234-bcdef0123456}">
+      <Declaration><![CDATA[PROPERTY IsChannelDone : BOOL]]></Declaration>
+      <Get Name="Get" Id="{f5d21a52-b886-4f4f-b673-d56b6a070e23}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsChannelDone := _IsChannelDone;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsFeedingDone" Id="{a1b2c3d4-e5f6-4789-0123-abcdef123456}">
+      <Declaration><![CDATA[PROPERTY IsFeedingDone : BOOL]]></Declaration>
+      <Get Name="Get" Id="{f5d21a52-b886-4f4f-b673-d56b6a070e12}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsFeedingDone := _IsFeedingDone;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsGrouped" Id="{ca4a1db1-b5fb-419b-ab09-72f5342a3922}">
+      <Declaration><![CDATA[PROPERTY IsGrouped : BOOL]]></Declaration>
+      <Get Name="Get" Id="{62b55f11-ffc5-43ea-98fb-7cfbcbf4d26b}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsGrouped := _IsGrouped;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsReady" Id="{8cb00010-cfbd-4bc9-bb17-8e1041b3a5ef}">
+      <Declaration><![CDATA[PROPERTY IsReady : BOOL]]></Declaration>
+      <Get Name="Get" Id="{e146eb11-6677-4952-acc3-dbdd922bf07d}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsReady := (stNciToPlc.ItpState = 2);]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="ResetChannel" Id="{dc04c0d4-1a98-4c91-a18d-f5e02a11b655}">
+      <Declaration><![CDATA[METHOD ResetChannel]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbStartStop(bStart := FALSE, bStop := FALSE, sNciToPlc := stNciToPlc);
+fbFeedTable(bExecute := FALSE, bReset := TRUE, stFeedGroupTable := refFeedTable, stNciToPlc := stNciToPlc);
+
+fbReset(
+    bExecute := TRUE,
+    sNciToPlc := stNciToPlc
+);
+
+_Error := FALSE;
+_ErrorId := 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StartFeedTable" Id="{e1f2f3f4-5a6b-7c8d-9e0f-1a2b3c4d5e6f}">
+      <Declaration><![CDATA[METHOD StartFeedTable
+VAR_IN_OUT
+    stTable : ST_NciFeedGroupTable;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Pobieramy referencję do tabeli (która np. fizycznie leży w Executorze)
+refFeedTable REF= stTable;
+
+// Zerujemy flagi gotowości
+_IsFeedingDone := FALSE;
+_IsChannelDone := FALSE;
+
+// Wyzwalamy blok feedujący
+_bExecuteFeed := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Stop" Id="{3a0bc19e-e373-45ab-a70e-e479a419ebf4}">
+      <Declaration><![CDATA[METHOD Stop]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbStartStop(
+    bStart := FALSE, 
+    bStop := TRUE,
+    sNciToPlc := stNciToPlc
+);]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Ungroup" Id="{6ad59f51-b0db-424f-ba3b-01fc63478ab8}">
+      <Declaration><![CDATA[METHOD Ungroup]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbUngroup(
+    bExecute := TRUE, 
+    nGroupId := _GroupId
+);]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_NciChannelTangential">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.BuildGroup">
+      <LineId Id="29" Count="10" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.ChannelError.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.ChannelErrorId.Get">
+      <LineId Id="3" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.CyclicLogic">
+      <LineId Id="3" Count="55" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.IsChannelDone.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.IsFeedingDone.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.IsGrouped.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.IsReady.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.ResetChannel">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+      <LineId Id="10" Count="1" />
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.StartFeedTable">
+      <LineId Id="3" Count="8" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.Stop">
+      <LineId Id="3" Count="3" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential.Ungroup">
+      <LineId Id="3" Count="2" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

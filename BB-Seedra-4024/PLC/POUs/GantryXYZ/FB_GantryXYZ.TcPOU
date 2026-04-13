@@ -32,9 +32,11 @@ VAR
     AxisX               : FB_Component_BasicAxis := (Name := 'AxisX');
     AxisY               : FB_Component_BasicAxis := (Name := 'AxisY');
     AxisZ               : FB_Component_BasicAxis := (Name := 'AxisZ');
+	AxisQ               : FB_Component_BasicAxis := (Name := 'AxisQ Tangential'); 
 	
 	
-	NciChannel          : FB_NciChannel := (Name := 'NCI Channel 1');
+	NciChannel          	: FB_NciChannel := (Name := 'NCI Channel 1');
+	NciChannelTangential	: FB_NciChannelTangential := (Name := 'NCI Channel Tangential');
 	
 	
 	
@@ -213,26 +215,57 @@ VAR
 	i				: UDINT;
 	SubModulesReady : BOOL := TRUE;
 END_VAR
-]]></Declaration>
+VAR_INST
+    LogTimer        : TON; // Timer do opóźniania logów, żeby nie zaspamować konsoli
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE SequenceState OF
     0:
         NoStateTasksToComplete := FALSE;
         SequenceState          := SequenceState + 10;
     10:
-
 		AxisX.Reset();
 		AxisY.Reset();
 		AxisZ.Reset();
+        AxisQ.Reset(); 
+        
+        NciChannel.ResetChannel();
+        NciChannelTangential.ResetChannel();
 
 		SequenceState := SequenceState + 10;
 		
     20:
         StateTasksComplete := TRUE;
-		
 END_CASE
 
-SUPER^.Clearing();]]></ST>
+// Bazowe wywołanie, które czeka na zgaszenie flag Error we wszystkich komponentach
+SUPER^.Clearing();
+
+
+// =======================================================================
+// SYSTEM SZPIEGOWSKI - Włącza się tylko, gdy SUPER^.Clearing() "wisi"
+// =======================================================================
+// Jeśli maszyna skończyła nasz kod (SequenceState=20), ale wciąż nie przeszła dalej (NOT _StateComplete)
+LogTimer(IN := (SequenceState = 20), PT := T#2S);
+
+IF LogTimer.Q THEN
+    LogTimer(IN := FALSE); // Zresetuj timer, żeby logować co 2 sekundy
+    
+    // Sprawdzamy Oś Q
+    IF AxisQ.Error THEN
+        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: AxisQ! ErrorID: %d', UDINT_TO_DINT(AxisQ.ErrorID));
+    END_IF
+    
+    // Sprawdzamy nowy kanał Tangencjalny
+    IF NciChannelTangential.ChannelError THEN
+        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: NciChannelTangential! ErrorID: %d', UDINT_TO_DINT(NciChannelTangential.ChannelErrorId));
+    END_IF
+    
+    // Sprawdzamy standardowy kanał NCI
+    IF NciChannel.ChannelError THEN
+        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: NciChannel! ErrorID: %d', UDINT_TO_DINT(NciChannel.ChannelErrorId));
+    END_IF
+END_IF]]></ST>
       </Implementation>
     </Method>
     <Property Name="Config" Id="{ca63134f-ae96-41d5-9585-0ef3c006e9b8}" FolderPath="Properties\">
@@ -650,15 +683,14 @@ CASE DescendantSequenceState OF
     0:
 		RegisterComponent(AxisX);
 		RegisterComponent(AxisY);	
-		RegisterComponent(AxisZ);	
+		RegisterComponent(AxisZ);
+		RegisterComponent(AxisQ);	
 		RegisterComponent(CylinderCuttingY);
 		RegisterComponent(CylinderCuttingX);
 		RegisterComponent(NciChannel);
+		RegisterComponent(NciChannelTangential); 
         _LogModeChanges         := FALSE;
         _LogStateChanges        := FALSE;
-		
-
-
 		
         DescendantSequenceState := DescendantSequenceState + 10;
     10:
@@ -713,13 +745,24 @@ CASE DescendantSequenceState OF
 			AxisZ.ResetMethod := ResetStratZ;
 		END_IF
 		
-
+		
 	
 		// Wstrzykiwanie zależności do Executora Groove XY
 		ExecutorGrooveXY.AxisX         := AxisX;
 		ExecutorGrooveXY.AxisY         := AxisY;
 		ExecutorGrooveXY.AxisZ         := AxisZ;
 		ExecutorGrooveXY.ConfigProvider := THIS^;
+		
+		// Dla zwykłego kanału
+		NciChannel.stAxisIds.nX := AxisX.Axis.NcToPlc.AxisId;
+		NciChannel.stAxisIds.nY := AxisY.Axis.NcToPlc.AxisId;
+		NciChannel.stAxisIds.nZ := AxisZ.Axis.NcToPlc.AxisId;
+
+		// Dla kanału tangencjalnego 
+		NciChannelTangential.stAxisIds.nX  := AxisX.Axis.NcToPlc.AxisId;
+		NciChannelTangential.stAxisIds.nY  := AxisY.Axis.NcToPlc.AxisId;
+		NciChannelTangential.stAxisIds.nZ  := AxisZ.Axis.NcToPlc.AxisId;
+		NciChannelTangential.stAxisIds.nQ1 := AxisQ.Axis.NcToPlc.AxisId;
 	
         DescendantSequenceState := DescendantSequenceState + 10;
 		//initialize persistent
@@ -991,15 +1034,7 @@ END_CASE]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
-      <LineId Id="28" Count="4" />
-      <LineId Id="165" Count="0" />
-      <LineId Id="75" Count="2" />
-      <LineId Id="130" Count="0" />
-      <LineId Id="99" Count="0" />
-      <LineId Id="67" Count="0" />
-      <LineId Id="45" Count="1" />
-      <LineId Id="68" Count="0" />
-      <LineId Id="47" Count="1" />
+      <LineId Id="182" Count="45" />
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Config.Get">
@@ -1077,14 +1112,13 @@ END_CASE]]></ST>
     <LineIds Name="FB_GantryXYZ.Initialize">
       <LineId Id="3" Count="4" />
       <LineId Id="68" Count="0" />
+      <LineId Id="316" Count="0" />
       <LineId Id="8" Count="0" />
       <LineId Id="90" Count="0" />
       <LineId Id="285" Count="0" />
+      <LineId Id="329" Count="0" />
       <LineId Id="10" Count="1" />
       <LineId Id="272" Count="0" />
-      <LineId Id="275" Count="0" />
-      <LineId Id="274" Count="0" />
-      <LineId Id="273" Count="0" />
       <LineId Id="12" Count="1" />
       <LineId Id="80" Count="0" />
       <LineId Id="100" Count="0" />
@@ -1108,6 +1142,9 @@ END_CASE]]></ST>
       <LineId Id="167" Count="0" />
       <LineId Id="173" Count="0" />
       <LineId Id="169" Count="3" />
+      <LineId Id="302" Count="0" />
+      <LineId Id="320" Count="8" />
+      <LineId Id="303" Count="0" />
       <LineId Id="151" Count="0" />
       <LineId Id="41" Count="0" />
       <LineId Id="79" Count="0" />

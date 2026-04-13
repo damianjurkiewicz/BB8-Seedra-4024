@@ -2381,6 +2381,159 @@ External Setpoint Generation:
 						</Var>
 					</Vars>
 				</Axis>
+				<Axis Id="4" CreateSymbols="true" AxisType="1" GroupId="6">
+					<Name>Axis 4</Name>
+					<AxisPara>
+						<OtherSettings AllowMotionCmdToSlave="true"/>
+					</AxisPara>
+					<Encoder Name="Enc" EncType="1">
+						<Vars VarGrpType="1">
+							<Name>Inputs</Name>
+							<Var>
+								<Name>In</Name>
+								<Type GUID="{901C2423-655B-45CE-B7E3-21F174F0F99F}" Namespace="MC">NCENCODERSTRUCT_IN2B</Type>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn1</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn2</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn3</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn4</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn5</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn6</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn7</Name>
+									<Comment><![CDATA[Drive Velocity Actual Value
+]]></Comment>
+								</SubVar>
+							</Var>
+						</Vars>
+						<Vars VarGrpType="2">
+							<Name>Outputs</Name>
+							<Var>
+								<Name>Out</Name>
+								<Type GUID="{9CC50AB2-5D79-4869-A3C2-1FA7761BAFEA}" Namespace="MC">NCENCODERSTRUCT_OUT2</Type>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut1</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut2</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut3</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut4</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut5</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut6</Name>
+								</SubVar>
+							</Var>
+						</Vars>
+					</Encoder>
+					<Drive Name="Drive" DrvType="5">
+						<DrvPara>
+							<Analog TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+						</DrvPara>
+						<Vars VarGrpType="1">
+							<Name>Inputs</Name>
+							<Var>
+								<Name>In</Name>
+								<Type GUID="{F95C7C69-0C87-46C4-9559-1285CCA5B23A}" Namespace="MC">NCDRIVESTRUCT_IN2</Type>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn1</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn2</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn3</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn4</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn5</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn6</Name>
+								</SubVar>
+							</Var>
+						</Vars>
+						<Vars VarGrpType="2">
+							<Name>Outputs</Name>
+							<Var>
+								<Name>Out</Name>
+								<Type GUID="{644DC4BD-3D15-4DCB-94C7-24F3A5D579AA}" Namespace="MC">NCDRIVESTRUCT_OUT2</Type>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut1</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut2</Name>
+								</SubVar>
+								<SubVar>
+									<Name>nCtrl2</Name>
+									<Comment><![CDATA[Digital Outputs Setpoint Generator:
+0x41 (0100 0001) = Minus (0x42 for inverse motor polarity)
+0x42 (0100 0010) = Plus (0x41 for inverse motor polarity)
+0x80 (1000 0000) = Stop
+]]></Comment>
+								</SubVar>
+								<SubVar>
+									<Name>nCtrl3</Name>
+									<Comment><![CDATA[Digital Outputs (Setpoint Generator + Position Controller):
+0x41 (0100 0001) = Minus (0x42 for inverse motor polarity)
+0x42 (0100 0010) = Plus (0x41 for inverse motor polarity)
+0x80 (1000 0000) = Stop
+]]></Comment>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut3</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut4</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut5</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut6</Name>
+								</SubVar>
+							</Var>
+						</Vars>
+					</Drive>
+					<Controller Name="Ctrl" CtrType="1">
+						<CtrPara PriorControlFactor="1">
+							<Observer BandWidth="20"/>
+						</CtrPara>
+					</Controller>
+					<Vars VarGrpType="1" InsertType="1">
+						<Name>Inputs</Name>
+						<Var>
+							<Name>FromPlc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+					</Vars>
+					<Vars VarGrpType="2" InsertType="1">
+						<Name>Outputs</Name>
+						<Var>
+							<Name>ToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+					</Vars>
+				</Axis>
 				<Channel Id="2" ChannelType="2" InterpreterType="2" LoadBufSize="65536" AxesColumns="#x3f">
 					<Name>NC-Channel</Name>
 					<Vars VarGrpType="1">
@@ -2503,7 +2656,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{9B70D4B7-054F-2971-90D7-5544730CEF27}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{2A29D337-25B8-012C-F384-8970A48460EB}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -2553,8 +2706,16 @@ External Setpoint Generation:
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.AxisQ.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.NciChannel.stNciToPlc</Name>
 							<Comment><![CDATA[ Zmienne zlinkowane bezpośrednio z hardwarem kanału NCI]]></Comment>
+							<Type GUID="{56354211-98EF-4057-9322-975DEAD0E29D}" Namespace="MC">NCTOPLC_NCICHANNEL_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.NciChannelTangential.stNciToPlc</Name>
 							<Type GUID="{56354211-98EF-4057-9322-975DEAD0E29D}" Namespace="MC">NCTOPLC_NCICHANNEL_REF</Type>
 						</Var>
 						<Var>
@@ -2601,7 +2762,15 @@ External Setpoint Generation:
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.AxisQ.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.NciChannel.stPlcToNci</Name>
+							<Type GUID="{48415C2A-E750-483B-A619-8655B2BEA4B8}" Namespace="MC">PLCTONC_NCICHANNEL_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.NciChannelTangential.stPlcToNci</Name>
 							<Type GUID="{48415C2A-E750-483B-A619-8655B2BEA4B8}" Namespace="MC">PLCTONC_NCICHANNEL_REF</Type>
 						</Var>
 						<Var>
@@ -2636,41 +2805,36 @@ External Setpoint Generation:
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.NcToPlc</Name>
+							<Name>TESTS.Test_MockedExecutor.MockAxisX.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.NcToPlc</Name>
+							<Name>TESTS.Test_MockedExecutor.MockAxisY.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.NcToPlc</Name>
+							<Name>TESTS.Test_MockedExecutor.MockAxisZ.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.AxisX.BasicAxis._Axis.NcToPlc</Name>
+							<Name>TESTS.Test_MockedExecutor.MockAxisX_Err.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.AxisY.BasicAxis._Axis.NcToPlc</Name>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisX.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.AxisZ.BasicAxis._Axis.NcToPlc</Name>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisY.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.NciChannel.stNciToPlc</Name>
-							<Comment><![CDATA[ Zmienne zlinkowane bezpośrednio z hardwarem kanału NCI]]></Comment>
-							<Type GUID="{56354211-98EF-4057-9322-975DEAD0E29D}" Namespace="MC">NCTOPLC_NCICHANNEL_REF</Type>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisZ.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingX.Sensor</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingY.Sensor</Name>
-							<Type>BOOL</Type>
+							<Name>TESTS.Test_GrooveExecutor.MockAxisZ_Err.BasicAxis._Axis.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
 							<Name>GVL_Safety.SafetyPermissionI</Name>
@@ -2722,36 +2886,49 @@ External Setpoint Generation:
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_MockedExecutor.MockAxisX.BasicAxis._Axis.NcToPlc</Name>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_MockedExecutor.MockAxisY.BasicAxis._Axis.NcToPlc</Name>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_MockedExecutor.MockAxisZ.BasicAxis._Axis.NcToPlc</Name>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_MockedExecutor.MockAxisX_Err.BasicAxis._Axis.NcToPlc</Name>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisX.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GrooveExecutor.MockAxisX.BasicAxis._Axis.NcToPlc</Name>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisY.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GrooveExecutor.MockAxisY.BasicAxis._Axis.NcToPlc</Name>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisZ.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GrooveExecutor.MockAxisZ.BasicAxis._Axis.NcToPlc</Name>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisQ.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_GrooveExecutor.MockAxisZ_Err.BasicAxis._Axis.NcToPlc</Name>
-							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+							<Name>TESTS.Test_GantryXYZ.Gantry.NciChannel.stNciToPlc</Name>
+							<Comment><![CDATA[ Zmienne zlinkowane bezpośrednio z hardwarem kanału NCI]]></Comment>
+							<Type GUID="{56354211-98EF-4057-9322-975DEAD0E29D}" Namespace="MC">NCTOPLC_NCICHANNEL_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.NciChannelTangential.stNciToPlc</Name>
+							<Type GUID="{56354211-98EF-4057-9322-975DEAD0E29D}" Namespace="MC">NCTOPLC_NCICHANNEL_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingX.Sensor</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingY.Sensor</Name>
+							<Type>BOOL</Type>
 						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
@@ -2775,58 +2952,6 @@ External Setpoint Generation:
 						<Var>
 							<Name>TESTS.Test_Extend_TurnsOnValve_And_ReportsExtended.Cylinder_Reset.Valve</Name>
 							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.AxisX.BasicAxis._Axis.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.AxisY.BasicAxis._Axis.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.AxisZ.BasicAxis._Axis.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.NciChannel.stPlcToNci</Name>
-							<Type GUID="{48415C2A-E750-483B-A619-8655B2BEA4B8}" Namespace="MC">PLCTONC_NCICHANNEL_REF</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingX.Valve</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingY.Valve</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.SafetyPermissionQ</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.PlcToNc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
 							<Name>TESTS.Test_MockedExecutor.MockAxisX.BasicAxis._Axis.PlcToNc</Name>
@@ -2859,6 +2984,66 @@ External Setpoint Generation:
 						<Var>
 							<Name>TESTS.Test_GrooveExecutor.MockAxisZ_Err.BasicAxis._Axis.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.SafetyPermissionQ</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisX.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisY.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisZ.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.AxisQ.BasicAxis._Axis.PlcToNc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.NciChannel.stPlcToNci</Name>
+							<Type GUID="{48415C2A-E750-483B-A619-8655B2BEA4B8}" Namespace="MC">PLCTONC_NCICHANNEL_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.NciChannelTangential.stPlcToNci</Name>
+							<Type GUID="{48415C2A-E750-483B-A619-8655B2BEA4B8}" Namespace="MC">PLCTONC_NCICHANNEL_REF</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingX.Valve</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>TESTS.Test_GantryXYZ.Gantry.CylinderCuttingY.Valve</Name>
+							<Type>BOOL</Type>
 						</Var>
 					</Vars>
 					<UnrestoredVarLinks ImportTime="2026-01-27T16:22:49">
@@ -6840,10 +7025,8 @@ Bit 8 - 15 : reserved]]></Comment>
 		<MappingInfo Identifier="{05000010-2001-0850-1000-040300205008}" Id="#x02030060" Watchdog="14000000040000000400000004000000"/>
 		<MappingInfo Identifier="{03040050-0050-0304-5000-040350000403}" Id="#x02030030" Watchdog="04000000040000000400000004000000"/>
 		<OwnerA Name="TIID^Device 3 (EtherCAT)">
-			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 10 (EL2904)">
-				<Link VarA="Term 1 (EK1100)^Term 8 (EL6900)^ConnectionInputs^TwinSafeGroup1.Term 10 (EL2904) - Module 1 (FSOES)_3 TxPDO" VarB="Module 1 (FSOES)^RxPDO^FSOE"/>
-			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 8 (EL6900)">
+				<Link VarA="Term 1 (EK1100)^Term 10 (EL2904)^Module 1 (FSOES)^RxPDO^FSOE" VarB="ConnectionInputs^TwinSafeGroup1.Term 10 (EL2904) - Module 1 (FSOES)_3 TxPDO"/>
 				<Link VarA="Term 1 (EK1100)^Term 10 (EL2904)^Module 1 (FSOES)^TxPDO^FSOE" VarB="ConnectionOutputs^TwinSafeGroup1.Term 10 (EL2904) - Module 1 (FSOES)_3 RxPDO"/>
 				<Link VarA="Term 1 (EK1100)^Term 9 (EL1904)^Module 1 (FSOES)^RxPDO^FSOE" VarB="ConnectionInputs^TwinSafeGroup1.Term 9 (EL1904) - Module 1 (FSOES)_2 TxPDO"/>
 				<Link VarA="Term 1 (EK1100)^Term 9 (EL1904)^Module 1 (FSOES)^TxPDO^FSOE" VarB="ConnectionOutputs^TwinSafeGroup1.Term 9 (EL1904) - Module 1 (FSOES)_2 RxPDO"/>
@@ -6929,6 +7112,10 @@ Bit 8 - 15 : reserved]]></Comment>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 9 (EL1904)">
 				<Link VarA="PlcTask Inputs^GVL_Safety.eStopButton" VarB="Module 1 (FSOES)^TxPDO^FSOE^InputChannel1"/>
 			</OwnerB>
+			<OwnerB Name="TINC^NC-Task 1 SAF^Axes^Axis 4">
+				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.AxisQ.BasicAxis._Axis.NcToPlc" VarB="Outputs^ToPlc"/>
+				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.AxisQ.BasicAxis._Axis.PlcToNc" VarB="Inputs^FromPlc"/>
+			</OwnerB>
 			<OwnerB Name="TINC^NC-Task 1 SAF^Axes^Axis X">
 				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.NcToPlc" VarB="Outputs^ToPlc"/>
 				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.PlcToNc" VarB="Inputs^FromPlc"/>
@@ -6944,6 +7131,10 @@ Bit 8 - 15 : reserved]]></Comment>
 			<OwnerB Name="TINC^NC-Task 1 SAF^NC-Channel">
 				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.NciChannel.stNciToPlc" VarB="Outputs^ToPlc"/>
 				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.NciChannel.stPlcToNci" VarB="Inputs^FromPlc"/>
+			</OwnerB>
+			<OwnerB Name="TINC^NC-Task 1 SAF^NC-ChannelTangential">
+				<Link VarA="PlcTask Inputs^MAIN.Seedra.GantryXYZ.NciChannelTangential.stNciToPlc" VarB="Outputs^ToPlc"/>
+				<Link VarA="PlcTask Outputs^MAIN.Seedra.GantryXYZ.NciChannelTangential.stPlcToNci" VarB="Inputs^FromPlc"/>
 			</OwnerB>
 		</OwnerA>
 	</Mappings>

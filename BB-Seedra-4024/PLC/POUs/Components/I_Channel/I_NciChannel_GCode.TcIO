@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <Itf Name="I_NciChannel_GCode" Id="{7a91496b-baa2-4b9c-9bd6-d47f2d3e317c}">
+    <Declaration><![CDATA[INTERFACE I_NciChannel_GCode EXTENDS I_NciChannelBase
+]]></Declaration>
+    <Property Name="IsMoving" Id="{863c3f1d-e3ba-4ca0-b3c8-cdfa03f416b8}">
+      <Declaration><![CDATA[PROPERTY IsMoving : BOOL]]></Declaration>
+      <Get Name="Get" Id="{49cc0586-bfa7-4842-a93d-55749afd24ad}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="IsProgramLoaded" Id="{20083fb0-60e0-44a1-a862-ec7336c142a2}">
+      <Declaration><![CDATA[PROPERTY IsProgramLoaded : BOOL]]></Declaration>
+      <Get Name="Get" Id="{fd981e8e-6705-4c5f-ae9b-b12f2b0e7e1d}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="LoadProgram" Id="{20f09308-de81-4286-853c-7c9f23771b69}">
+      <Declaration><![CDATA[METHOD LoadProgram
+VAR_INPUT
+	sProgramPath : STRING(255);
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Start" Id="{e1607d78-d8ee-4b50-8e8d-0575feea8216}">
+      <Declaration><![CDATA[METHOD Start
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>
