@@ -5,6 +5,7 @@
 
 VAR_INPUT
     stAxisIds : ST_NciAxisIds;
+	nGroupId  : UDINT := 5;
 END_VAR
 
 VAR
@@ -28,8 +29,6 @@ VAR
 
     _IsGrouped      : BOOL;
     _IsReady		: BOOL;
-
-    _GroupId        : UDINT := 5; 
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -44,7 +43,7 @@ _ErrorId := 0;
 
 fbBuildExtGroup(
     bExecute := TRUE,
-    nGroupId := _GroupId,
+    nGroupId := nGroupId,
     nXAxisId := stAxisIds.nX,
     nYAxisId := stAxisIds.nY,
     nZAxisId := stAxisIds.nZ,
@@ -220,7 +219,7 @@ _bExecuteFeed := TRUE;
       <Implementation>
         <ST><![CDATA[fbUngroup(
     bExecute := TRUE, 
-    nGroupId := _GroupId
+    nGroupId := nGroupId
 );]]></ST>
       </Implementation>
     </Method>
