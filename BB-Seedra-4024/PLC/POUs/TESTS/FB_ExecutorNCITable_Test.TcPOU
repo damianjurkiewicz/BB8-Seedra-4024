@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_ExecutorGCode_Test" Id="{c1b2c3d4-e5f6-4789-9999-000000000020}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorGCode_Test EXTENDS TcUnit.FB_TestSuite
+  <POU Name="FB_ExecutorNCITable_Test" Id="{f1b2c3d4-e5f6-4789-9999-000000000050}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorNCITable_Test EXTENDS TcUnit.FB_TestSuite
 VAR
-    Executor         : FB_ExecutorGCode;
-    MockChannel      : FB_MockNciChannel;
+    Executor         : FB_ExecutorNCITable;
+    MockChannel      : FB_MockNciChannelFeedTable;
 
-    Executor_Err     : FB_ExecutorGCode;
-    MockChannel_Err  : FB_MockNciChannel;
+    Executor_Err     : FB_ExecutorNCITable;
+    MockChannel_Err  : FB_MockNciChannelFeedTable;
 
     MockProvider     : FB_MockConfigProvider;
     MockAxisX        : FB_MockAxis;
@@ -16,10 +16,10 @@ VAR
     RecipeBuilder    : FB_RecipeBuilderRectangle;
 END_VAR]]></Declaration>
     <Implementation>
-      <ST><![CDATA[Test_Sequence_CallsChannelMethodsCorrectly();
+      <ST><![CDATA[Test_Sequence_ExecutesTableCorrectly();
 Test_ChannelError_AbortsSequence();]]></ST>
     </Implementation>
-    <Method Name="Test_ChannelError_AbortsSequence" Id="{c1b2c3d4-e5f6-4789-9999-000000000022}">
+    <Method Name="Test_ChannelError_AbortsSequence" Id="{f1b2c3d4-e5f6-4789-9999-000000000052}">
       <Declaration><![CDATA[METHOD Test_ChannelError_AbortsSequence
 VAR_INST
     Step : INT := 0;
@@ -53,38 +53,38 @@ CASE Step OF
 
         Executor_Err.Execute();
         Step := 10;
-        
+
     10:
         IF MockChannel_Err.BuildGroupCallCount > 0 THEN
             MockChannel_Err.MockChannelError := TRUE;
-            MockChannel_Err.MockChannelErrorId := 1234;
+            MockChannel_Err.MockChannelErrorId := 4321;
             Step := 20;
         END_IF
 
     20:
         IF Executor_Err.Error THEN
-            AssertEquals_UDINT(Expected := 1234, 
+            AssertEquals_UDINT(Expected := 4321, 
                                Actual := Executor_Err.ErrorID, 
-                               Message := 'Executor nie przepisal ErrorID z kanalu!');
+                               Message := 'Executor nie przepisal ErrorID z kanalu tabelarycznego!');
             TEST_FINISHED();
-            Step := 100; 
+            Step := 100;
         ELSIF Executor_Err.Done THEN
             AssertTrue(Condition := FALSE, Message := 'Executor zignorowal blad kanalu!');
             TEST_FINISHED();
-            Step := 100; 
+            Step := 100;
         END_IF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <Method Name="Test_Sequence_CallsChannelMethodsCorrectly" Id="{c1b2c3d4-e5f6-4789-9999-000000000021}">
-      <Declaration><![CDATA[METHOD Test_Sequence_CallsChannelMethodsCorrectly
+    <Method Name="Test_Sequence_ExecutesTableCorrectly" Id="{f1b2c3d4-e5f6-4789-9999-000000000051}">
+      <Declaration><![CDATA[METHOD Test_Sequence_ExecutesTableCorrectly
 VAR_INST
     Step         : INT := 0;
     RecipeConfig : ST_RecipeBuilder_Config;
     TimeoutTimer : TON;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[TEST('Test_Sequence_CallsChannelMethodsCorrectly');
+        <ST><![CDATA[TEST('Test_Sequence_ExecutesTableCorrectly');
 
 Executor.CyclicLogic();
 
@@ -107,7 +107,8 @@ CASE Step OF
         Executor.AxisX          := MockAxisX;
         Executor.AxisY          := MockAxisY;
         Executor.AxisZ          := MockAxisZ;
-        Executor.NciChannel     := MockChannel;
+        Executor.NciChannel     := MockChannel; 
+
         Step := 10;
 
     10:
@@ -124,20 +125,19 @@ CASE Step OF
 
     30:
         IF MockChannel.BuildGroupCallCount > 0 THEN
-            MockChannel.MockIsGrouped := TRUE;
+            MockChannel.MockIsGrouped := TRUE; 
             Step := 40;
         END_IF
 
     40:
-        IF MockChannel.LoadProgramCallCount > 0 THEN
-            AssertEquals_STRING(Expected := '', Actual := MockChannel.LoadedProgramPath, Message := 'Zla sciezka przekazana do kanalu!');
-            MockChannel.MockIsProgramLoaded := TRUE;
+        IF MockChannel.StartFeedTableCallCount > 0 THEN
+            MockChannel.MockIsFeedingDone := TRUE;
             Step := 50;
         END_IF
 
     50:
-        IF MockChannel.StartCallCount > 0 THEN
-            MockChannel.MockIsReady := TRUE;
+        IF MockChannel.MockIsFeedingDone THEN
+            MockChannel.MockIsChannelDone := TRUE;
             Step := 60;
         END_IF
 
@@ -153,7 +153,7 @@ CASE Step OF
             TEST_FINISHED();
             Step := 100;
         ELSIF Executor.Error THEN
-            AssertTrue(Condition := FALSE, Message := 'Wystapil Error!');
+            AssertTrue(Condition := FALSE, Message := 'Wystapil nieoczekiwany Error!');
             TEST_FINISHED();
             Step := 100;
         END_IF

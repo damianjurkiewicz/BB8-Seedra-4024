@@ -106,6 +106,9 @@
     <Compile Include="POUs\Executor\FB_ExecutorCut.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Executor\FB_ExecutorNCITable.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Executor\FB_ExecutorGrooveXY.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -196,6 +199,9 @@
     <Compile Include="POUs\TESTS\FB_Cylinder_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\TESTS\FB_ExecutorNCITable_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\TESTS\FB_ExecutorGCode_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -221,6 +227,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TESTS\Mocks\FB_MockAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\Mocks\FB_MockNciChannelFeedTable.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TESTS\Mocks\FB_MockNciChannel.TcPOU">
@@ -290,9 +299,6 @@
     <Compile Include="VISUs\V_Main.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
-    </Compile>
-    <Compile Include="VISU_TASK.TcTTO">
-      <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -432,6 +438,11 @@
     <None Include="PLC.tmc">
       <SubType>Content</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <SubObject Include="Visualization Manager.TargetVisualization">
+      <ExcludeFromBuild>true</ExcludeFromBuild>
+    </SubObject>
   </ItemGroup>
   <ProjectExtensions>
     <PlcProjectOptions>

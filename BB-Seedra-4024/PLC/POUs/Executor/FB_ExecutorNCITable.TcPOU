@@ -1,0 +1,168 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_ExecutorNCITable" Id="{e1b2c3d4-e5f6-4789-9999-000000000040}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorNCITable EXTENDS FB_ExecutorBase
+VAR
+    _NciChannel : I_NciChannel_FeedTable;
+    _FeedTable  : ST_NciFeedGroupTable; 
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Abort" Id="{e1b2c3d4-e5f6-4789-9999-000000000042}">
+      <Declaration><![CDATA[METHOD Abort]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _NciChannel <> 0 THEN
+    _NciChannel.Stop();
+    _NciChannel.ResetChannel();
+    _NciChannel.Ungroup();
+END_IF
+_bBusy := FALSE; _bDone := FALSE; _bError := FALSE; _uErrorID := 0; nStep := 0;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic" Id="{e1b2c3d4-e5f6-4789-9999-000000000041}">
+      <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
+VAR_INST
+    localConfig   : ST_GantryXYZ_Config;
+    recipeConfig  : ST_RecipeBuilder_Config;
+    MaterialTopZ  : REAL;
+    SafeZ         : REAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.CyclicLogic();
+
+IF nStep > 0 THEN
+    IF _RecipeBuilder = 0 OR _ConfigProvider = 0 OR _NciChannel = 0 THEN
+        nStep := 999;
+    END_IF
+END_IF
+
+CASE nStep OF
+    0: // IDLE
+
+    5: // INIT
+        IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
+            IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error THEN
+                nStep := 999;
+            ELSIF _AxisX.Enabled AND _AxisY.Enabled AND _AxisZ.Enabled THEN
+                _bBusy := TRUE;
+                localConfig := _ConfigProvider.Config;
+                recipeConfig := _RecipeBuilder.Config;
+
+                iCurrentCopyX := 1;
+                iCurrentCopyY := 1;
+
+                _AxisX.Velocity := localConfig.RapidSpeedX;
+                _AxisY.Velocity := localConfig.RapidSpeedY;
+                _AxisZ.Velocity := localConfig.RapidSpeedZ;
+
+                nStep := 8;
+            END_IF
+        END_IF
+
+    8: // Dojazd PTP
+        MoveToXY(recipeConfig.NciStartX, recipeConfig.NciStartY, 0.0, 0.0);
+        nStep := 9;
+
+    9: // Czekamy na XY, jedziemy z Z
+        IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error THEN
+            nStep := 999;
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN
+            localConfig := _ConfigProvider.Config;
+            MaterialTopZ := localConfig.GlobalOffsetZ + localConfig.RawBoardZ;
+            SafeZ := MaterialTopZ + localConfig.SafeClearanceZ;
+
+            _AxisZ.MoveAbsolute(SafeZ, 0);
+            nStep := 10;
+        END_IF
+
+    10: // Czekamy na Z
+        IF _AxisZ.Error THEN
+            nStep := 999;
+        ELSIF _AxisZ.InPosition THEN
+            nStep := 20;
+        END_IF
+
+    20: // Spięcie grupy
+        _NciChannel.BuildGroup();
+        nStep := 30;
+
+    30: // Start podawania tabeli punktów
+        IF _NciChannel.ChannelError THEN
+            nStep := 999;
+        ELSIF _NciChannel.IsGrouped THEN
+            _NciChannel.StartFeedTable(stTable := _FeedTable);
+            nStep := 40;
+        END_IF
+
+    40: // Czekamy aż sterownik PLC wyśle całą tabelę z RAM
+        IF _NciChannel.ChannelError THEN
+            nStep := 999;
+        ELSIF _NciChannel.IsFeedingDone THEN
+            nStep := 50;
+        END_IF
+
+    50: // Czekamy aż fizycznie frezarka dojedzie do końca
+        IF _NciChannel.ChannelError THEN
+            nStep := 999;
+        ELSIF _NciChannel.IsChannelDone THEN
+            _NciChannel.ResetChannel();
+            nStep := 80;
+        END_IF
+
+    80: // Rozpięcie grupy
+        _NciChannel.Ungroup();
+        nStep := 90;
+
+    90: // Obsługa Multiplexowania (Nestingu)
+        IF NOT _NciChannel.IsGrouped THEN
+            nStep := 110; 
+        END_IF
+
+    110:
+        iCurrentCopyX := iCurrentCopyX + 1;
+        IF iCurrentCopyX > _RecipeBuilder.ActualCopiesX THEN
+            iCurrentCopyX := 1;
+            iCurrentCopyY := iCurrentCopyY + 1;
+            IF iCurrentCopyY > _RecipeBuilder.ActualCopiesY THEN
+                nStep := 1000;
+            ELSE
+                nStep := 8;
+            END_IF
+        ELSE
+            nStep := 8;
+        END_IF
+
+    999: // ERROR
+        _bBusy := FALSE;
+        _bError := TRUE;
+        _bDone := FALSE;
+        _uErrorID := _NciChannel.ChannelErrorId;
+        _NciChannel.Ungroup();
+        nStep := 0;
+
+    1000: // DONE
+        _bBusy := FALSE;
+        _bDone := TRUE;
+        nStep := 0;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="NciChannel" Id="{e1b2c3d4-e5f6-4789-9999-000000000043}">
+      <Declaration><![CDATA[PROPERTY NciChannel : I_NciChannel_FeedTable]]></Declaration>
+      <Get Name="Get" Id="{e1b2c3d4-e5f6-4789-9999-000000000044}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[NciChannel := _NciChannel;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{e1b2c3d4-e5f6-4789-9999-000000000045}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_NciChannel := NciChannel;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+  </POU>
+</TcPlcObject>

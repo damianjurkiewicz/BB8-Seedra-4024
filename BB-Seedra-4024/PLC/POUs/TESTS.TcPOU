@@ -9,9 +9,10 @@ VAR
 //	Test_MockedExecutor 		: FB_ExecutorCut_Test; 
 //	Test_GrooveExecutor 		: FB_ExecutorGrooveXY_Test;
 //	Test_GantryXYZ				: FB_GantryXYZ_Test;
-	Test_NciChannel            	: FB_NciChannel_Test;
-    Test_NciChannelTangential  	: FB_NciChannelTangential_Test;
-	Test_ExecutorGCode  	: FB_ExecutorGCode_Test;
+//	Test_NciChannel            	: FB_NciChannel_Test;
+//  Test_NciChannelTangential  	: FB_NciChannelTangential_Test;
+	Test_ExecutorGCode  		: FB_ExecutorGCode_Test;
+	Test_ExecutorNCITable		: FB_ExecutorNCITable_Test;
 END_VAR
 ]]></Declaration>
     <Implementation>
