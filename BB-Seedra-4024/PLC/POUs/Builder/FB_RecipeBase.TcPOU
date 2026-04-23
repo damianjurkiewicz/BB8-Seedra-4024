@@ -148,6 +148,17 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <Property Name="ExecutionRoute" Id="{d2212b52-9f21-4298-b628-266a7518ecb2}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{8041d254-a158-4e66-a29b-c43d3e45cbc2}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Property Name="FootprintX" Id="{31cc2579-4943-4072-adcb-7298a1ade9ce}">
       <Declaration><![CDATA[PROPERTY FootprintX : REAL]]></Declaration>
       <Get Name="Get" Id="{e9997c45-4a9f-41c6-91e6-e1fa92e42836}">
@@ -506,6 +517,9 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.ConfigProvider.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.ExecutionRoute.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.FootprintX.Get">

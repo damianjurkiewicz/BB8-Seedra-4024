@@ -80,6 +80,17 @@ END_VAR
 _NominalY := _Config.PanelFrontLength;]]></ST>
       </Implementation>
     </Method>
+    <Property Name="ExecutionRoute" Id="{5de48596-9966-4044-9349-927935ea8a70}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{70e41018-2eab-4116-a6c6-e2cc04c50b69}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.ePTP_Macro;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="FB_init" Id="{ee63f777-622f-4528-bf37-252b5ad994fe}">
       <Declaration><![CDATA[METHOD FB_init : BOOL
 VAR_INPUT
@@ -125,6 +136,9 @@ _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
     <LineIds Name="FB_RecipeBuilderRectangle.CalculateFootprint">
       <LineId Id="7" Count="0" />
       <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderRectangle.ExecutionRoute.Get">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderRectangle.FB_init">
       <LineId Id="31" Count="15" />

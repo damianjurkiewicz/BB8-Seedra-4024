@@ -3392,7 +3392,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{E676295A-6F50-ABB9-A0B8-166657E60613}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{24B883D0-4005-43E2-2025-EFD0A2252B54}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -3521,39 +3521,39 @@ External Setpoint Generation:
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>SafetyTask Inputs</Name>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.NcToPlc</Name>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFX.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.NcToPlc</Name>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFY.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.NcToPlc</Name>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFZ.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.NcToPlc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFX.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.NcToPlc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFY.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.NcToPlc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFZ.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.NcToPlc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFX.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.NcToPlc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFY.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.NcToPlc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFZ.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
 						<Var>
@@ -3621,39 +3621,39 @@ External Setpoint Generation:
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.PlcToNc</Name>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFX.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.PlcToNc</Name>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFY.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.PlcToNc</Name>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFZ.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.PlcToNc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFX.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.PlcToNc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFY.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.PlcToNc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFZ.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXECUTORGCODE__CYCLICLOGIC__REFX.PlcToNc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFX.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXECUTORGCODE__CYCLICLOGIC__REFY.PlcToNc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFY.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>
-							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXECUTORGCODE__CYCLICLOGIC__REFZ.PlcToNc</Name>
+							<Name>TESTS.Test_ExecutorGCode.Executor_Err.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFZ.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
 						</Var>
 						<Var>

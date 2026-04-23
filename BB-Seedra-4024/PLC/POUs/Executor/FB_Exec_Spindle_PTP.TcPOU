@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_ExecutorGrooveXY" Id="{ba81cf30-ba63-41e2-ba37-7eadadaf4217}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorGrooveXY EXTENDS FB_ExecutorBase
+  <POU Name="FB_Exec_Spindle_PTP" Id="{ba81cf30-ba63-41e2-ba37-7eadadaf4217}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Exec_Spindle_PTP EXTENDS FB_ExecutorBase
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -242,10 +242,10 @@ CASE nStep OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_ExecutorGrooveXY">
+    <LineIds Name="FB_Exec_Spindle_PTP">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorGrooveXY.CyclicLogic">
+    <LineIds Name="FB_Exec_Spindle_PTP.CyclicLogic">
       <LineId Id="771" Count="91" />
       <LineId Id="1000" Count="6" />
       <LineId Id="869" Count="114" />

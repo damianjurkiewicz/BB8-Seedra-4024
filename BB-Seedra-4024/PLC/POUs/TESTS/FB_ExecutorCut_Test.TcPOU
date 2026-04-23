@@ -3,8 +3,8 @@
   <POU Name="FB_ExecutorCut_Test" Id="{7df5cf70-cbe1-43ae-a8be-81dbfb352aaf}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorCut_Test EXTENDS TcUnit.FB_TestSuite 
 VAR
-    Executor : FB_ExecutorCut;
-	Executor_Unhappy     : FB_ExecutorCut;
+    Executor : FB_Exec_Pneumatic_PTP;
+	Executor_Unhappy     : FB_Exec_Pneumatic_PTP;
 	
 	MockConfigProvider : FB_MockConfigProvider;
 
@@ -17,17 +17,17 @@ VAR
     TestRecipe   : FB_RecipeBuilderBorgoWings;
 
 	
-	Executor_Zero       : FB_ExecutorCut;
+	Executor_Zero       : FB_Exec_Pneumatic_PTP;
     MockCylinder_Zero   : FB_MockCylinder;
     BuilderArona        : FB_RecipeBuilderArona; // Arona to nasza wydmuszka, zwraca 0 segmentów!
 
-    Executor_AxisErr    : FB_ExecutorCut;
+    Executor_AxisErr    : FB_Exec_Pneumatic_PTP;
     MockAxisX_Err       : FB_MockAxis;
 
-    Executor_CutY       : FB_ExecutorCut;
+    Executor_CutY       : FB_Exec_Pneumatic_PTP;
     MockCylinder_CutY   : FB_MockCylinder;
 	
-	Executor_Nesting : FB_ExecutorCut;
+	Executor_Nesting : FB_Exec_Pneumatic_PTP;
     MockCylinder_Nesting : FB_MockCylinder;
 	
 END_VAR]]></Declaration>

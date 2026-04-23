@@ -36,6 +36,12 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Property Name="ExecutionRoute" Id="{961feff0-1b35-44a7-a40f-aa8e8218ab76}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{0600c360-f7b0-4067-a18f-ab3f6a6a02ac}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Property Name="FootprintX" Id="{b2c0660e-2273-4d0b-a3ff-b3d685a837ce}">
       <Declaration><![CDATA[PROPERTY FootprintX : REAL]]></Declaration>
       <Get Name="Get" Id="{1c249b0f-2c24-4249-828f-a42f5a98a347}">

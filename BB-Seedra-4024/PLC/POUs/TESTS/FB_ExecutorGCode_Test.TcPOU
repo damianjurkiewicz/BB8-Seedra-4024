@@ -3,10 +3,10 @@
   <POU Name="FB_ExecutorGCode_Test" Id="{c1b2c3d4-e5f6-4789-9999-000000000020}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorGCode_Test EXTENDS TcUnit.FB_TestSuite
 VAR
-    Executor         : FB_ExecutorGCode;
+    Executor         : FB_Exec_Spindle_GCodeXYZ;
     MockChannel      : FB_MockNciChannel;
 
-    Executor_Err     : FB_ExecutorGCode;
+    Executor_Err     : FB_Exec_Spindle_GCodeXYZ;
     MockChannel_Err  : FB_MockNciChannel;
 
     MockProvider     : FB_MockConfigProvider;
@@ -160,5 +160,17 @@ CASE Step OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="FB_ExecutorGCode_Test">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorGCode_Test.Test_ChannelError_AbortsSequence">
+      <LineId Id="3" Count="46" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorGCode_Test.Test_Sequence_CallsChannelMethodsCorrectly">
+      <LineId Id="3" Count="72" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>

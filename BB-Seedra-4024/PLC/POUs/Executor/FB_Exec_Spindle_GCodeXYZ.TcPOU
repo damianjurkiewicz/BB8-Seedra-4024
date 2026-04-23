@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_ExecutorGCode" Id="{1b4d4fb6-455b-439c-98a5-4fd2ee249483}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorGCode EXTENDS FB_ExecutorBase
+  <POU Name="FB_Exec_Spindle_GCodeXYZ" Id="{1b4d4fb6-455b-439c-98a5-4fd2ee249483}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Exec_Spindle_GCodeXYZ EXTENDS FB_ExecutorBase
 VAR
     _NciChannel : I_NciChannel_GCode;
 END_VAR]]></Declaration>
@@ -229,14 +229,14 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
-    <LineIds Name="FB_ExecutorGCode">
+    <LineIds Name="FB_Exec_Spindle_GCodeXYZ">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorGCode.Abort">
+    <LineIds Name="FB_Exec_Spindle_GCodeXYZ.Abort">
       <LineId Id="13" Count="15" />
       <LineId Id="3" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorGCode.CyclicLogic">
+    <LineIds Name="FB_Exec_Spindle_GCodeXYZ.CyclicLogic">
       <LineId Id="615" Count="40" />
       <LineId Id="851" Count="1" />
       <LineId Id="657" Count="2" />
@@ -253,10 +253,10 @@ END_VAR
       <LineId Id="752" Count="21" />
       <LineId Id="4" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorGCode.NciChannel.Get">
+    <LineIds Name="FB_Exec_Spindle_GCodeXYZ.NciChannel.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_ExecutorGCode.NciChannel.Set">
+    <LineIds Name="FB_Exec_Spindle_GCodeXYZ.NciChannel.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

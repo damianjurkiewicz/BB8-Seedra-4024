@@ -154,6 +154,17 @@ END_VAR
 _NominalY := _Config.Diameter;]]></ST>
       </Implementation>
     </Method>
+    <Property Name="ExecutionRoute" Id="{a6a1a916-e2d9-4ecd-aaea-35dbaf655dc7}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{8cc88c4b-9acc-479d-a8db-4a8fec50b100}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eGCode_Spindle;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="FB_init" Id="{f956be1b-85b3-48f2-beba-5361384ead49}">
       <Declaration><![CDATA[METHOD FB_init : BOOL
 VAR_INPUT
@@ -203,6 +214,9 @@ _Limits.Diameter.MaxVal := 600;]]></ST>
     <LineIds Name="FB_NCIBuilderCircle.CalculateFootprint">
       <LineId Id="15" Count="0" />
       <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NCIBuilderCircle.ExecutionRoute.Get">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIBuilderCircle.FB_init">
       <LineId Id="31" Count="15" />

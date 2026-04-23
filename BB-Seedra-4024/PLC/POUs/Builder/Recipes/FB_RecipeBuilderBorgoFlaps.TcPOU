@@ -147,6 +147,17 @@ _NominalX := _Config.PanelFrontWidth  + 2.0 * _Config.PanelHeight;
 _NominalY := _Config.PanelFrontLength + 2.0 * _Config.PanelHeight;]]></ST>
       </Implementation>
     </Method>
+    <Property Name="ExecutionRoute" Id="{0305d75c-974a-4eab-a51e-af357ba6ad95}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{656fd98a-8440-4295-ade6-b1b129d2e1b8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.ePTP_Macro;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="FB_init" Id="{4a0331ae-cce1-43c4-8f3f-519ce38c4c04}">
       <Declaration><![CDATA[METHOD FB_init : BOOL
 VAR_INPUT
@@ -187,6 +198,9 @@ _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.CalculateFootprint">
       <LineId Id="6" Count="1" />
       <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderBorgoFlaps.ExecutionRoute.Get">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.FB_init">
       <LineId Id="27" Count="15" />

@@ -92,6 +92,17 @@ _NominalX := (2.0 * _Config.PanelHeight) + 40.0;
 _NominalY := _Config.PanelFrontLength;]]></ST>
       </Implementation>
     </Method>
+    <Property Name="ExecutionRoute" Id="{7f69a90b-27cb-4780-8d18-f5335cbac906}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{c5f16da5-eee5-4f57-aa31-bf581754b3b8}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.ePTP_Macro;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
     <Method Name="FB_init" Id="{fc78a4c1-f2de-4ec3-8288-cc1bf83cb800}">
       <Declaration><![CDATA[METHOD FB_init : BOOL
 VAR_INPUT
@@ -136,6 +147,9 @@ _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
     <LineIds Name="FB_RecipeBuilderArona.CalculateFootprint">
       <LineId Id="6" Count="1" />
       <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilderArona.ExecutionRoute.Get">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderArona.FB_init">
       <LineId Id="31" Count="15" />

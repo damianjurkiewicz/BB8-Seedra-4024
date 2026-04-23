@@ -52,6 +52,9 @@
     <Compile Include="PlcTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Builder\E_ExecutionRoute.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderArona.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -103,13 +106,13 @@
     <Compile Include="POUs\Components\ST_Cylinder_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Executor\FB_ExecutorCut.TcPOU">
+    <Compile Include="POUs\Executor\FB_Exec_Pneumatic_PTP.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Executor\FB_ExecutorNCITable.TcPOU">
+    <Compile Include="POUs\Executor\FB_Exec_Tangential_FeedTable.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Executor\FB_ExecutorGrooveXY.TcPOU">
+    <Compile Include="POUs\Executor\FB_Exec_Spindle_PTP.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Executor\I_BB8Specification.TcIO">
@@ -121,7 +124,7 @@
     <Compile Include="POUs\Executor\I_MachiningExecutor.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Executor\FB_ExecutorGCode.TcPOU">
+    <Compile Include="POUs\Executor\FB_Exec_Spindle_GCodeXYZ.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\E_MachineProfile.TcDUT">

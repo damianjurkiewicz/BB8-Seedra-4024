@@ -10,12 +10,12 @@ VAR
     _RecipeBuilder      : I_RecipeBuilder;
     ipSubModules_Init   : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
 
-	ExecutorCutX : FB_ExecutorCut;
-	ExecutorCutY : FB_ExecutorCut;	
+	ExecutorCutX : FB_Exec_Pneumatic_PTP;
+	ExecutorCutY : FB_Exec_Pneumatic_PTP;	
 	
-	ExecutorGrooveXY	: FB_ExecutorGrooveXY;
+	ExecutorGrooveXY	: FB_Exec_Spindle_PTP;
 	
-	ExecutorNCI : FB_ExecutorGCode;
+	ExecutorNCI : FB_Exec_Spindle_GCodeXYZ;
 	
 	_Limits : ST_GantryXYZ_Limits;
 
@@ -388,27 +388,37 @@ END_VAR]]></Declaration>
                 
             10: 
                 SequenceState := 20;
-
+                
             20: 
                 IF _RecipeBuilder <> 0 THEN
                     IF _RecipeBuilder.Build() THEN 
                         
-                        // Kopiujemy konfigurację do zmiennej lokalnej
+                        // Kopiujemy konfigurację do zmiennej lokalnej (przydatne do logów/podglądu)
                         localConfig := _RecipeBuilder.Config;
-                        
+
                         // ========================================================
-                        // ROZWIDLENIE LOGIKI: PTP vs NCI (G-Code)
+                        // ROZWIDLENIE DLA FAZY 1 (Narzędzie Główne)
+                        // Routing decyduje, do którego executora ma trafić zadanie
                         // ========================================================
-                        // Sprawdzamy pole ze zmiennej lokalnej!
-                        IF localConfig.GCodePath <> '' THEN
-                            // Jeśli Builder wypluł G-Code, idziemy ścieżką CNC (NCI)
-                            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Tryb NCI wybrany. Zaladuje plik: %s', localConfig.GCodePath);
-                            SequenceState := 200; 
-                        ELSE
-                            // Jeśli nie ma G-Code'u, lecimy starym procesem PTP
-                            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Tryb PTP (klasyczny) wybrany. Brak sciezki G-Code.', '');
-                            SequenceState := 30; 
-                        END_IF
+                        CASE _RecipeBuilder.ExecutionRoute OF
+                            
+                            E_ExecutionRoute.ePTP_Macro:
+                                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Wrzeciono PTP', '');
+                                SequenceState := 30; 
+                                
+                            E_ExecutionRoute.eGCode_Spindle:
+                                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Wrzeciono G-Code', '');
+                                SequenceState := 40; 
+                                
+                            E_ExecutionRoute.eGCode_Tangential:
+                                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Noz Tangencjalny G-Code', '');
+                                SequenceState := 50;
+                                
+                            E_ExecutionRoute.eFeedTable_Tangential:
+                                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Noz Tangencjalny FeedTable', '');
+                                SequenceState := 60; 
+                                
+                        END_CASE
                     END_IF
                 ELSE
                     // Brak buildera = zły numer programu
@@ -416,80 +426,94 @@ END_VAR]]></Declaration>
                     ChangeState(E_PMLCommand.ePMLCommand_Abort);
                 END_IF     
 
-// ========================================================
-            // ŚCIEŻKA 1: KLASYCZNE PTP (BorgoWings, BorgoFlaps, Arona)
             // ========================================================
+            // FAZA 1: NARZĘDZIE GŁÓWNE
+            // ========================================================
+            
+            // --- 1A: Wrzeciono PTP (Klasyczne frezowanie z odcinków) ---
             30: 
-                IF ExecutorGrooveXY.Execute() THEN 
-                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: PTP - Start operacji GrooveXY', '');
-                    SequenceState := 40;
-                END_IF
-            40: 
+                IF ExecutorGrooveXY.Execute() THEN SequenceState := 35; END_IF
+            35: 
                 IF ExecutorGrooveXY.Done THEN 
-                    SequenceState := 50;
+                    SequenceState := 100; // Skok do Fazy 2 (Docinki)
                 ELSIF ExecutorGrooveXY.Error THEN
                     RaiseAlarmWithStrings(GantryAlarms[1], 'Blad w GrooveXY', '');
                     ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                    SequenceState := 999;
                 END_IF
                 
-            50: 
-                IF ExecutorCutY.Execute() THEN 
-                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: PTP - Start operacji CutY', '');
-                    SequenceState := 60; 
+            // --- 1B: Wrzeciono G-Code (NCI) ---
+            40:
+                IF ExecutorNCI.Execute() THEN SequenceState := 45; END_IF
+            45:
+                IF ExecutorNCI.Done THEN 
+                    SequenceState := 100; // Skok do Fazy 2 (Docinki)
+                ELSIF ExecutorNCI.Error THEN
+                    RaiseAlarmWithStrings(GantryAlarms[1], 'Krytyczny Blad NCI Wrzeciona', '');
+                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                    SequenceState := 999; 
                 END_IF
-            60: 
+                
+            // --- 1C: Nóż Tangencjalny G-Code (Do wpięcia w przyszłości) ---
+            50:
+                // IF ExecTangentialGCode.Execute() THEN SequenceState := 55; END_IF
+                SequenceState := 100; // Tymczasowo przeskakuje
+            55:
+                // IF ExecTangentialGCode.Done THEN SequenceState := 100; 
+                // ELSIF ExecTangentialGCode.Error THEN ... END_IF
+                
+            // --- 1D: Nóż Tangencjalny FeedTable (Do wpięcia w przyszłości) ---
+            60:
+                // IF ExecTangentialFeed.Execute() THEN SequenceState := 65; END_IF
+                SequenceState := 100; // Tymczasowo przeskakuje
+            65:
+                // IF ExecTangentialFeed.Done THEN SequenceState := 100; 
+                // ELSIF ExecTangentialFeed.Error THEN ... END_IF
+
+
+            // ========================================================
+            // FAZA 2: DOCINKA (Wspólna dla wszystkich recept)
+            // ========================================================
+            100: 
+                IF ExecutorCutY.Execute() THEN 
+                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Faza 2 - Start operacji CutY', '');
+                    SequenceState := 110; 
+                END_IF
+            110: 
                 IF ExecutorCutY.Done THEN 
-                    SequenceState := 70;
+                    SequenceState := 120;
                 ELSIF ExecutorCutY.Error THEN
                     RaiseAlarmWithStrings(GantryAlarms[1], 'Blad w CutY', '');
                     ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                    SequenceState := 999;
                 END_IF
                 
-            70: 
+            120: 
                 IF ExecutorCutX.Execute() THEN 
-                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: PTP - Start operacji CutX', '');
-                    SequenceState := 80; 
+                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Faza 2 - Start operacji CutX', '');
+                    SequenceState := 130; 
                 END_IF
-            80: 
+            130: 
                 IF ExecutorCutX.Done THEN 
-                    SequenceState := 1000;
+                    SequenceState := 1000; // Koniec całego detalu!
                 ELSIF ExecutorCutX.Error THEN
                     RaiseAlarmWithStrings(GantryAlarms[1], 'Blad w CutX', '');
                     ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                    SequenceState := 999;
                 END_IF
 
-            // ========================================================
-            // ŚCIEŻKA 2: KANAŁ INTERPOLACYJNY NCI (Rectangle, Kółka itp.)
-            // ========================================================
-            200:
-                IF ExecutorNCI.Execute() THEN
-                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: NCI - Start ExecutorNCI', '');
-                    SequenceState := 210;
-                END_IF
-                
-          210:
-                IF ExecutorNCI.Done THEN
-                    SequenceState := 1000;
-                ELSIF ExecutorNCI.Error THEN
-                    ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: BLAD KRYTYCZNY w ExecutorNCI! Wywoluje Abort.', '');
-                    RaiseAlarmWithStrings(GantryAlarms[1], 'Krytyczny Blad NCI', '');
-                    
-                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
-                    
-                    SequenceState := 999; // <--- KLUCZOWA ZMIANA: Uciekamy do martwego kroku!
-                END_IF
-                
+
             // ========================================================
             // MARTWY KROK DLA BŁĘDÓW
             // ========================================================
             999:
-                // Maszyna po prostu tu czeka. 
+                // Maszyna po prostu tu czeka.
                 // W tle PackML przetworzy komendę ChangeState i brutalnie przerwie
                 // metodę Execute(), przeskakując do metody Aborting()!
                 ;
     
             // ========================================================
-            // KONIEC OBRÓBKI (WSPÓLNY DLA OBU ŚCIEŻEK)
+            // KONIEC OBRÓBKI 
             // ========================================================
             1000:            
                 ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Sekwencja produkcyjna zakonczona sukcesem.', '');
@@ -1079,10 +1103,7 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
-      <LineId Id="416" Count="40" />
-      <LineId Id="513" Count="50" />
-      <LineId Id="575" Count="18" />
-      <LineId Id="498" Count="14" />
+      <LineId Id="597" Count="149" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.FB_init">

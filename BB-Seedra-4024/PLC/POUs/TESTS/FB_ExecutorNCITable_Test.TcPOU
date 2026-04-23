@@ -3,10 +3,10 @@
   <POU Name="FB_ExecutorNCITable_Test" Id="{f1b2c3d4-e5f6-4789-9999-000000000050}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorNCITable_Test EXTENDS TcUnit.FB_TestSuite
 VAR
-    Executor         : FB_ExecutorNCITable;
+    Executor         : FB_Exec_Tangential_FeedTable;
     MockChannel      : FB_MockNciChannelFeedTable;
 
-    Executor_Err     : FB_ExecutorNCITable;
+    Executor_Err     : FB_Exec_Tangential_FeedTable;
     MockChannel_Err  : FB_MockNciChannelFeedTable;
 
     MockProvider     : FB_MockConfigProvider;
@@ -160,5 +160,17 @@ CASE Step OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="FB_ExecutorNCITable_Test">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorNCITable_Test.Test_ChannelError_AbortsSequence">
+      <LineId Id="3" Count="46" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorNCITable_Test.Test_Sequence_ExecutesTableCorrectly">
+      <LineId Id="3" Count="72" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>
