@@ -3392,7 +3392,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{24B883D0-4005-43E2-2025-EFD0A2252B54}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{CDAF2D75-B01F-C45E-D14A-E54F702DB139}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -3403,6 +3403,30 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>GVL_Safety.SafeError</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.ComError</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.SafetyPermission</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.eStopButton</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorX</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorY</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorZ</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
@@ -3438,30 +3462,6 @@ External Setpoint Generation:
 							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Sensor</Name>
 							<Type>BOOL</Type>
 						</Var>
-						<Var>
-							<Name>GVL_Safety.ComError</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.SafetyPermission</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.eStopButton</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.ProximitySensorX</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.ProximitySensorY</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.ProximitySensorZ</Name>
-							<Type>BOOL</Type>
-						</Var>
 					</Vars>
 					<Vars VarGrpType="2" AreaNo="1">
 						<Name>PlcTask Outputs</Name>
@@ -3475,6 +3475,14 @@ External Setpoint Generation:
 						</Var>
 						<Var>
 							<Name>GVL_Safety.RestartFBs</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.SpindleEnable</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.CoolingEnable</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
@@ -3509,17 +3517,46 @@ External Setpoint Generation:
 							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Valve</Name>
 							<Type>BOOL</Type>
 						</Var>
-						<Var>
-							<Name>IO.SpindleEnable</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.CoolingEnable</Name>
-							<Type>BOOL</Type>
-						</Var>
 					</Vars>
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>SafetyTask Inputs</Name>
+						<Var>
+							<Name>GVL_Safety.SafetyPermissionI</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI1</Name>
+							<Comment><![CDATA[Terminal EL1008]]></Comment>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI2</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI3</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI4</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI5</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI6</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI7</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.DI8</Name>
+							<Type>BOOL</Type>
+						</Var>
 						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFX.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
@@ -3580,46 +3617,13 @@ External Setpoint Generation:
 							<Name>TESTS.Test_ExecutorNCITable.MockAxisZ.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
 						</Var>
-						<Var>
-							<Name>GVL_Safety.SafetyPermissionI</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI1</Name>
-							<Comment><![CDATA[Terminal EL1008]]></Comment>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI2</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI3</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI4</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI5</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI6</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI7</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.DI8</Name>
-							<Type>BOOL</Type>
-						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
+						<Var>
+							<Name>GVL_Safety.SafetyPermissionQ</Name>
+							<Type>BOOL</Type>
+						</Var>
 						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFX.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
@@ -3679,10 +3683,6 @@ External Setpoint Generation:
 						<Var>
 							<Name>TESTS.Test_ExecutorNCITable.MockAxisZ.BasicAxis._Axis.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.SafetyPermissionQ</Name>
-							<Type>BOOL</Type>
 						</Var>
 					</Vars>
 					<UnrestoredVarLinks ImportTime="2026-01-27T16:22:49">

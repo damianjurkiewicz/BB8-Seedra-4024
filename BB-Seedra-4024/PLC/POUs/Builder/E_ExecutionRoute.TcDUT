@@ -5,10 +5,9 @@
 {attribute 'strict'}
 TYPE E_ExecutionRoute :
 (
-    ePTP_Macro,              // 
-    eGCode_Spindle,          // Tylko 1 operacja: G-Code na wrzecionie (NCI 3-osiowe)
-    eGCode_Tangential,       // Tylko 1 operacja: G-Code na nożu (NCI 4-osiowe)
-    eFeedTable_Tangential    // Tylko 1 operacja: FeedTable na nożu
+    ePTP,              
+    eGCode,          
+    eFeedTable    
 );
 END_TYPE]]></Declaration>
   </DUT>

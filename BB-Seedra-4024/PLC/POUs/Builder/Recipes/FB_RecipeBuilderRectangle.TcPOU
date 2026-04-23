@@ -87,7 +87,7 @@ _NominalY := _Config.PanelFrontLength;]]></ST>
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.ePTP_Macro;]]></ST>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.ePTP;]]></ST>
         </Implementation>
       </Get>
     </Property>

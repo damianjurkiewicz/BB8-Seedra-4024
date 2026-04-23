@@ -161,7 +161,7 @@ _NominalY := _Config.Diameter;]]></ST>
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eGCode_Spindle;]]></ST>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eGCode;]]></ST>
         </Implementation>
       </Get>
     </Property>
