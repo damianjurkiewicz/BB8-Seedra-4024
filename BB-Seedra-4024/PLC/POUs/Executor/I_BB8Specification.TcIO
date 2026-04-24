@@ -3,6 +3,15 @@
   <Itf Name="I_BB8Specification" Id="{d7ebea93-19fd-4cf9-88f8-8809c3c592f9}">
     <Declaration><![CDATA[INTERFACE I_BB8Specification
 ]]></Declaration>
+    <Property Name="AxisQ" Id="{31aae7e7-a3a0-4a61-a267-3b384bd47281}">
+      <Declaration><![CDATA[PROPERTY AxisQ : I_BasicAxis]]></Declaration>
+      <Get Name="Get" Id="{bb5c9c35-554b-495c-8b4e-74caadf345f8}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{12cb3085-f878-46d7-a93b-c865ce50ed5e}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="AxisX" Id="{4993a6b5-db25-4553-9cb2-07b51c88c577}">
       <Declaration><![CDATA[PROPERTY AxisX : I_BasicAxis]]></Declaration>
       <Get Name="Get" Id="{522ea5ee-87d4-4fe1-8a51-2790c354af23}">

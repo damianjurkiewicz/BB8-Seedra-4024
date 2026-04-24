@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_MockGeometryWriter" Id="{a1b2c3d4-e5f6-4789-9999-10c4930e0000}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MockGeometryWriter IMPLEMENTS I_GeometryWriter
+VAR_OUTPUT
+    ClearCount                     : INT;
+    EnableTangentialFollowingCount : INT;
+    AddStartPointCount             : INT;
+    AddLineCount                   : INT;
+    AddArcCount                    : INT;
+    EndTableCount                  : INT;
+    
+    // Ostatnie parametry ze StartPoint (do weryfikacji)
+    LastStartX : LREAL;
+    LastStartY : LREAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="AddArc" Id="{a1b2c3d4-e5f6-4789-9999-10c4930e0001}">
+      <Declaration><![CDATA[METHOD AddArc : BOOL
+VAR_INPUT
+    TargetX    : LREAL;
+    TargetY    : LREAL;
+    CenterX    : LREAL;
+    CenterY    : LREAL;
+    Velo       : LREAL;
+    Clockwise  : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[AddArcCount := AddArcCount + 1;
+AddArc := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="AddLine" Id="{a1b2c3d4-e5f6-4789-9999-10c4930e0002}">
+      <Declaration><![CDATA[METHOD AddLine : BOOL
+VAR_INPUT
+    TargetX : LREAL;
+    TargetY : LREAL;
+    Velo    : LREAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[AddLineCount := AddLineCount + 1;
+AddLine := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="AddStartPoint" Id="{a1b2c3d4-e5f6-4789-9999-10c4930e0003}">
+      <Declaration><![CDATA[METHOD AddStartPoint : BOOL
+VAR_INPUT
+    TargetX : LREAL;
+    TargetY : LREAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[AddStartPointCount := AddStartPointCount + 1;
+LastStartX := TargetX;
+LastStartY := TargetY;
+AddStartPoint := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Clear" Id="{a1b2c3d4-e5f6-4789-9999-10c4930e0004}">
+      <Declaration><![CDATA[METHOD Clear : BOOL
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[ClearCount := ClearCount + 1;
+Clear := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="EnableTangentialFollowing" Id="{a1b2c3d4-e5f6-4789-9999-10c4930e0005}">
+      <Declaration><![CDATA[METHOD EnableTangentialFollowing : BOOL
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[EnableTangentialFollowingCount := EnableTangentialFollowingCount + 1;
+EnableTangentialFollowing := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="EndTable" Id="{a1b2c3d4-e5f6-4789-9999-10c4930e0006}">
+      <Declaration><![CDATA[METHOD EndTable : BOOL
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[EndTableCount := EndTableCount + 1;
+EndTable := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ResetCounters" Id="{a1b2c3d4-e5f6-4789-9999-10c4930e0007}">
+      <Declaration><![CDATA[METHOD ResetCounters
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[ClearCount := 0;
+EnableTangentialFollowingCount := 0;
+AddStartPointCount := 0;
+AddLineCount := 0;
+AddArcCount := 0;
+EndTableCount := 0;
+LastStartX := 0.0;
+LastStartY := 0.0;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

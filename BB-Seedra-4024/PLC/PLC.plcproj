@@ -136,13 +136,13 @@
     <Compile Include="POUs\GantryXYZ\E_MachineProfile.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\GantryXYZ\E_RecipeID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\GantryXYZ\ST_AxisProfile.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_Limits.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\GantryXYZ\E_RecipeID.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\FB_GantryXYZ.TcPOU">
@@ -214,6 +214,9 @@
     <Compile Include="POUs\TESTS\FB_ExecutorGCode_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\TESTS\FB_FeedBuilderRoundedRect_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\TESTS\FB_NciChannelTangential_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -236,6 +239,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TESTS\Mocks\FB_MockAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\Mocks\FB_MockGeometryWriter.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TESTS\Mocks\FB_MockNciChannelFeedTable.TcPOU">
@@ -262,6 +268,10 @@
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
     <Compile Include="VISUs\Modes\ProductionMode\V_ProductionArona.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionRoundRectangle.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>

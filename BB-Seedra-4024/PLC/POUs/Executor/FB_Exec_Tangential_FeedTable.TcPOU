@@ -148,34 +148,28 @@ END_IF
 CASE nStep OF
     0: // IDLE
 
-    5: // INIT
-        IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
-            IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error THEN
-                nStep := 999;
-            ELSIF _AxisX.Enabled AND _AxisY.Enabled AND _AxisZ.Enabled THEN
-                _bBusy := TRUE;
-                localConfig := _ConfigProvider.Config;
-                recipeConfig := _RecipeBuilder.Config;
-
-                iCurrentCopyX := 1;
-                iCurrentCopyY := 1;
-
-                _AxisX.Velocity := localConfig.RapidSpeedX;
-                _AxisY.Velocity := localConfig.RapidSpeedY;
-                _AxisZ.Velocity := localConfig.RapidSpeedZ;
-
-                nStep := 8;
-            END_IF
-        END_IF
+	5: // INIT
+			// Wywołujemy Enable na wszystkich osiach, w tym Q
+			IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() AND _AxisQ.Enable() THEN
+				
+				// Czekamy aż WSZYSTKIE osie potwierdzą gotowość i nie będą Busy (standard z innych executorów)
+				IF _AxisX.Enabled AND _AxisY.Enabled AND _AxisZ.Enabled AND _AxisQ.Enabled 
+				   AND NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisQ.Busy THEN
+					
+					_bBusy := TRUE;
+					// ... reszta przypisań (localConfig, recipeConfig)
+					nStep := 8;
+				END_IF
+			END_IF
 
     8: // Dojazd PTP
         MoveToXY(recipeConfig.NciStartX, recipeConfig.NciStartY, 0.0, 0.0);
         nStep := 9;
 
     9: // Czekamy na XY, jedziemy z Z
-        IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error THEN
+        IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error OR _AxisQ.Error THEN
             nStep := 999;
-        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition AND _AxisQ.InPosition THEN
             localConfig := _ConfigProvider.Config;
             MaterialTopZ := localConfig.GlobalOffsetZ + localConfig.RawBoardZ;
             SafeZ := MaterialTopZ + localConfig.SafeClearanceZ;
@@ -338,7 +332,9 @@ EndTable := NOT fbFeedPrep.bError;]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Tangential_FeedTable.CyclicLogic">
-      <LineId Id="3" Count="57" />
+      <LineId Id="3" Count="10" />
+      <LineId Id="192" Count="11" />
+      <LineId Id="32" Count="28" />
       <LineId Id="125" Count="5" />
       <LineId Id="67" Count="51" />
       <LineId Id="2" Count="0" />

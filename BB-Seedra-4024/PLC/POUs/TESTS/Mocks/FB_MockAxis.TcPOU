@@ -52,7 +52,7 @@ END_VAR
     <Method Name="CyclicLogic" Id="{102391e4-3a92-4a49-bde0-8864cda47509}">
       <Declaration><![CDATA[METHOD CyclicLogic]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[SUPER^.CyclicLogic();]]></ST>
       </Implementation>
     </Method>
     <Property Name="Deceleration" Id="{8113da0f-9094-45e4-bad9-b871668a9a1d}">
@@ -78,7 +78,8 @@ END_VAR
       <Declaration><![CDATA[METHOD Enable : BOOL
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Enabled := TRUE;
+        <ST><![CDATA[SUPER^.Enable(); 
+_Enabled := TRUE;
 Enable := TRUE;
 ]]></ST>
       </Implementation>
@@ -187,6 +188,7 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MockAxis.Enable">
+      <LineId Id="7" Count="0" />
       <LineId Id="5" Count="0" />
       <LineId Id="2" Count="0" />
       <LineId Id="4" Count="0" />

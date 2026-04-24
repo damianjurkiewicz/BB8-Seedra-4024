@@ -9,24 +9,78 @@
     </Implementation>
     <Method Name="Build" Id="{467bfb79-ab23-42b9-a66b-eeeb838e55fd}">
       <Declaration><![CDATA[METHOD Build : BOOL
-]]></Declaration>
+VAR
+    TotalX, TotalY, Radius : LREAL;
+    Velo : LREAL;
+	localConfig : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// (Wewnątrz metody Build w FB_FeedBuilderRoundedRect)
+        <ST><![CDATA[Build := FALSE;
 
-// 1. Zabezpieczenie
-IF _GeometryWriter = 0 THEN 
-    Build := FALSE; RETURN; 
+THIS^.UpdateNestingLimits();
+IF NOT _Config.IsValid OR _GeometryWriter = 0 THEN
+    RETURN;
 END_IF
 
-// 2. Czyścimy
+// Gabaryty i promień
+TotalX := _Config.PanelFrontWidth;
+TotalY := _Config.PanelFrontLength;
+Radius := _Config.Radius;
+
+// Zabezpieczenia promienia (żeby łuki się nie nałożyły na siebie w małych detalach)
+IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
+IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
+
+// PTP Start (ustawiamy nad środkiem dolnej krawędzi)
+_Config.NciStartX := TotalX / 2.0;
+_Config.NciStartY := 0.0;
+
+// ===================================================
+// POPRAWKA: Prędkość z użyciem zmiennej pomocniczej
+// ===================================================
+IF _ConfigProvider <> 0 THEN
+    localConfig := _ConfigProvider.Config; // Krok 1: Pobranie struktury z interfejsu
+    Velo := localConfig.CuttingSpeedXY;    // Krok 2: Odczytanie konkretnego pola
+ELSE
+    Velo := 50.0;
+END_IF
+
+// ============================================
+// GENEROWANIE TABELI 
+// ============================================
 _GeometryWriter.Clear();
 
-// 3. Rysujemy prostokąt
-// (zakładamy start z [0,0])
-_GeometryWriter.AddLine(TargetX := TotalX, TargetY := 0.0, Velo := Speed);
-_GeometryWriter.AddLine(TargetX := TotalX, TargetY := TotalY, Velo := Speed);
-_GeometryWriter.AddLine(TargetX := 0.0, TargetY := TotalY, Velo := Speed);
-_GeometryWriter.AddLine(TargetX := 0.0, TargetY := 0.0, Velo := Speed);
+// Konfiguracja wstępna NCI
+_GeometryWriter.EnableTangentialFollowing();
+_GeometryWriter.AddStartPoint(TotalX / 2.0, 0.0);
+
+// 1. Dolna krawędź -> Prawy dolny łuk
+_GeometryWriter.AddLine(TotalX - Radius, 0.0, Velo);
+IF Radius > 0 THEN
+    _GeometryWriter.AddArc(TotalX, Radius, TotalX - Radius, Radius, Velo, FALSE); // FALSE = G03 = CounterClockwise
+END_IF
+
+// 2. Prawa krawędź -> Prawy górny łuk
+_GeometryWriter.AddLine(TotalX, TotalY - Radius, Velo);
+IF Radius > 0 THEN
+    _GeometryWriter.AddArc(TotalX - Radius, TotalY, TotalX - Radius, TotalY - Radius, Velo, FALSE);
+END_IF
+
+// 3. Górna krawędź -> Lewy górny łuk
+_GeometryWriter.AddLine(Radius, TotalY, Velo);
+IF Radius > 0 THEN
+    _GeometryWriter.AddArc(0.0, TotalY - Radius, Radius, TotalY - Radius, Velo, FALSE);
+END_IF
+
+// 4. Lewa krawędź -> Lewy dolny łuk
+_GeometryWriter.AddLine(0.0, Radius, Velo);
+IF Radius > 0 THEN
+    _GeometryWriter.AddArc(Radius, 0.0, Radius, Radius, Velo, FALSE);
+END_IF
+
+// Powrót do punktu początkowego i koniec tabeli
+_GeometryWriter.AddLine(TotalX / 2.0, 0.0, Velo);
+_GeometryWriter.EndTable();
 
 Build := TRUE;]]></ST>
       </Implementation>
@@ -37,8 +91,8 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_NominalX := _Config.Diameter;
-_NominalY := _Config.Diameter;]]></ST>
+        <ST><![CDATA[_NominalX := _Config.PanelFrontWidth;
+_NominalY := _Config.PanelFrontLength;]]></ST>
       </Implementation>
     </Method>
     <Property Name="ExecutionRoute" Id="{e5b97dc5-f6eb-448a-a093-590b8fb46182}">
@@ -48,7 +102,7 @@ _NominalY := _Config.Diameter;]]></ST>
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eGCode;]]></ST>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eFeedTable;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -89,11 +143,11 @@ _Limits.Diameter.MaxVal := 600;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderRoundedRect.Build">
-      <LineId Id="1580" Count="16" />
+      <LineId Id="1730" Count="66" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderRoundedRect.CalculateFootprint">
-      <LineId Id="15" Count="0" />
+      <LineId Id="28" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderRoundedRect.ExecutionRoute.Get">
