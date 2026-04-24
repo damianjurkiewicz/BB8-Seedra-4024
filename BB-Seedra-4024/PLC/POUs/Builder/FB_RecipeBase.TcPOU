@@ -37,6 +37,7 @@ VAR
     _nFileWriteStep : INT := 0;                     // Krok maszyny stanów zapisu
     _sGCodeFilePath : STRING(255);                  // Ścieżka pliku
 	
+	_GeometryWriter : I_GeometryWriter;
 	
 END_VAR
 ]]></Declaration>
@@ -194,6 +195,25 @@ END_VAR
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[_FootprintY := FootprintY;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="GeometryWriter" Id="{0595b86d-12dc-4c63-b408-5e7e23b5a0e1}">
+      <Declaration><![CDATA[PROPERTY GeometryWriter : I_GeometryWriter]]></Declaration>
+      <Get Name="Get" Id="{e798f707-68ae-4415-b903-6eaef2d95e9e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[GeometryWriter := _GeometryWriter;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{c0543439-b8f5-43b2-aaf0-f68e18613a3b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_GeometryWriter := GeometryWriter;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -532,6 +552,12 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.FootprintY.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.GeometryWriter.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.GeometryWriter.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Limits.Get">

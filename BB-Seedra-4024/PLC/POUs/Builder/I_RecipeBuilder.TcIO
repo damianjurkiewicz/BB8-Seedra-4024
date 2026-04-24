@@ -60,6 +60,15 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Property Name="GeometryWriter" Id="{d4bebd77-571d-4217-889b-872c8fc3a75b}">
+      <Declaration><![CDATA[PROPERTY GeometryWriter : I_GeometryWriter]]></Declaration>
+      <Get Name="Get" Id="{d6a12bab-d176-4870-bbae-066a355dfdd1}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{36c32498-a83b-42dd-8e8e-4ca52f21093a}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="Limits" Id="{cb52d8bb-7c49-4fc2-8442-7c9db617c87d}">
       <Declaration><![CDATA[PROPERTY Limits : ST_Recipe_Limits]]></Declaration>
       <Get Name="Get" Id="{b51051d6-7967-4941-b388-23830aee7422}">

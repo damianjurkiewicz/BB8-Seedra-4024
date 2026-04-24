@@ -1,10 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_Exec_Tangential_FeedTable" Id="{e1b2c3d4-e5f6-4789-9999-000000000040}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_Exec_Tangential_FeedTable EXTENDS FB_ExecutorBase
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Exec_Tangential_FeedTable EXTENDS FB_ExecutorBase IMPLEMENTS I_GeometryWriter
 VAR
     _NciChannel : I_NciChannel_FeedTable;
     _FeedTable  : ST_NciFeedGroupTable; 
+    
+    // NCI Builder z Tc2_PlcInterpolation
+    fbFeedPrep  : FB_NciFeedTablePreparation;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -19,6 +22,110 @@ END_VAR]]></Declaration>
 END_IF
 _bBusy := FALSE; _bDone := FALSE; _bError := FALSE; _uErrorID := 0; nStep := 0;
 ]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="AddArc" Id="{af788716-9307-40d3-8fa3-1e39a3e2ad04}">
+      <Declaration><![CDATA[METHOD AddArc : BOOL
+VAR_INPUT
+    TargetX    : LREAL;
+    TargetY    : LREAL;
+    CenterX    : LREAL;
+    CenterY    : LREAL;
+    Velo       : LREAL;
+    Clockwise  : BOOL; 
+END_VAR
+
+VAR
+    stArc : ST_NciGeoCirclePlane;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stArc.fEndPosX := TargetX;
+stArc.fEndPosY := TargetY;
+stArc.fEndPosZ := 0.0;
+stArc.fCenterX := CenterX;
+stArc.fCenterY := CenterY;
+stArc.fCenterZ := 0.0;
+stArc.fVelo := Velo;
+stArc.bClockwise := Clockwise;
+stArc.nPlane := E_NciGeoPlane.E_NciGeoPlaneXY;
+
+fbFeedPrep(
+    nEntryType := E_NciEntryType.E_NciEntryTypeGeoCirclePlane,
+    pEntry := ADR(stArc),
+    bResetTable := FALSE,
+    bResetAll := FALSE,
+    stFeedGroupTable := _FeedTable
+);
+AddArc := NOT fbFeedPrep.bError;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="AddLine" Id="{de37e77a-59fa-4e4f-b465-dfe20df19cd8}">
+      <Declaration><![CDATA[METHOD AddLine : BOOL
+VAR_INPUT
+    TargetX : LREAL;
+    TargetY : LREAL;
+    Velo    : LREAL;
+END_VAR
+
+VAR
+    stLine : ST_NciGeoLine;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+
+stLine.fEndPosX := TargetX;
+stLine.fEndPosY := TargetY;
+stLine.fEndPosZ := 0.0;
+stLine.fVelo := Velo;
+
+fbFeedPrep(
+    nEntryType := E_NciEntryType.E_NciEntryTypeGeoLine,
+    pEntry := ADR(stLine),
+    bResetTable := FALSE,
+    bResetAll := FALSE,
+    stFeedGroupTable := _FeedTable
+);
+AddLine := NOT fbFeedPrep.bError;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="AddStartPoint" Id="{55a012b2-5afc-4c4d-8025-2901f3448d7b}">
+      <Declaration><![CDATA[METHOD AddStartPoint : BOOL
+VAR_INPUT
+    TargetX : LREAL;
+    TargetY : LREAL;
+END_VAR
+VAR
+    stStart : ST_NciGeoStart;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stStart.fPosX := TargetX;
+stStart.fPosY := TargetY;
+stStart.fPosZ := 0.0;
+
+fbFeedPrep(
+    nEntryType := E_NciEntryType.E_NciEntryTypeGeoStart,
+    pEntry := ADR(stStart),
+    bResetTable := FALSE,
+    bResetAll := FALSE,
+    stFeedGroupTable := _FeedTable
+);
+AddStartPoint := NOT fbFeedPrep.bError;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Clear" Id="{ce1afe41-d722-4a51-b756-4addb08a67f1}">
+      <Declaration><![CDATA[METHOD Clear : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbFeedPrep(
+    nEntryType := E_NciEntryType.E_NciEntryTypeNone,
+    pEntry := 0,
+    bResetTable := TRUE,
+    bResetAll := TRUE, // Czyści też modale i błędy (wg str. 315)
+    stFeedGroupTable := _FeedTable
+);
+Clear := NOT fbFeedPrep.bError;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CyclicLogic" Id="{e1b2c3d4-e5f6-4789-9999-000000000041}">
@@ -88,11 +195,11 @@ CASE nStep OF
         _NciChannel.BuildGroup();
         nStep := 30;
 
-    30: // Start podawania tabeli punktów
+	30: // Start podawania tabeli punktów
         IF _NciChannel.ChannelError THEN
             nStep := 999;
         ELSIF _NciChannel.IsGrouped THEN
-            _NciChannel.StartFeedTable(stTable := _FeedTable);
+            _NciChannel.StartFeedTable(stTable := THIS^._FeedTable); // Podajemy wewnetrzna tabele!
             nStep := 40;
         END_IF
 
@@ -149,6 +256,49 @@ CASE nStep OF
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Method Name="EnableTangentialFollowing" Id="{d2004b92-6a97-4549-b0d7-74a42dd1632f}">
+      <Declaration><![CDATA[METHOD EnableTangentialFollowing : BOOL
+VAR
+    stTf : ST_NciTangentialFollowingDesc;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[stTf.bTangOn := TRUE;
+stTf.nTangAxis := E_NciAxesInGroup.Q1Axis;
+stTf.nPathAxis1 := E_NciAxesInGroup.XAxis;
+stTf.nPathAxis2 := E_NciAxesInGroup.YAxis;
+stTf.fOffset := 0.0;
+stTf.fCriticalAngle1 := 90.0; 
+stTf.nTfBehavior := E_TangentialFollowingBehavior.E_TfIngoreAll; // Uwaga na literówkę Beckhoffa!
+
+fbFeedPrep(
+    nEntryType := E_NciEntryType.E_NciEntryTypeTfDesc,
+    pEntry := ADR(stTf),
+    bResetTable := FALSE,
+    bResetAll := FALSE,
+    stFeedGroupTable := _FeedTable
+);
+EnableTangentialFollowing := NOT fbFeedPrep.bError;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="EndTable" Id="{65428bc6-7970-4afa-a4f2-edf109d35f22}">
+      <Declaration><![CDATA[METHOD EndTable : BOOL
+VAR
+    stEnd : ST_NciEndOfTables;
+END_VAR
+
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+fbFeedPrep(
+    nEntryType := E_NciEntryType.E_NciEntryTypeEndOfTables,
+    pEntry := ADR(stEnd),
+    bResetTable := FALSE,
+    bResetAll := FALSE,
+    stFeedGroupTable := _FeedTable
+);
+EndTable := NOT fbFeedPrep.bError;]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="NciChannel" Id="{e1b2c3d4-e5f6-4789-9999-000000000043}">
       <Declaration><![CDATA[PROPERTY NciChannel : I_NciChannel_FeedTable]]></Declaration>
       <Get Name="Get" Id="{e1b2c3d4-e5f6-4789-9999-000000000044}">
@@ -171,9 +321,35 @@ END_CASE]]></ST>
       <LineId Id="3" Count="5" />
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_Exec_Tangential_FeedTable.AddArc">
+      <LineId Id="15" Count="16" />
+      <LineId Id="10" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Exec_Tangential_FeedTable.AddLine">
+      <LineId Id="10" Count="13" />
+      <LineId Id="7" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Exec_Tangential_FeedTable.AddStartPoint">
+      <LineId Id="11" Count="10" />
+      <LineId Id="6" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Exec_Tangential_FeedTable.Clear">
+      <LineId Id="7" Count="6" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_Exec_Tangential_FeedTable.CyclicLogic">
-      <LineId Id="3" Count="115" />
+      <LineId Id="3" Count="57" />
+      <LineId Id="125" Count="5" />
+      <LineId Id="67" Count="51" />
       <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Exec_Tangential_FeedTable.EnableTangentialFollowing">
+      <LineId Id="10" Count="14" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Exec_Tangential_FeedTable.EndTable">
+      <LineId Id="9" Count="7" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Tangential_FeedTable.NciChannel.Get">
       <LineId Id="2" Count="0" />

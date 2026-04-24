@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_FeedBuilderRoundedRect" Id="{1ddf87ea-7324-49e6-913d-124770f09345}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedBuilderRoundedRect EXTENDS FB_RecipeBase
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{467bfb79-ab23-42b9-a66b-eeeb838e55fd}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// (Wewnątrz metody Build w FB_FeedBuilderRoundedRect)
+
+// 1. Zabezpieczenie
+IF _GeometryWriter = 0 THEN 
+    Build := FALSE; RETURN; 
+END_IF
+
+// 2. Czyścimy
+_GeometryWriter.Clear();
+
+// 3. Rysujemy prostokąt
+// (zakładamy start z [0,0])
+_GeometryWriter.AddLine(TargetX := TotalX, TargetY := 0.0, Velo := Speed);
+_GeometryWriter.AddLine(TargetX := TotalX, TargetY := TotalY, Velo := Speed);
+_GeometryWriter.AddLine(TargetX := 0.0, TargetY := TotalY, Velo := Speed);
+_GeometryWriter.AddLine(TargetX := 0.0, TargetY := 0.0, Velo := Speed);
+
+Build := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CalculateFootprint" Id="{69122a13-5bee-4ba2-aa84-35b261dbcd57}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_NominalX := _Config.Diameter;
+_NominalY := _Config.Diameter;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ExecutionRoute" Id="{e5b97dc5-f6eb-448a-a093-590b8fb46182}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{80e5bd51-d53c-4301-b5e9-03d7a4f13cae}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eGCode;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="FB_init" Id="{aac41d9e-f220-4057-8151-b975e6456f0e}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
+_Limits.PanelFrontLength.MaxVal := 2400.0;
+
+_Limits.PanelFrontWidth.MinVal  := 100.0;
+_Limits.PanelFrontWidth.MaxVal  := 1200.0;
+
+_Limits.PanelHeight.MinVal      := 0.0;
+_Limits.PanelHeight.MaxVal      := 0.0;
+
+_Limits.RailHeightCorrection.MinVal := 0.0;
+_Limits.RailHeightCorrection.MaxVal := 0.0;
+
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.GrooveDepthZ.MinVal := 0.0;
+_Limits.GrooveDepthZ.MaxVal := 9.0; 
+
+_Limits.Diameter.MinVal := 10;
+_Limits.Diameter.MaxVal := 600;]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_FeedBuilderRoundedRect">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderRoundedRect.Build">
+      <LineId Id="1580" Count="16" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderRoundedRect.CalculateFootprint">
+      <LineId Id="15" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderRoundedRect.ExecutionRoute.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderRoundedRect.FB_init">
+      <LineId Id="31" Count="15" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="53" Count="1" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="63" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

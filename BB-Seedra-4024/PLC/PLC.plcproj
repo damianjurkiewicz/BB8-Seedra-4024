@@ -55,6 +55,12 @@
     <Compile Include="POUs\Builder\E_ExecutionRoute.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Builder\I_GeometryWriter.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderRoundedRect.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderArona.TcPOU">
       <SubType>Code</SubType>
     </Compile>

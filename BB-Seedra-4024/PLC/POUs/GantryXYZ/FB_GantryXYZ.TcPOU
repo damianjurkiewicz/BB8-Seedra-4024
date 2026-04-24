@@ -389,8 +389,20 @@ END_VAR]]></Declaration>
             10: 
                 SequenceState := 20;
                 
-            20: 
+			20: 
                 IF _RecipeBuilder <> 0 THEN
+                    
+                    // =======================================================
+                    // WSTRZYKNIĘCIE ZALEŻNOŚCI (INVERSION OF CONTROL)
+                    // Jeśli to ścieżka FeedTable, użyczamy recepturze interfejsu 
+                    // I_GeometryWriter pochodzącego prosto z naszego Executora!
+                    // =======================================================
+                    IF _RecipeBuilder.ExecutionRoute = E_ExecutionRoute.eFeedTable THEN
+                        _RecipeBuilder.GeometryWriter := ExecTangentialFeed; 
+                    END_IF
+                    
+                    // Dopiero teraz każemy recepcie się zbudować.
+                    // Jeśli to FeedTable, recepta bezpiecznie wypełni wewnątrz tabelę Executora.
                     IF _RecipeBuilder.Build() THEN 
                         
                         // Kopiujemy konfigurację do zmiennej lokalnej (przydatne do logów/podglądu)
@@ -419,7 +431,7 @@ END_VAR]]></Declaration>
                     // Brak buildera = zły numer programu
                     ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: BLAD KRYTYCZNY! Brak obiektu _RecipeBuilder. Wywoluje Abort.', '');
                     ChangeState(E_PMLCommand.ePMLCommand_Abort);
-                END_IF     
+                END_IF
 
             // ========================================================
             // FAZA 1: NARZĘDZIE GŁÓWNE
@@ -1092,7 +1104,9 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
-      <LineId Id="750" Count="138" />
+      <LineId Id="750" Count="13" />
+      <LineId Id="892" Count="41" />
+      <LineId Id="794" Count="94" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.FB_init">
