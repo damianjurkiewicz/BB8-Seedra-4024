@@ -3,10 +3,12 @@
   <POU Name="FB_RecipeBuilder_Test" Id="{ede2b717-c9c9-439b-9f45-ba86089b083e}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilder_Test EXTENDS TcUnit.FB_TestSuite
 VAR
-    BuilderArona : FB_RecipeBuilderArona;
-	BuilderBorgoFlaps : FB_RecipeBuilderBorgoFlaps;
-	BuilderBorgoWings : FB_RecipeBuilderBorgoWings; 
-    Config  : ST_RecipeBuilder_Config;
+    BuilderArona 		: FB_RecipeBuilderArona;
+    BuilderBorgoFlaps 	: FB_RecipeBuilderBorgoFlaps;
+	BuilderBorgoWings 	: FB_RecipeBuilderBorgoWings; 
+	BuilderCircle 		: FB_NCIBuilderCircle;
+	BuilderRectangle    : FB_RecipeBuilderRectangle;
+    Config  			: ST_RecipeBuilder_Config;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[Test_Arona_Calculates_Segments();
@@ -17,6 +19,7 @@ Test_BorgoWings_Calculates_Footprint();
 Test_BorgoWings_Calculates_MaxCopies();
 Test_BorgoWings_Calculates_Segments();
 Test_BoundaryValues_Are_Clamped();
+Test_ExecutionRoute_Assignments();
 Test_GlobalOffset_Reduces_MaxCopies();]]></ST>
     </Implementation>
     <Method Name="Test_Arona_Calculates_Segments" Id="{7a994464-7f61-40a8-a740-1b9398842f86}">
@@ -377,6 +380,37 @@ AssertEquals_REAL(Expected := 0.0, // Założone minimum dla wysokości z Twojeg
 TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Test_ExecutionRoute_Assignments" Id="{076ed893-6a38-4eca-b580-bafd987ce60c}">
+      <Declaration><![CDATA[METHOD Test_ExecutionRoute_Assignments
+VAR_INST
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_ExecutionRoute_Assignments');
+
+// ASSERT - Sprawdzamy czy każdy z builderów prawidłowo zgłasza swój format do maszyny stanów Gantry
+AssertEquals_INT(Expected := E_ExecutionRoute.ePTP, 
+                 Actual := BuilderArona.ExecutionRoute, 
+                 Message := 'Arona powinna byc obslugiwana przez ścieżkę ePTP');
+                 
+AssertEquals_INT(Expected := E_ExecutionRoute.ePTP, 
+                 Actual := BuilderBorgoFlaps.ExecutionRoute, 
+                 Message := 'BorgoFlaps powinna byc obslugiwana przez ścieżkę ePTP');
+                 
+AssertEquals_INT(Expected := E_ExecutionRoute.ePTP, 
+                 Actual := BuilderBorgoWings.ExecutionRoute, 
+                 Message := 'BorgoWings powinna byc obslugiwana przez ścieżkę ePTP');
+                 
+AssertEquals_INT(Expected := E_ExecutionRoute.eGCode, 
+                 Actual := BuilderCircle.ExecutionRoute, 
+                 Message := 'Circle powinien byc obslugiwany przez ścieżkę eGCode');
+                 
+AssertEquals_INT(Expected := E_ExecutionRoute.ePTP, 
+                 Actual := BuilderRectangle.ExecutionRoute, 
+                 Message := 'Rectangle powinien byc obslugiwany przez ścieżkę ePTP');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="Test_GlobalOffset_Reduces_MaxCopies" Id="{593b9c31-c36d-4ad8-a81a-6167338e3125}">
       <Declaration><![CDATA[METHOD Test_GlobalOffset_Reduces_MaxCopies
 VAR_INST 
@@ -437,6 +471,7 @@ TEST_FINISHED();]]></ST>
       <LineId Id="53" Count="1" />
       <LineId Id="39" Count="0" />
       <LineId Id="46" Count="0" />
+      <LineId Id="78" Count="0" />
       <LineId Id="63" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_Arona_Calculates_Segments">
@@ -485,6 +520,10 @@ TEST_FINISHED();]]></ST>
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_BoundaryValues_Are_Clamped">
       <LineId Id="10" Count="26" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBuilder_Test.Test_ExecutionRoute_Assignments">
+      <LineId Id="112" Count="22" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilder_Test.Test_GlobalOffset_Reduces_MaxCopies">

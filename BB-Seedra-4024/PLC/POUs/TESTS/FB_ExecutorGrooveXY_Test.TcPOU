@@ -4,9 +4,9 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorGrooveXY_Test EXTENDS TcUnit.FB_TestSuite 
 VAR
     // Instancje naszych obiektów testowanych (SUT - System Under Test)
-    Executor         : FB_ExecutorSpindleNC;
-    Executor_Zero    : FB_ExecutorSpindleNC;
-    Executor_Unhappy : FB_ExecutorSpindleNC;
+    Executor         : FB_Exec_Spindle_PTP;
+    Executor_Zero    : FB_Exec_Spindle_PTP;
+    Executor_Unhappy : FB_Exec_Spindle_PTP;
 
     // Zaślepka konfiguracji
     MockConfigProvider : FB_MockConfigProvider;
