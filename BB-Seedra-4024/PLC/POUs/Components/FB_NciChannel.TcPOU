@@ -25,6 +25,8 @@ VAR
     _IsGrouped      : BOOL;
     _IsProgLoaded   : BOOL;
     _IsReady		:BOOL;
+	
+
 
 END_VAR]]></Declaration>
     <Implementation>
@@ -147,6 +149,15 @@ IF fbLoadProg.bErr THEN
 ELSIF fbLoadProg.bBusy = FALSE AND fbLoadProg.bExecute THEN
     _IsProgLoaded := TRUE;
 	fbLoadProg(bExecute := FALSE, sNciToPlc := stNciToPlc);
+END_IF
+
+// --- OBSŁUGA ZEROWANIA fbReset ---
+IF fbReset.bErr THEN
+    _Error := TRUE;
+    _ErrorId := fbReset.nErrId;
+    fbReset(bExecute := FALSE, sNciToPlc := stNciToPlc);
+ELSIF fbReset.bBusy = FALSE AND fbReset.bExecute THEN
+    fbReset(bExecute := FALSE, sNciToPlc := stNciToPlc);
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -297,6 +308,8 @@ END_VAR
       <LineId Id="68" Count="0" />
       <LineId Id="31" Count="14" />
       <LineId Id="5" Count="0" />
+      <LineId Id="99" Count="7" />
+      <LineId Id="98" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.IsGrouped.Get">
       <LineId Id="2" Count="0" />

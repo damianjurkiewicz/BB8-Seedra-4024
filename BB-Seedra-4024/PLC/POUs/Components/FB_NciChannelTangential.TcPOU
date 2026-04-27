@@ -29,6 +29,8 @@ VAR
 
     _IsGrouped      : BOOL;
     _IsReady		: BOOL;
+	
+	_bResetFeed : BOOL;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -78,39 +80,53 @@ END_IF]]></ST>
       <Implementation>
         <ST><![CDATA[SUPER^.CyclicLogic();
 
-// Odblokowanie override (100%)
+
 stPlcToNci.ChnAxesOvr := 1000000;
 
-// --- ODŚWIEŻANIE BLOKÓW SYSTEMOWYCH ---
+
 fbBuildExtGroup(tTimeOut := T#2S);
 fbUngroup(tTimeOut := T#2S);
 fbStartStop(sNciToPlc := stNciToPlc, tTimeOut := T#2S);
 fbReset(sNciToPlc := stNciToPlc, tTimeOut := T#2S);
 
-// --- CYKLICZNA OBSŁUGA FEED TABLE ---
+
 IF __ISVALIDREF(refFeedTable) THEN
     fbFeedTable(
         bExecute := _bExecuteFeed,
-		bReset := FALSE,
+        bReset := _bResetFeed,
         stFeedGroupTable := refFeedTable,
         stNciToPlc := stNciToPlc,
         bFeedingDone => _IsFeedingDone,
         bChannelDone => _IsChannelDone
     );
     
-    // POPRAWKA: Czekamy na _IsChannelDone (koniec ruchu fizycznego!), a nie na _IsFeedingDone
+ 
+    IF _bResetFeed THEN
+        _bResetFeed := FALSE;
+    END_IF
+
+
     IF _IsChannelDone OR fbFeedTable.bError THEN
-        _bExecuteFeed := FALSE; 
+        IF _bExecuteFeed AND _IsChannelDone THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'NciChannelTan: Ruch interpolowany zakonczony (Channel Done).', '');
+        END_IF
+        _bExecuteFeed := FALSE;
     END_IF
     
     IF fbFeedTable.bError THEN
+        IF NOT _Error THEN
+            ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'NciChannelTan: BLAD FeedTable! Kod: %d', UDINT_TO_DINT(fbFeedTable.nErrorId));
+        END_IF
         _Error := TRUE;
         _ErrorId := fbFeedTable.nErrorId;
     END_IF
 END_IF
 
-// --- AKTUALIZACJA STATUSÓW START/STOP ---
+
 IF fbStartStop.bErr THEN
+    IF NOT _Error THEN
+        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'NciChannelTan: BLAD StartStop! Kod: %d', UDINT_TO_DINT(fbStartStop.nErrId));
+    END_IF
     _Error := TRUE;
     _ErrorId := fbStartStop.nErrId;
     fbStartStop(bStart := FALSE, bStop := FALSE, sNciToPlc := stNciToPlc);
@@ -120,23 +136,40 @@ ELSIF NOT fbStartStop.bBusy AND fbStartStop.bStop THEN
     fbStartStop(bStop := FALSE, sNciToPlc := stNciToPlc);
 END_IF
 
-// --- STATUSY GRUPY ---
+
 IF fbUngroup.bErr THEN
+    IF fbUngroup.bExecute THEN
+        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'NciChannelTan: BLAD rozpinania grupy! Kod: %d', UDINT_TO_DINT(fbUngroup.nErrId));
+    END_IF
     _Error := TRUE;
     _ErrorId := fbUngroup.nErrId;
     fbUngroup(bExecute := FALSE);
     _IsGrouped := FALSE;
 ELSIF fbUngroup.bBusy = FALSE AND fbUngroup.bExecute THEN
+    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'NciChannelTan: Grupa rozpieta pomyslnie.', '');
     _IsGrouped := FALSE;
     fbUngroup(bExecute := FALSE);
 END_IF
 
 IF fbBuildExtGroup.bErr THEN
+    IF fbBuildExtGroup.bExecute THEN
+        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'NciChannelTan: BLAD budowania grupy rozszerzonej! Kod: %d', UDINT_TO_DINT(fbBuildExtGroup.nErrId));
+    END_IF
     _Error := TRUE;
     _ErrorId := fbBuildExtGroup.nErrId;
+    fbBuildExtGroup(bExecute := FALSE); 
 ELSIF fbBuildExtGroup.bBusy = FALSE AND fbBuildExtGroup.bExecute THEN
+    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'NciChannelTan: Grupa rozszerzona (X,Y,Z,Q) zbudowana pomyslnie.', '');
     _IsGrouped := TRUE;
     fbBuildExtGroup(bExecute := FALSE);
+END_IF
+
+IF fbReset.bErr THEN
+    _Error := TRUE;
+    _ErrorId := fbReset.nErrId;
+    fbReset(bExecute := FALSE, sNciToPlc := stNciToPlc);
+ELSIF fbReset.bBusy = FALSE AND fbReset.bExecute THEN
+    fbReset(bExecute := FALSE, sNciToPlc := stNciToPlc);
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -181,11 +214,7 @@ END_IF]]></ST>
       <Implementation>
         <ST><![CDATA[fbStartStop(bStart := FALSE, bStop := FALSE, sNciToPlc := stNciToPlc);
 
-
-IF __ISVALIDREF(refFeedTable) THEN
-    fbFeedTable(bExecute := FALSE, bReset := TRUE, stFeedGroupTable := refFeedTable, stNciToPlc := stNciToPlc);
-END_IF
-
+_bResetFeed := TRUE; // <-- ZMIANA: Zamiast lokalnego wywołania, ustawiamy flagę
 _bExecuteFeed := FALSE; 
 
 fbReset(
@@ -259,14 +288,15 @@ _bExecuteFeed := TRUE;
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannelTangential.CyclicLogic">
-      <LineId Id="3" Count="9" />
-      <LineId Id="77" Count="0" />
-      <LineId Id="13" Count="0" />
-      <LineId Id="59" Count="2" />
-      <LineId Id="78" Count="0" />
-      <LineId Id="62" Count="14" />
-      <LineId Id="29" Count="29" />
+      <LineId Id="283" Count="10" />
+      <LineId Id="386" Count="17" />
+      <LineId Id="405" Count="6" />
+      <LineId Id="413" Count="5" />
+      <LineId Id="322" Count="36" />
+      <LineId Id="360" Count="4" />
       <LineId Id="2" Count="0" />
+      <LineId Id="379" Count="6" />
+      <LineId Id="378" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannelTangential.IsChannelDone.Get">
       <LineId Id="2" Count="0" />
@@ -281,7 +311,7 @@ _bExecuteFeed := TRUE;
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannelTangential.ResetChannel">
-      <LineId Id="24" Count="14" />
+      <LineId Id="93" Count="10" />
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannelTangential.Start">

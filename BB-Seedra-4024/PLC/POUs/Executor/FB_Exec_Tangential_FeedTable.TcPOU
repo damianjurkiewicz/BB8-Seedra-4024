@@ -141,6 +141,7 @@ END_VAR]]></Declaration>
 
 IF nStep > 0 THEN
     IF _RecipeBuilder = 0 OR _ConfigProvider = 0 OR _NciChannel = 0 THEN
+        ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'ExecTangential: BŁĄD - Brak wymaganych referencji!', '');
         nStep := 999;
     END_IF
 END_IF
@@ -148,25 +149,43 @@ END_IF
 CASE nStep OF
     0: // IDLE
 
-	5: // INIT
-			// Wywołujemy Enable na wszystkich osiach, w tym Q
-			IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() AND _AxisQ.Enable() THEN
-				
-				// Czekamy aż WSZYSTKIE osie potwierdzą gotowość i nie będą Busy (standard z innych executorów)
-				IF _AxisX.Enabled AND _AxisY.Enabled AND _AxisZ.Enabled AND _AxisQ.Enabled 
-				   AND NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisQ.Busy THEN
-					
-					_bBusy := TRUE;
-					// ... reszta przypisań (localConfig, recipeConfig)
-					nStep := 8;
-				END_IF
-			END_IF
+    5: // INIT
 
-    8: // Dojazd PTP
+        IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() AND _AxisQ.Enable() THEN
+            
+         
+            IF _AxisX.Enabled AND _AxisY.Enabled AND _AxisZ.Enabled AND _AxisQ.Enabled 
+               AND NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisQ.Busy THEN
+                
+                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecTangential: Osie gotowe. Rozpoczynam sekwencję Nestingu.', '');
+                _bBusy := TRUE;
+                localConfig := _ConfigProvider.Config;
+                recipeConfig := _RecipeBuilder.Config;
+
+                IF NOT recipeConfig.IsValid THEN
+                    ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'ExecTangential: Receptura nieprawidłowa (IsValid=FALSE)!', '');
+                    nStep := 1000;
+                    RETURN;
+                END_IF
+
+                iCurrentCopyX := 1;
+                iCurrentCopyY := 1;
+
+                _AxisX.Velocity := localConfig.RapidSpeedX;
+                _AxisY.Velocity := localConfig.RapidSpeedY;
+                _AxisZ.Velocity := localConfig.RapidSpeedZ;
+
+                nStep := 8;
+            END_IF
+        END_IF
+
+    8: 
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecTangential: Dojazd PTP do punktu startowego NCI.', '');
         MoveToXY(recipeConfig.NciStartX, recipeConfig.NciStartY, 0.0, 0.0);
+		_AxisQ.MoveAbsolute(0.0, 0);
         nStep := 9;
 
-    9: // Czekamy na XY, jedziemy z Z
+    9: 
         IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error OR _AxisQ.Error THEN
             nStep := 999;
         ELSIF _AxisX.InPosition AND _AxisY.InPosition AND _AxisQ.InPosition THEN
@@ -174,49 +193,54 @@ CASE nStep OF
             MaterialTopZ := localConfig.GlobalOffsetZ + localConfig.RawBoardZ;
             SafeZ := MaterialTopZ + localConfig.SafeClearanceZ;
 
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecTangential: Punkt startowy osiągnięty. Ustawiam oś Z na pozycję bezpieczną.', '');
             _AxisZ.MoveAbsolute(SafeZ, 0);
             nStep := 10;
         END_IF
 
-    10: // Czekamy na Z
+    10: 
         IF _AxisZ.Error THEN
             nStep := 999;
         ELSIF _AxisZ.InPosition THEN
             nStep := 20;
         END_IF
 
-    20: // Spięcie grupy
+    20: 
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecTangential: Budowanie grupy NCI (X,Y,Z,Q).', '');
         _NciChannel.BuildGroup();
         nStep := 30;
 
-	30: // Start podawania tabeli punktów
+    30: 
         IF _NciChannel.ChannelError THEN
             nStep := 999;
         ELSIF _NciChannel.IsGrouped THEN
-            _NciChannel.StartFeedTable(stTable := THIS^._FeedTable); // Podajemy wewnetrzna tabele!
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecTangential: Grupa zbudowana. Start podawania punktów (FeedTable).', '');
+            _NciChannel.StartFeedTable(stTable := THIS^._FeedTable); 
             nStep := 40;
         END_IF
 
-    40: // Czekamy aż sterownik PLC wyśle całą tabelę z RAM
+    40: 
         IF _NciChannel.ChannelError THEN
             nStep := 999;
         ELSIF _NciChannel.IsFeedingDone THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecTangential: Tabela przesłana do NC. Czekam na koniec ruchu.', '');
             nStep := 50;
         END_IF
 
-    50: // Czekamy aż fizycznie frezarka dojedzie do końca
+    50: 
         IF _NciChannel.ChannelError THEN
             nStep := 999;
         ELSIF _NciChannel.IsChannelDone THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecTangential: Ruch NCI zakończony. Resetowanie kanału.', '');
             _NciChannel.ResetChannel();
             nStep := 80;
         END_IF
 
-    80: // Rozpięcie grupy
+    80: 
         _NciChannel.Ungroup();
         nStep := 90;
 
-    90: // Obsługa Multiplexowania (Nestingu)
+    90: 
         IF NOT _NciChannel.IsGrouped THEN
             nStep := 110; 
         END_IF
@@ -229,21 +253,25 @@ CASE nStep OF
             IF iCurrentCopyY > _RecipeBuilder.ActualCopiesY THEN
                 nStep := 1000;
             ELSE
+                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecTangential: Rozpoczynam kolejny rząd (Y) kopii.', '');
                 nStep := 8;
             END_IF
         ELSE
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecTangential: Rozpoczynam kolejną kopię w rzędzie (X).', '');
             nStep := 8;
         END_IF
 
-    999: // ERROR
+    999: 
         _bBusy := FALSE;
         _bError := TRUE;
         _bDone := FALSE;
         _uErrorID := _NciChannel.ChannelErrorId;
+        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'ExecTangential: BŁĄD KRYTYCZNY! ErrorID: %d', UDINT_TO_DINT(_uErrorID));
         _NciChannel.Ungroup();
         nStep := 0;
 
-    1000: // DONE
+    1000: 
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecTangential: Wszystkie operacje zakończone sukcesem.', '');
         _bBusy := FALSE;
         _bDone := TRUE;
         nStep := 0;
@@ -332,11 +360,9 @@ EndTable := NOT fbFeedPrep.bError;]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Tangential_FeedTable.CyclicLogic">
-      <LineId Id="3" Count="10" />
-      <LineId Id="192" Count="11" />
-      <LineId Id="32" Count="28" />
-      <LineId Id="125" Count="5" />
-      <LineId Id="67" Count="51" />
+      <LineId Id="212" Count="44" />
+      <LineId Id="349" Count="0" />
+      <LineId Id="257" Count="91" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Tangential_FeedTable.EnableTangentialFollowing">
