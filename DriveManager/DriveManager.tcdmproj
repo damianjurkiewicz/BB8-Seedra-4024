@@ -4,20 +4,26 @@
     <Name>Drive Manager 2</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{2579dec3-ddd0-46b2-a447-033be8942146}</ProjectGuid>
-    <TcPath>
-    </TcPath>
+    <TcPath>C:\Users\Damian\Documents\GitHub\BB8-Seedra-4024\BB-Seedra-4024\BB-Seedra-4024.tsproj</TcPath>
     <AssemblyName>DriveManager</AssemblyName>
     <RootNamespace>DriveManager</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="Term 24 %28EL7037%29.tcdmdrv">
+      <SubType>Content</SubType>
+      <IoItemPathName>TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 24 (EL7037)</IoItemPathName>
+    </Content>
     <Content Include="Term 5 %28EL7221-9014%29.tcdmdrv">
       <SubType>Content</SubType>
+      <IoItemPathName>TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 5 (EL7221-9014)</IoItemPathName>
     </Content>
     <Content Include="Term 6 %28EL7221-9014%29.tcdmdrv">
       <SubType>Content</SubType>
+      <IoItemPathName>TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 6 (EL7221-9014)</IoItemPathName>
     </Content>
     <Content Include="Term 7 %28EL7221-9014%29.tcdmdrv">
       <SubType>Content</SubType>
+      <IoItemPathName>TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 7 (EL7221-9014)</IoItemPathName>
     </Content>
   </ItemGroup>
 </Project>

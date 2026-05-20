@@ -317,7 +317,7 @@
     <TcDMDrive>
       <SortId>2</SortId>
       <DriveModuleType>4</DriveModuleType>
-      <TcLink>
+      <TcLink ProtocalType="11">
         <TcPrjPath>..\BB-Seedra-4024\BB-Seedra-4024.tsproj</TcPrjPath>
         <IoItemPathName>TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 7 (EL7221-9014)</IoItemPathName>
         <ItemId>7</ItemId>
@@ -355,6 +355,7 @@
       <Inverter>
         <Device>
           <Name>DMInverterTypeDevice</Name>
+          <ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
           <Parameter>
             <PropertyName>MaxAllowedMainVoltage</PropertyName>
             <Value>48</Value>
@@ -384,7 +385,6 @@
                 <GroupType>AM812x</GroupType>
                 <ElectricMotorType>AM8122-xJx0</ElectricMotorType>
                 <MotorfeedbackType>Sick#EKS36-0KF0A0S16</MotorfeedbackType>
-                <MotorbrakeType></MotorbrakeType>
                 <AssemblyType>AM8OCT</AssemblyType>
                 <VendorName>BECKHOFF</VendorName>
                 <IsAc>true</IsAc>
@@ -736,12 +736,10 @@
                   <Data type="int8">0</Data>
                 </Parameter>
                 <Parameter>
-                  <Comment LcId="1033"></Comment>
                   <Name>AbsolutePositionData_ResolutionSinglePos</Name>
                   <Data type="int16">18</Data>
                 </Parameter>
                 <Parameter>
-                  <Comment LcId="1033"></Comment>
                   <Name>AbsolutePositionData_ResolutionMultiPos</Name>
                   <Data type="int16">0</Data>
                 </Parameter>
@@ -775,6 +773,7 @@
             <Load MoveStyle="Linear">
               <IsMotorRotary>true</IsMotorRotary>
               <Name>InverterChannelTypeBlockLoad</Name>
+              <ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
               <Parameter>
                 <PropertyName>FeedConstantUnit</PropertyName>
                 <Value>mm</Value>
@@ -819,6 +818,7 @@
             <Controller>
               <Filter Id="0">
                 <Name>ControllerFilter</Name>
+                <ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
                 <Parameter>
                   <PropertyName>Filter_Type</PropertyName>
                   <Value>1</Value>
