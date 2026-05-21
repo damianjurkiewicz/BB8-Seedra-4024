@@ -27,6 +27,32 @@
       <CatalogNo>EL7037</CatalogNo>
       <HardwareVersion>10</HardwareVersion>
       <SerialNr>136 826</SerialNr>
+      <WatchLog UpdateIntervalInMs="500">
+        <WatchLogItem>
+          <WatchLogParaCoE Index="4120" SubIndex="2" />
+          <Alias>Type</Alias>
+        </WatchLogItem>
+        <WatchLogItem>
+          <WatchLogParaCoE Index="4120" SubIndex="4" />
+          <Alias>Serial Nr</Alias>
+        </WatchLogItem>
+        <WatchLogItem>
+          <WatchLogParaCoE Index="4322" SubIndex="1" />
+          <Alias>BIC</Alias>
+        </WatchLogItem>
+        <WatchLogItem>
+          <WatchLogParaCoE Index="4106" SubIndex="0" />
+          <Alias>Firmware version</Alias>
+        </WatchLogItem>
+        <WatchLogItem>
+          <WatchLogParaCoE Index="63744" SubIndex="5" />
+          <Alias>DC link voltage</Alias>
+        </WatchLogItem>
+        <WatchLogItem>
+          <WatchLogParaCoE Index="36880" SubIndex="17" />
+          <Alias>Amplifier temperature</Alias>
+        </WatchLogItem>
+      </WatchLog>
       <Inverter>
         <Device>
           <Name>DMInverterTypeDevice</Name>
@@ -48,12 +74,22 @@
           <TcLink>
             <TcPrjPath>..\BB-Seedra-4024\BB-Seedra-4024.tsproj</TcPrjPath>
             <IoItemPathName>TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 20 (EL7037)</IoItemPathName>
-            <NcItemPathName AxisType="1">TINC^NC-Task 1 SAF^Axes^Test Axis X</NcItemPathName>
+            <NcItemPathName AxisType="1">TINC^NC-Task 1 SAF^Axes^Axis 9</NcItemPathName>
           </TcLink>
           <SelectedModifyOptPDOsMode>0</SelectedModifyOptPDOsMode>
           <Block Id="0">
             <Controller />
           </Block>
+          <WatchLog ChnId="0" UpdateIntervalInMs="500">
+            <WatchLogItem>
+              <WatchLogParaCoE Index="24592" SubIndex="1" />
+              <Alias>Status word</Alias>
+            </WatchLogItem>
+            <WatchLogItem>
+              <WatchLogParaCoE Index="32786" SubIndex="1" />
+              <Alias>Actual operation mode</Alias>
+            </WatchLogItem>
+          </WatchLog>
         </Channel>
       </Inverter>
     </TcDMDrive>
@@ -81,11 +117,11 @@
       <ProcessData>
         <Send>
           <BitStart>24784</BitStart>
-          <BitLength>64</BitLength>
+          <BitLength>96</BitLength>
         </Send>
         <Recv>
           <BitStart>24784</BitStart>
-          <BitLength>64</BitLength>
+          <BitLength>96</BitLength>
         </Recv>
         <Sm2>
           <Type>Outputs</Type>
@@ -93,9 +129,9 @@
           <StartAddress>4352</StartAddress>
           <ControlByte>36</ControlByte>
           <Enable>1</Enable>
-          <Pdo>5632</Pdo>
+          <Pdo>5633</Pdo>
           <Pdo>5634</Pdo>
-          <Pdo>5636</Pdo>
+          <Pdo>5635</Pdo>
         </Sm2>
         <Sm3>
           <Type>Inputs</Type>
@@ -103,18 +139,131 @@
           <StartAddress>4480</StartAddress>
           <ControlByte>32</ControlByte>
           <Enable>1</Enable>
-          <Pdo>6656</Pdo>
+          <Pdo>6657</Pdo>
           <Pdo>6659</Pdo>
         </Sm3>
-        <TxPdo Fixed="true" Sm="3">
+        <TxPdo Fixed="true">
           <Index>#x1a00</Index>
           <Name>ENC Status compact</Name>
-          <Exclude>#x1a01</Exclude>
           <Entry>
             <Index>#x6000</Index>
             <SubIndex>1</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Latch C valid</Name>
+            <Name>Latch C valid</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>2</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Latch extern valid</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>3</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Set counter done</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>4</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Counter underflow</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>5</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Counter overflow</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x0</Index>
+            <BitLen>2</BitLen>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>8</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Extrapolation stall</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>9</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Status of input A</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>10</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Status of input B</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>11</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Status of input C</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x0</Index>
+            <BitLen>1</BitLen>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>13</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Status of extern latch</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>14</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Sync error</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x0</Index>
+            <BitLen>1</BitLen>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>16</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>TxPDO Toggle</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>17</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>Counter value</Name>
+            <DataType>UINT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>18</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>Latch value</Name>
+            <DataType>UINT</DataType>
+          </Entry>
+        </TxPdo>
+        <TxPdo Fixed="true" Sm="3">
+          <Index>#x1a01</Index>
+          <Name>ENC Status</Name>
+          <Entry>
+            <Index>#x6000</Index>
+            <SubIndex>1</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Latch C valid</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -129,7 +278,7 @@
             <Index>#x6000</Index>
             <SubIndex>2</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Latch extern valid</Name>
+            <Name>Latch extern valid</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -144,7 +293,7 @@
             <Index>#x6000</Index>
             <SubIndex>3</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Set counter done</Name>
+            <Name>Set counter done</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -159,7 +308,7 @@
             <Index>#x6000</Index>
             <SubIndex>4</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Counter underflow</Name>
+            <Name>Counter underflow</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -174,7 +323,7 @@
             <Index>#x6000</Index>
             <SubIndex>5</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Counter overflow</Name>
+            <Name>Counter overflow</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -188,13 +337,12 @@
           <Entry>
             <Index>#x0</Index>
             <BitLen>2</BitLen>
-            <Name>Status__</Name>
           </Entry>
           <Entry>
             <Index>#x6000</Index>
             <SubIndex>8</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Extrapolation stall</Name>
+            <Name>Extrapolation stall</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -209,7 +357,7 @@
             <Index>#x6000</Index>
             <SubIndex>9</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Status of input A</Name>
+            <Name>Status of input A</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -224,7 +372,7 @@
             <Index>#x6000</Index>
             <SubIndex>10</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Status of input B</Name>
+            <Name>Status of input B</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -239,7 +387,7 @@
             <Index>#x6000</Index>
             <SubIndex>11</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Status of input C</Name>
+            <Name>Status of input C</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -253,13 +401,12 @@
           <Entry>
             <Index>#x0</Index>
             <BitLen>1</BitLen>
-            <Name>Status__</Name>
           </Entry>
           <Entry>
             <Index>#x6000</Index>
             <SubIndex>13</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Status of extern latch</Name>
+            <Name>Status of extern latch</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -274,7 +421,7 @@
             <Index>#x6000</Index>
             <SubIndex>14</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Sync error</Name>
+            <Name>Sync error</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -288,13 +435,12 @@
           <Entry>
             <Index>#x0</Index>
             <BitLen>1</BitLen>
-            <Name>Status__</Name>
           </Entry>
           <Entry>
             <Index>#x6000</Index>
             <SubIndex>16</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__TxPDO Toggle</Name>
+            <Name>TxPDO Toggle</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -308,150 +454,32 @@
           <Entry>
             <Index>#x6000</Index>
             <SubIndex>17</SubIndex>
-            <BitLen>16</BitLen>
+            <BitLen>32</BitLen>
             <Name>Counter value</Name>
-            <DataType>UINT</DataType>
+            <DataType>UDINT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
               <IndexOffset>-2147483620</IndexOffset>
-              <Length>2</Length>
+              <Length>4</Length>
             </AdsInfo>
           </Entry>
           <Entry>
             <Index>#x6000</Index>
             <SubIndex>18</SubIndex>
-            <BitLen>16</BitLen>
+            <BitLen>32</BitLen>
             <Name>Latch value</Name>
-            <DataType>UINT</DataType>
+            <DataType>UDINT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-2147483618</IndexOffset>
-              <Length>2</Length>
+              <IndexOffset>-2147483616</IndexOffset>
+              <Length>4</Length>
             </AdsInfo>
-          </Entry>
-        </TxPdo>
-        <TxPdo Fixed="true">
-          <Index>#x1a01</Index>
-          <Name>ENC Status</Name>
-          <Exclude>#x1a00</Exclude>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>1</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__Latch C valid</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>2</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__Latch extern valid</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>3</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__Set counter done</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>4</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__Counter underflow</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>5</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__Counter overflow</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x0</Index>
-            <BitLen>2</BitLen>
-            <Name>Status__</Name>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>8</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__Extrapolation stall</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>9</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__Status of input A</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>10</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__Status of input B</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>11</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__Status of input C</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x0</Index>
-            <BitLen>1</BitLen>
-            <Name>Status__</Name>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>13</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__Status of extern latch</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>14</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__Sync error</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x0</Index>
-            <BitLen>1</BitLen>
-            <Name>Status__</Name>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>16</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Status__TxPDO Toggle</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>17</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>Counter value</Name>
-            <DataType>UDINT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x6000</Index>
-            <SubIndex>18</SubIndex>
-            <BitLen>32</BitLen>
-            <Name>Latch value</Name>
-            <DataType>UDINT</DataType>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true">
@@ -472,14 +500,14 @@
             <Index>#x6010</Index>
             <SubIndex>1</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Ready to enable</Name>
+            <Name>Ready to enable</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741568</IndexOffset>
+              <IndexOffset>-1073741536</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -487,14 +515,14 @@
             <Index>#x6010</Index>
             <SubIndex>2</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Ready</Name>
+            <Name>Ready</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741567</IndexOffset>
+              <IndexOffset>-1073741535</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -502,14 +530,14 @@
             <Index>#x6010</Index>
             <SubIndex>3</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Warning</Name>
+            <Name>Warning</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741566</IndexOffset>
+              <IndexOffset>-1073741534</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -517,14 +545,14 @@
             <Index>#x6010</Index>
             <SubIndex>4</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Error</Name>
+            <Name>Error</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741565</IndexOffset>
+              <IndexOffset>-1073741533</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -532,14 +560,14 @@
             <Index>#x6010</Index>
             <SubIndex>5</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Moving positive</Name>
+            <Name>Moving positive</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741564</IndexOffset>
+              <IndexOffset>-1073741532</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -547,14 +575,14 @@
             <Index>#x6010</Index>
             <SubIndex>6</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Moving negative</Name>
+            <Name>Moving negative</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741563</IndexOffset>
+              <IndexOffset>-1073741531</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -562,14 +590,14 @@
             <Index>#x6010</Index>
             <SubIndex>7</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Torque reduced</Name>
+            <Name>Torque reduced</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741562</IndexOffset>
+              <IndexOffset>-1073741530</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -577,34 +605,33 @@
             <Index>#x6010</Index>
             <SubIndex>8</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Motor stall</Name>
+            <Name>Motor stall</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741561</IndexOffset>
+              <IndexOffset>-1073741529</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
           <Entry>
             <Index>#x0</Index>
             <BitLen>3</BitLen>
-            <Name>Status__</Name>
           </Entry>
           <Entry>
             <Index>#x6010</Index>
             <SubIndex>12</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Digital input 1</Name>
+            <Name>Digital input 1</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741557</IndexOffset>
+              <IndexOffset>-1073741525</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -612,14 +639,14 @@
             <Index>#x6010</Index>
             <SubIndex>13</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Digital input 2</Name>
+            <Name>Digital input 2</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741556</IndexOffset>
+              <IndexOffset>-1073741524</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -627,34 +654,33 @@
             <Index>#x6010</Index>
             <SubIndex>14</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Sync error</Name>
+            <Name>Sync error</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741555</IndexOffset>
+              <IndexOffset>-1073741523</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
           <Entry>
             <Index>#x0</Index>
             <BitLen>1</BitLen>
-            <Name>Status__</Name>
           </Entry>
           <Entry>
             <Index>#x6010</Index>
             <SubIndex>16</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__TxPDO Toggle</Name>
+            <Name>TxPDO Toggle</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741553</IndexOffset>
+              <IndexOffset>-1073741521</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -691,133 +717,129 @@
         <TxPdo Fixed="true">
           <Index>#x1a06</Index>
           <Name>POS Status compact</Name>
-          <Exclude>#x1a07</Exclude>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>1</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Busy</Name>
+            <Name>Busy</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>2</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__In-Target</Name>
+            <Name>In-Target</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>3</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Warning</Name>
+            <Name>Warning</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>4</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Error</Name>
+            <Name>Error</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>5</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Calibrated</Name>
+            <Name>Calibrated</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>6</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Accelerate</Name>
+            <Name>Accelerate</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>7</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Decelerate</Name>
+            <Name>Decelerate</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>8</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Ready to execute</Name>
+            <Name>Ready to execute</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x0</Index>
             <BitLen>8</BitLen>
-            <Name>Status__</Name>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true">
           <Index>#x1a07</Index>
           <Name>POS Status</Name>
-          <Exclude>#x1a06</Exclude>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>1</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Busy</Name>
+            <Name>Busy</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>2</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__In-Target</Name>
+            <Name>In-Target</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>3</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Warning</Name>
+            <Name>Warning</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>4</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Error</Name>
+            <Name>Error</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>5</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Calibrated</Name>
+            <Name>Calibrated</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>6</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Accelerate</Name>
+            <Name>Accelerate</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>7</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Decelerate</Name>
+            <Name>Decelerate</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
             <SubIndex>8</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Status__Ready to execute</Name>
+            <Name>Ready to execute</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x0</Index>
             <BitLen>8</BitLen>
-            <Name>Status__</Name>
           </Entry>
           <Entry>
             <Index>#x6020</Index>
@@ -874,15 +896,57 @@
             <DataType>DINT</DataType>
           </Entry>
         </TxPdo>
-        <RxPdo Fixed="true" Sm="2">
+        <RxPdo Fixed="true">
           <Index>#x1600</Index>
           <Name>ENC Control compact</Name>
-          <Exclude>#x1601</Exclude>
           <Entry>
             <Index>#x7000</Index>
             <SubIndex>1</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Enable latch C</Name>
+            <Name>Enable latch C</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x7000</Index>
+            <SubIndex>2</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Enable latch extern on positive edge</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x7000</Index>
+            <SubIndex>3</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Set counter</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x7000</Index>
+            <SubIndex>4</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Enable latch extern on negative edge</Name>
+            <DataType>BIT</DataType>
+          </Entry>
+          <Entry>
+            <Index>#x0</Index>
+            <BitLen>12</BitLen>
+          </Entry>
+          <Entry>
+            <Index>#x7000</Index>
+            <SubIndex>17</SubIndex>
+            <BitLen>16</BitLen>
+            <Name>Set counter value</Name>
+            <DataType>UINT</DataType>
+          </Entry>
+        </RxPdo>
+        <RxPdo Fixed="true" Sm="2">
+          <Index>#x1601</Index>
+          <Name>ENC Control</Name>
+          <Entry>
+            <Index>#x7000</Index>
+            <SubIndex>1</SubIndex>
+            <BitLen>1</BitLen>
+            <Name>Enable latch C</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -897,7 +961,7 @@
             <Index>#x7000</Index>
             <SubIndex>2</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Enable latch extern on positive edge</Name>
+            <Name>Enable latch extern on positive edge</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -912,7 +976,7 @@
             <Index>#x7000</Index>
             <SubIndex>3</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Set counter</Name>
+            <Name>Set counter</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -927,7 +991,7 @@
             <Index>#x7000</Index>
             <SubIndex>4</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Enable latch extern on negative edge</Name>
+            <Name>Enable latch extern on negative edge</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
@@ -941,60 +1005,6 @@
           <Entry>
             <Index>#x0</Index>
             <BitLen>12</BitLen>
-            <Name>Control__</Name>
-          </Entry>
-          <Entry>
-            <Index>#x7000</Index>
-            <SubIndex>17</SubIndex>
-            <BitLen>16</BitLen>
-            <Name>Set counter value</Name>
-            <DataType>UINT</DataType>
-            <AdsInfo>
-              <AmsAddress>
-                <AmsPort>11</AmsPort>
-              </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-2130706404</IndexOffset>
-              <Length>2</Length>
-            </AdsInfo>
-          </Entry>
-        </RxPdo>
-        <RxPdo Fixed="true">
-          <Index>#x1601</Index>
-          <Name>ENC Control</Name>
-          <Exclude>#x1600</Exclude>
-          <Entry>
-            <Index>#x7000</Index>
-            <SubIndex>1</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Control__Enable latch C</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x7000</Index>
-            <SubIndex>2</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Control__Enable latch extern on positive edge</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x7000</Index>
-            <SubIndex>3</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Control__Set counter</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x7000</Index>
-            <SubIndex>4</SubIndex>
-            <BitLen>1</BitLen>
-            <Name>Control__Enable latch extern on negative edge</Name>
-            <DataType>BIT</DataType>
-          </Entry>
-          <Entry>
-            <Index>#x0</Index>
-            <BitLen>12</BitLen>
-            <Name>Control__</Name>
           </Entry>
           <Entry>
             <Index>#x7000</Index>
@@ -1002,6 +1012,14 @@
             <BitLen>32</BitLen>
             <Name>Set counter value</Name>
             <DataType>UDINT</DataType>
+            <AdsInfo>
+              <AmsAddress>
+                <AmsPort>11</AmsPort>
+              </AmsAddress>
+              <IndexGroup>50593872</IndexGroup>
+              <IndexOffset>-2130706404</IndexOffset>
+              <Length>4</Length>
+            </AdsInfo>
           </Entry>
         </RxPdo>
         <RxPdo Fixed="true" Sm="2">
@@ -1011,14 +1029,14 @@
             <Index>#x7010</Index>
             <SubIndex>1</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Enable</Name>
+            <Name>Enable</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964368</IndexOffset>
+              <IndexOffset>-1056964352</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -1026,14 +1044,14 @@
             <Index>#x7010</Index>
             <SubIndex>2</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Reset</Name>
+            <Name>Reset</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964367</IndexOffset>
+              <IndexOffset>-1056964351</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -1041,105 +1059,91 @@
             <Index>#x7010</Index>
             <SubIndex>3</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Reduce torque</Name>
+            <Name>Reduce torque</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964366</IndexOffset>
+              <IndexOffset>-1056964350</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
           <Entry>
             <Index>#x0</Index>
             <BitLen>8</BitLen>
-            <Name>Control__</Name>
           </Entry>
           <Entry>
             <Index>#x7010</Index>
             <SubIndex>12</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Digital output 1</Name>
+            <Name>Digital output 1</Name>
             <DataType>BIT</DataType>
             <AdsInfo>
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964357</IndexOffset>
+              <IndexOffset>-1056964341</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
           <Entry>
             <Index>#x0</Index>
             <BitLen>4</BitLen>
-            <Name>Control__</Name>
           </Entry>
         </RxPdo>
-        <RxPdo Fixed="true">
+        <RxPdo Fixed="true" Sm="2">
           <Index>#x1603</Index>
           <Name>STM Position</Name>
-          <Exclude>#x1604</Exclude>
-          <Exclude>#x1605</Exclude>
-          <Exclude>#x1606</Exclude>
-          <Exclude>#x1607</Exclude>
           <Entry>
             <Index>#x7010</Index>
             <SubIndex>17</SubIndex>
             <BitLen>32</BitLen>
             <Name>Position</Name>
             <DataType>UDINT</DataType>
+            <AdsInfo>
+              <AmsAddress>
+                <AmsPort>11</AmsPort>
+              </AmsAddress>
+              <IndexGroup>50593872</IndexGroup>
+              <IndexOffset>-2130706398</IndexOffset>
+              <Length>4</Length>
+            </AdsInfo>
           </Entry>
         </RxPdo>
-        <RxPdo Fixed="true" Sm="2">
+        <RxPdo Fixed="true">
           <Index>#x1604</Index>
           <Name>STM Velocity</Name>
-          <Exclude>#x1603</Exclude>
-          <Exclude>#x1605</Exclude>
-          <Exclude>#x1606</Exclude>
-          <Exclude>#x1607</Exclude>
           <Entry>
             <Index>#x7010</Index>
             <SubIndex>33</SubIndex>
             <BitLen>16</BitLen>
             <Name>Velocity</Name>
             <DataType>INT</DataType>
-            <AdsInfo>
-              <AmsAddress>
-                <AmsPort>11</AmsPort>
-              </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-2130706400</IndexOffset>
-              <Length>2</Length>
-            </AdsInfo>
           </Entry>
         </RxPdo>
         <RxPdo Fixed="true">
           <Index>#x1605</Index>
           <Name>POS Control compact</Name>
-          <Exclude>#x1603</Exclude>
-          <Exclude>#x1604</Exclude>
-          <Exclude>#x1606</Exclude>
           <Entry>
             <Index>#x7020</Index>
             <SubIndex>1</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Execute</Name>
+            <Name>Execute</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x7020</Index>
             <SubIndex>2</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Emergency stop</Name>
+            <Name>Emergency stop</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x0</Index>
             <BitLen>14</BitLen>
-            <Name>Control__</Name>
           </Entry>
           <Entry>
             <Index>#x7020</Index>
@@ -1152,27 +1156,23 @@
         <RxPdo Fixed="true">
           <Index>#x1606</Index>
           <Name>POS Control</Name>
-          <Exclude>#x1603</Exclude>
-          <Exclude>#x1604</Exclude>
-          <Exclude>#x1605</Exclude>
           <Entry>
             <Index>#x7020</Index>
             <SubIndex>1</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Execute</Name>
+            <Name>Execute</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x7020</Index>
             <SubIndex>2</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Emergency stop</Name>
+            <Name>Emergency stop</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x0</Index>
             <BitLen>14</BitLen>
-            <Name>Control__</Name>
           </Entry>
           <Entry>
             <Index>#x7020</Index>
@@ -1213,25 +1213,20 @@
         <RxPdo Fixed="true">
           <Index>#x1607</Index>
           <Name>POS Control 2</Name>
-          <Exclude>#x1603</Exclude>
-          <Exclude>#x1604</Exclude>
-          <Exclude>#x1605</Exclude>
           <Entry>
             <Index>#x0</Index>
             <BitLen>2</BitLen>
-            <Name>Control__</Name>
           </Entry>
           <Entry>
             <Index>#x7021</Index>
             <SubIndex>3</SubIndex>
             <BitLen>1</BitLen>
-            <Name>Control__Enable auto start</Name>
+            <Name>Enable auto start</Name>
             <DataType>BIT</DataType>
           </Entry>
           <Entry>
             <Index>#x0</Index>
             <BitLen>13</BitLen>
-            <Name>Control__</Name>
           </Entry>
           <Entry>
             <Index>#x7021</Index>
@@ -1270,7 +1265,7 @@
           </Entry>
         </RxPdo>
         <AlternativeSmMappings>
-          <AlternativeSmMapping Default="1" Selected="true">
+          <AlternativeSmMapping Default="1">
             <Name>Velocity control compact</Name>
             <Sm No="2">
               <Pdo ChannelNo="1">#x1600</Pdo>
@@ -1307,7 +1302,7 @@
               <Pdo ChannelNo="1">#x1a03</Pdo>
             </Sm>
           </AlternativeSmMapping>
-          <AlternativeSmMapping>
+          <AlternativeSmMapping Selected="true">
             <Name>Position control</Name>
             <Sm No="2">
               <Pdo ChannelNo="1">#x1601</Pdo>
@@ -1425,7 +1420,7 @@
               <Ccs>1</Ccs>
               <Index>7186</Index>
               <SubIndex>0</SubIndex>
-              <Data>0300001602160416</Data>
+              <Data>0300011602160316</Data>
             </InitCmd>
             <InitCmd Fixed="true" CompleteAccess="true">
               <Transition>PS</Transition>
@@ -1434,7 +1429,7 @@
               <Ccs>1</Ccs>
               <Index>7187</Index>
               <SubIndex>0</SubIndex>
-              <Data>0200001a031a</Data>
+              <Data>0200011a031a</Data>
             </InitCmd>
             <InitCmd>
               <Transition>IP</Transition>
@@ -1444,13 +1439,49 @@
               <SubIndex>1</SubIndex>
               <Data>00001700</Data>
             </InitCmd>
-            <InitCmd AdaptAutomatically="true">
+            <InitCmd>
               <Transition>IP</Transition>
               <Timeout>0</Timeout>
               <Ccs>1</Ccs>
               <Index>4339</Index>
               <SubIndex>5</SubIndex>
               <Data>0100</Data>
+            </InitCmd>
+            <InitCmd>
+              <Transition>PS</Transition>
+              <Comment><![CDATA[STM Features Ch.1 / Operation mode]]></Comment>
+              <Timeout>0</Timeout>
+              <Ccs>1</Ccs>
+              <Index>32786</Index>
+              <SubIndex>1</SubIndex>
+              <Data>03</Data>
+            </InitCmd>
+            <InitCmd>
+              <Transition>PS</Transition>
+              <Comment><![CDATA[STM Features Ch.1 / Function for input 1]]></Comment>
+              <Timeout>0</Timeout>
+              <Ccs>1</Ccs>
+              <Index>32786</Index>
+              <SubIndex>50</SubIndex>
+              <Data>01</Data>
+            </InitCmd>
+            <InitCmd>
+              <Transition>PS</Transition>
+              <Comment><![CDATA[STM Features Ch.1 / Function for input 2]]></Comment>
+              <Timeout>0</Timeout>
+              <Ccs>1</Ccs>
+              <Index>32786</Index>
+              <SubIndex>54</SubIndex>
+              <Data>01</Data>
+            </InitCmd>
+            <InitCmd>
+              <Transition>PS</Transition>
+              <Comment><![CDATA[STM Features Ch.1 / Speed range]]></Comment>
+              <Timeout>0</Timeout>
+              <Ccs>1</Ccs>
+              <Index>32786</Index>
+              <SubIndex>5</SubIndex>
+              <Data>01</Data>
             </InitCmd>
           </InitCmds>
           <CanOpenType>39</CanOpenType>
@@ -1741,7 +1772,7 @@
           <Cmd>5</Cmd>
           <Adp>1008</Adp>
           <Ado>2064</Ado>
-          <Data>0011080024000100</Data>
+          <Data>00110c0024000100</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -1751,7 +1782,7 @@
           <Cmd>5</Cmd>
           <Adp>1008</Adp>
           <Ado>2072</Ado>
-          <Data>8011080020000100</Data>
+          <Data>80110c0020000100</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -1761,7 +1792,7 @@
           <Cmd>5</Cmd>
           <Adp>1008</Adp>
           <Ado>1536</Ado>
-          <Data>00000003080000070011000201000000</Data>
+          <Data>000000030c0000070011000201000000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -1771,7 +1802,7 @@
           <Cmd>5</Cmd>
           <Adp>1008</Adp>
           <Ado>1552</Ado>
-          <Data>00000003080000078011000101000000</Data>
+          <Data>000000030c0000078011000101000000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -2081,6 +2112,6 @@
       <AmsNetId>0.0.0.0.4.1</AmsNetId>
       <AmsPort>1008</AmsPort>
     </AmsAddress>
-    <LinkedAxis Chn="0">TINC^NC-Task 1 SAF^Axes^Test Axis X</LinkedAxis>
+    <LinkedAxis Chn="0">TINC^NC-Task 1 SAF^Axes^Axis 9</LinkedAxis>
   </EtherCAT>
 </TreeItem>
