@@ -188,7 +188,7 @@ CASE nStep OF
     9: 
         IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error OR _AxisQ.Error THEN
             nStep := 999;
-        ELSIF _AxisX.InPosition AND _AxisY.InPosition AND _AxisQ.InPosition THEN
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN
             localConfig := _ConfigProvider.Config;
             MaterialTopZ := localConfig.GlobalOffsetZ + localConfig.RawBoardZ;
             SafeZ := MaterialTopZ + localConfig.SafeClearanceZ;

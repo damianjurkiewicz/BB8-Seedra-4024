@@ -2597,14 +2597,14 @@ External Setpoint Generation:
 					<Name>Axis Q</Name>
 					<AxisPara>
 						<General UnitName="°"/>
-						<Dynamic Acceleration="15000" Deceleration="15000" Jerk="144968"/>
-						<Velo RefSearch="90" RefSync="90" SlowManual="90" FastManual="3600" Fast="32215.17" Maximum="32215.2"/>
+						<Dynamic Acceleration="15000" Deceleration="15000" Jerk="48322.755"/>
+						<Velo RefSearch="107.3839" RefSync="107.3839" SlowManual="536.9195" FastManual="3221.517" Fast="10738.39" Maximum="10738.39"/>
 						<PositionAreaControl Enable="false"/>
 						<TargetPosControl Enable="false"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="360" ScaleFactorDenominator="1048576" Inverse="true" MaxCount="#xffffffff">
+						<EncPara ScaleFactorNumerator="360" ScaleFactorDenominator="3145728" Inverse="true" MaxCount="#xffffffff">
 							<SoftEndMinControl Range="-300"/>
 							<SoftEndMaxControl Range="300"/>
 							<Inc RefPosition="72"/>
@@ -2667,7 +2667,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara Inverse="true" MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="35436.687" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="11812.229" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -2745,7 +2745,7 @@ External Setpoint Generation:
 				<Axis Id="2" CreateSymbols="true" AxisType="1">
 					<Name>Axis Y</Name>
 					<AxisPara>
-						<Dynamic Acceleration="637.5915" Deceleration="637.5915" Jerk="1912.7745"/>
+						<Dynamic Acceleration="637.591" Deceleration="637.591" Jerk="1912.77"/>
 						<Velo RefSearch="20" RefSync="10" SlowManual="20" FastManual="50" Fast="425.061" Maximum="425.061"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
@@ -2869,153 +2869,6 @@ External Setpoint Generation:
 					</Drive>
 					<Controller Name="Ctrl" CtrType="1">
 						<CtrPara PriorControlFactor="1">
-							<PosDiffControl Range="2"/>
-							<Observer BandWidth="20"/>
-						</CtrPara>
-					</Controller>
-					<Vars VarGrpType="1" InsertType="1">
-						<Name>Inputs</Name>
-						<Var>
-							<Name>FromPlc</Name>
-							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
-						</Var>
-					</Vars>
-					<Vars VarGrpType="2" InsertType="1">
-						<Name>Outputs</Name>
-						<Var>
-							<Name>ToPlc</Name>
-							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
-						</Var>
-					</Vars>
-				</Axis>
-				<Axis Id="3" CreateSymbols="true" AxisType="1">
-					<Name>Axis X</Name>
-					<AxisPara>
-						<Dynamic Acceleration="796.99" Deceleration="796.99" Jerk="2390.97"/>
-						<Velo RefSync="10" SlowManual="20" FastManual="50" Fast="531.327" Maximum="531.327"/>
-						<OtherSettings AllowMotionCmdToSlave="true"/>
-					</AxisPara>
-					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="5.9375" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
-							<SoftEndMinControl Enable="true" Range="-2000"/>
-							<SoftEndMaxControl Enable="true" Range="2000"/>
-							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
-						</EncPara>
-						<Vars VarGrpType="1">
-							<Name>Inputs</Name>
-							<Var>
-								<Name>In</Name>
-								<Type GUID="{901C2423-655B-45CE-B7E3-21F174F0F99F}" Namespace="MC">NCENCODERSTRUCT_IN2B</Type>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn1</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn2</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn3</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn4</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn5</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn6</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn7</Name>
-									<Comment><![CDATA[Drive Velocity Actual Value
-]]></Comment>
-								</SubVar>
-							</Var>
-						</Vars>
-						<Vars VarGrpType="2">
-							<Name>Outputs</Name>
-							<Var>
-								<Name>Out</Name>
-								<Type GUID="{9CC50AB2-5D79-4869-A3C2-1FA7761BAFEA}" Namespace="MC">NCENCODERSTRUCT_OUT2</Type>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut1</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut2</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut3</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut4</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut5</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut6</Name>
-								</SubVar>
-							</Var>
-						</Vars>
-					</Encoder>
-					<Drive Name="Drive" DrvType="16">
-						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="584.4597" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
-							<TimeComp TaskDelayCycles="1"/>
-						</DrvPara>
-						<Vars VarGrpType="1">
-							<Name>Inputs</Name>
-							<Var>
-								<Name>In</Name>
-								<Type GUID="{F95C7C69-0C87-46C4-9559-1285CCA5B23A}" Namespace="MC">NCDRIVESTRUCT_IN2</Type>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn1</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn2</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn3</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn4</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn5</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataIn6</Name>
-								</SubVar>
-							</Var>
-						</Vars>
-						<Vars VarGrpType="2">
-							<Name>Outputs</Name>
-							<Var>
-								<Name>Out</Name>
-								<Type GUID="{644DC4BD-3D15-4DCB-94C7-24F3A5D579AA}" Namespace="MC">NCDRIVESTRUCT_OUT2</Type>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut1</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut2</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut3</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut4</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut5</Name>
-								</SubVar>
-								<SubVar TypeFormatIndex="2">
-									<Name>nDataOut6</Name>
-								</SubVar>
-							</Var>
-						</Vars>
-					</Drive>
-					<Controller Name="Ctrl" CtrType="1">
-						<CtrPara PriorControlFactor="1">
-							<PosDiffControl Range="2"/>
 							<Observer BandWidth="20"/>
 						</CtrPara>
 					</Controller>
@@ -3176,6 +3029,151 @@ External Setpoint Generation:
 					<Controller Name="Ctrl" CtrType="1">
 						<CtrPara PriorControlFactor="1">
 							<PosDiffControl Range="2"/>
+							<Observer BandWidth="20"/>
+						</CtrPara>
+					</Controller>
+					<Vars VarGrpType="1" InsertType="1">
+						<Name>Inputs</Name>
+						<Var>
+							<Name>FromPlc</Name>
+							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
+						</Var>
+					</Vars>
+					<Vars VarGrpType="2" InsertType="1">
+						<Name>Outputs</Name>
+						<Var>
+							<Name>ToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+					</Vars>
+				</Axis>
+				<Axis Id="3" CreateSymbols="true" AxisType="1" GroupId="6">
+					<Name>Axis X</Name>
+					<AxisPara>
+						<Dynamic Acceleration="796.99" Deceleration="796.99" Jerk="2390.97"/>
+						<Velo RefSync="10" SlowManual="20" FastManual="50" Fast="531.327" Maximum="531.327"/>
+						<OtherSettings AllowMotionCmdToSlave="true"/>
+					</AxisPara>
+					<Encoder Name="Enc" EncType="19">
+						<EncPara ScaleFactorNumerator="5.9375" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
+							<SoftEndMinControl Enable="true" Range="-2000"/>
+							<SoftEndMaxControl Enable="true" Range="2000"/>
+							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
+						</EncPara>
+						<Vars VarGrpType="1">
+							<Name>Inputs</Name>
+							<Var>
+								<Name>In</Name>
+								<Type GUID="{901C2423-655B-45CE-B7E3-21F174F0F99F}" Namespace="MC">NCENCODERSTRUCT_IN2B</Type>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn1</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn2</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn3</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn4</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn5</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn6</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn7</Name>
+									<Comment><![CDATA[Drive Velocity Actual Value
+]]></Comment>
+								</SubVar>
+							</Var>
+						</Vars>
+						<Vars VarGrpType="2">
+							<Name>Outputs</Name>
+							<Var>
+								<Name>Out</Name>
+								<Type GUID="{9CC50AB2-5D79-4869-A3C2-1FA7761BAFEA}" Namespace="MC">NCENCODERSTRUCT_OUT2</Type>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut1</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut2</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut3</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut4</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut5</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut6</Name>
+								</SubVar>
+							</Var>
+						</Vars>
+					</Encoder>
+					<Drive Name="Drive" DrvType="16">
+						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
+							<Analog VeloReferenz="584.4597" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<TimeComp TaskDelayCycles="1"/>
+						</DrvPara>
+						<Vars VarGrpType="1">
+							<Name>Inputs</Name>
+							<Var>
+								<Name>In</Name>
+								<Type GUID="{F95C7C69-0C87-46C4-9559-1285CCA5B23A}" Namespace="MC">NCDRIVESTRUCT_IN2</Type>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn1</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn2</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn3</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn4</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn5</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataIn6</Name>
+								</SubVar>
+							</Var>
+						</Vars>
+						<Vars VarGrpType="2">
+							<Name>Outputs</Name>
+							<Var>
+								<Name>Out</Name>
+								<Type GUID="{644DC4BD-3D15-4DCB-94C7-24F3A5D579AA}" Namespace="MC">NCDRIVESTRUCT_OUT2</Type>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut1</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut2</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut3</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut4</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut5</Name>
+								</SubVar>
+								<SubVar TypeFormatIndex="2">
+									<Name>nDataOut6</Name>
+								</SubVar>
+							</Var>
+						</Vars>
+					</Drive>
+					<Controller Name="Ctrl" CtrType="1">
+						<CtrPara PriorControlFactor="1">
 							<Observer BandWidth="20"/>
 						</CtrPara>
 					</Controller>
@@ -3434,7 +3432,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{7AB6A302-A04D-8896-F197-F22F464F5BEE}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{E40A65BE-99EB-DDB7-16A8-61BA9EEAAC8F}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -4301,6 +4299,10 @@ External Setpoint Generation:
 								<OrderCode>EL7221-9014</OrderCode>
 								<Name>Term 5 (EL7221-9014)</Name>
 								<ProductRevision>EL7221-9014-0029</ProductRevision>
+								<FirmwareVersion>18</FirmwareVersion>
+								<CatalogNo>EL7221-9014</CatalogNo>
+								<HardwareVersion>03</HardwareVersion>
+								<SerialNr>7 718</SerialNr>
 								<WatchLog UpdateIntervalInMs="500">
 									<WatchLogItem>
 										<WatchLogParaCoE Index="4120" SubIndex="2"/>
@@ -4872,7 +4874,7 @@ External Setpoint Generation:
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
-													<Value>1</Value>
+													<Value>3</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioLoadSide</PropertyName>
