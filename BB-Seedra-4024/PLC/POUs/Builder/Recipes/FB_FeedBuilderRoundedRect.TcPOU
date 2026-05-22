@@ -12,11 +12,10 @@
 VAR
     TotalX, TotalY, Radius : LREAL;
     Velo : LREAL;
-	localConfig : ST_GantryXYZ_Config;
+    localConfig : ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[Build := FALSE;
-
 THIS^.UpdateNestingLimits();
 IF NOT _Config.IsValid OR _GeometryWriter = 0 THEN
     RETURN;
@@ -27,59 +26,62 @@ TotalX := _Config.PanelFrontWidth;
 TotalY := _Config.PanelFrontLength;
 Radius := _Config.Radius;
 
-// Zabezpieczenia promienia (żeby łuki się nie nałożyły na siebie w małych detalach)
-IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
-IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
-
-// PTP Start (ustawiamy nad środkiem dolnej krawędzi)
-_Config.NciStartX := TotalX / 2.0;
-_Config.NciStartY := 0.0;
+// Zabezpieczenia promienia
+IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0;
+END_IF
+IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0;
+END_IF
 
 // ===================================================
-// POPRAWKA: Prędkość z użyciem zmiennej pomocniczej
+// PTP Start (Zaczynamy na środku LEWEJ krawędzi,
+// aby początkowy ruch celował w +Y - tak jak stoi nóż)
 // ===================================================
+_Config.NciStartX := 0.0;
+_Config.NciStartY := TotalY / 2.0;
+
+// Prędkość z użyciem zmiennej pomocniczej
 IF _ConfigProvider <> 0 THEN
-    localConfig := _ConfigProvider.Config; // Krok 1: Pobranie struktury z interfejsu
-    Velo := localConfig.CuttingSpeedXY;    // Krok 2: Odczytanie konkretnego pola
+    localConfig := _ConfigProvider.Config;
+    Velo := localConfig.CuttingSpeedXY;
 ELSE
     Velo := 50.0;
 END_IF
 
 // ============================================
-// GENEROWANIE TABELI 
+// GENEROWANIE TABELI (Ruch Clockwise)
 // ============================================
 _GeometryWriter.Clear();
-
 // Konfiguracja wstępna NCI
 _GeometryWriter.EnableTangentialFollowing();
-_GeometryWriter.AddStartPoint(TotalX / 2.0, 0.0);
+_GeometryWriter.AddStartPoint(0.0, TotalY / 2.0);
 
-// 1. Dolna krawędź -> Prawy dolny łuk
-_GeometryWriter.AddLine(TotalX - Radius, 0.0, Velo);
+// 1. Lewa krawędź -> Lewy górny łuk (Tniemy w kierunku +Y)
+_GeometryWriter.AddLine(0.0, TotalY - Radius, Velo);
 IF Radius > 0 THEN
-    _GeometryWriter.AddArc(TotalX, Radius, TotalX - Radius, Radius, Velo, FALSE); // FALSE = G03 = CounterClockwise
+    // TRUE = G02 = Clockwise (Nóż skręca w prawo)
+    _GeometryWriter.AddArc(Radius, TotalY, Radius, TotalY - Radius, Velo, TRUE);
 END_IF
 
-// 2. Prawa krawędź -> Prawy górny łuk
-_GeometryWriter.AddLine(TotalX, TotalY - Radius, Velo);
+// 2. Górna krawędź -> Prawy górny łuk (Tniemy w kierunku +X)
+_GeometryWriter.AddLine(TotalX - Radius, TotalY, Velo);
 IF Radius > 0 THEN
-    _GeometryWriter.AddArc(TotalX - Radius, TotalY, TotalX - Radius, TotalY - Radius, Velo, FALSE);
+    _GeometryWriter.AddArc(TotalX, TotalY - Radius, TotalX - Radius, TotalY - Radius, Velo, TRUE);
 END_IF
 
-// 3. Górna krawędź -> Lewy górny łuk
-_GeometryWriter.AddLine(Radius, TotalY, Velo);
+// 3. Prawa krawędź -> Prawy dolny łuk (Tniemy w kierunku -Y)
+_GeometryWriter.AddLine(TotalX, Radius, Velo);
 IF Radius > 0 THEN
-    _GeometryWriter.AddArc(0.0, TotalY - Radius, Radius, TotalY - Radius, Velo, FALSE);
+    _GeometryWriter.AddArc(TotalX - Radius, 0.0, TotalX - Radius, Radius, Velo, TRUE);
 END_IF
 
-// 4. Lewa krawędź -> Lewy dolny łuk
-_GeometryWriter.AddLine(0.0, Radius, Velo);
+// 4. Dolna krawędź -> Lewy dolny łuk (Tniemy w kierunku -X)
+_GeometryWriter.AddLine(Radius, 0.0, Velo);
 IF Radius > 0 THEN
-    _GeometryWriter.AddArc(Radius, 0.0, Radius, Radius, Velo, FALSE);
+    _GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, TRUE);
 END_IF
 
-// Powrót do punktu początkowego i koniec tabeli
-_GeometryWriter.AddLine(TotalX / 2.0, 0.0, Velo);
+// Powrót do punktu początkowego i koniec tabeli (Zamykamy na lewej krawędzi)
+_GeometryWriter.AddLine(0.0, TotalY / 2.0, Velo);
 _GeometryWriter.EndTable();
 
 Build := TRUE;]]></ST>
@@ -143,7 +145,7 @@ _Limits.Diameter.MaxVal := 600;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderRoundedRect.Build">
-      <LineId Id="1730" Count="66" />
+      <LineId Id="1807" Count="68" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderRoundedRect.CalculateFootprint">
