@@ -74,7 +74,7 @@
           <TcLink>
             <TcPrjPath>..\BB-Seedra-4024\BB-Seedra-4024.tsproj</TcPrjPath>
             <IoItemPathName>TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 20 (EL7037)</IoItemPathName>
-            <NcItemPathName AxisType="1">TINC^NC-Task 1 SAF^Axes^Axis 9</NcItemPathName>
+            <NcItemPathName AxisType="1">TINC^NC-Task 1 SAF^Axes^Axis Z</NcItemPathName>
           </TcLink>
           <SelectedModifyOptPDOsMode>0</SelectedModifyOptPDOsMode>
           <Block Id="0">
@@ -116,11 +116,11 @@
       </Info>
       <ProcessData>
         <Send>
-          <BitStart>24784</BitStart>
+          <BitStart>808</BitStart>
           <BitLength>96</BitLength>
         </Send>
         <Recv>
-          <BitStart>24784</BitStart>
+          <BitStart>808</BitStart>
           <BitLength>96</BitLength>
         </Recv>
         <Sm2>
@@ -269,8 +269,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741616</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741016</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -284,8 +284,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741615</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741015</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -299,8 +299,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741614</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741014</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -314,8 +314,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741613</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741013</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -329,8 +329,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741612</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741012</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -348,8 +348,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741609</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741009</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -363,8 +363,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741608</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741008</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -378,8 +378,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741607</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741007</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -393,8 +393,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741606</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741006</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -412,8 +412,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741604</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741004</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -427,8 +427,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741603</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741003</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -446,8 +446,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741601</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073741001</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -461,8 +461,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-2147483620</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-2147483545</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -476,8 +476,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-2147483616</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-2147483541</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -506,8 +506,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741536</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740936</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -521,8 +521,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741535</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740935</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -536,8 +536,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741534</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740934</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -551,8 +551,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741533</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740933</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -566,8 +566,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741532</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740932</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -581,8 +581,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741531</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740931</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -596,8 +596,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741530</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740930</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -611,8 +611,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741529</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740929</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -630,8 +630,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741525</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740925</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -645,8 +645,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741524</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740924</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -660,8 +660,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741523</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740923</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -679,8 +679,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1073741521</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1073740921</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -952,8 +952,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964400</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1056963800</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -967,8 +967,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964399</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1056963799</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -982,8 +982,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964398</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1056963798</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -997,8 +997,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964397</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1056963797</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -1016,8 +1016,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-2130706404</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-2130706329</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -1035,8 +1035,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964352</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1056963752</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -1050,8 +1050,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964351</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1056963751</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -1065,8 +1065,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964350</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1056963750</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -1084,8 +1084,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-1056964341</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-1056963741</IndexOffset>
               <Length>1</Length>
             </AdsInfo>
           </Entry>
@@ -1107,8 +1107,8 @@
               <AmsAddress>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
-              <IndexGroup>50593872</IndexGroup>
-              <IndexOffset>-2130706398</IndexOffset>
+              <IndexGroup>50593824</IndexGroup>
+              <IndexOffset>-2130706323</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -1463,7 +1463,7 @@
               <Ccs>1</Ccs>
               <Index>32786</Index>
               <SubIndex>50</SubIndex>
-              <Data>01</Data>
+              <Data>00</Data>
             </InitCmd>
             <InitCmd>
               <Transition>PS</Transition>
@@ -1472,7 +1472,7 @@
               <Ccs>1</Ccs>
               <Index>32786</Index>
               <SubIndex>54</SubIndex>
-              <Data>01</Data>
+              <Data>00</Data>
             </InitCmd>
             <InitCmd>
               <Transition>PS</Transition>
@@ -1792,7 +1792,7 @@
           <Cmd>5</Cmd>
           <Adp>1008</Adp>
           <Ado>1536</Ado>
-          <Data>000000030c0000070011000201000000</Data>
+          <Data>1e0000010c0000070011000201000000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -1802,7 +1802,7 @@
           <Cmd>5</Cmd>
           <Adp>1008</Adp>
           <Ado>1552</Ado>
-          <Data>000000030c0000078011000101000000</Data>
+          <Data>1e0000010c0000078011000101000000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -2112,6 +2112,6 @@
       <AmsNetId>0.0.0.0.4.1</AmsNetId>
       <AmsPort>1008</AmsPort>
     </AmsAddress>
-    <LinkedAxis Chn="0">TINC^NC-Task 1 SAF^Axes^Axis 9</LinkedAxis>
+    <LinkedAxis Chn="0">TINC^NC-Task 1 SAF^Axes^Axis Z</LinkedAxis>
   </EtherCAT>
 </TreeItem>

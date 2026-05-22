@@ -908,6 +908,7 @@ VAR_INST
 	flagY :BOOL;
 	flagZ :BOOL;
 	flagQ :BOOL;
+	ActualPosition : LREAL;
 END_VAR
 ]]></Declaration>
       <Implementation>
@@ -944,11 +945,14 @@ END_VAR
                     flagZ := AxisZ.Home();
                 END_IF
                 IF NOT flagQ THEN
+
+				ActualPosition := AxisQ.ActualPosition;
+
                     fbHomeMcQ(
                         Axis := AxisQ.Axis, 
                         Execute := TRUE, 
                         HomingMode := MC_Direct, 
-                        Position := 0.0
+                        Position := AxisQ.Axis.NcToPlc.ActPos
                     );
                     IF fbHomeMcQ.Done THEN
                         flagQ := TRUE;
@@ -993,6 +997,7 @@ END_VAR
                 AxisX.Enable();
                 AxisY.Enable();
                 AxisZ.Enable();
+				AxisQ.Enable();
 
                 IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
                     SequenceState := 20;
@@ -1012,6 +1017,7 @@ END_VAR
                 AxisX.Enable();
                 AxisY.Enable();
                 AxisZ.Enable();
+				AxisQ.Enable();
 
                 IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
                     SequenceState := 20;
@@ -1270,11 +1276,18 @@ END_CASE]]></ST>
       <LineId Id="753" Count="4" />
       <LineId Id="759" Count="9" />
       <LineId Id="770" Count="0" />
-      <LineId Id="772" Count="27" />
+      <LineId Id="772" Count="12" />
+      <LineId Id="840" Count="2" />
+      <LineId Id="839" Count="0" />
+      <LineId Id="786" Count="13" />
       <LineId Id="801" Count="11" />
       <LineId Id="814" Count="9" />
-      <LineId Id="659" Count="16" />
-      <LineId Id="682" Count="19" />
+      <LineId Id="659" Count="12" />
+      <LineId Id="836" Count="0" />
+      <LineId Id="672" Count="3" />
+      <LineId Id="682" Count="14" />
+      <LineId Id="837" Count="0" />
+      <LineId Id="697" Count="4" />
       <LineId Id="708" Count="5" />
       <LineId Id="27" Count="0" />
     </LineIds>

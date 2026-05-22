@@ -2596,15 +2596,18 @@ External Setpoint Generation:
 				<Axis Id="1" CreateSymbols="true" AxisType="1">
 					<Name>Axis Q</Name>
 					<AxisPara>
-						<Dynamic Acceleration="536.919" Deceleration="536.919" Jerk="1610.76"/>
-						<Velo RefSync="10" SlowManual="17.8973" FastManual="107.3838" Fast="357.946" Maximum="357.946"/>
+						<General UnitName="°"/>
+						<Dynamic Acceleration="15000" Deceleration="15000" Jerk="144968"/>
+						<Velo RefSearch="90" RefSync="90" SlowManual="90" FastManual="3600" Fast="32215.17" Maximum="32215.2"/>
+						<PositionAreaControl Enable="false"/>
+						<TargetPosControl Enable="false"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="4" ScaleFactorDenominator="1048576" Inverse="true" MaxCount="#xffffffff">
-							<SoftEndMinControl Enable="true" Range="-300"/>
+						<EncPara ScaleFactorNumerator="360" ScaleFactorDenominator="1048576" Inverse="true" MaxCount="#xffffffff">
+							<SoftEndMinControl Range="-300"/>
 							<SoftEndMaxControl Range="300"/>
-							<Inc RefPosition="72" RefMode="2"/>
+							<Inc RefPosition="72"/>
 						</EncPara>
 						<Vars VarGrpType="1">
 							<Name>Inputs</Name>
@@ -2664,7 +2667,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara Inverse="true" MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="393.7406" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="35436.687" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -2720,6 +2723,7 @@ External Setpoint Generation:
 					</Drive>
 					<Controller Name="Ctrl" CtrType="1">
 						<CtrPara PriorControlFactor="1">
+							<PosDiffControl Enable="false"/>
 							<Observer BandWidth="20"/>
 						</CtrPara>
 					</Controller>
@@ -2742,7 +2746,7 @@ External Setpoint Generation:
 					<Name>Axis Y</Name>
 					<AxisPara>
 						<Dynamic Acceleration="637.5915" Deceleration="637.5915" Jerk="1912.7745"/>
-						<Velo RefSearch="80" RefSync="10" SlowManual="21.25305" FastManual="127.5183" Fast="425.061" Maximum="425.061"/>
+						<Velo RefSearch="20" RefSync="10" SlowManual="20" FastManual="50" Fast="425.061" Maximum="425.061"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
@@ -2865,6 +2869,7 @@ External Setpoint Generation:
 					</Drive>
 					<Controller Name="Ctrl" CtrType="1">
 						<CtrPara PriorControlFactor="1">
+							<PosDiffControl Range="2"/>
 							<Observer BandWidth="20"/>
 						</CtrPara>
 					</Controller>
@@ -2886,8 +2891,8 @@ External Setpoint Generation:
 				<Axis Id="3" CreateSymbols="true" AxisType="1">
 					<Name>Axis X</Name>
 					<AxisPara>
-						<Dynamic Acceleration="796.9905" Deceleration="796.9905" Jerk="2390.9715"/>
-						<Velo RefSearch="100" RefSync="10" SlowManual="26.56635" FastManual="159.3981" Fast="531.327" Maximum="531.327"/>
+						<Dynamic Acceleration="796.99" Deceleration="796.99" Jerk="2390.97"/>
+						<Velo RefSync="10" SlowManual="20" FastManual="50" Fast="531.327" Maximum="531.327"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
@@ -3010,6 +3015,7 @@ External Setpoint Generation:
 					</Drive>
 					<Controller Name="Ctrl" CtrType="1">
 						<CtrPara PriorControlFactor="1">
+							<PosDiffControl Range="2"/>
 							<Observer BandWidth="20"/>
 						</CtrPara>
 					</Controller>
@@ -3032,11 +3038,13 @@ External Setpoint Generation:
 					<Name>Axis Z</Name>
 					<AxisPara>
 						<Dynamic AccelerationMaximum="300" DecelerationMaximum="300" Acceleration="32.8734" Deceleration="32.8734" Jerk="432.264"/>
-						<Velo RefSearch="20" RefSync="5" SlowManual="5" FastManual="20" Maximum="20"/>
+						<Velo RefSearch="5" RefSync="2" SlowManual="5" FastManual="10" Maximum="20"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="4">
-						<EncPara MaxCount="#xffffffff"/>
+						<EncPara ScaleFactorNumerator="12" ScaleFactorDenominator="12800" Inverse="true" MaxCount="#xffffffff">
+							<Inc RefMode="1"/>
+						</EncPara>
 						<Vars VarGrpType="1">
 							<Name>Inputs</Name>
 							<Var>
@@ -3094,7 +3102,7 @@ External Setpoint Generation:
 						</Vars>
 					</Encoder>
 					<Drive Name="Drive" DrvType="24">
-						<DrvPara>
+						<DrvPara Inverse="true">
 							<Analog VeloReferenz="20" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
@@ -3167,6 +3175,7 @@ External Setpoint Generation:
 					</Drive>
 					<Controller Name="Ctrl" CtrType="1">
 						<CtrPara PriorControlFactor="1">
+							<PosDiffControl Range="2"/>
 							<Observer BandWidth="20"/>
 						</CtrPara>
 					</Controller>
@@ -3425,11 +3434,43 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{F980EB15-4D27-E719-4D30-EE3D6A933327}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{B56F4EAD-B6DA-7B1A-E3AC-10B74EA6958A}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
 						<Name>PlcTask Inputs</Name>
+						<Var>
+							<Name>GVL_Safety.FBError</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.SafeError</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.ComError</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.SafetyPermission</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.eStopButton</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorX</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorY</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.ProximitySensorZ</Name>
+							<Type>BOOL</Type>
+						</Var>
 						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.NcToPlc</Name>
 							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
@@ -3463,41 +3504,29 @@ External Setpoint Generation:
 							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Sensor</Name>
 							<Type>BOOL</Type>
 						</Var>
-						<Var>
-							<Name>GVL_Safety.FBError</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.SafeError</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.ComError</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.SafetyPermission</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.eStopButton</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.ProximitySensorX</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.ProximitySensorY</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.ProximitySensorZ</Name>
-							<Type>BOOL</Type>
-						</Var>
 					</Vars>
 					<Vars VarGrpType="2" AreaNo="1">
 						<Name>PlcTask Outputs</Name>
+						<Var>
+							<Name>GVL_Safety.RunStop</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.ErrorAck</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>GVL_Safety.RestartFBs</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.SpindleEnable</Name>
+							<Type>BOOL</Type>
+						</Var>
+						<Var>
+							<Name>IO.CoolingEnable</Name>
+							<Type>BOOL</Type>
+						</Var>
 						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.AxisX.BasicAxis._Axis.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
@@ -3530,41 +3559,9 @@ External Setpoint Generation:
 							<Name>MAIN.Seedra.GantryXYZ.CylinderCuttingY.Valve</Name>
 							<Type>BOOL</Type>
 						</Var>
-						<Var>
-							<Name>GVL_Safety.RunStop</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.ErrorAck</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.RestartFBs</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.SpindleEnable</Name>
-							<Type>BOOL</Type>
-						</Var>
-						<Var>
-							<Name>IO.CoolingEnable</Name>
-							<Type>BOOL</Type>
-						</Var>
 					</Vars>
 					<Vars VarGrpType="1" ContextId="1" AreaNo="16">
 						<Name>SafetyTask Inputs</Name>
-						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFX.NcToPlc</Name>
-							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFY.NcToPlc</Name>
-							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFZ.NcToPlc</Name>
-							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
-						</Var>
 						<Var>
 							<Name>GVL_Safety.SafetyPermissionI</Name>
 							<Type>BOOL</Type>
@@ -3602,9 +3599,25 @@ External Setpoint Generation:
 							<Name>IO.DI8</Name>
 							<Type>BOOL</Type>
 						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFX.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFY.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
+						<Var>
+							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFZ.NcToPlc</Name>
+							<Type GUID="{25521FAA-EA5F-4C7F-8864-BBCCDACD2E98}" Namespace="MC">NCTOPLC_AXIS_REF</Type>
+						</Var>
 					</Vars>
 					<Vars VarGrpType="2" ContextId="1" AreaNo="17">
 						<Name>SafetyTask Outputs</Name>
+						<Var>
+							<Name>GVL_Safety.SafetyPermissionQ</Name>
+							<Type>BOOL</Type>
+						</Var>
 						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFX.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
@@ -3616,10 +3629,6 @@ External Setpoint Generation:
 						<Var>
 							<Name>MAIN.Seedra.GantryXYZ.ExecutorNCI.__FB_EXEC_SPINDLE_GCODEXYZ__CYCLICLOGIC__REFZ.PlcToNc</Name>
 							<Type GUID="{96B75FEB-2D84-43BE-A3EC-D9A681F27D52}" Namespace="MC">PLCTONC_AXIS_REF</Type>
-						</Var>
-						<Var>
-							<Name>GVL_Safety.SafetyPermissionQ</Name>
-							<Type>BOOL</Type>
 						</Var>
 					</Vars>
 					<UnrestoredVarLinks ImportTime="2026-01-27T16:22:49">
@@ -4339,7 +4348,7 @@ External Setpoint Generation:
 										<TcLink>
 											<TcPrjPath>..\BB-Seedra-4024\BB-Seedra-4024.tsproj</TcPrjPath>
 											<IoItemPathName>TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 5 (EL7221-9014)</IoItemPathName>
-											<NcItemPathName AxisType="1">TINC^NC-Task 1 SAF^Axes^Axis Z</NcItemPathName>
+											<NcItemPathName AxisType="1">TINC^NC-Task 1 SAF^Axes^Axis Q</NcItemPathName>
 										</TcLink>
 										<SelectedModifyOptPDOsMode>0</SelectedModifyOptPDOsMode>
 										<Block Id="0">
@@ -4849,17 +4858,17 @@ External Setpoint Generation:
 													</Parameter>
 												</DatabaseParameters>
 											</Brake>
-											<Load MoveStyle="Linear">
+											<Load MoveStyle="Rotary">
 												<IsMotorRotary>true</IsMotorRotary>
 												<Name>InverterChannelTypeBlockLoad</Name>
 												<ProjectGUID>00000000-0000-0000-0000-000000000000</ProjectGUID>
 												<Parameter>
 													<PropertyName>FeedConstantUnit</PropertyName>
-													<Value>mm</Value>
+													<Value>°</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>4</Value>
+													<Value>360</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
@@ -7419,7 +7428,7 @@ Bit 8 - 15 : reserved]]></Comment>
 										<TcLink>
 											<TcPrjPath>..\BB-Seedra-4024\BB-Seedra-4024.tsproj</TcPrjPath>
 											<IoItemPathName>TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 20 (EL7037)</IoItemPathName>
-											<NcItemPathName AxisType="1">TINC^NC-Task 1 SAF^Axes^Axis 9</NcItemPathName>
+											<NcItemPathName AxisType="1">TINC^NC-Task 1 SAF^Axes^Axis Z</NcItemPathName>
 										</TcLink>
 										<SelectedModifyOptPDOsMode>0</SelectedModifyOptPDOsMode>
 										<Block Id="0">
