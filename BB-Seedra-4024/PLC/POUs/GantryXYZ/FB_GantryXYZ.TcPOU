@@ -630,9 +630,9 @@ END_VAR
     // --- OŚ Z ---
     ProfilesZ[E_MachineProfile.eProduction].SoftLimitMin := -10.0;
     ProfilesZ[E_MachineProfile.eProduction].SoftLimitMax := 90.0;
-    ProfilesZ[E_MachineProfile.eProduction].Acceleration := 500.0;   // Wchodzenie w materiał mniej agresywne
-    ProfilesZ[E_MachineProfile.eProduction].Deceleration := 2000.0;
-    ProfilesZ[E_MachineProfile.eProduction].Jerk         := 5000.0;
+    ProfilesZ[E_MachineProfile.eProduction].Acceleration := 200.0;   // Wchodzenie w materiał mniej agresywne
+    ProfilesZ[E_MachineProfile.eProduction].Deceleration := 200.0;
+    ProfilesZ[E_MachineProfile.eProduction].Jerk         := 300.0;
 
 
 // ===============================================================================
@@ -657,8 +657,8 @@ END_VAR
     ProfilesZ[E_MachineProfile.eManual].SoftLimitMin := -20.0;
     ProfilesZ[E_MachineProfile.eManual].SoftLimitMax := 100.0;
     ProfilesZ[E_MachineProfile.eManual].Acceleration := 200.0;
-    ProfilesZ[E_MachineProfile.eManual].Deceleration := 500.0;
-    ProfilesZ[E_MachineProfile.eManual].Jerk         := 1000.0;]]></ST>
+    ProfilesZ[E_MachineProfile.eManual].Deceleration := 200.0;
+    ProfilesZ[E_MachineProfile.eManual].Jerk         := 300.0;]]></ST>
       </Implementation>
     </Method>
     <Method Name="HMICommunication" Id="{0dce72f4-da14-4dd2-b6a3-5db9db3404e0}">
