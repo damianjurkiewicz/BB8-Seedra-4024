@@ -945,7 +945,10 @@ END_VAR
                     flagZ := AxisZ.Home();
                 END_IF
                 IF NOT flagQ THEN
-
+				
+				AxisQ.MoveAbsolute(0,0);
+				
+				
 				ActualPosition := AxisQ.ActualPosition;
 
                     fbHomeMcQ(
@@ -1277,7 +1280,9 @@ END_CASE]]></ST>
       <LineId Id="759" Count="9" />
       <LineId Id="770" Count="0" />
       <LineId Id="772" Count="12" />
-      <LineId Id="840" Count="2" />
+      <LineId Id="840" Count="1" />
+      <LineId Id="844" Count="2" />
+      <LineId Id="842" Count="0" />
       <LineId Id="839" Count="0" />
       <LineId Id="786" Count="13" />
       <LineId Id="801" Count="11" />
