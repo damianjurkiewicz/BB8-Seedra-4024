@@ -61,7 +61,7 @@ VAR
     fbHomeStratX        : FB_Homing_StandardNC;
     fbHomeStratY        : FB_Homing_StandardNC;
     fbHomeStratZ        : FB_Homing_StandardNC;
-	fbHomeStratQ 		: FB_Homing_StandardNC;
+	fbHomeStratQ 		: FB_Homing_Direct;
 
     // =========================================================
     //  ALARMS
@@ -901,129 +901,62 @@ VAR
 	SubModulesReady : BOOL := TRUE;
 END_VAR
 
-VAR_INST
-	flagX :BOOL;
-	flagY :BOOL;
-	flagZ :BOOL;
-	flagQ :BOOL;
-	ActualPosition : LREAL;
-END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE _CurrentMode OF
 
     //=================================PRODUCTION MODE==================================
     E_PMLUnitMode.ePMLUnitMode_Production:
- CASE SequenceState OF
-    0:
-        NoStateTasksToComplete := FALSE;
-        SequenceState := 10;
-
-    10:
-        AxisX.Enable();
-        AxisY.Enable();
-        AxisZ.Enable();
-        AxisQ.Enable();
-
-        SequenceState := 20;
-
-    20:
-        IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled AND AxisQ.Enabled THEN
-            SequenceState := 30;
-        END_IF
-
-    (* ========================================= *)
-    (* HOMING OŚ Z                               *)
-    (* ========================================= *)
-    30:
-        IF NOT flagZ THEN
-          //  flagZ := AxisZ.Home();
-			 fbHomeStratZ.Execute();
-			 flagZ := TRUE;
-        END_IF
-        
-        IF flagZ THEN
-            flagZ := FALSE;
-            SequenceState := 31;
-        END_IF
-
-    31:
-        IF AxisZ.Axis.Status.Homed THEN
-            flagZ := FALSE;
-            SequenceState := 40;
-        END_IF
-
-    (* ========================================= *)
-    (* HOMING OŚ Q                               *)
-    (* ========================================= *)
-    40:
-        (* Blokada: Start Q (a potem X i Y) czeka, aż oś Z fizycznie się zatrzyma *)
-        IF NOT AxisZ.Busy THEN
-            
-            IF NOT flagQ THEN
-                IF AxisQ.MoveAbsolute(0,0) THEN
-                    fbHomeMcQ(
-                        Axis := AxisQ.Axis, 
-                        Execute := TRUE, 
-                        HomingMode := MC_Direct, 
-                        Position := 0.0
-                    );
-                    
-                    IF fbHomeMcQ.Done THEN
-                        flagQ := TRUE;
-                        fbHomeMcQ(Axis := AxisQ.Axis, Execute := FALSE);
-						SequenceState := 41;
-                    END_IF
-
-                END_IF
-            END_IF
-
-        END_IF
-
-    41:
-        IF flagQ THEN   
-            flagQ := FALSE;
-            SequenceState := 42; 
-        END_IF
-        
-    42: 
-        IF AxisQ.Axis.Status.Homed THEN  
-            flagQ := FALSE;
-            SequenceState := 50;
-        END_IF
-
-    (* ========================================= *)
-    (* HOMING OŚ X oraz Y RAZEM                  *)
-    (* ========================================= *)
-    50:
-        IF NOT flagX THEN
-            flagX := AxisX.Home();
-        END_IF
-        
-        IF NOT flagY THEN
-            flagY := AxisY.Home();
-        END_IF
-        
-        IF flagX AND flagY THEN
-            flagX := FALSE;
-            flagY := FALSE;
-            SequenceState := 51; 
-        END_IF
-            
-    51:
-        IF AxisX.Axis.Status.Homed AND AxisY.Axis.Status.Homed THEN
-            flagX := FALSE;
-            flagY := FALSE;
-            SequenceState := 60;
-        END_IF
-
-    (* ========================================= *)
-    (* ZAKOŃCZENIE SEKWENCJI                     *)
-    (* ========================================= *)
-    60:
-        StateTasksComplete := TRUE;
-
-END_CASE
+	
+	CASE SequenceState OF
+		0:
+			NoStateTasksToComplete := FALSE;
+			StateTasksComplete     := FALSE;
+			SequenceState          := 10;
+	
+		10:
+			AxisX.Enable();
+			AxisY.Enable();
+			AxisZ.Enable();
+			AxisQ.Enable();
+			SequenceState := 20;
+	
+		20:
+			IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled AND AxisQ.Enabled THEN
+				SequenceState := 30;
+			END_IF
+	
+		30:
+			fbHomeStratZ.Execute();
+			SequenceState := 31;
+	
+		31:
+			IF fbHomeStratZ.Done THEN
+				SequenceState := 40;
+			ELSIF fbHomeStratZ.Error THEN
+				SequenceState := 99; 
+			END_IF
+	
+		40:
+			fbHomeStratQ.Execute();
+			fbHomeStratX.Execute();
+			fbHomeStratY.Execute();
+			SequenceState := 41;
+				
+		41:
+			IF fbHomeStratQ.Done AND fbHomeStratX.Done AND fbHomeStratY.Done THEN
+				SequenceState := 50;
+			ELSIF fbHomeStratQ.Error OR fbHomeStratX.Error OR fbHomeStratY.Error THEN
+				SequenceState := 99;
+			END_IF
+	
+		50:
+			StateTasksComplete := TRUE;
+			SequenceState      := 0; 
+	
+		99:
+			;
+	END_CASE
 
 
     //=================================MAINTENANCE & MANUAL MODE==================================
@@ -1314,13 +1247,7 @@ END_CASE]]></ST>
     <LineIds Name="FB_GantryXYZ.Resetting">
       <LineId Id="597" Count="2" />
       <LineId Id="753" Count="0" />
-      <LineId Id="1051" Count="23" />
-      <LineId Id="1172" Count="1" />
-      <LineId Id="1075" Count="31" />
-      <LineId Id="1158" Count="0" />
-      <LineId Id="1108" Count="0" />
-      <LineId Id="1157" Count="0" />
-      <LineId Id="1109" Count="47" />
+      <LineId Id="1274" Count="48" />
       <LineId Id="823" Count="0" />
       <LineId Id="659" Count="12" />
       <LineId Id="836" Count="0" />

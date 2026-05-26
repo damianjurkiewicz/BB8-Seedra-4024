@@ -32,15 +32,27 @@ SUPER^.Abort();]]></ST>
         <ST><![CDATA[CASE nStep OF
     0: // IDLE
         fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+		
+	10:	
+		_Axis.MoveAbsolute(0,0);
+		IF  NOT _Axis.Busy THEN
+			nStep := 15;
+		END_IF
 
-    10: // TRIGGER DIRECT HOMING
+    15: // TRIGGER DIRECT HOMING
         fbMcHome(
             Axis        := _Axis.Axis, 
             Execute     := TRUE, 
-            Position    := ReferencePosition,
+            Position    := 0,
             HomingMode  := MC_Direct
         );
-        IF fbMcHome.Busy THEN
+        
+        
+        IF fbMcHome.Done THEN
+            _bBusy := FALSE;
+            _bDone := TRUE;
+            nStep  := 0;
+        ELSIF fbMcHome.Busy THEN
             nStep := 20;
         ELSIF fbMcHome.Error THEN
             nStep := 99;
@@ -64,5 +76,19 @@ SUPER^.Abort();]]></ST>
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="FB_Homing_Direct">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Direct.Abort">
+      <LineId Id="3" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Direct.CyclicLogic">
+      <LineId Id="45" Count="2" />
+      <LineId Id="83" Count="1" />
+      <LineId Id="86" Count="3" />
+      <LineId Id="48" Count="34" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>
