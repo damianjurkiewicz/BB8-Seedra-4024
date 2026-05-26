@@ -952,7 +952,7 @@ END_VAR
                         Axis := AxisQ.Axis, 
                         Execute := TRUE, 
                         HomingMode := MC_Direct, 
-                        Position := AxisQ.Axis.NcToPlc.ActPos
+                        Position := 0.0
                     );
                     IF fbHomeMcQ.Done THEN
                         flagQ := TRUE;

@@ -2597,14 +2597,14 @@ External Setpoint Generation:
 					<Name>Axis Q</Name>
 					<AxisPara>
 						<General UnitName="°"/>
-						<Dynamic Acceleration="15000" Deceleration="15000" Jerk="48322.755"/>
-						<Velo RefSearch="107.3839" RefSync="107.3839" SlowManual="536.9195" FastManual="3221.517" Fast="10738.39" Maximum="10738.39"/>
+						<Dynamic Acceleration="15000" Deceleration="15000" Jerk="48322.8"/>
+						<Velo RefSearch="107.3839" RefSync="107.3839" SlowManual="536.9195" FastManual="3221.517" Fast="10738.39" Maximum="10738.4"/>
 						<PositionAreaControl Enable="false"/>
 						<TargetPosControl Enable="false"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="360" ScaleFactorDenominator="3145728" Inverse="true" MaxCount="#xffffffff">
+						<EncPara ScaleFactorNumerator="360" ScaleFactorDenominator="3145728" MaxCount="#xffffffff">
 							<SoftEndMinControl Range="-300"/>
 							<SoftEndMaxControl Range="300"/>
 							<Inc RefPosition="72"/>
@@ -2666,7 +2666,7 @@ External Setpoint Generation:
 						</Vars>
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
-						<DrvPara Inverse="true" MaxCount="#xffffffff" DriveControlDWord="#x00020100">
+						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
 							<Analog VeloReferenz="11812.229" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
@@ -2896,7 +2896,7 @@ External Setpoint Generation:
 					</AxisPara>
 					<Encoder Name="Enc" EncType="4">
 						<EncPara ScaleFactorNumerator="12" ScaleFactorDenominator="12800" Inverse="true" MaxCount="#xffffffff">
-							<Inc RefMode="1"/>
+							<Inc RefPosition="42" RefMode="1"/>
 						</EncPara>
 						<Vars VarGrpType="1">
 							<Name>Inputs</Name>
@@ -3432,7 +3432,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{E40A65BE-99EB-DDB7-16A8-61BA9EEAAC8F}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{C2785FB1-5A66-6912-D1ED-7771E88734B9}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
