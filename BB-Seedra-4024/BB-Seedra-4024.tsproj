@@ -2891,7 +2891,7 @@ External Setpoint Generation:
 					<Name>Axis Z</Name>
 					<AxisPara>
 						<Dynamic AccelerationMaximum="300" DecelerationMaximum="300" Acceleration="32.8734" Deceleration="32.8734" Jerk="432.264"/>
-						<Velo RefSearch="5" RefSync="2" SlowManual="5" FastManual="10" Maximum="20"/>
+						<Velo RefSearch="20" RefSync="2" SlowManual="5" FastManual="10" Maximum="20"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="4">
