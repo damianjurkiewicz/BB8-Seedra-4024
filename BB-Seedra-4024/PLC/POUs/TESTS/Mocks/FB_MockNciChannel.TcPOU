@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_MockNciChannel" Id="{c1b2c3d4-e5f6-4789-9999-000000000010}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MockNciChannel EXTENDS FB_ComponentBase IMPLEMENTS I_NciChannel_GCode
+VAR_INPUT
+    MockIsGrouped      : BOOL;
+    MockIsProgramLoaded: BOOL;
+    MockIsReady        : BOOL;
+    MockIsMoving       : BOOL;
+    MockChannelError   : BOOL;
+    MockChannelErrorId : UDINT;
+END_VAR
+VAR_OUTPUT
+    BuildGroupCallCount : INT;
+    LoadProgramCallCount: INT;
+    StartCallCount      : INT;
+    StopCallCount       : INT;
+    UngroupCallCount    : INT;
+    ResetCallCount      : INT;
+    LoadedProgramPath   : STRING(255);
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="BuildGroup" Id="{a1b2c3d4-e5f6-4789-9999-000000000011}">
+      <Declaration><![CDATA[METHOD BuildGroup]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[BuildGroupCallCount := BuildGroupCallCount + 1;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ChannelError" Id="{a1b2c3d4-e5f6-4789-9999-000000000012}">
+      <Declaration><![CDATA[PROPERTY ChannelError : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-000000000013}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ChannelError := MockChannelError;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ChannelErrorId" Id="{a1b2c3d4-e5f6-4789-9999-000000000014}">
+      <Declaration><![CDATA[PROPERTY ChannelErrorId : UDINT]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-000000000015}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ChannelErrorId := MockChannelErrorId;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsGrouped" Id="{a1b2c3d4-e5f6-4789-9999-000000000016}">
+      <Declaration><![CDATA[PROPERTY IsGrouped : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-000000000017}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsGrouped := MockIsGrouped;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsMoving" Id="{a1b2c3d4-e5f6-4789-9999-000000000018}">
+      <Declaration><![CDATA[PROPERTY IsMoving : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-000000000019}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsMoving := MockIsMoving;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsProgramLoaded" Id="{a1b2c3d4-e5f6-4789-9999-000000000020}">
+      <Declaration><![CDATA[PROPERTY IsProgramLoaded : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-000000000021}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsProgramLoaded := MockIsProgramLoaded;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsReady" Id="{a1b2c3d4-e5f6-4789-9999-000000000022}">
+      <Declaration><![CDATA[PROPERTY IsReady : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-000000000023}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsReady := MockIsReady;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="LoadProgram" Id="{a1b2c3d4-e5f6-4789-9999-000000000024}">
+      <Declaration><![CDATA[METHOD LoadProgram
+VAR_INPUT
+    sProgramPath : STRING(255);
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[LoadProgramCallCount := LoadProgramCallCount + 1;
+LoadedProgramPath := sProgramPath;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ResetChannel" Id="{a1b2c3d4-e5f6-4789-9999-000000000025}">
+      <Declaration><![CDATA[METHOD ResetChannel]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[ResetCallCount := ResetCallCount + 1;
+MockChannelError := FALSE;
+MockChannelErrorId := 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Start" Id="{a1b2c3d4-e5f6-4789-9999-000000000026}">
+      <Declaration><![CDATA[METHOD Start]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[StartCallCount := StartCallCount + 1;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Stop" Id="{a1b2c3d4-e5f6-4789-9999-000000000027}">
+      <Declaration><![CDATA[METHOD Stop]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[StopCallCount := StopCallCount + 1;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Ungroup" Id="{a1b2c3d4-e5f6-4789-9999-000000000028}">
+      <Declaration><![CDATA[METHOD Ungroup]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[UngroupCallCount := UngroupCallCount + 1;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

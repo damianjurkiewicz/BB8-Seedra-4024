@@ -3,8 +3,6 @@
   <POU Name="FB_MockAxis" Id="{f3603fea-aa28-47ef-b114-9fa5d52e454a}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_MockAxis EXTENDS SPT_Components.FB_Component_BasicAxis
 VAR
-    _MockInPosition : BOOL := TRUE;
-    _MockBusy       : BOOL := FALSE;
 	_Enabled		: BOOL := FALSE;
 	
 	_MockVelocity     : LREAL;
@@ -12,6 +10,11 @@ VAR
     _MockDeceleration : LREAL;
 	
 	_ForceError	:	BOOL;
+END_VAR
+
+VAR_INPUT
+    MockInPosition : BOOL := TRUE;
+    MockBusy       : BOOL := FALSE;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -42,14 +45,14 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[Busy := _MockBusy;]]></ST>
+          <ST><![CDATA[Busy := MockBusy;]]></ST>
         </Implementation>
       </Get>
     </Property>
     <Method Name="CyclicLogic" Id="{102391e4-3a92-4a49-bde0-8864cda47509}">
       <Declaration><![CDATA[METHOD CyclicLogic]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[SUPER^.CyclicLogic();]]></ST>
       </Implementation>
     </Method>
     <Property Name="Deceleration" Id="{8113da0f-9094-45e4-bad9-b871668a9a1d}">
@@ -75,7 +78,8 @@ END_VAR
       <Declaration><![CDATA[METHOD Enable : BOOL
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Enabled := TRUE;
+        <ST><![CDATA[SUPER^.Enable(); 
+_Enabled := TRUE;
 Enable := TRUE;
 ]]></ST>
       </Implementation>
@@ -128,7 +132,7 @@ END_VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[InPosition := _MockInPosition;]]></ST>
+          <ST><![CDATA[InPosition := MockInPosition;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -139,8 +143,8 @@ VAR_INPUT
 	AbortPrevious : BOOL;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_MockBusy := FALSE;
-_MockInPosition := TRUE;]]></ST>
+        <ST><![CDATA[MockBusy := FALSE;
+MockInPosition := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Property Name="Velocity" Id="{5d262761-a250-4ecf-8080-ed7ad47ce2c5}">
@@ -184,6 +188,7 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_MockAxis.Enable">
+      <LineId Id="7" Count="0" />
       <LineId Id="5" Count="0" />
       <LineId Id="2" Count="0" />
       <LineId Id="4" Count="0" />

@@ -18,13 +18,14 @@ VAR_INST
     MockProvider : FB_MockConfigProvider;
 END_VAR
 VAR
-    TestConfig   : ST_RecipeBuilder_Config;
-    BuilderWings : I_RecipeBuilder;
-    BuilderFlaps : I_RecipeBuilder;
-    BuilderArona : I_RecipeBuilder;
-    BuilderRect  : I_RecipeBuilder;
+    TestConfig       : ST_RecipeBuilder_Config;
+    BuilderWings     : I_RecipeBuilder;
+    BuilderFlaps     : I_RecipeBuilder;
+    BuilderArona     : I_RecipeBuilder;
+    BuilderCircle    : I_RecipeBuilder;
+    BuilderRectangle : I_RecipeBuilder;
     
-    iMockProvider : I_GantryConfigProvider;
+    iMockProvider    : I_GantryConfigProvider;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[TEST('Test_InjectsConfigProviderToAllBuilders');
@@ -33,27 +34,26 @@ END_VAR]]></Declaration>
 // Rzutujemy instancję bloku na interfejs (aby kompilator wiedział, jak je porównywać)
 iMockProvider := MockProvider;
 
-// ACT
+// 2. ACT
 Factory.InitializeFactory(Config := TestConfig, ConfigProvider := iMockProvider);
 
 // Wyciągamy instancje z fabryki
-BuilderWings := Factory.GetBuilder(E_RecipeID.eBorgoWings);
-BuilderFlaps := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
-BuilderArona := Factory.GetBuilder(E_RecipeID.eArona);
-BuilderRect  := Factory.GetBuilder(E_RecipeID.eCircle);
+BuilderWings     := Factory.GetBuilder(E_RecipeID.eBorgoWings);
+BuilderFlaps     := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
+BuilderArona     := Factory.GetBuilder(E_RecipeID.eArona);
+BuilderCircle    := Factory.GetBuilder(E_RecipeID.eCircle);
+BuilderRectangle := Factory.GetBuilder(E_RecipeID.eRectangle);
 
 // 3. ASSERT
-// Teraz porównujemy interfejs z interfejsem - kompilator będzie zadowolony!
 AssertTrue(Condition := (BuilderWings.ConfigProvider = iMockProvider),
            Message := 'BuilderWings nie otrzymal wstrzyknietego ConfigProvidera!');
-           
 AssertTrue(Condition := (BuilderFlaps.ConfigProvider = iMockProvider),
            Message := 'BuilderFlaps nie otrzymal wstrzyknietego ConfigProvidera!');
-           
 AssertTrue(Condition := (BuilderArona.ConfigProvider = iMockProvider),
            Message := 'BuilderArona nie otrzymal wstrzyknietego ConfigProvidera!');
-           
-AssertTrue(Condition := (BuilderRect.ConfigProvider = iMockProvider),
+AssertTrue(Condition := (BuilderCircle.ConfigProvider = iMockProvider),
+           Message := 'BuilderCircle nie otrzymal wstrzyknietego ConfigProvidera!');
+AssertTrue(Condition := (BuilderRectangle.ConfigProvider = iMockProvider),
            Message := 'BuilderRectangle nie otrzymal wstrzyknietego ConfigProvidera!');
 
 TEST_FINISHED();]]></ST>
@@ -62,27 +62,28 @@ TEST_FINISHED();]]></ST>
     <Method Name="Test_ReturnsCorrectBuilder" Id="{f4d0cc26-5c2a-4ddf-b356-c729fd5c6098}">
       <Declaration><![CDATA[METHOD Test_ReturnsCorrectBuilder
 VAR
-    BuilderWings : I_RecipeBuilder;
-    BuilderFlaps : I_RecipeBuilder;
-    BuilderArona : I_RecipeBuilder;
+    BuilderWings     : I_RecipeBuilder;
+    BuilderFlaps     : I_RecipeBuilder;
+    BuilderArona     : I_RecipeBuilder;
+    BuilderCircle    : I_RecipeBuilder; // Dodane!
+    BuilderRectangle : I_RecipeBuilder; // Dodane!
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[TEST('Test_ReturnsCorrectBuilder');
 
 // 1. ACT - Prosimy fabrykę o wszystkie wspierane przepisy
-BuilderWings := Factory.GetBuilder(E_RecipeID.eBorgoWings);
-BuilderFlaps := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
-BuilderArona := Factory.GetBuilder(E_RecipeID.eArona);
+BuilderWings     := Factory.GetBuilder(E_RecipeID.eBorgoWings);
+BuilderFlaps     := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
+BuilderArona     := Factory.GetBuilder(E_RecipeID.eArona);
+BuilderCircle    := Factory.GetBuilder(E_RecipeID.eCircle);
+BuilderRectangle := Factory.GetBuilder(E_RecipeID.eRectangle);
 
 // 2. ASSERT - Sprawdzamy, czy żaden z nich nie jest pusty (0)
-AssertTrue(Condition := (BuilderWings <> 0), 
-           Message := 'Fabryka zwrocila 0 dla eBorgoWings!');
-           
-AssertTrue(Condition := (BuilderFlaps <> 0), 
-           Message := 'Fabryka zwrocila 0 dla eBorgoFlaps!');
-           
-AssertTrue(Condition := (BuilderArona <> 0), 
-           Message := 'Fabryka zwrocila 0 dla eArona!');
+AssertTrue(Condition := (BuilderWings <> 0), Message := 'Fabryka zwrocila 0 dla eBorgoWings!');
+AssertTrue(Condition := (BuilderFlaps <> 0), Message := 'Fabryka zwrocila 0 dla eBorgoFlaps!');
+AssertTrue(Condition := (BuilderArona <> 0), Message := 'Fabryka zwrocila 0 dla eArona!');
+AssertTrue(Condition := (BuilderCircle <> 0), Message := 'Fabryka zwrocila 0 dla eCircle!');
+AssertTrue(Condition := (BuilderRectangle <> 0), Message := 'Fabryka zwrocila 0 dla eRectangle!');
 
 TEST_FINISHED();]]></ST>
       </Implementation>
@@ -166,11 +167,11 @@ TEST_FINISHED();]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory_Test.Test_InjectsConfigProviderToAllBuilders">
-      <LineId Id="57" Count="28" />
+      <LineId Id="189" Count="27" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory_Test.Test_ReturnsCorrectBuilder">
-      <LineId Id="28" Count="16" />
+      <LineId Id="73" Count="15" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory_Test.Test_ReturnsZeroOnInvalidID">

@@ -3,19 +3,22 @@
   <DUT Name="ST_RecipeBuilder_Config" Id="{dbdbd64a-f55f-4772-a86a-1207ae4f3c57}">
     <Declaration><![CDATA[TYPE ST_RecipeBuilder_Config :
 STRUCT
-    PanelFrontLength     : REAL;
-    PanelFrontWidth      : REAL;
-    PanelHeight          : REAL;
-    RailHeightCorrection : REAL;
-    CuttingOverpass      : REAL;
-    GroovingOverpass     : REAL;
-    FillAll              : BOOL; 
-    RequestedCopiesX     : DINT;
-    RequestedCopiesY     : DINT; 
-    IsValid              : BOOL; 
-    GCodePath            : STRING(255); 
-    
-    GrooveDepthZ         : REAL; 
+    PanelFrontLength     	: REAL;
+    PanelFrontWidth      	: REAL;
+    PanelHeight          	: REAL;
+    RailHeightCorrection 	: REAL;
+    CuttingOverpass      	: REAL;
+    GroovingOverpass    	: REAL;
+    FillAll             	: BOOL; 
+    RequestedCopiesX    	: DINT;
+    RequestedCopiesY    	: DINT; 
+    IsValid             	: BOOL; 
+    GCodePath           	: STRING(255); 
+    Radius					: REAL;
+	Diameter				: REAL; 
+    GrooveDepthZ         	: REAL;
+	NciStartX				: REAL;
+	NciStartY				: REAL; 
 END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <DUT Name="E_ExecutionRoute" Id="{d4c2545a-b601-4d58-8696-606a772c25f3}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+TYPE E_ExecutionRoute :
+(
+    ePTP,              
+    eGCode,          
+    eFeedTable    
+);
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

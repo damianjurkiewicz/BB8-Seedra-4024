@@ -36,6 +36,12 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Property Name="ExecutionRoute" Id="{961feff0-1b35-44a7-a40f-aa8e8218ab76}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{0600c360-f7b0-4067-a18f-ab3f6a6a02ac}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
     <Property Name="FootprintX" Id="{b2c0660e-2273-4d0b-a3ff-b3d685a837ce}">
       <Declaration><![CDATA[PROPERTY FootprintX : REAL]]></Declaration>
       <Get Name="Get" Id="{1c249b0f-2c24-4249-828f-a42f5a98a347}">
@@ -51,6 +57,15 @@
         <Declaration><![CDATA[]]></Declaration>
       </Get>
       <Set Name="Set" Id="{0a3a18d1-13c3-4727-bb69-a7fa42e8a244}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="GeometryWriter" Id="{d4bebd77-571d-4217-889b-872c8fc3a75b}">
+      <Declaration><![CDATA[PROPERTY GeometryWriter : I_GeometryWriter]]></Declaration>
+      <Get Name="Get" Id="{d6a12bab-d176-4870-bbae-066a355dfdd1}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{36c32498-a83b-42dd-8e8e-4ca52f21093a}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>

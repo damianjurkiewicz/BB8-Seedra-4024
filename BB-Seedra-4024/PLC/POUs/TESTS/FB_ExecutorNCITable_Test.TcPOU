@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_ExecutorNCITable_Test" Id="{f1b2c3d4-e5f6-4789-9999-000000000050}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_ExecutorNCITable_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+    Executor         : FB_Exec_Tangential_FeedTable;
+    MockChannel      : FB_MockNciChannelFeedTable;
+
+    Executor_Err     : FB_Exec_Tangential_FeedTable;
+    MockChannel_Err  : FB_MockNciChannelFeedTable;
+
+    MockProvider     : FB_MockConfigProvider;
+    MockAxisX        : FB_MockAxis;
+    MockAxisY        : FB_MockAxis;
+    MockAxisZ        : FB_MockAxis;
+    RecipeBuilder    : FB_RecipeBuilderRectangle;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_Sequence_ExecutesTableCorrectly();
+Test_ChannelError_AbortsSequence();]]></ST>
+    </Implementation>
+    <Method Name="Test_ChannelError_AbortsSequence" Id="{f1b2c3d4-e5f6-4789-9999-000000000052}">
+      <Declaration><![CDATA[METHOD Test_ChannelError_AbortsSequence
+VAR_INST
+    Step : INT := 0;
+    TimeoutTimer : TON;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_ChannelError_AbortsSequence');
+
+Executor_Err.CyclicLogic();
+
+TimeoutTimer(IN := (Step > 0 AND Step < 100), PT := T#2S);
+IF TimeoutTimer.Q THEN
+    AssertTrue(FALSE, 'Timeout! Maszyna stanow utknela.');
+    TEST_FINISHED();
+    Step := 100;
+END_IF
+
+CASE Step OF
+    0:
+        Executor_Err.RecipeBuilder  := RecipeBuilder;
+        Executor_Err.ConfigProvider := MockProvider;
+        Executor_Err.AxisX          := MockAxisX;
+        Executor_Err.AxisY          := MockAxisY;
+        Executor_Err.AxisZ          := MockAxisZ;
+        Executor_Err.NciChannel     := MockChannel_Err;
+
+        MockAxisX.MockInPosition := TRUE;
+        MockAxisY.MockInPosition := TRUE;
+        MockAxisZ.MockInPosition := TRUE;
+        MockChannel_Err.MockChannelError := FALSE;
+
+        Executor_Err.Execute();
+        Step := 10;
+
+    10:
+        IF MockChannel_Err.BuildGroupCallCount > 0 THEN
+            MockChannel_Err.MockChannelError := TRUE;
+            MockChannel_Err.MockChannelErrorId := 4321;
+            Step := 20;
+        END_IF
+
+    20:
+        IF Executor_Err.Error THEN
+            AssertEquals_UDINT(Expected := 4321, 
+                               Actual := Executor_Err.ErrorID, 
+                               Message := 'Executor nie przepisal ErrorID z kanalu tabelarycznego!');
+            TEST_FINISHED();
+            Step := 100;
+        ELSIF Executor_Err.Done THEN
+            AssertTrue(Condition := FALSE, Message := 'Executor zignorowal blad kanalu!');
+            TEST_FINISHED();
+            Step := 100;
+        END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Sequence_ExecutesTableCorrectly" Id="{f1b2c3d4-e5f6-4789-9999-000000000051}">
+      <Declaration><![CDATA[METHOD Test_Sequence_ExecutesTableCorrectly
+VAR_INST
+    Step         : INT := 0;
+    RecipeConfig : ST_RecipeBuilder_Config;
+    TimeoutTimer : TON;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Sequence_ExecutesTableCorrectly');
+
+Executor.CyclicLogic();
+
+TimeoutTimer(IN := (Step > 0 AND Step < 100), PT := T#2S);
+IF TimeoutTimer.Q THEN
+    AssertTrue(FALSE, 'Timeout! Maszyna stanow utknela.');
+    TEST_FINISHED();
+    Step := 100;
+END_IF
+
+CASE Step OF
+    0:
+        RecipeConfig.PanelFrontLength := 1000.0;
+        RecipeConfig.PanelFrontWidth  := 1000.0; // <- Wymagane, zeby nie ustawilo 0 sztuk!
+        RecipeBuilder.Config := RecipeConfig;
+        RecipeBuilder.Build();
+
+        Executor.RecipeBuilder  := RecipeBuilder;
+        Executor.ConfigProvider := MockProvider;
+        Executor.AxisX          := MockAxisX;
+        Executor.AxisY          := MockAxisY;
+        Executor.AxisZ          := MockAxisZ;
+        Executor.NciChannel     := MockChannel; 
+
+        Step := 10;
+
+    10:
+        Executor.Execute();
+        Step := 20;
+
+    20:
+        IF Executor.Busy THEN
+            MockAxisX.MockInPosition := TRUE;
+            MockAxisY.MockInPosition := TRUE;
+            MockAxisZ.MockInPosition := TRUE;
+            Step := 30;
+        END_IF
+
+    30:
+        IF MockChannel.BuildGroupCallCount > 0 THEN
+            MockChannel.MockIsGrouped := TRUE; 
+            Step := 40;
+        END_IF
+
+    40:
+        IF MockChannel.StartFeedTableCallCount > 0 THEN
+            MockChannel.MockIsFeedingDone := TRUE;
+            Step := 50;
+        END_IF
+
+    50:
+        IF MockChannel.MockIsFeedingDone THEN
+            MockChannel.MockIsChannelDone := TRUE;
+            Step := 60;
+        END_IF
+
+    60:
+        IF MockChannel.UngroupCallCount > 0 THEN
+            MockChannel.MockIsGrouped := FALSE;
+            Step := 70;
+        END_IF
+
+    70:
+        IF Executor.Done THEN
+            AssertTrue(Condition := TRUE, Message := 'Test OK');
+            TEST_FINISHED();
+            Step := 100;
+        ELSIF Executor.Error THEN
+            AssertTrue(Condition := FALSE, Message := 'Wystapil nieoczekiwany Error!');
+            TEST_FINISHED();
+            Step := 100;
+        END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_ExecutorNCITable_Test">
+      <LineId Id="3" Count="0" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorNCITable_Test.Test_ChannelError_AbortsSequence">
+      <LineId Id="3" Count="46" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorNCITable_Test.Test_Sequence_ExecutesTableCorrectly">
+      <LineId Id="3" Count="72" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

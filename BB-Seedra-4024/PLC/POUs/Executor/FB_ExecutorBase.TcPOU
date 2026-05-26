@@ -16,6 +16,7 @@ VAR
     _AxisX          : SPT_Motion_Control.I_BasicAxis;
     _AxisY          : SPT_Motion_Control.I_BasicAxis;
     _AxisZ          : SPT_Motion_Control.I_BasicAxis;
+	_AxisQ			: SPT_Motion_Control.I_BasicAxis;
     _Cylinder       : I_Cylinder;                     
     _RecipeBuilder  : I_RecipeBuilder;
 	_ConfigProvider : I_GantryConfigProvider;
@@ -37,6 +38,25 @@ iCurrentSegment := 1;
 StepTimer(IN := FALSE);]]></ST>
       </Implementation>
     </Method>
+    <Property Name="AxisQ" Id="{914cb134-2cdd-4b39-bf95-234a22eb90b5}">
+      <Declaration><![CDATA[PROPERTY AxisQ : I_BasicAxis]]></Declaration>
+      <Get Name="Get" Id="{fa420f18-f81d-49e1-8b56-94b14fabf227}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[AxisQ := _AxisQ;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{16d148c7-2b4d-4069-a39d-93c0ec225613}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_AxisQ := AxisQ;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="AxisX" Id="{bf7bf1e8-4628-46ee-9a7f-8b243677db34}">
       <Declaration><![CDATA[PROPERTY AxisX : I_BasicAxis]]></Declaration>
       <Get Name="Get" Id="{d93144b5-dd29-483a-8b76-9038e49c9a6d}">
@@ -259,6 +279,12 @@ END_VAR
     <LineIds Name="FB_ExecutorBase.Abort">
       <LineId Id="6" Count="3" />
       <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorBase.AxisQ.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_ExecutorBase.AxisQ.Set">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_ExecutorBase.AxisX.Get">
       <LineId Id="2" Count="0" />

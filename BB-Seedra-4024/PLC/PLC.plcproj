@@ -52,6 +52,15 @@
     <Compile Include="PlcTask.TcTTO">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Builder\E_ExecutionRoute.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\I_GeometryWriter.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderRoundedRect.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderArona.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -70,13 +79,25 @@
     <Compile Include="POUs\Components\FB_Cylinder.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Components\I_Channel\ST_NciAxisIds.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Components\I_Channel\I_NciChannelBase.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Components\I_Channel\I_NciChannel_FeedTable.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Components\I_Channel\I_NciChannel_GCode.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Components\I_Cylinder.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\I_NciChannel.TcIO">
+    <Compile Include="POUs\Components\FB_NciChannel.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Components\FB_NciChannel.TcPOU">
+    <Compile Include="POUs\Components\FB_NciChannelTangential.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Components\ST_Cylinder_Command.TcDUT">
@@ -91,10 +112,13 @@
     <Compile Include="POUs\Components\ST_Cylinder_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Executor\FB_ExecutorCut.TcPOU">
+    <Compile Include="POUs\Executor\FB_Exec_Pneumatic_PTP.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Executor\FB_ExecutorGrooveXY.TcPOU">
+    <Compile Include="POUs\Executor\FB_Exec_Tangential_FeedTable.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Executor\FB_Exec_Spindle_PTP.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Executor\I_BB8Specification.TcIO">
@@ -106,19 +130,19 @@
     <Compile Include="POUs\Executor\I_MachiningExecutor.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Executor\FB_ExecutorNCI.TcPOU">
+    <Compile Include="POUs\Executor\FB_Exec_Spindle_GCodeXYZ.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\E_MachineProfile.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\E_RecipeID.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\ST_AxisProfile.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_Limits.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\GantryXYZ\E_RecipeID.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\FB_GantryXYZ.TcPOU">
@@ -184,6 +208,21 @@
     <Compile Include="POUs\TESTS\FB_Cylinder_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\TESTS\FB_ExecutorNCITable_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\FB_ExecutorGCode_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\FB_FeedBuilderRoundedRect_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\FB_NciChannelTangential_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\FB_NciChannel_Test.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\TESTS\FB_GantryXYZ_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -200,6 +239,15 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TESTS\Mocks\FB_MockAxis.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\Mocks\FB_MockGeometryWriter.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\Mocks\FB_MockNciChannelFeedTable.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\TESTS\Mocks\FB_MockNciChannel.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TESTS\Mocks\FB_MockCylinder.TcPOU">
@@ -220,6 +268,10 @@
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
     <Compile Include="VISUs\Modes\ProductionMode\V_ProductionArona.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionRoundRectangle.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
@@ -276,6 +328,7 @@
     <Folder Include="GVLs" />
     <Folder Include="POUs\Builder\Recipes" />
     <Folder Include="POUs\Components" />
+    <Folder Include="POUs\Components\I_Channel" />
     <Folder Include="POUs\GantryXYZ" />
     <Folder Include="POUs\Executor" />
     <Folder Include="POUs\Builder" />
@@ -365,6 +418,10 @@
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_NCI">
       <DefaultResolution>Tc2_NCI, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_NCI</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_PlcInterpolation">
+      <DefaultResolution>Tc2_PlcInterpolation, * (Beckhoff Automation GmbH)</DefaultResolution>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Standard">
       <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>

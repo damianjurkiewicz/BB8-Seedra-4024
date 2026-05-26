@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_NciChannel_Test" Id="{a1b2c3d4-e5f6-4789-9999-000000000001}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NciChannel_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+    Channel : FB_NciChannel;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_LoadProgram_ClearsLoadedFlag();
+Test_ResetChannel_ClearsErrors();
+Test_BuildGroup_ClearsGroupedFlag();
+Test_Real_BuildGroup_Integration();
+Test_DisconnectedState_ReturnsNotReady();
+]]></ST>
+    </Implementation>
+
+    <Method Name="Test_BuildGroup_ClearsGroupedFlag" Id="{a1b2c3d4-e5f6-4789-9999-000000000004}">
+      <Declaration><![CDATA[METHOD Test_BuildGroup_ClearsGroupedFlag
+VAR_INST
+    Executed : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BuildGroup_ClearsGroupedFlag');
+IF NOT Executed THEN
+    Channel.BuildGroup();
+    AssertFalse(Condition := Channel.IsGrouped, Message := 'IsGrouped nie zostalo zresetowane przy wywolaniu BuildGroup!');
+    AssertFalse(Condition := Channel.ChannelError, Message := 'Bledy kanalu nie zostaly zresetowane przy probie BuildGroup!');
+    TEST_FINISHED();
+    Executed := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+
+    <Method Name="Test_DisconnectedState_ReturnsNotReady" Id="{a1b2c3d4-e5f6-4789-9999-000000000005}">
+      <Declaration><![CDATA[METHOD Test_DisconnectedState_ReturnsNotReady
+VAR_INST
+    Executed : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_DisconnectedState_ReturnsNotReady');
+IF NOT Executed THEN
+    AssertFalse(Condition := Channel.IsReady, Message := 'IsReady zwrocilo TRUE pomimo braku fizycznego polaczenia z NC!');
+    AssertFalse(Condition := Channel.IsMoving, Message := 'IsMoving zwrocilo TRUE pomimo braku fizycznego polaczenia z NC!');
+    TEST_FINISHED();
+    Executed := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+
+    <Method Name="Test_LoadProgram_ClearsLoadedFlag" Id="{a1b2c3d4-e5f6-4789-9999-000000000002}">
+      <Declaration><![CDATA[METHOD Test_LoadProgram_ClearsLoadedFlag
+VAR_INST
+    Executed : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_LoadProgram_ClearsLoadedFlag');
+IF NOT Executed THEN
+    Channel.LoadProgram('C:\test_path.nc');
+    AssertFalse(Condition := Channel.IsProgramLoaded, Message := 'Flaga IsProgramLoaded nie zostala zresetowana!');
+    TEST_FINISHED();
+    Executed := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+
+    <Method Name="Test_Real_BuildGroup_Integration" Id="{2814b410-d8c4-46e1-a1cb-9e210955a4c2}">
+      <Declaration><![CDATA[METHOD Test_Real_BuildGroup_Integration
+VAR_INST
+    Step : INT := 0;
+    TimeoutTimer : TON;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Real_BuildGroup_Integration');
+
+// Wstrzykujemy ID osi testowych (odczytane z Twojego tsproj) oraz poprawne ID grupy
+Channel.stAxisIds.nX := 5; 
+Channel.stAxisIds.nY := 6;
+Channel.stAxisIds.nZ := 7;
+Channel.nGroupId := 11; // Wirtualna grupa NCI dla testow to 11
+
+Channel.CyclicLogic();
+
+CASE Step OF
+    0:
+        Channel.BuildGroup();
+        Step := 10;
+
+    10:
+        TimeoutTimer(IN := TRUE, PT := T#3S);
+        
+        IF Channel.IsGrouped THEN
+            Step := 20;
+        ELSIF Channel.ChannelError THEN
+            AssertTrue(Condition := FALSE, Message := CONCAT('NC zwrocilo blad! ErrorID: ', UDINT_TO_STRING(Channel.ChannelErrorId)));
+            TEST_FINISHED();
+        ELSIF TimeoutTimer.Q THEN
+            AssertTrue(Condition := FALSE, Message := 'Timeout! NC nie odpowiedzialo.');
+            TEST_FINISHED();
+        END_IF
+
+    20:
+        AssertTrue(Condition := Channel.IsGrouped, Message := 'Grupa powinna byc zgloszona jako gotowa!');
+        Channel.Ungroup();
+        Step := 30;
+
+    30:
+        IF NOT Channel.IsGrouped THEN
+            TimeoutTimer(IN := FALSE);
+            TEST_FINISHED();
+            Step := 100;
+        END_IF
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+
+    <Method Name="Test_ResetChannel_ClearsErrors" Id="{a1b2c3d4-e5f6-4789-9999-000000000003}">
+      <Declaration><![CDATA[METHOD Test_ResetChannel_ClearsErrors
+VAR_INST
+    Executed : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_ResetChannel_ClearsErrors');
+IF NOT Executed THEN
+    Channel.ResetChannel();
+    AssertFalse(Condition := Channel.ChannelError, Message := 'Flaga bledu kanalu nie zniknela po wywolaniu ResetChannel!');
+    AssertEquals_UDINT(Expected := 0, Actual := Channel.ChannelErrorId, Message := 'ID bledu nie zostalo wyzerowane!');
+    TEST_FINISHED();
+    Executed := TRUE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

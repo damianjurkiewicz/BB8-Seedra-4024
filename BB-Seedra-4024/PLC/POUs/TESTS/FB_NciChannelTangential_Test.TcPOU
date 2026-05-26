@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_NciChannelTangential_Test" Id="{b1b2c3d4-e5f6-4789-9999-000000000001}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NciChannelTangential_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+    ChannelTan  : FB_NciChannelTangential;
+    DummyTable  : ST_NciFeedGroupTable;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_StartFeedTable_ResetsDoneFlags();
+Test_ResetChannel_ClearsErrors();
+Test_BuildExtGroup_ClearsGroupedFlag();
+]]></ST>
+    </Implementation>
+    <Method Name="Test_BuildExtGroup_ClearsGroupedFlag" Id="{b1b2c3d4-e5f6-4789-9999-000000000004}">
+      <Declaration><![CDATA[METHOD Test_BuildExtGroup_ClearsGroupedFlag
+VAR_INST
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_BuildExtGroup_ClearsGroupedFlag');
+
+// ACT - Budowanie grupy zawierającej dodatkowo oś Q1
+ChannelTan.BuildGroup();
+
+// ASSERT
+AssertFalse(Condition := ChannelTan.IsGrouped,
+            Message := 'IsGrouped nie zostalo zresetowane przy wywolaniu BuildGroup na EXT grupie!');
+AssertFalse(Condition := ChannelTan.ChannelError,
+            Message := 'Bledy kanalu tangencjalnego nie zostaly zresetowane przy probie BuildGroup!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_ResetChannel_ClearsErrors" Id="{b1b2c3d4-e5f6-4789-9999-000000000003}">
+      <Declaration><![CDATA[METHOD Test_ResetChannel_ClearsErrors
+VAR_INST
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_ResetChannel_ClearsErrors');
+
+// ACT
+ChannelTan.ResetChannel();
+
+// ASSERT
+AssertFalse(Condition := ChannelTan.ChannelError,
+            Message := 'Flaga bledu kanalu tangencjalnego nie zniknela po wywolaniu ResetChannel!');
+AssertEquals_UDINT(Expected := 0, 
+                   Actual := ChannelTan.ChannelErrorId, 
+                   Message := 'ID bledu nie zostalo wyzerowane w kanale tangencjalnym!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_StartFeedTable_ResetsDoneFlags" Id="{b1b2c3d4-e5f6-4789-9999-000000000002}">
+      <Declaration><![CDATA[METHOD Test_StartFeedTable_ResetsDoneFlags
+VAR_INST
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_StartFeedTable_ResetsDoneFlags');
+
+// ACT - Przekazujemy strukturę z tabelą i startujemy feedowanie punktów
+ChannelTan.StartFeedTable(stTable := DummyTable);
+
+// ASSERT - Flagi końca powinny być natychmiast wyzerowane
+AssertFalse(Condition := ChannelTan.IsFeedingDone,
+            Message := 'IsFeedingDone powinno byc FALSE na starcie interpolacji tabelarycznej!');
+AssertFalse(Condition := ChannelTan.IsChannelDone,
+            Message := 'IsChannelDone powinno byc FALSE na starcie interpolacji tabelarycznej!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_NciChannelTangential_Test">
+      <LineId Id="3" Count="2" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential_Test.Test_BuildExtGroup_ClearsGroupedFlag">
+      <LineId Id="3" Count="10" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential_Test.Test_ResetChannel_ClearsErrors">
+      <LineId Id="3" Count="11" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NciChannelTangential_Test.Test_StartFeedTable_ResetsDoneFlags">
+      <LineId Id="3" Count="10" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

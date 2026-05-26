@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <Itf Name="I_NciChannelBase" Id="{621d396d-a712-4314-9317-18e0a12884ff}">
+    <Declaration><![CDATA[INTERFACE I_NciChannelBase EXTENDS I_ComponentBase
+]]></Declaration>
+    <Method Name="BuildGroup" Id="{5439cb1a-b8ef-46bc-8b6a-64a9cf8db48f}">
+      <Declaration><![CDATA[METHOD BuildGroup
+
+]]></Declaration>
+    </Method>
+    <Property Name="ChannelError" Id="{bd1a5da7-6046-4778-9051-4ddb2e401168}">
+      <Declaration><![CDATA[PROPERTY ChannelError : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a697e5cf-f209-4696-a4b9-cdb3ab0a03f5}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="ChannelErrorId" Id="{70652d02-87ca-4140-a719-653c0d561a22}">
+      <Declaration><![CDATA[PROPERTY ChannelErrorId : UDINT]]></Declaration>
+      <Get Name="Get" Id="{3ea1bc4d-3aa1-488b-8197-01b768b74b98}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="IsGrouped" Id="{491dcdd1-0461-4e2f-93ad-e950495e0c5b}">
+      <Declaration><![CDATA[PROPERTY IsGrouped : BOOL]]></Declaration>
+      <Get Name="Get" Id="{2a0672f3-3a00-42b6-9201-90e777c0b9ef}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="IsReady" Id="{6978e012-72a4-46fd-9420-9e08db683d11}">
+      <Declaration><![CDATA[PROPERTY IsReady : BOOL]]></Declaration>
+      <Get Name="Get" Id="{20f89dbc-3283-43bf-b065-ce61067d03df}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Method Name="ResetChannel" Id="{7d258806-166e-4393-948c-0dd169c6ac1a}">
+      <Declaration><![CDATA[METHOD ResetChannel
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Stop" Id="{b90f03ae-c194-4529-8014-173f40a894e9}">
+      <Declaration><![CDATA[METHOD Stop
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="Ungroup" Id="{49d61b60-7e7e-4601-a87f-20dcda08eb54}">
+      <Declaration><![CDATA[METHOD Ungroup
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>

@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_FeedBuilderRoundedRect_Test" Id="{f5d21a52-b886-4f4f-b673-1e515ec1e300}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedBuilderRoundedRect_Test EXTENDS TcUnit.FB_TestSuite
+VAR
+    Builder    : FB_FeedBuilderRoundedRect;
+    MockWriter : FB_MockGeometryWriter;
+    Config     : ST_RecipeBuilder_Config;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_Calculates_Footprint_And_StartPoint();
+Test_Generates_Lines_And_Arcs_With_Radius();
+Test_Zero_Radius_Generates_Only_Lines();]]></ST>
+    </Implementation>
+    <Method Name="Test_Calculates_Footprint_And_StartPoint" Id="{f5d21a52-b886-4f4f-b673-1e515ec1e301}">
+      <Declaration><![CDATA[METHOD Test_Calculates_Footprint_And_StartPoint
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Calculates_Footprint_And_StartPoint');
+
+// 1. ARRANGE
+Config.PanelFrontWidth  := 300.0;
+Config.PanelFrontLength := 400.0;
+Config.Radius           := 10.0;
+Config.CuttingOverpass  := 0.0; // Upraszczamy Footprint
+Config.GroovingOverpass := 0.0;
+
+Builder.Config := Config;
+Builder.GeometryWriter := MockWriter; // Wstrzykujemy mock
+
+// 2. ACT
+WasBuilt := Builder.Build();
+
+// 3. ASSERT
+AssertTrue(Condition := WasBuilt, Message := 'Recepta zwrocila FALSE przy probie Build()!');
+
+AssertEquals_REAL(Expected := 300.0, 
+                  Actual := Builder.FootprintX, 
+                  Delta := 0.01, 
+                  Message := 'Zle wyliczony FootprintX dla zaokraglonego prostokata!');
+
+AssertEquals_REAL(Expected := 400.0, 
+                  Actual := Builder.FootprintY, 
+                  Delta := 0.01, 
+                  Message := 'Zle wyliczony FootprintY dla zaokraglonego prostokata!');
+
+// Sprawdzamy czy start w osi X to srodek detalu (zgodnie z kodem TotalX / 2.0)
+AssertEquals_LREAL(Expected := 150.0, 
+                   Actual := MockWriter.LastStartX, 
+                   Delta := 0.01, 
+                   Message := 'Punt Startowy NCI X nie znajduje sie na srodku dolnej krawedzi!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Generates_Lines_And_Arcs_With_Radius" Id="{f5d21a52-b886-4f4f-b673-1e515ec1e302}">
+      <Declaration><![CDATA[METHOD Test_Generates_Lines_And_Arcs_With_Radius
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Generates_Lines_And_Arcs_With_Radius');
+
+// 1. ARRANGE
+Config.PanelFrontWidth  := 200.0;
+Config.PanelFrontLength := 300.0;
+Config.Radius           := 20.0;
+Builder.Config := Config;
+Builder.GeometryWriter := MockWriter;
+
+// Uzywamy nowej metody do resetowania mocka
+MockWriter.ResetCounters();
+
+// 2. ACT
+WasBuilt := Builder.Build();
+
+// 3. ASSERT
+// 4 rogi z promieniem > 0 powinny wygenerować 4 łuki
+AssertEquals_INT(Expected := 4, 
+                 Actual := MockWriter.AddArcCount, 
+                 Message := 'Oczekiwano wygenerowania 4 lukow (AddArc)!');
+
+// Dojazd od punktu srodkowego (1), miedzy 4 rogami (3), i powrot do srodka (1) = 5 linii.
+AssertEquals_INT(Expected := 5, 
+                 Actual := MockWriter.AddLineCount, 
+                 Message := 'Oczekiwano wygenerowania 5 linii prostych (AddLine)!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Zero_Radius_Generates_Only_Lines" Id="{f5d21a52-b886-4f4f-b673-1e515ec1e303}">
+      <Declaration><![CDATA[METHOD Test_Zero_Radius_Generates_Only_Lines
+VAR
+    WasBuilt : BOOL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Zero_Radius_Generates_Only_Lines');
+
+// 1. ARRANGE
+Config.PanelFrontWidth  := 200.0;
+Config.PanelFrontLength := 300.0;
+Config.Radius           := 0.0; // Promień ZERO (ostry prostokąt)
+Builder.Config := Config;
+Builder.GeometryWriter := MockWriter;
+
+// Uzywamy nowej metody do resetowania mocka
+MockWriter.ResetCounters();
+
+// 2. ACT
+WasBuilt := Builder.Build();
+
+// 3. ASSERT
+// Przy promieniu = 0 kod recepty ma warunek IF Radius > 0, wiec łuki się nie dodadzą
+AssertEquals_INT(Expected := 0, 
+                 Actual := MockWriter.AddArcCount, 
+                 Message := 'Przy promieniu 0 wygenerowano luki!');
+
+AssertEquals_INT(Expected := 5, 
+                 Actual := MockWriter.AddLineCount, 
+                 Message := 'Oczekiwano wygenerowania 5 linii prostych (prostokat bez zaokraglen)!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

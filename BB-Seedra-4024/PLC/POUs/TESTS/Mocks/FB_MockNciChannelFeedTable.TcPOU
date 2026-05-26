@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_MockNciChannelFeedTable" Id="{d1b2c3d4-e5f6-4789-9999-000000000030}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MockNciChannelFeedTable EXTENDS FB_ComponentBase IMPLEMENTS I_NciChannel_FeedTable
+VAR_INPUT
+    MockIsGrouped      : BOOL;
+    MockIsReady        : BOOL;
+    MockChannelError   : BOOL;
+    MockChannelErrorId : UDINT;
+    MockIsFeedingDone  : BOOL;
+    MockIsChannelDone  : BOOL;
+END_VAR
+VAR_OUTPUT
+    BuildGroupCallCount     : INT;
+    StartFeedTableCallCount : INT;
+    StopCallCount           : INT;
+    UngroupCallCount        : INT;
+    ResetCallCount          : INT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="BuildGroup" Id="{a1b2c3d4-e5f6-4789-9999-100000000011}">
+      <Declaration><![CDATA[METHOD BuildGroup]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[BuildGroupCallCount := BuildGroupCallCount + 1;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ChannelError" Id="{a1b2c3d4-e5f6-4789-9999-200000000011}">
+      <Declaration><![CDATA[PROPERTY ChannelError : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-200000000012}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ChannelError := MockChannelError;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ChannelErrorId" Id="{a1b2c3d4-e5f6-4789-9999-200000000013}">
+      <Declaration><![CDATA[PROPERTY ChannelErrorId : UDINT]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-200000000014}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ChannelErrorId := MockChannelErrorId;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsChannelDone" Id="{a1b2c3d4-e5f6-4789-9999-200000000021}">
+      <Declaration><![CDATA[PROPERTY IsChannelDone : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-200000000022}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsChannelDone := MockIsChannelDone;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsFeedingDone" Id="{a1b2c3d4-e5f6-4789-9999-200000000019}">
+      <Declaration><![CDATA[PROPERTY IsFeedingDone : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-200000000020}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsFeedingDone := MockIsFeedingDone;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsGrouped" Id="{a1b2c3d4-e5f6-4789-9999-200000000015}">
+      <Declaration><![CDATA[PROPERTY IsGrouped : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-200000000016}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsGrouped := MockIsGrouped;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="IsReady" Id="{a1b2c3d4-e5f6-4789-9999-200000000017}">
+      <Declaration><![CDATA[PROPERTY IsReady : BOOL]]></Declaration>
+      <Get Name="Get" Id="{a1b2c3d4-e5f6-4789-9999-200000000018}">
+        <Declaration><![CDATA[]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[IsReady := MockIsReady;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="ResetChannel" Id="{a1b2c3d4-e5f6-4789-9999-100000000013}">
+      <Declaration><![CDATA[METHOD ResetChannel]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[ResetCallCount := ResetCallCount + 1;
+MockChannelError := FALSE;
+MockChannelErrorId := 0;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="StartFeedTable" Id="{a1b2c3d4-e5f6-4789-9999-100000000012}">
+      <Declaration><![CDATA[METHOD StartFeedTable
+VAR_IN_OUT
+    stTable : ST_NciFeedGroupTable;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[StartFeedTableCallCount := StartFeedTableCallCount + 1;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Stop" Id="{a1b2c3d4-e5f6-4789-9999-100000000014}">
+      <Declaration><![CDATA[METHOD Stop]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[StopCallCount := StopCallCount + 1;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Ungroup" Id="{a1b2c3d4-e5f6-4789-9999-100000000015}">
+      <Declaration><![CDATA[METHOD Ungroup]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[UngroupCallCount := UngroupCallCount + 1;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

@@ -7,11 +7,9 @@ STRUCT
     CutterXOffsetY   : REAL;
     CutterYOffsetX   : REAL;
     CutterYOffsetY   : REAL;
-    CuttingSpeedX    : REAL;
-    CuttingSpeedY    : REAL;
+	CuttingSpeedXY	 :REAL;
     CuttingIdleTime  : REAL;
-    GroovingSpeedX   : REAL;
-    GroovingSpeedY   : REAL;
+	GroovingSpeedXY  : REAL;
     GroovingSpeedZ   : REAL;
     GroovingIdleTime : REAL;
     RapidSpeedX      : REAL;

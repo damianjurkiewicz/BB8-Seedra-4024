@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <Itf Name="I_GeometryWriter" Id="{30dc15d7-2c56-44a4-aaea-17b7aa8b5c9b}">
+    <Declaration><![CDATA[INTERFACE I_GeometryWriter
+
+
+
+]]></Declaration>
+    <Method Name="AddArc" Id="{a72e30e6-e984-4c37-9121-f29f6b1927b6}">
+      <Declaration><![CDATA[METHOD AddArc : BOOL
+VAR_INPUT
+    TargetX    : LREAL;
+    TargetY    : LREAL;
+    CenterX    : LREAL;
+    CenterY    : LREAL;
+    Velo       : LREAL;
+    Clockwise  : BOOL; 
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="AddLine" Id="{f4f04758-1e9c-46c2-a655-389290c6ffc8}">
+      <Declaration><![CDATA[METHOD AddLine : BOOL
+VAR_INPUT
+    TargetX : LREAL;
+    TargetY : LREAL;
+    Velo    : LREAL;
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="AddStartPoint" Id="{a9c855e3-b199-4571-b454-c231e9f1c099}">
+      <Declaration><![CDATA[METHOD AddStartPoint : BOOL
+VAR_INPUT
+    TargetX : LREAL;
+    TargetY : LREAL;
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="Clear" Id="{6886b5bf-f669-42e8-933c-2f73bf76f494}">
+      <Declaration><![CDATA[METHOD Clear : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="EnableTangentialFollowing" Id="{31f985d8-d88b-4600-b935-ef1d86cff651}">
+      <Declaration><![CDATA[METHOD EnableTangentialFollowing : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+    <Method Name="EndTable" Id="{5d7b8dfb-7103-409c-b6f4-152577166389}">
+      <Declaration><![CDATA[METHOD EndTable : BOOL
+VAR_INPUT
+END_VAR
+]]></Declaration>
+    </Method>
+  </Itf>
+</TcPlcObject>
