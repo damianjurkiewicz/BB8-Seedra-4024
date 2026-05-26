@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Homing_Direct" Id="{9b95ef4f-a5ad-4500-8bd8-c009b6c64182}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Homing_Direct EXTENDS FB_Homing_Base
+VAR
+    fbMcHome          : MC_Home;
+    ReferencePosition : LREAL := 0.0;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Abort" Id="{11112222-3333-4444-bbbb-111111111111}">
+      <Declaration><![CDATA[METHOD Abort
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Zresetuj blok sprzętowy
+IF _Axis <> 0 THEN
+    fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+END_IF
+
+// Wywołaj Abort z klasy bazowej
+SUPER^.Abort();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic" Id="{22223333-4444-5555-bbbb-222222222222}">
+      <Declaration><![CDATA[METHOD CyclicLogic
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE nStep OF
+    0: // IDLE
+        fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+
+    10: // TRIGGER DIRECT HOMING
+        fbMcHome(
+            Axis        := _Axis.Axis, 
+            Execute     := TRUE, 
+            Position    := ReferencePosition,
+            HomingMode  := MC_Direct
+        );
+        IF fbMcHome.Busy THEN
+            nStep := 20;
+        ELSIF fbMcHome.Error THEN
+            nStep := 99;
+        END_IF
+
+    20: // WAIT FOR DONE
+        fbMcHome(Axis := _Axis.Axis);
+        IF fbMcHome.Done THEN
+            _bBusy := FALSE;
+            _bDone := TRUE;
+            nStep  := 0;
+        ELSIF fbMcHome.Error THEN
+            nStep := 99;
+        END_IF
+
+    99: // ERROR HANDLING
+        _bBusy    := FALSE;
+        _bError   := TRUE;
+        _bErrorID := fbMcHome.ErrorID;
+        nStep     := 0;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

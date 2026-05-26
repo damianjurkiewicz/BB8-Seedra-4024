@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Homing_CustomPLC" Id="{67041d96-67cd-4750-9cca-5a2eaf95eb0c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Homing_CustomPLC EXTENDS FB_Homing_Base
+VAR
+// =================================================================================
+    // IMPORTANT: FOR THIS BLOCK TO WORK, YOU MUST SET THE FOLLOWING IN NC AXIS PARAMETERS:
+    // Reference Mode -> 'Application (PLC code)'
+    // =================================================================================
+    
+    fbReadAppReq  : MC_ReadApplicationRequest;
+    // fbMcJog       : MC_Jog;
+    // fbSetPosition : MC_SetPosition; 
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Abort" Id="{12345678-1234-1234-cccc-111111111111}">
+      <Declaration><![CDATA[METHOD Abort
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.Abort();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic" Id="{87654321-4321-4321-cccc-222222222222}">
+      <Declaration><![CDATA[METHOD CyclicLogic
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE nStep OF
+    0: // IDLE
+    
+    10: // READ APPLICATION REQUEST (Placeholder)
+        _bBusy := FALSE;
+        _bDone := TRUE;
+        nStep  := 0;
+        
+    99: // ERROR HANDLING
+        _bBusy    := FALSE;
+        _bError   := TRUE;
+        _bErrorID := 9999;
+        nStep     := 0;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Homing_CustomPLC">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_CustomPLC.Abort">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_CustomPLC.CyclicLogic">
+      <LineId Id="3" Count="12" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

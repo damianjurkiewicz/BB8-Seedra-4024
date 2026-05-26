@@ -68,8 +68,6 @@ VAR
     // =========================================================
     GantryAlarms        : ARRAY[1..GANTRY_ALARM_COUNT] OF FB_TcAlarm;
 	
-
-
 	ResetStratX : FB_ResetRoutine_SoEDrive;
 	ResetStratY : FB_ResetRoutine_SoEDrive;
 	ResetStratZ : FB_ResetRoutine_SoEDrive;

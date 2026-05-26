@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Homing_StandardNC" Id="{a68036c7-0906-4add-a8ec-d72fc1d336c0}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Homing_StandardNC EXTENDS FB_Homing_Base IMPLEMENTS I_MotionSequence
+VAR
+	fbMcHome : MC_Home;
+	_ReferencePosition : LREAL;	
+END_VAR
+VAR_INPUT
+bSensorInput :BOOL;	
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Abort" Id="{771dc933-2c39-43b9-9ff8-76313dbd940b}">
+      <Declaration><![CDATA[METHOD Abort
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+_bBusy := FALSE;
+nStep := 0;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic" Id="{3ee0a176-f137-4cd7-8aa9-6d46284035d2}">
+      <Declaration><![CDATA[METHOD CyclicLogic
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE nStep OF
+    0: // IDLE
+        fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+
+    10: // TRIGGER HOMING
+        fbMcHome(
+            Axis        := _Axis.Axis, 
+            Execute     := TRUE, 
+            HomingMode  := MC_DefaultHoming, // <--- CZYTAJ Z PARAMETRÓW NC!
+            bCalibrationCam := bSensorInput,
+        );
+        
+        // Czekamy aż blok przyjmie komendę
+        IF fbMcHome.Busy THEN
+            nStep := 20;
+        ELSIF fbMcHome.Error THEN
+            nStep := 99;
+        END_IF
+
+    20: // WAIT FOR DONE
+        // Wywołanie cykliczne
+		fbMcHome(
+            Axis := _Axis.Axis,
+            bCalibrationCam := bSensorInput 
+        );
+        
+        IF fbMcHome.Done THEN
+            _bBusy := FALSE;
+            _bDone := TRUE;
+            nStep := 0; // Koniec sukcesem
+        ELSIF fbMcHome.Error THEN
+            nStep := 99;
+        END_IF
+
+    99: // ERROR HANDLING
+        _bBusy    := FALSE;
+        _bError   := TRUE;
+        _bErrorID := fbMcHome.ErrorID;
+        nStep    := 0;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Homing_StandardNC">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.Abort">
+      <LineId Id="6" Count="1" />
+      <LineId Id="5" Count="0" />
+      <LineId Id="13" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.CyclicLogic">
+      <LineId Id="5" Count="20" />
+      <LineId Id="44" Count="2" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="27" Count="13" />
+      <LineId Id="4" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

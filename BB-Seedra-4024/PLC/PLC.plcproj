@@ -139,6 +139,21 @@
     <Compile Include="POUs\GantryXYZ\E_RecipeID.TcDUT">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\GantryXYZ\HomingStrategies\FB_Homing_Base.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\HomingStrategies\FB_Homing_CustomPLC.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\HomingStrategies\FB_Homing_Direct.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\HomingStrategies\FB_Homing_StandardNC.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\GantryXYZ\HomingStrategies\I_HomingStrategy.TcIO">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\GantryXYZ\ST_AxisProfile.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -146,9 +161,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\FB_GantryXYZ.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\GantryXYZ\FB_Homing_StandardNC.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\I_GantryConfigProvider.TcIO">
@@ -332,6 +344,7 @@
     <Folder Include="POUs\GantryXYZ" />
     <Folder Include="POUs\Executor" />
     <Folder Include="POUs\Builder" />
+    <Folder Include="POUs\GantryXYZ\HomingStrategies" />
     <Folder Include="POUs\TESTS" />
     <Folder Include="POUs\TESTS\Mocks" />
     <Folder Include="VISUs" />
