@@ -36,14 +36,10 @@ SUPER^.Abort();]]></ST>
      
 		10: 
 			IF _Axis.MoveAbsolute(0,0) THEN
-				nStep := 13;
+				nStep := 12;
 			END_IF	
 
-		12: IF NOT _Axis.Busy THEN
-				nStep := 13;
-			END_IF		
-	
-		13: 
+		12: 
 			IF _Axis.InPosition THEN
 				nStep:=20;	
 			END_IF
@@ -87,9 +83,6 @@ END_CASE]]></ST>
       <LineId Id="342" Count="2" />
       <LineId Id="352" Count="0" />
       <LineId Id="409" Count="3" />
-      <LineId Id="421" Count="0" />
-      <LineId Id="413" Count="0" />
-      <LineId Id="423" Count="1" />
       <LineId Id="422" Count="0" />
       <LineId Id="417" Count="0" />
       <LineId Id="419" Count="1" />
