@@ -5,6 +5,7 @@
 VAR
     fbMcHome          : MC_Home;
     ReferencePosition : LREAL := 0.0;
+	DelayTimer        : TON;
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -30,49 +31,48 @@ SUPER^.Abort();]]></ST>
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE nStep OF
-    0: // IDLE
+    0: 
         fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
-		
-	10:	
-		_Axis.MoveAbsolute(0,0);
-		IF  NOT _Axis.Busy THEN
-			nStep := 15;
-		END_IF
+     
+		10: 
+			IF _Axis.MoveAbsolute(0,0) THEN
+				nStep := 13;
+			END_IF	
 
-    15: // TRIGGER DIRECT HOMING
-        fbMcHome(
+		12: IF NOT _Axis.Busy THEN
+				nStep := 13;
+			END_IF		
+	
+		13: 
+			IF _Axis.InPosition THEN
+				nStep:=20;	
+			END_IF
+		
+		20: 	
+	
+	        fbMcHome(
             Axis        := _Axis.Axis, 
             Execute     := TRUE, 
-            Position    := 0,
+            Position    := 0.0,
             HomingMode  := MC_Direct
         );
         
-        
         IF fbMcHome.Done THEN
-            _bBusy := FALSE;
-            _bDone := TRUE;
-            nStep  := 0;
-        ELSIF fbMcHome.Busy THEN
-            nStep := 20;
+            nStep := 40;
+            
         ELSIF fbMcHome.Error THEN
-            nStep := 99;
+            _bBusy    := FALSE;
+            _bError   := TRUE;
+            _bErrorID := fbMcHome.ErrorID;
+            nStep     := 0;
         END_IF
 
-    20: // WAIT FOR DONE
-        fbMcHome(Axis := _Axis.Axis);
-        IF fbMcHome.Done THEN
-            _bBusy := FALSE;
-            _bDone := TRUE;
-            nStep  := 0;
-        ELSIF fbMcHome.Error THEN
-            nStep := 99;
-        END_IF
+    40: 
+        fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+        _bBusy := FALSE;
+        _bDone := TRUE; 
+        nStep  := 0;
 
-    99: // ERROR HANDLING
-        _bBusy    := FALSE;
-        _bError   := TRUE;
-        _bErrorID := fbMcHome.ErrorID;
-        nStep     := 0;
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -84,10 +84,20 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_Direct.CyclicLogic">
-      <LineId Id="45" Count="2" />
-      <LineId Id="83" Count="1" />
-      <LineId Id="86" Count="3" />
-      <LineId Id="48" Count="34" />
+      <LineId Id="342" Count="2" />
+      <LineId Id="352" Count="0" />
+      <LineId Id="409" Count="3" />
+      <LineId Id="421" Count="0" />
+      <LineId Id="413" Count="0" />
+      <LineId Id="423" Count="1" />
+      <LineId Id="422" Count="0" />
+      <LineId Id="417" Count="0" />
+      <LineId Id="419" Count="1" />
+      <LineId Id="380" Count="0" />
+      <LineId Id="389" Count="2" />
+      <LineId Id="393" Count="14" />
+      <LineId Id="392" Count="0" />
+      <LineId Id="381" Count="6" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

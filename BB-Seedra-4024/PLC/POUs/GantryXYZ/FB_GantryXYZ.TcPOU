@@ -147,6 +147,7 @@ E_PMLUnitMode.ePMLUnitMode_Production:
                 fbHomeStratX.Abort();
                 fbHomeStratY.Abort();
                 fbHomeStratZ.Abort();
+				fbHomeStratQ.Abort();
                 
                 ExecutorCutX.Abort();
                 ExecutorCutY.Abort();
@@ -361,6 +362,7 @@ fbHomeStratZ.bSensorInput := IO.ProximitySensorZ;
 fbHomeStratX.CyclicLogic();
 fbHomeStratY.CyclicLogic();
 fbHomeStratZ.CyclicLogic();
+fbHomeStratQ.CyclicLogic();
 
 NciChannel.CyclicLogic();
 
@@ -908,7 +910,7 @@ END_VAR
     //=================================PRODUCTION MODE==================================
     E_PMLUnitMode.ePMLUnitMode_Production:
 	
-	CASE SequenceState OF
+CASE SequenceState OF
 		0:
 			NoStateTasksToComplete := FALSE;
 			StateTasksComplete     := FALSE;
@@ -923,10 +925,16 @@ END_VAR
 	
 		20:
 			IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled AND AxisQ.Enabled THEN
-				SequenceState := 30;
+				SequenceState := 23;
 			END_IF
 	
-		30:
+			
+		23:
+			IF NOT AxisZ.Busy THEN
+				SequenceState := 24;
+			END_IF
+			
+		24:
 			fbHomeStratZ.Execute();
 			SequenceState := 31;
 	
@@ -939,14 +947,24 @@ END_VAR
 	
 		40:
 			fbHomeStratQ.Execute();
+			SequenceState := 41; 
+			
+		41: 
+			IF fbHomeStratQ.Done THEN
+				SequenceState := 43;
+			ELSIF fbHomeStratQ.Error THEN
+				SequenceState := 99; 
+			END_IF		
+		
+		43:
 			fbHomeStratX.Execute();
 			fbHomeStratY.Execute();
-			SequenceState := 41;
+			SequenceState := 44;
 				
-		41:
-			IF fbHomeStratQ.Done AND fbHomeStratX.Done AND fbHomeStratY.Done THEN
+		44:
+			IF fbHomeStratX.Done AND fbHomeStratY.Done THEN
 				SequenceState := 50;
-			ELSIF fbHomeStratQ.Error OR fbHomeStratX.Error OR fbHomeStratY.Error THEN
+			ELSIF fbHomeStratX.Error OR fbHomeStratY.Error THEN
 				SequenceState := 99;
 			END_IF
 	
@@ -955,7 +973,7 @@ END_VAR
 			SequenceState      := 0; 
 	
 		99:
-			;
+			; // Obsługa błędu bazowania
 	END_CASE
 
 
@@ -1057,7 +1075,9 @@ END_CASE]]></ST>
     <LineIds Name="FB_GantryXYZ.Aborting">
       <LineId Id="149" Count="1" />
       <LineId Id="401" Count="0" />
-      <LineId Id="461" Count="64" />
+      <LineId Id="461" Count="50" />
+      <LineId Id="533" Count="0" />
+      <LineId Id="512" Count="13" />
       <LineId Id="118" Count="0" />
       <LineId Id="181" Count="2" />
       <LineId Id="198" Count="0" />
@@ -1125,6 +1145,7 @@ END_CASE]]></ST>
       <LineId Id="40" Count="0" />
       <LineId Id="35" Count="2" />
       <LineId Id="34" Count="0" />
+      <LineId Id="65" Count="0" />
       <LineId Id="54" Count="1" />
       <LineId Id="47" Count="0" />
       <LineId Id="46" Count="0" />
@@ -1247,7 +1268,14 @@ END_CASE]]></ST>
     <LineIds Name="FB_GantryXYZ.Resetting">
       <LineId Id="597" Count="2" />
       <LineId Id="753" Count="0" />
-      <LineId Id="1274" Count="48" />
+      <LineId Id="1274" Count="0" />
+      <LineId Id="1339" Count="17" />
+      <LineId Id="1399" Count="0" />
+      <LineId Id="1404" Count="0" />
+      <LineId Id="1406" Count="2" />
+      <LineId Id="1405" Count="0" />
+      <LineId Id="1357" Count="27" />
+      <LineId Id="1386" Count="11" />
       <LineId Id="823" Count="0" />
       <LineId Id="659" Count="12" />
       <LineId Id="836" Count="0" />
