@@ -324,6 +324,7 @@ GantryXYZ_HMI.Config.RawBoardY     := LIMIT(_Limits.RawBoardY.MinVal, Config.Raw
 GantryXYZ_HMI.Config.RawBoardZ      := LIMIT(_Limits.RawBoardZ.MinVal, Config.RawBoardZ, _Limits.RawBoardZ.MaxVal);
 GantryXYZ_HMI.Config.SafeClearanceZ := LIMIT(_Limits.SafeClearanceZ.MinVal, Config.SafeClearanceZ, _Limits.SafeClearanceZ.MaxVal);
 
+GantryXYZ_HMI.Config.AxisQ_SavedPos := Config.AxisQ_SavedPos;
 ]]></ST>
         </Implementation>
       </Set>
@@ -384,7 +385,10 @@ ExecTangentialFeed.CyclicLogic();
 //Set the current alarm severity for this module
 _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentSeverity := _CurrentAlarmSeverity);
 
-//Simulate Alarm Messaging
+// Śledzenie i zapamiętywanie pozycji osi Q dla noża tangencjalnego
+IF AxisQ.Axis.Status.Homed THEN 
+    GantryXYZ_HMI.Config.AxisQ_SavedPos := AxisQ.Axis.NcToPlc.ActPos;
+END_IF
 ]]></ST>
       </Implementation>
     </Method>
@@ -642,7 +646,8 @@ CASE DescendantSequenceState OF
 		
         DescendantSequenceState := DescendantSequenceState + 10;
     10:
-
+		// Wczytanie zapisanej pozycji dla noża tangencjalnego
+		fbHomeStratQ.ReferencePosition := GantryXYZ_HMI.Config.AxisQ_SavedPos;
 		
 		// Przypisanie osi do strategii
 		fbHomeStratX.Axis := AxisX;
@@ -1166,6 +1171,7 @@ END_CASE]]></ST>
       <LineId Id="72" Count="0" />
       <LineId Id="80" Count="0" />
       <LineId Id="79" Count="0" />
+      <LineId Id="92" Count="0" />
       <LineId Id="69" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -1191,7 +1197,10 @@ END_CASE]]></ST>
       <LineId Id="51" Count="0" />
       <LineId Id="58" Count="0" />
       <LineId Id="61" Count="1" />
-      <LineId Id="12" Count="4" />
+      <LineId Id="12" Count="3" />
+      <LineId Id="68" Count="0" />
+      <LineId Id="70" Count="1" />
+      <LineId Id="16" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
@@ -1232,6 +1241,7 @@ END_CASE]]></ST>
       <LineId Id="10" Count="1" />
       <LineId Id="272" Count="0" />
       <LineId Id="12" Count="1" />
+      <LineId Id="385" Count="0" />
       <LineId Id="80" Count="0" />
       <LineId Id="100" Count="0" />
       <LineId Id="106" Count="3" />

@@ -22,6 +22,7 @@ STRUCT
     RawBoardY        : REAL;
 	RawBoardZ        : REAL;
     SafeClearanceZ   : REAL; 
+	AxisQ_SavedPos	 : LREAL;
 END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

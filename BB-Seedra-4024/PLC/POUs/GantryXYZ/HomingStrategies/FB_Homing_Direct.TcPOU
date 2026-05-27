@@ -2,12 +2,14 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_Homing_Direct" Id="{9b95ef4f-a5ad-4500-8bd8-c009b6c64182}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_Homing_Direct EXTENDS FB_Homing_Base
+VAR_INPUT
+    ReferencePosition : LREAL := 0.0;
+END_VAR
 VAR
     fbMcHome          : MC_Home;
-    ReferencePosition : LREAL := 0.0;
-	DelayTimer        : TON;
-END_VAR
-]]></Declaration>
+    fbMoveAbs         : MC_MoveAbsolute;
+    DelayTimer        : TON;
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
@@ -17,12 +19,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Zresetuj blok sprzętowy
-IF _Axis <> 0 THEN
+        <ST><![CDATA[IF _Axis <> 0 THEN
     fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+    fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
 END_IF
 
-// Wywołaj Abort z klasy bazowej
 SUPER^.Abort();]]></ST>
       </Implementation>
     </Method>
@@ -33,29 +34,19 @@ SUPER^.Abort();]]></ST>
         <ST><![CDATA[CASE nStep OF
     0: 
         fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
-     
-		10: 
-			IF _Axis.MoveAbsolute(0,0) THEN
-				nStep := 12;
-			END_IF	
+        fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
 
-		12: 
-			IF _Axis.InPosition THEN
-				nStep:=20;	
-			END_IF
-		
-		20: 	
-	
-	        fbMcHome(
+    10: 
+        fbMcHome(
             Axis        := _Axis.Axis, 
             Execute     := TRUE, 
-            Position    := 0.0,
+            Position    := ReferencePosition,
             HomingMode  := MC_Direct
         );
         
         IF fbMcHome.Done THEN
-            nStep := 40;
-            
+            fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+            nStep := 20;
         ELSIF fbMcHome.Error THEN
             _bBusy    := FALSE;
             _bError   := TRUE;
@@ -63,12 +54,27 @@ SUPER^.Abort();]]></ST>
             nStep     := 0;
         END_IF
 
+    20: 
+        fbMoveAbs(
+            Axis     := _Axis.Axis,
+            Execute  := TRUE,
+            Position := 0.0,
+        );
+        
+        IF fbMoveAbs.Done THEN
+            fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
+            nStep := 40;
+        ELSIF fbMoveAbs.Error THEN
+            _bBusy    := FALSE;
+            _bError   := TRUE;
+            _bErrorID := fbMoveAbs.ErrorID;
+            nStep     := 0;
+        END_IF
+        
     40: 
-        fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
         _bBusy := FALSE;
         _bDone := TRUE; 
         nStep  := 0;
-
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -76,21 +82,12 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_Direct.Abort">
-      <LineId Id="3" Count="5" />
+      <LineId Id="12" Count="4" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_Direct.CyclicLogic">
-      <LineId Id="342" Count="2" />
-      <LineId Id="352" Count="0" />
-      <LineId Id="409" Count="3" />
-      <LineId Id="422" Count="0" />
-      <LineId Id="417" Count="0" />
-      <LineId Id="419" Count="1" />
-      <LineId Id="380" Count="0" />
-      <LineId Id="389" Count="2" />
-      <LineId Id="393" Count="14" />
-      <LineId Id="392" Count="0" />
-      <LineId Id="381" Count="6" />
+      <LineId Id="460" Count="27" />
+      <LineId Id="489" Count="15" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
