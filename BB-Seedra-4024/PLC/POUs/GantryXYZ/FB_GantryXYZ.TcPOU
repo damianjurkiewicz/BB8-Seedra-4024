@@ -388,6 +388,7 @@ _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentS
 // Śledzenie i zapamiętywanie pozycji osi Q dla noża tangencjalnego
 IF AxisQ.Axis.Status.Homed THEN 
     GantryXYZ_HMI.Config.AxisQ_SavedPos := AxisQ.Axis.NcToPlc.ActPos;
+//	fbHomeStratQ.ReferencePosition := GantryXYZ_HMI.Config.AxisQ_SavedPos;
 END_IF
 ]]></ST>
       </Implementation>
@@ -1200,6 +1201,7 @@ END_CASE]]></ST>
       <LineId Id="12" Count="3" />
       <LineId Id="68" Count="0" />
       <LineId Id="70" Count="1" />
+      <LineId Id="74" Count="0" />
       <LineId Id="16" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>

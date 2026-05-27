@@ -37,28 +37,33 @@ SUPER^.Abort();]]></ST>
         fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
 
     10: 
-        fbMcHome(
-            Axis        := _Axis.Axis, 
-            Execute     := TRUE, 
-            Position    := ReferencePosition,
-            HomingMode  := MC_Direct
-        );
-        
-        IF fbMcHome.Done THEN
-            fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+        IF _Axis.Axis.Status.Homed THEN
             nStep := 20;
-        ELSIF fbMcHome.Error THEN
-            _bBusy    := FALSE;
-            _bError   := TRUE;
-            _bErrorID := fbMcHome.ErrorID;
-            nStep     := 0;
+        ELSE
+            fbMcHome(
+                Axis        := _Axis.Axis, 
+                Execute     := TRUE, 
+                Position    := ReferencePosition,
+                HomingMode  := MC_Direct
+            );
+            
+            IF fbMcHome.Done THEN
+                fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+                nStep := 20;
+            ELSIF fbMcHome.Error THEN
+                _bBusy    := FALSE;
+                _bError   := TRUE;
+                _bErrorID := fbMcHome.ErrorID;
+                nStep     := 0;
+            END_IF
         END_IF
 
     20: 
         fbMoveAbs(
             Axis     := _Axis.Axis,
             Execute  := TRUE,
-            Position := 0.0,
+			Velocity := 100,
+            Position := 0.0
         );
         
         IF fbMoveAbs.Done THEN
@@ -86,8 +91,9 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_Direct.CyclicLogic">
-      <LineId Id="460" Count="27" />
-      <LineId Id="489" Count="15" />
+      <LineId Id="506" Count="30" />
+      <LineId Id="554" Count="0" />
+      <LineId Id="537" Count="16" />
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
