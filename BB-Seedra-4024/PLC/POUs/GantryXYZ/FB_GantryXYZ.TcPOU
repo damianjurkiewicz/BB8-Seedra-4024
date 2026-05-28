@@ -598,7 +598,7 @@ _Limits.RawBoardX.MinVal       := 200.0;   _Limits.RawBoardX.MaxVal       := 122
 _Limits.RawBoardY.MinVal       := 200.0;   _Limits.RawBoardY.MaxVal       := 2440.0;
 _Limits.RawBoardZ.MinVal       := 1.0;     _Limits.RawBoardZ.MaxVal       := 12.0;
 _Limits.SafeClearanceZ.MinVal  := 1.0;     _Limits.SafeClearanceZ.MaxVal  := 100.0;
-_Limits.RapidSpeedQ.MinVal 	   := 1.0; 	   _Limits.RapidSpeedQ.MaxVal := 360.0; 
+_Limits.RapidSpeedQ.MinVal 	   := 1.0; 	   _Limits.RapidSpeedQ.MaxVal := 1080.0; 
 
 
 InitProfiles();]]></ST>
@@ -917,12 +917,9 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// We retrieve the homing velocity directly from the NC axis parameters (configured in the TwinCAT UI) to avoid hardcoding values in the PLC and to ensure overall configuration consistency. 
-// This is done in this dedicated method because reading these parameters requires an established connection with the NC system, which is not available during the early stages of controller startup (e.g., in FB_init).
-ProfilesQ[E_MachineProfile.eHoming].Velocity := AxisQ.AxisParameters.fRefVeloSearch;
+        <ST><![CDATA[fbHomeStratQ.HomingVelocity := AxisQ.AxisParameters.fRefVeloSearch;
 
-// You can add more NC-linked parameters here in the future, for example:
-// ProfilesX[E_MachineProfile.eProduction].SoftLimitMax := AxisX.AxisParameters.fSoftLimitMax;]]></ST>
+]]></ST>
       </Implementation>
     </Method>
     <Property Name="RecipeBuilder" Id="{7e3c2008-dd15-410b-92f3-2adf472e0386}" FolderPath="Properties\">
@@ -1276,7 +1273,7 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ReadAxisParameters">
-      <LineId Id="7" Count="4" />
+      <LineId Id="9" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RecipeBuilder.Get">

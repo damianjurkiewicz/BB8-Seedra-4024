@@ -9,6 +9,7 @@ VAR
     fbMcHome          : MC_Home;
     fbMoveAbs         : MC_MoveAbsolute;
     DelayTimer        : TON;
+	_HomingVelocity   : LREAL := 50.0;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -62,7 +63,7 @@ SUPER^.Abort();]]></ST>
         fbMoveAbs(
             Axis     := _Axis.Axis,
             Execute  := TRUE,
-			Velocity := 100,
+			Velocity := _HomingVelocity,
             Position := 0.0
         );
         
@@ -83,6 +84,25 @@ SUPER^.Abort();]]></ST>
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Property Name="HomingVelocity" Id="{3f3d8927-9408-4cd7-a0bf-1a57402b1b16}">
+      <Declaration><![CDATA[PROPERTY HomingVelocity : LREAL]]></Declaration>
+      <Get Name="Get" Id="{c93d9d27-c57a-4121-985e-3d7fed3d16f5}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HomingVelocity := _HomingVelocity;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{5340dd65-c2c2-4f94-84b0-97558e14820f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_HomingVelocity := HomingVelocity;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <LineIds Name="FB_Homing_Direct">
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -94,6 +114,12 @@ END_CASE]]></ST>
       <LineId Id="506" Count="30" />
       <LineId Id="554" Count="0" />
       <LineId Id="537" Count="16" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Direct.HomingVelocity.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Direct.HomingVelocity.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>
