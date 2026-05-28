@@ -218,8 +218,8 @@ aRecipeNames[E_RecipeID.eBorgoWings] 	:= 'Borgo Wings';
 aRecipeNames[E_RecipeID.eArona]      	:= 'Arona';
 aRecipeNames[E_RecipeID.eCircle]  		:= 'NCI Circle';
 aRecipeNames[E_RecipeID.eRectangle]		:= 'Rectangle';
-aRecipeNames[E_RecipeID.eRoundedRect]	:= 'Rounded$NRectangle';
-aRecipeNames[E_RecipeID.eRoundedRect]	:= 'Circle';
+aRecipeNames[E_RecipeID.eRoundedRect]	:= 'Rounded Rect';
+aRecipeNames[E_RecipeID.eFeedCircle]	:= 'Feed Circle';
 
 sSelectedRecipeName := aRecipeNames[GantryXYZ.ProgramIdRequested];
 
