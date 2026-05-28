@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_FeedBuilderCircle" Id="{e9adcfe5-7e4a-4852-a853-8210a47fd80c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedBuilderCircle EXTENDS FB_RecipeBase
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{cd170bea-55d1-4b18-9d93-4857d1144680}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+VAR
+    TotalX, Radius : LREAL;
+    Velo : LREAL;
+    localConfig : ST_GantryXYZ_Config;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Busy := TRUE;
+_Done := FALSE;
+_Error := FALSE;
+Build := FALSE;
+
+THIS^.UpdateNestingLimits();
+
+IF NOT _Config.IsValid THEN
+    _Busy := FALSE;
+    _Error := TRUE; 
+    RETURN;
+END_IF
+
+// Podstawowe wyliczenia geometryczne na podstawie średnicy
+TotalX := _Config.Diameter;
+Radius := TotalX / 2.0;
+
+// Punkt startowy (prawa krawędź kółka, na osi symetrii Y)
+// Dzięki temu ruch CCW w górę (+Y) da nam na starcie kąt tangencjalny 0 stopni.
+_Config.NciStartX := TotalX;
+_Config.NciStartY := Radius;
+
+IF _ConfigProvider <> 0 THEN
+    localConfig := _ConfigProvider.Config;
+    Velo := localConfig.CuttingSpeedXY;
+ELSE
+    Velo := 50.0;
+END_IF
+
+// ============================================
+// GENEROWANIE TABELI (Kierunek: Lewoskrętnie / CCW)
+// ============================================
+_GeometryWriter.Clear();
+_GeometryWriter.EnableTangentialFollowing();
+
+// Start na prawej krawędzi (TotalX, Radius)
+_GeometryWriter.AddStartPoint(TotalX, Radius);
+
+// 1. Górna połowa kółka do lewej krawędzi (0, Radius)
+// Cel: X=0, Y=Radius | Środek: X=Radius, Y=Radius | CCW: FALSE
+_GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, FALSE);
+
+// 2. Dolna połowa kółka wracająca do prawej krawędzi (TotalX, Radius)
+// Cel: X=TotalX, Y=Radius | Środek: X=Radius, Y=Radius | CCW: FALSE
+_GeometryWriter.AddArc(TotalX, Radius, Radius, Radius, Velo, FALSE);
+
+_GeometryWriter.EndTable();
+
+_Busy := FALSE;
+_Done := TRUE;
+Build := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CalculateFootprint" Id="{bcba16d7-1bb9-45ef-95d7-88011fb53b8e}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_NominalX := _Config.Diameter;
+_NominalY := _Config.Diameter;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ExecutionRoute" Id="{d2087356-9a9c-4c33-89d5-bf6c71c7e6ae}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{7fbe3751-e710-423a-8f1b-b2644f0b3a95}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eFeedTable;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="FB_init" Id="{3462e180-3698-449a-9577-fb4640fc1cef}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Limits.Diameter.MinVal := 10.0;
+_Limits.Diameter.MaxVal := 1200.0;
+
+]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_FeedBuilderCircle">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderCircle.Build">
+      <LineId Id="2101" Count="49" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderCircle.CalculateFootprint">
+      <LineId Id="32" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderCircle.ExecutionRoute.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderCircle.FB_init">
+      <LineId Id="82" Count="2" />
+      <LineId Id="63" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

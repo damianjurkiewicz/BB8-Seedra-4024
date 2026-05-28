@@ -4,13 +4,14 @@
     <Declaration><![CDATA[{attribute 'qualified_only'}
 TYPE E_RecipeId :
 (
-    eNone       := 0, 
-    eBorgoFlaps := 1,
-    eBorgoWings := 2,
-    eArona      := 3,
-	eCircle 	:= 4,
-	eRectangle  := 5,
-	eRoundedRect := 6
+    eNone        := 0, 
+    eBorgoFlaps  := 1,
+    eBorgoWings  := 2,
+    eArona       := 3,
+	eCircle 	 := 4,
+	eRectangle   := 5,
+	eRoundedRect := 6,
+	eFeedCircle  := 7
 ) := eNone; 
 END_TYPE]]></Declaration>
   </DUT>
