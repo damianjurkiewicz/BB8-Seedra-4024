@@ -26,6 +26,9 @@ VAR
 	_ActualCopiesY			: DINT;
 	_NominalX 				: REAL;
     _NominalY 				: REAL;
+	_Busy					: BOOL;
+	_Done					: BOOL;
+	_Error					: BOOL;
 	
 	// --- GENERYCZNY GENERATOR G-CODE (NCI) ---
     fbCreateFile    : ItpPpgCreateMain;
@@ -74,6 +77,25 @@ END_VAR
         <ST><![CDATA[Build := FALSE;]]></ST>
       </Implementation>
     </Method>
+    <Property Name="Busy" Id="{a9db9b6c-8eb1-4c93-8b62-2f01d1c13c3a}">
+      <Declaration><![CDATA[PROPERTY Busy : BOOL]]></Declaration>
+      <Get Name="Get" Id="{483f8e7b-8254-4848-b7d1-613795426f51}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Busy := _Busy;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{1243a542-e270-4a34-813e-02853c7e0109}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Busy := Busy;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Method Name="CalculateFootprint" Id="{b5903cf0-35f3-4a36-9bbd-0a6781b9e2f5}">
       <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
 VAR_INPUT
@@ -114,7 +136,8 @@ _Config.PanelFrontLength     := LIMIT(_Limits.PanelFrontLength.MinVal, Config.Pa
 _Config.PanelFrontWidth      := LIMIT(_Limits.PanelFrontWidth.MinVal,  Config.PanelFrontWidth,  _Limits.PanelFrontWidth.MaxVal);
 _Config.PanelHeight          := LIMIT(_Limits.PanelHeight.MinVal,      Config.PanelHeight,      _Limits.PanelHeight.MaxVal);
 _Config.RailHeightCorrection := LIMIT(_Limits.RailHeightCorrection.MinVal, Config.RailHeightCorrection, _Limits.RailHeightCorrection.MaxVal);
-_Config.GrooveDepthZ		:=	LIMIT(_Limits.GrooveDepthZ.MinVal,	Config.GrooveDepthZ, _Limits.GrooveDepthZ.MaxVal);
+_Config.GrooveDepthZ		 :=	LIMIT(_Limits.GrooveDepthZ.MinVal,	Config.GrooveDepthZ, _Limits.GrooveDepthZ.MaxVal);
+_Config.Diameter 			 := LIMIT(_Limits.Diameter.MinVal, Config.Diameter, _Limits.Diameter.MaxVal);
 
 
 THIS^.UpdateNestingLimits();
@@ -146,6 +169,44 @@ END_VAR
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[_ConfigProvider := ConfigProvider;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Done" Id="{95f7dd68-43a4-412e-aee7-bfaa1fc7a303}">
+      <Declaration><![CDATA[PROPERTY Done : BOOL]]></Declaration>
+      <Get Name="Get" Id="{f917eb4b-8c90-4223-a28c-4f44be300935}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Done := _Done;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{e5ea673e-d2a8-4e8f-9caf-1b2230715dca}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Done := Done;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Error" Id="{5a010892-cf00-4d6b-a054-1dc9b83bd5cd}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{c1aca7d3-ffa8-424c-8a8a-0100db86b490}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := _Error;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{41b517d7-5e51-4abd-a86d-80b23eeef3ea}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Error := Error;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -329,6 +390,9 @@ VAR
     MachineConfig   : ST_GantryXYZ_Config; // Zmienna do odczytu offsetu
     EffectiveBoardX : REAL;
     EffectiveBoardY : REAL;
+END_VAR
+VAR_INST
+    bLogFired       : BOOL; // <-- Zapamięta, czy log już poszedł
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// 1. Czysty gabaryt z logiki receptury
@@ -370,6 +434,30 @@ END_IF
 // 5. WERYFIKACJA GABARYTÓW (Zabezpieczenie przed za dużym detalem)
 // =========================================================
 _Config.IsValid := (_MaxCopiesX > 0) AND (_MaxCopiesY > 0) AND (_NominalX > 0) AND (_NominalY > 0);
+
+IF NOT _Config.IsValid THEN
+    IF NOT bLogFired THEN
+        ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'UpdateNestingLimits: Konfiguracja odrzucona (IsValid = FALSE)! Sprawdzam dlaczego...', '');
+        
+        IF _MaxCopiesX <= 0 THEN 
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _MaxCopiesX <= 0 (Detal wychodzi poza szerokosc stolu)', ''); 
+        END_IF
+        IF _MaxCopiesY <= 0 THEN 
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _MaxCopiesY <= 0 (Detal wychodzi poza dlugosc stolu)', ''); 
+        END_IF
+        IF _NominalX <= 0 THEN 
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _NominalX <= 0 (Szerokosc Nominalna to zero!)', ''); 
+        END_IF
+        IF _NominalY <= 0 THEN 
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _NominalY <= 0 (Dlugosc Nominalna to zero!)', ''); 
+        END_IF
+        
+        bLogFired := TRUE; // Zablokuj kolejne wysyłanie
+    END_IF
+ELSE
+    // Jeśli znowu jest poprawnie (np. poprawiono na HMI), odblokuj logi na przyszłość
+    bLogFired := FALSE;
+END_IF
 
 // =========================================================
 // 6. AUTO-KOREKTA KOPII I LIMITÓW DLA HMI
@@ -517,6 +605,12 @@ END_CASE]]></ST>
     <LineIds Name="FB_RecipeBase.Build">
       <LineId Id="11" Count="0" />
     </LineIds>
+    <LineIds Name="FB_RecipeBase.Busy.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.Busy.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_RecipeBase.CalculateFootprint">
       <LineId Id="6" Count="1" />
       <LineId Id="5" Count="0" />
@@ -525,9 +619,15 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Config.Set">
-      <LineId Id="76" Count="6" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="77" Count="1" />
+      <LineId Id="92" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="82" Count="0" />
       <LineId Id="44" Count="5" />
       <LineId Id="86" Count="0" />
+      <LineId Id="90" Count="0" />
       <LineId Id="50" Count="5" />
       <LineId Id="57" Count="2" />
       <LineId Id="62" Count="1" />
@@ -537,6 +637,18 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.ConfigProvider.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.Done.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.Done.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.Error.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.ExecutionRoute.Get">
@@ -593,7 +705,11 @@ END_CASE]]></ST>
       <LineId Id="190" Count="0" />
       <LineId Id="180" Count="3" />
       <LineId Id="158" Count="12" />
-      <LineId Id="100" Count="9" />
+      <LineId Id="100" Count="5" />
+      <LineId Id="204" Count="0" />
+      <LineId Id="223" Count="21" />
+      <LineId Id="203" Count="0" />
+      <LineId Id="106" Count="3" />
       <LineId Id="192" Count="0" />
       <LineId Id="194" Count="2" />
       <LineId Id="193" Count="0" />

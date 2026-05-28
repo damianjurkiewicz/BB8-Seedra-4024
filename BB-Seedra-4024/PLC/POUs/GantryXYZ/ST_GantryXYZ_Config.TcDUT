@@ -7,7 +7,7 @@ STRUCT
     CutterXOffsetY   : REAL;
     CutterYOffsetX   : REAL;
     CutterYOffsetY   : REAL;
-	CuttingSpeedXY	 :REAL;
+	CuttingSpeedXY	 : REAL;
     CuttingIdleTime  : REAL;
 	GroovingSpeedXY  : REAL;
     GroovingSpeedZ   : REAL;
@@ -23,6 +23,7 @@ STRUCT
 	RawBoardZ        : REAL;
     SafeClearanceZ   : REAL; 
 	AxisQ_SavedPos	 : LREAL;
+	RapidSpeedQ		 : REAL; 
 END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>

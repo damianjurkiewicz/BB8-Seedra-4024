@@ -166,7 +166,7 @@ CASE nStep OF
                 _AxisX.Velocity := localConfig.RapidSpeedX;
                 _AxisY.Velocity := localConfig.RapidSpeedY;
                 _AxisZ.Velocity := localConfig.RapidSpeedZ;
-                _AxisQ.Velocity := 180.0;
+                _AxisQ.Velocity := localConfig.RapidSpeedQ;
 
                 nStep := 8;
             END_IF

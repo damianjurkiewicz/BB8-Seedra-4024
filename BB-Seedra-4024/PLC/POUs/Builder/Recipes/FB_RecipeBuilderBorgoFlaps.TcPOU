@@ -17,11 +17,17 @@ VAR_INST
     ShorterX        : REAL;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// 1. Zlecenie przeliczenia gabarytów, footrpintu i limitów klasie bazowej
+        <ST><![CDATA[_Busy := TRUE;
+_Done := FALSE;
+_Error := FALSE;
+Build := FALSE;
+
 THIS^.UpdateNestingLimits();
 
 // 2. Jeśli detal wystaje poza maszynę - przerywamy od razu!
 IF NOT _Config.IsValid THEN
+    _Busy := FALSE;
+    _Error := TRUE; 
     Build := FALSE;
     RETURN;
 END_IF
@@ -133,6 +139,8 @@ _SegmentsCutY[6].Start.Y := TotalY + _Config.CuttingOverpass;
 _SegmentsCutY[6].Stop.Y  := -_Config.CuttingOverpass;
 
 
+_Busy := FALSE;
+_Done := TRUE;
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -192,7 +200,13 @@ _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.Build">
-      <LineId Id="721" Count="115" />
+      <LineId Id="843" Count="2" />
+      <LineId Id="721" Count="0" />
+      <LineId Id="846" Count="0" />
+      <LineId Id="722" Count="2" />
+      <LineId Id="847" Count="4" />
+      <LineId Id="728" Count="108" />
+      <LineId Id="852" Count="1" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderBorgoFlaps.CalculateFootprint">

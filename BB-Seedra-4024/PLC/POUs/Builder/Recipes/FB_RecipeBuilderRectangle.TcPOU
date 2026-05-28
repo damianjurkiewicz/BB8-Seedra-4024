@@ -17,15 +17,19 @@ VAR_INST
     ShorterX        : REAL;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// 1. Zlecenie przeliczenia gabarytów, footrpintu i limitów klasie bazowej
+        <ST><![CDATA[_Busy := TRUE;
+_Done := FALSE;
+_Error := FALSE;
+Build := FALSE;
 THIS^.UpdateNestingLimits();
 
 // 2. Jeśli detal wystaje poza maszynę - przerywamy od razu!
 IF NOT _Config.IsValid THEN
+    _Busy := FALSE;
+    _Error := TRUE; 
     Build := FALSE;
     RETURN;
 END_IF
-
 // 3. Pobieramy wyliczone gabaryty nominalne do lokalnych zmiennych roboczych
 TotalX   := _NominalX;
 TotalY   := _NominalY; 
@@ -67,6 +71,8 @@ _SegmentsCutY[2].Stop.X  := TotalX;
 _SegmentsCutY[2].Start.Y := TotalY +_Config.CuttingOverpass; 
 _SegmentsCutY[2].Stop.Y  := -_Config.CuttingOverpass;        
 
+_Busy := FALSE;
+_Done := TRUE;
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -125,12 +131,16 @@ _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderRectangle.Build">
-      <LineId Id="605" Count="11" />
+      <LineId Id="727" Count="2" />
+      <LineId Id="605" Count="3" />
+      <LineId Id="730" Count="4" />
+      <LineId Id="613" Count="3" />
       <LineId Id="620" Count="4" />
       <LineId Id="634" Count="0" />
       <LineId Id="646" Count="14" />
       <LineId Id="682" Count="15" />
       <LineId Id="720" Count="0" />
+      <LineId Id="735" Count="1" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBuilderRectangle.CalculateFootprint">

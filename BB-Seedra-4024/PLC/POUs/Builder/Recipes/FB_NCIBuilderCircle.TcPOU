@@ -36,15 +36,22 @@ END_VAR]]></Declaration>
 
 CASE nBuildStep OF
     0:
-        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Rozpoczynam budowanie relatywnego G-Code dla kółka', '');
+		// Na samym starcie zgłaszamy światu zewnętrznemu, że pracujemy
+        _Busy := TRUE;
+        _Done := FALSE;
+        _Error := FALSE;
         
-        // 1. Zlecenie przeliczenia limitów klasie bazowej
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Rozpoczynam budowanie relatywnego G-Code dla kolka', '');
+        
         THIS^.UpdateNestingLimits();
-        
         IF NOT _Config.IsValid THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'NCIBuilderCircle: Walidacja nie przeszla! Ustawiam ERROR.', '');
+            _Busy := FALSE;
+            _Error := TRUE;
             Build := FALSE;
             RETURN;
         END_IF
+		
 		// 2. Obliczenia geometryczne
         Diameter := _Config.Diameter;
         Radius   := Diameter / 2.0; 
@@ -138,8 +145,10 @@ CASE nBuildStep OF
         END_IF
 
     1000:
+        _Busy := FALSE;
+        _Done := TRUE; 
         nBuildStep := 0;
-        Build := TRUE; 
+        Build := TRUE;
         
 END_CASE]]></ST>
       </Implementation>
@@ -202,13 +211,18 @@ _Limits.Diameter.MaxVal := 600;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIBuilderCircle.Build">
-      <LineId Id="1344" Count="12" />
+      <LineId Id="1344" Count="3" />
+      <LineId Id="1580" Count="7" />
+      <LineId Id="1599" Count="6" />
+      <LineId Id="1593" Count="0" />
       <LineId Id="1450" Count="8" />
       <LineId Id="1505" Count="20" />
       <LineId Id="1464" Count="11" />
       <LineId Id="1526" Count="31" />
       <LineId Id="1499" Count="1" />
-      <LineId Id="1411" Count="19" />
+      <LineId Id="1411" Count="16" />
+      <LineId Id="1595" Count="2" />
+      <LineId Id="1429" Count="1" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIBuilderCircle.CalculateFootprint">

@@ -15,9 +15,16 @@ VAR
     localConfig : ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[Build := FALSE;
+        <ST><![CDATA[_Busy := TRUE;
+_Done := FALSE;
+_Error := FALSE;
+Build := FALSE;
 THIS^.UpdateNestingLimits();
-IF NOT _Config.IsValid OR _GeometryWriter = 0 THEN
+
+IF NOT _Config.IsValid THEN
+    _Busy := FALSE;
+    _Error := TRUE; 
+    Build := FALSE;
     RETURN;
 END_IF
 
@@ -79,6 +86,8 @@ END_IF
 _GeometryWriter.AddLine(TotalX, TotalY / 2.0, Velo);
 _GeometryWriter.EndTable();
 
+_Busy := FALSE;
+_Done := TRUE;
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
@@ -140,7 +149,12 @@ _Limits.Diameter.MaxVal := 600;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderRoundedRect.Build">
-      <LineId Id="2009" Count="63" />
+      <LineId Id="2078" Count="2" />
+      <LineId Id="2009" Count="1" />
+      <LineId Id="2086" Count="0" />
+      <LineId Id="2081" Count="4" />
+      <LineId Id="2013" Count="59" />
+      <LineId Id="2087" Count="1" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderRoundedRect.CalculateFootprint">

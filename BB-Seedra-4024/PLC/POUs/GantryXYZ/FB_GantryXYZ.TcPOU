@@ -324,6 +324,8 @@ GantryXYZ_HMI.Config.RawBoardY     := LIMIT(_Limits.RawBoardY.MinVal, Config.Raw
 GantryXYZ_HMI.Config.RawBoardZ      := LIMIT(_Limits.RawBoardZ.MinVal, Config.RawBoardZ, _Limits.RawBoardZ.MaxVal);
 GantryXYZ_HMI.Config.SafeClearanceZ := LIMIT(_Limits.SafeClearanceZ.MinVal, Config.SafeClearanceZ, _Limits.SafeClearanceZ.MaxVal);
 
+GantryXYZ_HMI.Config.RapidSpeedQ := LIMIT(_Limits.RapidSpeedQ.MinVal, Config.RapidSpeedQ, _Limits.RapidSpeedQ.MaxVal);
+
 GantryXYZ_HMI.Config.AxisQ_SavedPos := Config.AxisQ_SavedPos;
 ]]></ST>
         </Implementation>
@@ -414,55 +416,58 @@ END_VAR]]></Declaration>
                 SequenceState := 20;
                 
 			20: 
-                IF _RecipeBuilder <> 0 THEN
-                    
-                    // =======================================================
-                    // WSTRZYKNIĘCIE ZALEŻNOŚCI (INVERSION OF CONTROL)
-                    // Jeśli to ścieżka FeedTable, użyczamy recepturze interfejsu 
-                    // I_GeometryWriter pochodzącego prosto z naszego Executora!
-                    // =======================================================
-                    IF _RecipeBuilder.ExecutionRoute = E_ExecutionRoute.eFeedTable THEN
-                        _RecipeBuilder.GeometryWriter := ExecTangentialFeed; 
-                    END_IF
-                    
-                    // Dopiero teraz każemy recepcie się zbudować.
-                    // Jeśli to FeedTable, recepta bezpiecznie wypełni wewnątrz tabelę Executora.
-                    IF _RecipeBuilder.Build() THEN 
-                        
-                        // Kopiujemy konfigurację do zmiennej lokalnej (przydatne do logów/podglądu)
-                        localConfig := _RecipeBuilder.Config;
-
-                        // ========================================================
-                        // ROZWIDLENIE DLA FAZY 1 (Narzędzie Główne)
-                        // ========================================================
-                        CASE _RecipeBuilder.ExecutionRoute OF
-                            
-                            E_ExecutionRoute.ePTP:
-                                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb PTP', '');
-                                SequenceState := 30; 
-                                
-                            E_ExecutionRoute.eGCode:
-                                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb G-Code', '');
-                                SequenceState := 40;                             
-                                
-                            E_ExecutionRoute.eFeedTable:
-                                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb FeedTable', '');
-                                SequenceState := 60; 
-                                
-                        END_CASE
+				IF _RecipeBuilder <> 0 THEN
+					
+					// Zależność dla FeedTable
+					IF _RecipeBuilder.ExecutionRoute = E_ExecutionRoute.eFeedTable THEN
+						_RecipeBuilder.GeometryWriter := ExecTangentialFeed;
+					END_IF
+					
+					// 1. PO PROSTU KAZEMY RECEPCIE PRACOWAĆ (nie sprawdzamy co zwraca funkcja!)
+					_RecipeBuilder.Build();
+					
+					// 2. SPRAWDZAMY FLAGI STANU
+					IF _RecipeBuilder.Done THEN 
 						
-						ELSE
+						// ========================================================
+						// SUKCES - ROZWIDLENIE DLA FAZY 1
+						// ========================================================
+						localConfig := _RecipeBuilder.Config;
+						
+						CASE _RecipeBuilder.ExecutionRoute OF
+							E_ExecutionRoute.ePTP:
+								ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb PTP', '');
+								SequenceState := 30; 
+								
+							E_ExecutionRoute.eGCode:
+								ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb G-Code', '');
+								SequenceState := 40;                             
+								
+							E_ExecutionRoute.eFeedTable:
+								ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb FeedTable', '');
+								SequenceState := 60; 
+						END_CASE
+						
+					ELSIF _RecipeBuilder.Error THEN
+						
+						// ========================================================
+						// PORAŻKA 
+						// ========================================================
+						ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: Krok 20 - Recepta zglosila ERROR!', '');
 						RaiseAlarmWithStrings(GantryAlarms[1], 'Blad budowania recepty! Sprawdz wymiary z HMI.', '');
 						ChangeState(E_PMLCommand.ePMLCommand_Abort);
 						SequenceState := 999;
-						// -----------------------------------------------------------
-
-                    END_IF
-                ELSE
-                    // Brak buildera = zły numer programu
-                    ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: BLAD KRYTYCZNY! Brak obiektu _RecipeBuilder. Wywoluje Abort.', '');
-                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
-                END_IF
+			
+					END_IF
+					// Jeśli nie jest ani Done, ani Error, to maszyna po prostu nic nie robi 
+					// i przechodzi do następnego cyklu PLC, dając recepcie czas na pracę (bo flaga _Busy jest aktywna).
+			
+				ELSE
+					// Brak buildera = zły numer programu
+					ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: BLAD KRYTYCZNY! Brak obiektu _RecipeBuilder.', '');
+					ChangeState(E_PMLCommand.ePMLCommand_Abort);
+					SequenceState := 999;
+				END_IF
 
             // ========================================================
             // FAZA 1: NARZĘDZIE GŁÓWNE
@@ -568,7 +573,35 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[
+
+
+// ===============================================================================
+// LIMIT COMMITTED FROM HMI
+// ===============================================================================
+_Limits.CutterXOffsetX.MinVal := -200.0;   _Limits.CutterXOffsetX.MaxVal := 200.0;
+_Limits.CutterXOffsetY.MinVal := -200.0;   _Limits.CutterXOffsetY.MaxVal := 200.0;
+_Limits.CutterYOffsetX.MinVal := -200.0;   _Limits.CutterYOffsetX.MaxVal := 200.0;
+_Limits.CutterYOffsetY.MinVal := -200.0;   _Limits.CutterYOffsetY.MaxVal := 200.0;
+_Limits.GlobalOffsetX.MinVal   := -500.0;   _Limits.GlobalOffsetX.MaxVal   := 500.0;
+_Limits.GlobalOffsetY.MinVal   := -500.0;   _Limits.GlobalOffsetY.MaxVal   := 500.0;
+_Limits.GlobalOffsetZ.MinVal   := -5.0;     _Limits.GlobalOffsetZ.MaxVal   := 5.0;
+_Limits.CuttingSpeedXY.MinVal  := 1.0;     _Limits.CuttingSpeedXY.MaxVal  := 100.0;
+_Limits.GroovingSpeedXY.MinVal := 1.0;     _Limits.GroovingSpeedXY.MaxVal := 100.0;
+_Limits.GroovingSpeedZ.MinVal  := 1.0;     _Limits.GroovingSpeedZ.MaxVal  := 100.0;
+_Limits.RapidSpeedX.MinVal     := 1.0;     _Limits.RapidSpeedX.MaxVal     := 200.0;
+_Limits.RapidSpeedY.MinVal     := 1.0;     _Limits.RapidSpeedY.MaxVal     := 200.0;
+_Limits.RapidSpeedZ.MinVal     := 1.0;     _Limits.RapidSpeedZ.MaxVal     := 20.0;
+_Limits.CuttingIdleTime.MinVal  := 0.0;    _Limits.CuttingIdleTime.MaxVal  := 10.0;
+_Limits.GroovingIdleTime.MinVal := 0.0;    _Limits.GroovingIdleTime.MaxVal := 10.0;
+_Limits.RawBoardX.MinVal       := 200.0;   _Limits.RawBoardX.MaxVal       := 1220.0;
+_Limits.RawBoardY.MinVal       := 200.0;   _Limits.RawBoardY.MaxVal       := 2440.0;
+_Limits.RawBoardZ.MinVal       := 1.0;     _Limits.RawBoardZ.MaxVal       := 12.0;
+_Limits.SafeClearanceZ.MinVal  := 1.0;     _Limits.SafeClearanceZ.MaxVal  := 100.0;
+_Limits.RapidSpeedQ.MinVal 	   := 1.0; 	   _Limits.RapidSpeedQ.MaxVal := 360.0; 
+
+
+InitProfiles();]]></ST>
       </Implementation>
     </Method>
     <Method Name="HMICommunication" Id="{0dce72f4-da14-4dd2-b6a3-5db9db3404e0}">
@@ -693,7 +726,7 @@ CASE DescendantSequenceState OF
 		// Wstrzykiwanie zależności do ExecTangentialFeed
 		ExecTangentialFeed.AxisX          := AxisX;
 		ExecTangentialFeed.AxisY          := AxisY;
-		//ExecTangentialFeed.AxisZ          := AxisZ;
+		ExecTangentialFeed.AxisZ          := AxisZ;
 		ExecTangentialFeed.AxisQ 		  := AxisQ;
 		ExecTangentialFeed.NciChannel     := NciChannelTangential; 
 		ExecTangentialFeed.ConfigProvider := THIS^;
@@ -748,7 +781,7 @@ CASE DescendantSequenceState OF
     30:
         //Call the Super
         IF SUPER^.Initialize() THEN
-			InitProfiles();
+			ReadAxisParameters();
             DescendantSequenceState := DescendantSequenceState + 10;
         END_IF
     40:
@@ -763,29 +796,6 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// ===============================================================================
-// LIMIT COMMITTED FROM HMI
-// ===============================================================================
-_Limits.CutterXOffsetX.MinVal := -200.0;   _Limits.CutterXOffsetX.MaxVal := 200.0;
-_Limits.CutterXOffsetY.MinVal := -200.0;   _Limits.CutterXOffsetY.MaxVal := 200.0;
-_Limits.CutterYOffsetX.MinVal := -200.0;   _Limits.CutterYOffsetX.MaxVal := 200.0;
-_Limits.CutterYOffsetY.MinVal := -200.0;   _Limits.CutterYOffsetY.MaxVal := 200.0;
-_Limits.GlobalOffsetX.MinVal   := -500.0;   _Limits.GlobalOffsetX.MaxVal   := 500.0;
-_Limits.GlobalOffsetY.MinVal   := -500.0;   _Limits.GlobalOffsetY.MaxVal   := 500.0;
-_Limits.GlobalOffsetZ.MinVal   := -5.0;     _Limits.GlobalOffsetZ.MaxVal   := 5.0;
-_Limits.CuttingSpeedXY.MinVal  := 1.0;     _Limits.CuttingSpeedXY.MaxVal  := 100.0;
-_Limits.GroovingSpeedXY.MinVal := 1.0;     _Limits.GroovingSpeedXY.MaxVal := 100.0;
-_Limits.GroovingSpeedZ.MinVal  := 1.0;     _Limits.GroovingSpeedZ.MaxVal  := 100.0;
-_Limits.RapidSpeedX.MinVal     := 1.0;     _Limits.RapidSpeedX.MaxVal     := 200.0;
-_Limits.RapidSpeedY.MinVal     := 1.0;     _Limits.RapidSpeedY.MaxVal     := 200.0;
-_Limits.RapidSpeedZ.MinVal     := 1.0;     _Limits.RapidSpeedZ.MaxVal     := 20.0;
-_Limits.CuttingIdleTime.MinVal  := 0.0;    _Limits.CuttingIdleTime.MaxVal  := 10.0;
-_Limits.GroovingIdleTime.MinVal := 0.0;    _Limits.GroovingIdleTime.MaxVal := 10.0;
-_Limits.RawBoardX.MinVal       := 200.0;   _Limits.RawBoardX.MaxVal       := 1220.0;
-_Limits.RawBoardY.MinVal       := 200.0;   _Limits.RawBoardY.MaxVal       := 2440.0;
-_Limits.RawBoardZ.MinVal       := 1.0;     _Limits.RawBoardZ.MaxVal       := 12.0;
-_Limits.SafeClearanceZ.MinVal  := 1.0;     _Limits.SafeClearanceZ.MaxVal  := 100.0;
-
-// ===============================================================================
 // PROFIL 1: HOMING (Otwarte limity do bazowania, powolne i miękkie ruchy)
 // ===============================================================================
 // --- OŚ X ---
@@ -815,7 +825,7 @@ ProfilesQ[E_MachineProfile.eHoming].SoftLimitMax := 300.0;
 ProfilesQ[E_MachineProfile.eHoming].Acceleration := 15000.0;
 ProfilesQ[E_MachineProfile.eHoming].Deceleration := 15000.0;
 ProfilesQ[E_MachineProfile.eHoming].Jerk         := 48322.8;
-ProfilesQ[E_MachineProfile.eHoming].Velocity     := AxisQ.AxisParameters.fRefVeloSearch;
+
 
 // ===============================================================================
 // PROFIL 2: PRODUCTION (Wąskie limity dla bezpieczeństwa, wysoka dynamika pracy)
@@ -901,6 +911,20 @@ GantryXYZ_HMI.Command.ProgramIdRequested := ProgramIdRequested;]]></ST>
         </Implementation>
       </Set>
     </Property>
+    <Method Name="ReadAxisParameters" Id="{fa8e4d08-dd4b-43dc-aa98-9f8ef932c8a4}">
+      <Declaration><![CDATA[METHOD PRIVATE ReadAxisParameters
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// We retrieve the homing velocity directly from the NC axis parameters (configured in the TwinCAT UI) to avoid hardcoding values in the PLC and to ensure overall configuration consistency. 
+// This is done in this dedicated method because reading these parameters requires an established connection with the NC system, which is not available during the early stages of controller startup (e.g., in FB_init).
+ProfilesQ[E_MachineProfile.eHoming].Velocity := AxisQ.AxisParameters.fRefVeloSearch;
+
+// You can add more NC-linked parameters here in the future, for example:
+// ProfilesX[E_MachineProfile.eProduction].SoftLimitMax := AxisX.AxisParameters.fSoftLimitMax;]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="RecipeBuilder" Id="{7e3c2008-dd15-410b-92f3-2adf472e0386}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY RecipeBuilder : I_RecipeBuilder]]></Declaration>
       <Get Name="Get" Id="{646b66c6-cab8-496a-a121-e2412f446155}">
@@ -1172,6 +1196,8 @@ END_CASE]]></ST>
       <LineId Id="72" Count="0" />
       <LineId Id="80" Count="0" />
       <LineId Id="79" Count="0" />
+      <LineId Id="96" Count="0" />
+      <LineId Id="95" Count="0" />
       <LineId Id="92" Count="0" />
       <LineId Id="69" Count="0" />
       <LineId Id="2" Count="0" />
@@ -1207,16 +1233,16 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
       <LineId Id="750" Count="13" />
-      <LineId Id="892" Count="36" />
-      <LineId Id="937" Count="0" />
-      <LineId Id="939" Count="0" />
-      <LineId Id="941" Count="3" />
-      <LineId Id="938" Count="0" />
-      <LineId Id="929" Count="4" />
+      <LineId Id="1044" Count="51" />
       <LineId Id="794" Count="94" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.FB_init">
+      <LineId Id="193" Count="2" />
+      <LineId Id="170" Count="21" />
+      <LineId Id="198" Count="0" />
+      <LineId Id="197" Count="0" />
+      <LineId Id="192" Count="0" />
       <LineId Id="164" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.HMICommunication">
@@ -1233,70 +1259,14 @@ END_CASE]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
-      <LineId Id="3" Count="4" />
-      <LineId Id="68" Count="0" />
-      <LineId Id="316" Count="0" />
-      <LineId Id="8" Count="0" />
-      <LineId Id="90" Count="0" />
-      <LineId Id="285" Count="0" />
-      <LineId Id="329" Count="0" />
-      <LineId Id="10" Count="1" />
-      <LineId Id="272" Count="0" />
-      <LineId Id="12" Count="1" />
-      <LineId Id="385" Count="0" />
-      <LineId Id="80" Count="0" />
-      <LineId Id="100" Count="0" />
-      <LineId Id="106" Count="3" />
-      <LineId Id="357" Count="0" />
-      <LineId Id="369" Count="0" />
-      <LineId Id="373" Count="0" />
-      <LineId Id="371" Count="1" />
-      <LineId Id="370" Count="0" />
-      <LineId Id="110" Count="3" />
-      <LineId Id="102" Count="0" />
-      <LineId Id="358" Count="0" />
-      <LineId Id="123" Count="0" />
-      <LineId Id="247" Count="0" />
-      <LineId Id="261" Count="0" />
-      <LineId Id="249" Count="6" />
-      <LineId Id="262" Count="0" />
-      <LineId Id="257" Count="3" />
-      <LineId Id="235" Count="0" />
-      <LineId Id="286" Count="0" />
-      <LineId Id="288" Count="4" />
-      <LineId Id="287" Count="0" />
-      <LineId Id="339" Count="0" />
-      <LineId Id="342" Count="3" />
-      <LineId Id="359" Count="0" />
-      <LineId Id="346" Count="0" />
-      <LineId Id="340" Count="1" />
-      <LineId Id="130" Count="0" />
-      <LineId Id="220" Count="13" />
-      <LineId Id="124" Count="0" />
-      <LineId Id="105" Count="0" />
-      <LineId Id="157" Count="0" />
-      <LineId Id="167" Count="0" />
-      <LineId Id="173" Count="0" />
-      <LineId Id="169" Count="3" />
-      <LineId Id="302" Count="0" />
-      <LineId Id="320" Count="8" />
-      <LineId Id="303" Count="0" />
-      <LineId Id="151" Count="0" />
-      <LineId Id="347" Count="0" />
-      <LineId Id="41" Count="0" />
-      <LineId Id="79" Count="0" />
-      <LineId Id="78" Count="0" />
-      <LineId Id="42" Count="4" />
-      <LineId Id="48" Count="0" />
-      <LineId Id="51" Count="2" />
-      <LineId Id="374" Count="1" />
-      <LineId Id="55" Count="3" />
+      <LineId Id="517" Count="116" />
+      <LineId Id="639" Count="0" />
+      <LineId Id="635" Count="3" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.InitProfiles">
-      <LineId Id="6" Count="52" />
-      <LineId Id="60" Count="61" />
-      <LineId Id="5" Count="0" />
+      <LineId Id="131" Count="91" />
+      <LineId Id="129" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Get">
       <LineId Id="2" Count="0" />
@@ -1304,6 +1274,10 @@ END_CASE]]></ST>
     <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Set">
       <LineId Id="4" Count="3" />
       <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ReadAxisParameters">
+      <LineId Id="7" Count="4" />
+      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RecipeBuilder.Get">
       <LineId Id="2" Count="0" />

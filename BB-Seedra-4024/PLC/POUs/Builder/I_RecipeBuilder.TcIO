@@ -18,6 +18,15 @@
       <Declaration><![CDATA[METHOD Build : BOOL
 ]]></Declaration>
     </Method>
+    <Property Name="Busy" Id="{b05530b6-09cc-4522-af33-84f83497b22f}">
+      <Declaration><![CDATA[PROPERTY Busy : BOOL]]></Declaration>
+      <Get Name="Get" Id="{56984f1d-bedb-40d9-a933-bdb8e55d91ce}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{97956bca-fc96-45f4-9b2d-26a34a9f1cc3}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="Config" Id="{41a1f94d-1ba6-473a-8fd2-d71e6a5c7ac8}">
       <Declaration><![CDATA[PROPERTY Config : ST_RecipeBuilder_Config]]></Declaration>
       <Get Name="Get" Id="{9b92c909-482e-45d4-839d-e73654fca949}">
@@ -33,6 +42,24 @@
         <Declaration><![CDATA[]]></Declaration>
       </Get>
       <Set Name="Set" Id="{db2e7971-1ba6-4a42-8104-1c956218d8fa}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="Done" Id="{e09b3c59-4d66-4bec-b5f8-a0864915d785}">
+      <Declaration><![CDATA[PROPERTY Done : BOOL]]></Declaration>
+      <Get Name="Get" Id="{2fe5a509-c50d-4bcd-96cf-e3705a06840a}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{699a33eb-4116-4960-9278-9781a6101fdb}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="Error" Id="{1e30a85a-1302-494a-ac13-0c5613db912a}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{d93d9f60-85e7-4a7e-88b1-6c269c18fcfc}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{5f69266e-4525-4da8-91b5-725368d3751b}">
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
