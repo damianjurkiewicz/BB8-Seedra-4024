@@ -917,7 +917,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[fbHomeStratQ.HomingVelocity := AxisQ.AxisParameters.fRefVeloSearch;
+        <ST><![CDATA[IF AxisQ.AxisParameters.fRefVeloSearch > 0.0 THEN
+    fbHomeStratQ.HomingVelocity := AxisQ.AxisParameters.fRefVeloSearch;
+ELSE
+    fbHomeStratQ.HomingVelocity := 50.0;
+END_IF
 
 ]]></ST>
       </Implementation>
@@ -1273,6 +1277,7 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ReadAxisParameters">
+      <LineId Id="11" Count="3" />
       <LineId Id="9" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
