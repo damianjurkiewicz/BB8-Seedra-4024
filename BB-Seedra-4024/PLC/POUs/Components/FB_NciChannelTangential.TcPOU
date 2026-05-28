@@ -48,8 +48,8 @@ fbBuildExtGroup(
     nGroupId := nGroupId,
     nXAxisId := stAxisIds.nX,
     nYAxisId := stAxisIds.nY,
-    nZAxisId := stAxisIds.nZ,
-    nQ1AxisId := stAxisIds.nQ1 // <--- Tu podpinamy Q1 ze struktury
+    nZAxisId := 0,
+    nQ1AxisId := stAxisIds.nQ1 
 );]]></ST>
       </Implementation>
     </Method>

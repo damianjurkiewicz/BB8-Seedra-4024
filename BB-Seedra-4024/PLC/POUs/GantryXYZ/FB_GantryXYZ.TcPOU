@@ -693,8 +693,8 @@ CASE DescendantSequenceState OF
 		// Wstrzykiwanie zależności do ExecTangentialFeed
 		ExecTangentialFeed.AxisX          := AxisX;
 		ExecTangentialFeed.AxisY          := AxisY;
-		ExecTangentialFeed.AxisZ          := AxisZ;
-		ExecTangentialFeed.AxisQ := AxisQ;
+		//ExecTangentialFeed.AxisZ          := AxisZ;
+		ExecTangentialFeed.AxisQ 		  := AxisQ;
 		ExecTangentialFeed.NciChannel     := NciChannelTangential; 
 		ExecTangentialFeed.ConfigProvider := THIS^;
 		
