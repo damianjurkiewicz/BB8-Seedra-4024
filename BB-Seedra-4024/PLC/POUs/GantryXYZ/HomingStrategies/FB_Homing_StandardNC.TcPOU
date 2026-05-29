@@ -10,6 +10,7 @@ VAR
 END_VAR
 VAR_INPUT
     bSensorInput : BOOL;
+	bForceHoming : BOOL := FALSE;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -35,8 +36,8 @@ nStep := 0;]]></ST>
         fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
         fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
 
-    10: 
-        IF _Axis.Axis.Status.Homed THEN
+	10: 
+        IF _Axis.Axis.Status.Homed AND NOT bForceHoming THEN
             nStep := 15; 
         ELSE
             nStep := 20; 
@@ -46,13 +47,17 @@ nStep := 0;]]></ST>
         fbMoveAbs(
             Axis     := _Axis.Axis,
             Execute  := TRUE,
-            Position := 0.0,
+            Position := _ReferencePosition,
             Velocity := _RapidVelocity 
         );
         
         IF fbMoveAbs.Done THEN
             fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE); 
-            nStep := 20; 
+            
+            _bBusy := FALSE;
+            _bDone := TRUE;
+            nStep  := 0; 
+            
         ELSIF fbMoveAbs.Error THEN
             nStep := 99;
         END_IF
@@ -160,7 +165,11 @@ END_VAR
       <LineId Id="13" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_StandardNC.CyclicLogic">
-      <LineId Id="223" Count="80" />
+      <LineId Id="223" Count="4" />
+      <LineId Id="304" Count="0" />
+      <LineId Id="306" Count="16" />
+      <LineId Id="324" Count="5" />
+      <LineId Id="248" Count="55" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_StandardNC.RapidVelocity.Get">

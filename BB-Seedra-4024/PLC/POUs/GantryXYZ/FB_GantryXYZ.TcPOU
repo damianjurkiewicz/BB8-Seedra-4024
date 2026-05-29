@@ -356,13 +356,7 @@ END_VAR]]></Declaration>
     RETURN;
 END_IF
 
-//aaa(
-//	Axis := AxisY.Axis , 
-//	Execute := TRUE , 
-//	ParameterNumber := MC_AxisParameter.AxisMinSoftPosLimit , 
-//	Value := -66, 
-//	 );
-	 
+
 
 SUPER^.CyclicLogic();
 
@@ -372,7 +366,10 @@ fbHomeStratZ.bSensorInput := IO.ProximitySensorZ;
 
 fbHomeStratX.RapidVelocity := GantryXYZ_HMI.Config.RapidSpeedX;
 fbHomeStratY.RapidVelocity := GantryXYZ_HMI.Config.RapidSpeedY;
+
 fbHomeStratZ.RapidVelocity := GantryXYZ_HMI.Config.RapidSpeedZ;
+//Axis Z needs to be homed always, because doesn't have an encoder 
+fbHomeStratZ.bForceHoming := TRUE;
 
 fbHomeStratX.CyclicLogic();
 fbHomeStratY.CyclicLogic();
@@ -1213,15 +1210,17 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CyclicLogic">
       <LineId Id="3" Count="3" />
-      <LineId Id="20" Count="5" />
-      <LineId Id="19" Count="0" />
+      <LineId Id="20" Count="0" />
       <LineId Id="26" Count="0" />
       <LineId Id="7" Count="1" />
       <LineId Id="41" Count="2" />
       <LineId Id="40" Count="0" />
       <LineId Id="78" Count="0" />
       <LineId Id="81" Count="1" />
+      <LineId Id="84" Count="0" />
       <LineId Id="77" Count="0" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="83" Count="0" />
       <LineId Id="35" Count="2" />
       <LineId Id="34" Count="0" />
       <LineId Id="65" Count="0" />
