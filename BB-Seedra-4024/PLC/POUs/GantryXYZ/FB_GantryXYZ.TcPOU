@@ -891,6 +891,21 @@ ProfilesQ[E_MachineProfile.eManual].Deceleration := 15000.0;
 ProfilesQ[E_MachineProfile.eManual].Jerk         := 48322.8;]]></ST>
       </Implementation>
     </Method>
+    <Method Name="MoveZToSafePosition" Id="{acabef9e-913d-43a5-abe7-a6cc0b93fa0e}">
+      <Declaration><![CDATA[METHOD PRIVATE MoveZToSafePosition
+VAR
+    MaterialTopZ : REAL;
+    SafeZ : REAL;
+	Config : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[MaterialTopZ := Config.GlobalOffsetZ + Config.RawBoardZ;
+SafeZ := MaterialTopZ + Config.SafeClearanceZ;
+
+AxisZ.Velocity := Config.RapidSpeedZ;
+AxisZ.MoveAbsolute(SafeZ, 0);]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="ProgramIdRequested" Id="{3b163a54-6fcd-4be2-bb98-ad529d342348}" FolderPath="Properties\">
       <Declaration><![CDATA[PROPERTY ProgramIdRequested : E_RecipeID]]></Declaration>
       <Get Name="Get" Id="{21210547-61ea-4bd8-a78a-96552b4742ab}">
@@ -966,106 +981,67 @@ END_VAR
     <Method Name="Resetting" Id="{e7a01217-de28-430f-aeef-f83d9f1b6f0d}" FolderPath="States\">
       <Declaration><![CDATA[METHOD PROTECTED Resetting
 VAR
-	i				: UDINT;
-	SubModulesReady : BOOL := TRUE;
-END_VAR
-
-]]></Declaration>
+    i : UDINT;
+    SubModulesReady : BOOL := TRUE;
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE _CurrentMode OF
 
-    //=================================PRODUCTION MODE==================================
     E_PMLUnitMode.ePMLUnitMode_Production:
-	
-CASE SequenceState OF
-		0:
-			NoStateTasksToComplete := FALSE;
-			StateTasksComplete     := FALSE;
-			SequenceState          := 10;
-	
-		10:
-			AxisX.Enable();
-			AxisY.Enable();
-			AxisZ.Enable();
-			AxisQ.Enable();
-			SequenceState := 20;
-	
-		20:
-			IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled AND AxisQ.Enabled THEN
-				SequenceState := 23;
-			END_IF
-	
-			
-		23:
-			IF NOT AxisZ.Busy THEN
-				SequenceState := 24;
-			END_IF
-			
-		24:
-			fbHomeStratZ.Execute();
-			SequenceState := 30;
-			
-		30:
-			IF fbHomeStratZ.Done THEN
-				SequenceState := 40;
-			ELSIF fbHomeStratZ.Error THEN
-				SequenceState := 99; 
-			END_IF
-	
-		40:
-			fbHomeStratQ.Execute();
-			SequenceState := 41; 
-			
-		41: 
-			IF fbHomeStratQ.Done THEN
-				SequenceState := 43;
-			ELSIF fbHomeStratQ.Error THEN
-				SequenceState := 99; 
-			END_IF		
-		
-		43:
-			fbHomeStratX.Execute();
-			fbHomeStratY.Execute();
-			SequenceState := 44;
-				
-		44:
-			IF fbHomeStratX.Done AND fbHomeStratY.Done THEN
-				SequenceState := 50;
-			ELSIF fbHomeStratX.Error OR fbHomeStratY.Error THEN
-				SequenceState := 99;
-			END_IF
-	
-		50:
-			StateTasksComplete := TRUE;
-			SequenceState      := 0; 
-	
-		99:
-			; // Obsługa błędu bazowania
-	END_CASE
-
-
-    //=================================MAINTENANCE & MANUAL MODE==================================
-    E_PMLUnitMode.ePMLUnitMode_Maintenance:
         CASE SequenceState OF
             0:
                 NoStateTasksToComplete := FALSE;
-                SequenceState := 10;
-
+                StateTasksComplete     := FALSE;
+                SequenceState          := 10;
+        
             10:
                 AxisX.Enable();
                 AxisY.Enable();
                 AxisZ.Enable();
-				AxisQ.Enable();
-
-                IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
-                    SequenceState := 20;
-                END_IF
-
+                AxisQ.Enable();
+                SequenceState := 20;
+        
             20:
+                IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled AND AxisQ.Enabled THEN
+                    SequenceState := 25;
+                END_IF
+        
+            25:
+                IF NOT AxisZ.Busy THEN
+                    MoveZToSafePosition();
+                    SequenceState := 26;
+                END_IF
+                
+            26:
+                IF AxisZ.InPosition THEN
+                    SequenceState := 30;
+                ELSIF AxisZ.Error THEN
+                    SequenceState := 99;
+                END_IF
+                
+            30:
+                fbHomeStratX.Execute();
+                fbHomeStratY.Execute();
+                fbHomeStratZ.Execute();
+                fbHomeStratQ.Execute();
+                SequenceState := 40;
+        
+            40:
+                IF fbHomeStratX.Done AND fbHomeStratY.Done AND fbHomeStratZ.Done AND fbHomeStratQ.Done THEN
+                    SequenceState := 50;
+                ELSIF fbHomeStratX.Error OR fbHomeStratY.Error OR fbHomeStratZ.Error OR fbHomeStratQ.Error THEN
+                    SequenceState := 99;
+                END_IF
+        
+            50:
                 StateTasksComplete := TRUE;
+                SequenceState      := 0; 
+        
+            99:
+                ;
         END_CASE
 
-    E_PMLUnitMode.ePMLUnitMode_Manual:
+    E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
         CASE SequenceState OF
             0:
                 NoStateTasksToComplete := FALSE;
@@ -1075,9 +1051,9 @@ CASE SequenceState OF
                 AxisX.Enable();
                 AxisY.Enable();
                 AxisZ.Enable();
-				AxisQ.Enable();
+                AxisQ.Enable();
 
-                IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled THEN
+                IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled AND AxisQ.Enabled THEN
                     SequenceState := 20;
                 END_IF
 
@@ -1275,6 +1251,10 @@ END_CASE]]></ST>
       <LineId Id="131" Count="91" />
       <LineId Id="129" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.MoveZToSafePosition">
+      <LineId Id="12" Count="3" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -1301,26 +1281,7 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
-      <LineId Id="597" Count="2" />
-      <LineId Id="753" Count="0" />
-      <LineId Id="1274" Count="0" />
-      <LineId Id="1339" Count="17" />
-      <LineId Id="1399" Count="0" />
-      <LineId Id="1404" Count="0" />
-      <LineId Id="1406" Count="2" />
-      <LineId Id="1405" Count="0" />
-      <LineId Id="1357" Count="2" />
-      <LineId Id="1409" Count="0" />
-      <LineId Id="1361" Count="23" />
-      <LineId Id="1386" Count="11" />
-      <LineId Id="823" Count="0" />
-      <LineId Id="659" Count="12" />
-      <LineId Id="836" Count="0" />
-      <LineId Id="672" Count="3" />
-      <LineId Id="682" Count="14" />
-      <LineId Id="837" Count="0" />
-      <LineId Id="697" Count="4" />
-      <LineId Id="708" Count="5" />
+      <LineId Id="1422" Count="77" />
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.StateChanged">
