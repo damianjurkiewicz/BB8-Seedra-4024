@@ -891,18 +891,48 @@ ProfilesQ[E_MachineProfile.eManual].Deceleration := 15000.0;
 ProfilesQ[E_MachineProfile.eManual].Jerk         := 48322.8;]]></ST>
       </Implementation>
     </Method>
-    <Method Name="MoveZToSafePosition" Id="{acabef9e-913d-43a5-abe7-a6cc0b93fa0e}">
-      <Declaration><![CDATA[METHOD PRIVATE MoveZToSafePosition
-VAR
+    <Method Name="IsZAboveMaterial" Id="{51c33e2d-9980-4bce-a548-57fca5c8ab84}">
+      <Declaration><![CDATA[METHOD PRIVATE IsZAboveMaterial : BOOL
+VAR_INST
     MaterialTopZ : REAL;
-    SafeZ : REAL;
-	Config : ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[MaterialTopZ := Config.GlobalOffsetZ + Config.RawBoardZ;
-SafeZ := MaterialTopZ + Config.SafeClearanceZ;
+        <ST><![CDATA[MaterialTopZ := GantryXYZ_HMI.Config.GlobalOffsetZ + GantryXYZ_HMI.Config.RawBoardZ;
 
-AxisZ.Velocity := Config.RapidSpeedZ;
+IF AxisZ.Axis.NcToPlc.ActPos >= MaterialTopZ THEN
+    IsZAboveMaterial := TRUE;
+ELSE
+    IsZAboveMaterial := FALSE;
+END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="MoveZToSafePosition" Id="{acabef9e-913d-43a5-abe7-a6cc0b93fa0e}">
+      <Declaration><![CDATA[METHOD PRIVATE MoveZToSafePosition
+VAR_INST
+    MaterialTopZ : REAL;
+    SafeZ        : REAL;
+    SpeedZ       : LREAL;
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[MaterialTopZ := GantryXYZ_HMI.Config.GlobalOffsetZ + GantryXYZ_HMI.Config.RawBoardZ;
+SafeZ := MaterialTopZ + GantryXYZ_HMI.Config.SafeClearanceZ;
+
+SpeedZ := GantryXYZ_HMI.Config.RapidSpeedZ;
+
+IF SpeedZ <= 0.0 THEN
+    IF AxisZ.AxisParameters.fRefVeloSearch > 0.0 THEN
+        SpeedZ := (AxisZ.AxisParameters.fRefVeloSearch);
+    ELSE
+        SpeedZ := 10.0;
+    END_IF
+END_IF
+
+IF SafeZ <= 0.0 THEN
+    SafeZ := 42.0;
+END_IF
+
+AxisZ.Velocity := SpeedZ;
 AxisZ.MoveAbsolute(SafeZ, 0);]]></ST>
       </Implementation>
     </Method>
@@ -983,7 +1013,11 @@ END_VAR
 VAR
     i : UDINT;
     SubModulesReady : BOOL := TRUE;
-END_VAR]]></Declaration>
+END_VAR
+VAR_INST
+    DelayTimer : TON;
+END_VAR
+]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE _CurrentMode OF
 
@@ -993,6 +1027,7 @@ END_VAR]]></Declaration>
                 NoStateTasksToComplete := FALSE;
                 StateTasksComplete     := FALSE;
                 SequenceState          := 10;
+				DelayTimer(IN := FALSE);
         
             10:
                 AxisX.Enable();
@@ -1008,37 +1043,63 @@ END_VAR]]></Declaration>
         
             25:
                 IF NOT AxisZ.Busy THEN
-                    MoveZToSafePosition();
-                    SequenceState := 26;
+                    IF NOT IsZAboveMaterial() THEN
+                        MoveZToSafePosition();
+                        DelayTimer(IN := FALSE);
+                        SequenceState := 27;
+                    ELSE
+                        SequenceState := 30;
+                    END_IF
                 END_IF
-                
-            26:
+                         
+            27:
                 IF AxisZ.InPosition THEN
                     SequenceState := 30;
                 ELSIF AxisZ.Error THEN
                     SequenceState := 99;
                 END_IF
                 
-            30:
-                fbHomeStratX.Execute();
-                fbHomeStratY.Execute();
-                fbHomeStratZ.Execute();
+            30:   
                 fbHomeStratQ.Execute();
-                SequenceState := 40;
+				SequenceState := 31;
+				
+			31:	
+				IF fbHomeStratQ.Done THEN
+                    SequenceState := 32;
+				END_IF	
+			
+			32: 
+		    	fbHomeStratZ.Execute();
+                SequenceState := 34;
+
+            34:     
+                fbHomeStratY.Execute();
+                SequenceState := 38;
+
+
+            38: 
+				fbHomeStratX.Execute();    
+                DelayTimer(IN := TRUE, PT := T#500MS);
+                IF DelayTimer.Q THEN
+                    DelayTimer(IN := FALSE); 
+                    SequenceState := 44;
+                END_IF
+				
         
-            40:
-                IF fbHomeStratX.Done AND fbHomeStratY.Done AND fbHomeStratZ.Done AND fbHomeStratQ.Done THEN
+			44: 	
+				IF fbHomeStratX.Done AND fbHomeStratY.Done THEN
                     SequenceState := 50;
-                ELSIF fbHomeStratX.Error OR fbHomeStratY.Error OR fbHomeStratZ.Error OR fbHomeStratQ.Error THEN
+                ELSIF fbHomeStratX.Error OR fbHomeStratY.Error OR fbHomeStratQ.Error THEN
                     SequenceState := 99;
                 END_IF
-        
+				
             50:
                 StateTasksComplete := TRUE;
                 SequenceState      := 0; 
         
             99:
-                ;
+                ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                
         END_CASE
 
     E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
@@ -1251,8 +1312,12 @@ END_CASE]]></ST>
       <LineId Id="131" Count="91" />
       <LineId Id="129" Count="0" />
     </LineIds>
+    <LineIds Name="FB_GantryXYZ.IsZAboveMaterial">
+      <LineId Id="11" Count="5" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
     <LineIds Name="FB_GantryXYZ.MoveZToSafePosition">
-      <LineId Id="12" Count="3" />
+      <LineId Id="65" Count="17" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Get">
@@ -1281,7 +1346,30 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
-      <LineId Id="1422" Count="77" />
+      <LineId Id="1513" Count="7" />
+      <LineId Id="1636" Count="0" />
+      <LineId Id="1521" Count="23" />
+      <LineId Id="1551" Count="7" />
+      <LineId Id="1689" Count="0" />
+      <LineId Id="1697" Count="0" />
+      <LineId Id="1695" Count="1" />
+      <LineId Id="1692" Count="2" />
+      <LineId Id="1641" Count="0" />
+      <LineId Id="1681" Count="0" />
+      <LineId Id="1684" Count="0" />
+      <LineId Id="1688" Count="0" />
+      <LineId Id="1656" Count="2" />
+      <LineId Id="1662" Count="3" />
+      <LineId Id="1671" Count="0" />
+      <LineId Id="1666" Count="3" />
+      <LineId Id="1623" Count="0" />
+      <LineId Id="1672" Count="0" />
+      <LineId Id="1571" Count="0" />
+      <LineId Id="1698" Count="0" />
+      <LineId Id="1701" Count="3" />
+      <LineId Id="1700" Count="0" />
+      <LineId Id="1699" Count="0" />
+      <LineId Id="1572" Count="30" />
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.StateChanged">

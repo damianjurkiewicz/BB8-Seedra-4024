@@ -76,16 +76,22 @@ nStep := 0;]]></ST>
             nStep := 99;
         END_IF
 
-    25: 
+	25: 
         fbMcHome(
             Axis            := _Axis.Axis,
             bCalibrationCam := bSensorInput 
         );
         IF fbMcHome.Done THEN
             fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
-            nStep := 30; 
+            nStep := 26; 
         ELSIF fbMcHome.Error THEN
             nStep := 99;
+        END_IF
+
+    26:
+        
+        IF NOT fbMcHome.Busy AND _Axis.Axis.Status.StandStill THEN
+            nStep := 30;
         END_IF
 
     30: 
@@ -95,6 +101,12 @@ nStep := 0;]]></ST>
             Position := _ReferencePosition,
             Velocity := 10.0
         );
+		
+		IF NOT fbMoveAbs.Busy AND _Axis.Axis.Status.StandStill THEN
+			nStep := 32;
+		END_IF
+	
+	32:	
         
         IF fbMoveAbs.Done THEN
             fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
@@ -169,7 +181,13 @@ END_VAR
       <LineId Id="304" Count="0" />
       <LineId Id="306" Count="16" />
       <LineId Id="324" Count="5" />
-      <LineId Id="248" Count="55" />
+      <LineId Id="248" Count="15" />
+      <LineId Id="331" Count="15" />
+      <LineId Id="274" Count="8" />
+      <LineId Id="352" Count="0" />
+      <LineId Id="349" Count="2" />
+      <LineId Id="347" Count="1" />
+      <LineId Id="283" Count="20" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_StandardNC.RapidVelocity.Get">
