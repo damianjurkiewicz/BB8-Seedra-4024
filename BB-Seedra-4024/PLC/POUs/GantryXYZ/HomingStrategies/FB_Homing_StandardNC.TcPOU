@@ -7,6 +7,7 @@ VAR
     fbMoveAbs          : MC_MoveAbsolute;
     _ReferencePosition : LREAL;	
     _RapidVelocity     : LREAL := 100.0; 
+	_HomingVelocity	   : LREAL := 10.0;
 END_VAR
 VAR_INPUT
     bSensorInput : BOOL;
@@ -99,7 +100,7 @@ nStep := 0;]]></ST>
             Axis     := _Axis.Axis,
             Execute  := TRUE,
             Position := _ReferencePosition,
-            Velocity := 10.0
+            Velocity := _HomingVelocity
         );
 		
 		IF NOT fbMoveAbs.Busy AND _Axis.Axis.Status.StandStill THEN
@@ -131,6 +132,25 @@ nStep := 0;]]></ST>
 END_CASE]]></ST>
       </Implementation>
     </Method>
+    <Property Name="HomingVelocity" Id="{fc23ba41-7127-4d8c-b05f-5af60e33e4c0}">
+      <Declaration><![CDATA[PROPERTY HomingVelocity : LREAL]]></Declaration>
+      <Get Name="Get" Id="{4f88d4aa-ea04-4139-b6d5-e91faecaa074}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HomingVelocity := _HomingVelocity;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{1b632f69-3ff5-4249-9a45-c25d579a3ae0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_HomingVelocity := HomingVelocity;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
     <Property Name="RapidVelocity" Id="{f0fbf57d-46d4-437e-a0af-eca81cd38185}">
       <Declaration><![CDATA[PROPERTY RapidVelocity : LREAL]]></Declaration>
       <Get Name="Get" Id="{9137618d-957c-4a09-afea-77e08ff34abb}">
@@ -189,6 +209,12 @@ END_VAR
       <LineId Id="347" Count="1" />
       <LineId Id="283" Count="20" />
       <LineId Id="4" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.HomingVelocity.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_StandardNC.HomingVelocity.Set">
+      <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_StandardNC.RapidVelocity.Get">
       <LineId Id="2" Count="0" />

@@ -690,10 +690,6 @@ CASE DescendantSequenceState OF
 		fbHomeStratZ.Axis := AxisZ;
 		fbHomeStratQ.Axis := AxisQ;
 		
-		// Position to reach after homing
-		fbHomeStratX.ReferencePosition := 0.0;
-		fbHomeStratY.ReferencePosition := 0.0;
-		fbHomeStratZ.ReferencePosition := 42.0;
 		
 		// Wstrzyknięcie strategii do osi (Dependency Injection)
 		AxisX.HomeMethod := fbHomeStratX;
@@ -929,7 +925,7 @@ IF SpeedZ <= 0.0 THEN
 END_IF
 
 IF SafeZ <= 0.0 THEN
-    SafeZ := 42.0;
+    SafeZ := AxisZ.AxisParameters.fEncRefPosition; 
 END_IF
 
 AxisZ.Velocity := SpeedZ;
@@ -963,13 +959,34 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF AxisQ.AxisParameters.fRefVeloSearch > 0.0 THEN
+        <ST><![CDATA[//We use it to parametrize Homing Strategies directly from the UI
+IF AxisQ.AxisParameters.fRefVeloSearch > 0.0 THEN
     fbHomeStratQ.HomingVelocity := AxisQ.AxisParameters.fRefVeloSearch;
 ELSE
     fbHomeStratQ.HomingVelocity := 50.0;
 END_IF
 
-]]></ST>
+IF AxisX.AxisParameters.fRefVeloSearch > 0.0 THEN
+    fbHomeStratX.HomingVelocity := AxisX.AxisParameters.fRefVeloSearch;
+ELSE
+    fbHomeStratX.HomingVelocity := 10.0;
+END_IF
+
+IF AxisY.AxisParameters.fRefVeloSearch > 0.0 THEN
+    fbHomeStratY.HomingVelocity := AxisY.AxisParameters.fRefVeloSearch;
+ELSE
+    fbHomeStratY.HomingVelocity := 10.0;
+END_IF
+
+IF AxisZ.AxisParameters.fRefVeloSearch > 0.0 THEN
+    fbHomeStratZ.HomingVelocity := AxisZ.AxisParameters.fRefVeloSearch;
+ELSE
+    fbHomeStratZ.HomingVelocity := 10.0;
+END_IF
+
+fbHomeStratX.ReferencePosition := AxisX.AxisParameters.fEncRefPosition;
+fbHomeStratY.ReferencePosition := AxisY.AxisParameters.fEncRefPosition;
+fbHomeStratZ.ReferencePosition := AxisZ.AxisParameters.fEncRefPosition;]]></ST>
       </Implementation>
     </Method>
     <Property Name="RecipeBuilder" Id="{7e3c2008-dd15-410b-92f3-2adf472e0386}" FolderPath="Properties\">
@@ -1303,7 +1320,8 @@ END_CASE]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
-      <LineId Id="517" Count="116" />
+      <LineId Id="517" Count="24" />
+      <LineId Id="546" Count="87" />
       <LineId Id="639" Count="0" />
       <LineId Id="635" Count="3" />
       <LineId Id="2" Count="0" />
@@ -1317,7 +1335,10 @@ END_CASE]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.MoveZToSafePosition">
-      <LineId Id="65" Count="17" />
+      <LineId Id="65" Count="12" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="80" Count="2" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ProgramIdRequested.Get">
@@ -1328,8 +1349,8 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ReadAxisParameters">
-      <LineId Id="11" Count="3" />
-      <LineId Id="9" Count="1" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="20" Count="25" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RecipeBuilder.Get">
