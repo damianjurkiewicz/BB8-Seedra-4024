@@ -370,6 +370,10 @@ fbHomeStratX.bSensorInput := IO.ProximitySensorX;
 fbHomeStratY.bSensorInput := IO.ProximitySensorY;
 fbHomeStratZ.bSensorInput := IO.ProximitySensorZ;
 
+fbHomeStratX.RapidVelocity := GantryXYZ_HMI.Config.RapidSpeedX;
+fbHomeStratY.RapidVelocity := GantryXYZ_HMI.Config.RapidSpeedY;
+fbHomeStratZ.RapidVelocity := GantryXYZ_HMI.Config.RapidSpeedZ;
+
 fbHomeStratX.CyclicLogic();
 fbHomeStratY.CyclicLogic();
 fbHomeStratZ.CyclicLogic();
@@ -1215,6 +1219,9 @@ END_CASE]]></ST>
       <LineId Id="7" Count="1" />
       <LineId Id="41" Count="2" />
       <LineId Id="40" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="81" Count="1" />
+      <LineId Id="77" Count="0" />
       <LineId Id="35" Count="2" />
       <LineId Id="34" Count="0" />
       <LineId Id="65" Count="0" />
