@@ -784,7 +784,7 @@
               </Parameter>
               <Parameter>
                 <PropertyName>FeedConstant</PropertyName>
-                <Value>4.75</Value>
+                <Value>4.8</Value>
               </Parameter>
               <Parameter>
                 <PropertyName>GearRatioMotorSide</PropertyName>
@@ -1651,6 +1651,24 @@ Bit 8 - 15 : reserved</Comment>
               <Index>32784</Index>
               <SubIndex>23</SubIndex>
               <Data>c4090000</Data>
+            </InitCmd>
+            <InitCmd>
+              <Transition>PS</Transition>
+              <Comment><![CDATA[FB Settings / Singleturn bits]]></Comment>
+              <Timeout>0</Timeout>
+              <Ccs>1</Ccs>
+              <Index>32768</Index>
+              <SubIndex>18</SubIndex>
+              <Data>14</Data>
+            </InitCmd>
+            <InitCmd>
+              <Transition>PS</Transition>
+              <Comment><![CDATA[FB Settings / Multiturn bits]]></Comment>
+              <Timeout>0</Timeout>
+              <Ccs>1</Ccs>
+              <Index>32768</Index>
+              <SubIndex>19</SubIndex>
+              <Data>0c</Data>
             </InitCmd>
           </InitCmds>
           <CanOpenType>39</CanOpenType>
