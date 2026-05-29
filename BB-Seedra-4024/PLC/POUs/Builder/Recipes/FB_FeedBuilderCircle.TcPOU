@@ -101,7 +101,10 @@ END_VAR
         <ST><![CDATA[_Limits.Diameter.MinVal := 10.0;
 _Limits.Diameter.MaxVal := 1200.0;
 
-]]></ST>
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_FeedBuilderCircle">
@@ -120,6 +123,7 @@ _Limits.Diameter.MaxVal := 1200.0;
     </LineIds>
     <LineIds Name="FB_FeedBuilderCircle.FB_init">
       <LineId Id="82" Count="2" />
+      <LineId Id="90" Count="2" />
       <LineId Id="63" Count="0" />
     </LineIds>
   </POU>

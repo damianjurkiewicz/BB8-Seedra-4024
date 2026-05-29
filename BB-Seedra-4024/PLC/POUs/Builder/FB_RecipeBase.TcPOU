@@ -139,6 +139,9 @@ _Config.RailHeightCorrection := LIMIT(_Limits.RailHeightCorrection.MinVal, Confi
 _Config.GrooveDepthZ		 :=	LIMIT(_Limits.GrooveDepthZ.MinVal,	Config.GrooveDepthZ, _Limits.GrooveDepthZ.MaxVal);
 _Config.Diameter 			 := LIMIT(_Limits.Diameter.MinVal, Config.Diameter, _Limits.Diameter.MaxVal);
 
+_Config.CuttingOverpass      := LIMIT(_Limits.CuttingOverpass.MinVal, Config.CuttingOverpass, _Limits.CuttingOverpass.MaxVal);
+_Config.GroovingOverpass     := LIMIT(_Limits.GroovingOverpass.MinVal, Config.GroovingOverpass, _Limits.GroovingOverpass.MaxVal);
+_Config.Radius               := LIMIT(_Limits.Radius.MinVal, Config.Radius, _Limits.Radius.MaxVal);
 
 THIS^.UpdateNestingLimits();
 
@@ -628,6 +631,7 @@ END_CASE]]></ST>
       <LineId Id="44" Count="5" />
       <LineId Id="86" Count="0" />
       <LineId Id="90" Count="0" />
+      <LineId Id="97" Count="2" />
       <LineId Id="50" Count="5" />
       <LineId Id="57" Count="2" />
       <LineId Id="62" Count="1" />

@@ -969,19 +969,19 @@ END_IF
 IF AxisX.AxisParameters.fRefVeloSearch > 0.0 THEN
     fbHomeStratX.HomingVelocity := AxisX.AxisParameters.fRefVeloSearch;
 ELSE
-    fbHomeStratX.HomingVelocity := 10.0;
+    fbHomeStratX.HomingVelocity := 50.0;
 END_IF
 
 IF AxisY.AxisParameters.fRefVeloSearch > 0.0 THEN
     fbHomeStratY.HomingVelocity := AxisY.AxisParameters.fRefVeloSearch;
 ELSE
-    fbHomeStratY.HomingVelocity := 10.0;
+    fbHomeStratY.HomingVelocity := 50.0;
 END_IF
 
 IF AxisZ.AxisParameters.fRefVeloSearch > 0.0 THEN
     fbHomeStratZ.HomingVelocity := AxisZ.AxisParameters.fRefVeloSearch;
 ELSE
-    fbHomeStratZ.HomingVelocity := 10.0;
+    fbHomeStratZ.HomingVelocity := 20.0;
 END_IF
 
 fbHomeStratX.ReferencePosition := AxisX.AxisParameters.fEncRefPosition;

@@ -8,6 +8,10 @@ VAR
     
     // NCI Builder z Tc2_PlcInterpolation
     fbFeedPrep  : FB_NciFeedTablePreparation;
+	
+	// Lokalne offsety aktualizowane co kopię nestingu
+	_CurrentOffsetX : LREAL;
+	_CurrentOffsetY : LREAL;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -34,15 +38,14 @@ VAR_INPUT
     Velo       : LREAL;
     Clockwise  : BOOL; 
 END_VAR
-
 VAR
     stArc : ST_NciGeoCirclePlane;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[stArc.fEndPosX := TargetX;
-stArc.fEndPosY := TargetY;
-stArc.fCenterX := CenterX;
-stArc.fCenterY := CenterY;
+        <ST><![CDATA[stArc.fEndPosX := TargetX + _CurrentOffsetX;
+stArc.fEndPosY := TargetY + _CurrentOffsetY;
+stArc.fCenterX := CenterX + _CurrentOffsetX;
+stArc.fCenterY := CenterY + _CurrentOffsetY;
 stArc.fVelo := Velo;
 stArc.bClockwise := Clockwise;
 stArc.nPlane := E_NciGeoPlane.E_NciGeoPlaneXY;
@@ -64,15 +67,12 @@ VAR_INPUT
     TargetY : LREAL;
     Velo    : LREAL;
 END_VAR
-
 VAR
     stLine : ST_NciGeoLine;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-
-stLine.fEndPosX := TargetX;
-stLine.fEndPosY := TargetY;
+        <ST><![CDATA[stLine.fEndPosX := TargetX + _CurrentOffsetX;
+stLine.fEndPosY := TargetY + _CurrentOffsetY;
 stLine.fVelo := Velo;
 
 fbFeedPrep(
@@ -95,9 +95,8 @@ VAR
     stStart : ST_NciGeoStart;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[stStart.fPosX := TargetX;
-stStart.fPosY := TargetY;
-
+        <ST><![CDATA[stStart.fPosX := TargetX + _CurrentOffsetX;
+stStart.fPosY := TargetY + _CurrentOffsetY;
 
 fbFeedPrep(
     nEntryType := E_NciEntryType.E_NciEntryTypeGeoStart,
@@ -172,10 +171,29 @@ CASE nStep OF
             END_IF
         END_IF
 
-    8: 
-        MoveToXY(recipeConfig.NciStartX, recipeConfig.NciStartY, 0.0, 0.0);
-        _AxisQ.MoveAbsolute(0.0, 0);
-        nStep := 9;
+8: 
+        localConfig := _ConfigProvider.Config;
+		// Wyliczamy aktualny offset dla tej konkretnej kopii (Nesting + GlobalOffset maszyny)
+		_CurrentOffsetX := (iCurrentCopyX - 1) * _RecipeBuilder.FootprintX + localConfig.GlobalOffsetX;
+		_CurrentOffsetY := (iCurrentCopyY - 1) * _RecipeBuilder.FootprintY + localConfig.GlobalOffsetY;
+		
+		// PRZEBUDOWUJEMY TABELĘ DLA OBECNEJ KOPII
+		_RecipeBuilder.Build();
+		nStep := 85;
+
+	85:
+		// Czekamy na koniec budowania (Build() jest synchroniczny więc zajmie max 1 cykl)
+		IF _RecipeBuilder.Done THEN
+			// Odświeżamy config z buildera, bo NciStartX na pewno został przeliczony
+			recipeConfig := _RecipeBuilder.Config;
+			
+			// NciStartX jest lokalny, MoveToXY z klasy bazowej doda Nesting + Global (czyli ustawi nas idealnie w AddStartPoint)
+			MoveToXY(recipeConfig.NciStartX, recipeConfig.NciStartY, 0.0, 0.0);
+			_AxisQ.MoveAbsolute(0.0, 0);
+			nStep := 9;
+		ELSIF _RecipeBuilder.Error THEN
+			nStep := 999;
+		END_IF
 
     9: 
         IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error OR _AxisQ.Error THEN
@@ -184,7 +202,6 @@ CASE nStep OF
             localConfig := _ConfigProvider.Config;
             MaterialTopZ := localConfig.GlobalOffsetZ + localConfig.RawBoardZ;
             SafeZ := MaterialTopZ + localConfig.SafeClearanceZ;
-            
             IF _AxisZ.MoveAbsolute(SafeZ, 0) THEN
                 nStep := 10;
             END_IF
@@ -348,18 +365,15 @@ EndTable := NOT fbFeedPrep.bError;]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Tangential_FeedTable.AddArc">
-      <LineId Id="15" Count="1" />
-      <LineId Id="18" Count="1" />
-      <LineId Id="21" Count="10" />
+      <LineId Id="58" Count="14" />
       <LineId Id="10" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Tangential_FeedTable.AddLine">
-      <LineId Id="10" Count="3" />
-      <LineId Id="15" Count="8" />
+      <LineId Id="43" Count="10" />
       <LineId Id="7" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Tangential_FeedTable.AddStartPoint">
-      <LineId Id="11" Count="10" />
+      <LineId Id="38" Count="9" />
       <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Tangential_FeedTable.Clear">
@@ -367,7 +381,9 @@ EndTable := NOT fbFeedPrep.bError;]]></ST>
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Tangential_FeedTable.CyclicLogic">
-      <LineId Id="371" Count="73" />
+      <LineId Id="371" Count="36" />
+      <LineId Id="522" Count="33" />
+      <LineId Id="424" Count="20" />
       <LineId Id="514" Count="0" />
       <LineId Id="445" Count="68" />
       <LineId Id="2" Count="0" />
