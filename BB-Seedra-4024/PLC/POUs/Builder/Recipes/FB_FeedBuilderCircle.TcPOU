@@ -14,6 +14,7 @@ VAR
     Velo : LREAL;
     localConfig : ST_GantryXYZ_Config;
     LeadInY : LREAL := 20.0;
+    LeadOutY : LREAL := 20.0;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[_Busy := TRUE;
@@ -49,6 +50,7 @@ _GeometryWriter.AddStartPoint(TotalX, Radius - LeadInY);
 _GeometryWriter.AddLine(TotalX, Radius, Velo); 
 _GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, FALSE);
 _GeometryWriter.AddArc(TotalX, Radius, Radius, Radius, Velo, FALSE);
+_GeometryWriter.AddLine(TotalX, Radius + LeadOutY, Velo); 
 
 _GeometryWriter.EndTable();
 
@@ -99,7 +101,7 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderCircle.Build">
-      <LineId Id="2165" Count="37" />
+      <LineId Id="2218" Count="38" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderCircle.CalculateFootprint">
