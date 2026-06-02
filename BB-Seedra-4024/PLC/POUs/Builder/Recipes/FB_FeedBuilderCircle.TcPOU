@@ -13,8 +13,8 @@ VAR
     TotalX, Radius : LREAL;
     Velo : LREAL;
     localConfig : ST_GantryXYZ_Config;
-END_VAR
-]]></Declaration>
+    LeadInY : LREAL := 20.0;
+END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[_Busy := TRUE;
 _Done := FALSE;
@@ -25,18 +25,15 @@ THIS^.UpdateNestingLimits();
 
 IF NOT _Config.IsValid THEN
     _Busy := FALSE;
-    _Error := TRUE; 
+    _Error := TRUE;
     RETURN;
 END_IF
 
-// Podstawowe wyliczenia geometryczne na podstawie średnicy
 TotalX := _Config.Diameter;
 Radius := TotalX / 2.0;
 
-// Punkt startowy (prawa krawędź kółka, na osi symetrii Y)
-// Dzięki temu ruch CCW w górę (+Y) da nam na starcie kąt tangencjalny 0 stopni.
 _Config.NciStartX := TotalX;
-_Config.NciStartY := Radius;
+_Config.NciStartY := Radius - LeadInY;
 
 IF _ConfigProvider <> 0 THEN
     localConfig := _ConfigProvider.Config;
@@ -45,21 +42,12 @@ ELSE
     Velo := 50.0;
 END_IF
 
-// ============================================
-// GENEROWANIE TABELI (Kierunek: Lewoskrętnie / CCW)
-// ============================================
 _GeometryWriter.Clear();
 _GeometryWriter.EnableTangentialFollowing();
 
-// Start na prawej krawędzi (TotalX, Radius)
-_GeometryWriter.AddStartPoint(TotalX, Radius);
-
-// 1. Górna połowa kółka do lewej krawędzi (0, Radius)
-// Cel: X=0, Y=Radius | Środek: X=Radius, Y=Radius | CCW: FALSE
+_GeometryWriter.AddStartPoint(TotalX, Radius - LeadInY); 
+_GeometryWriter.AddLine(TotalX, Radius, Velo); 
 _GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, FALSE);
-
-// 2. Dolna połowa kółka wracająca do prawej krawędzi (TotalX, Radius)
-// Cel: X=TotalX, Y=Radius | Środek: X=Radius, Y=Radius | CCW: FALSE
 _GeometryWriter.AddArc(TotalX, Radius, Radius, Radius, Velo, FALSE);
 
 _GeometryWriter.EndTable();
@@ -111,7 +99,7 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderCircle.Build">
-      <LineId Id="2101" Count="49" />
+      <LineId Id="2165" Count="37" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderCircle.CalculateFootprint">
