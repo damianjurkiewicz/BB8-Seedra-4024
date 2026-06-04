@@ -467,7 +467,7 @@ END_IF
 // =========================================================
 
 // ZABEZPIECZENIE Z: Głębokość frezowania nie może przekroczyć grubości płyty!
-_Limits.GrooveDepthZ.MaxVal := MachineConfig.RawBoardZ + 2.0;
+_Limits.GrooveDepthZ.MaxVal := MachineConfig.RawBoardZ + 4.0;
 // Bezlitosne obcięcie (clamping) wpisanej wartości do nowego limitu
 _Config.GrooveDepthZ := LIMIT(_Limits.GrooveDepthZ.MinVal, _Config.GrooveDepthZ, _Limits.GrooveDepthZ.MaxVal);
 
