@@ -3,13 +3,14 @@
   <POU Name="FB_RecipeFactory" Id="{eb67f754-8d88-44c2-acf6-733dd105dd46}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeFactory
 VAR
-    BuilderWings : FB_RecipeBuilderBorgoWings;
-    BuilderFlaps : FB_RecipeBuilderBorgoFlaps;
-    BuilderArona : FB_RecipeBuilderArona;
-	BuilderCircle : FB_NCIBuilderCircle;
-	BuilderRectangle : FB_RecipeBuilderRectangle;
-	BuilderRoundedRect : FB_FeedBuilderRoundedRect;
-	BuilderFeedCircle  : FB_FeedBuilderCircle;
+    BuilderWings 			: FB_RecipeBuilderBorgoWings;
+    BuilderFlaps 			: FB_RecipeBuilderBorgoFlaps;
+    BuilderArona 			: FB_RecipeBuilderArona;
+	BuilderCircle 			: FB_NCIBuilderCircle;
+	BuilderRectangle 		: FB_RecipeBuilderRectangle;
+	BuilderRoundedRect 		: FB_FeedBuilderRoundedRect;
+	BuilderFeedCircle  		: FB_FeedBuilderCircle;
+	BuilderMeina2			: FB_FeedBuilderMeina2;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -40,7 +41,10 @@ END_VAR]]></Declaration>
         GetBuilder := BuilderRoundedRect;    
 
 	E_RecipeID.eFeedCircle:                 
-        GetBuilder := BuilderFeedCircle;           
+        GetBuilder := BuilderFeedCircle;        
+
+	E_RecipeID.eMeina2:
+		GetBuilder := BuilderMeina2;   
         
 ELSE
     GetBuilder := 0; 
@@ -54,20 +58,29 @@ VAR_INPUT
 	ConfigProvider : I_GantryConfigProvider;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[BuilderWings.Config := Config;
-BuilderWings.ConfigProvider := ConfigProvider; 
-BuilderFlaps.Config := Config;
-BuilderFlaps.ConfigProvider := ConfigProvider;
-BuilderArona.Config := Config;
-BuilderArona.ConfigProvider := ConfigProvider;
-BuilderCircle.Config := Config;
-BuilderCircle.ConfigProvider := ConfigProvider;
-BuilderRectangle.Config := Config;                    
-BuilderRectangle.ConfigProvider := ConfigProvider;    
-BuilderRoundedRect.Config := Config;
-BuilderRoundedRect.ConfigProvider := ConfigProvider;
-BuilderFeedCircle.Config := Config;                    
-BuilderFeedCircle.ConfigProvider := ConfigProvider;    
+        <ST><![CDATA[BuilderWings.Config 				:= Config;
+BuilderWings.ConfigProvider 		:= ConfigProvider; 
+
+BuilderFlaps.Config 				:= Config;
+BuilderFlaps.ConfigProvider 		:= ConfigProvider;
+
+BuilderArona.Config 				:= Config;
+BuilderArona.ConfigProvider 		:= ConfigProvider;
+
+BuilderCircle.Config 				:= Config;
+BuilderCircle.ConfigProvider 		:= ConfigProvider;
+
+BuilderRectangle.Config 			:= Config;                    
+BuilderRectangle.ConfigProvider 	:= ConfigProvider; 
+   
+BuilderRoundedRect.Config 			:= Config;
+BuilderRoundedRect.ConfigProvider 	:= ConfigProvider;
+
+BuilderFeedCircle.Config 			:= Config;                    
+BuilderFeedCircle.ConfigProvider 	:= ConfigProvider;
+
+BuilderMeina2.Config				:= Config;    
+BuilderMeina2.ConfigProvider		:= ConfigProvider;    
 ]]></ST>
       </Implementation>
     </Method>
@@ -78,13 +91,14 @@ VAR_INPUT
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[// Fabryka rozsyła nową konfigurację do wszystkich swoich "dzieci"
-BuilderWings.Config := Config;
-BuilderFlaps.Config := Config;
-BuilderArona.Config := Config;
-BuilderCircle.Config := Config;
-BuilderRectangle.Config := Config;   
-BuilderRoundedRect.Config := Config;      
-BuilderFeedCircle.Config := Config;              ]]></ST>
+BuilderWings.Config 		:= Config;
+BuilderFlaps.Config 		:= Config;
+BuilderArona.Config 		:= Config;
+BuilderCircle.Config 		:= Config;
+BuilderRectangle.Config 	:= Config;   
+BuilderRoundedRect.Config 	:= Config;      
+BuilderFeedCircle.Config 	:= Config; 
+BuilderMeina2.Config		:= Config;                 ]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeFactory">
@@ -99,17 +113,32 @@ BuilderFeedCircle.Config := Config;              ]]></ST>
       <LineId Id="53" Count="0" />
       <LineId Id="60" Count="1" />
       <LineId Id="59" Count="0" />
+      <LineId Id="66" Count="0" />
+      <LineId Id="65" Count="0" />
+      <LineId Id="67" Count="0" />
       <LineId Id="43" Count="2" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.InitializeFactory">
-      <LineId Id="19" Count="6" />
+      <LineId Id="19" Count="1" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="21" Count="1" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="23" Count="1" />
+      <LineId Id="56" Count="0" />
+      <LineId Id="25" Count="0" />
       <LineId Id="14" Count="0" />
+      <LineId Id="55" Count="0" />
       <LineId Id="31" Count="0" />
       <LineId Id="30" Count="0" />
+      <LineId Id="54" Count="0" />
       <LineId Id="36" Count="1" />
+      <LineId Id="53" Count="0" />
       <LineId Id="43" Count="0" />
       <LineId Id="42" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="51" Count="0" />
+      <LineId Id="49" Count="0" />
       <LineId Id="44" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.UpdateConfig">
@@ -119,6 +148,7 @@ BuilderFeedCircle.Config := Config;              ]]></ST>
       <LineId Id="16" Count="0" />
       <LineId Id="20" Count="0" />
       <LineId Id="24" Count="0" />
+      <LineId Id="28" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

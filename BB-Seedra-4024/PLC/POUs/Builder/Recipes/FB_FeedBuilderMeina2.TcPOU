@@ -1,0 +1,185 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_FeedBuilderMeina2" Id="{22b8006b-85a6-4b7f-b0ea-19ab060d1e2b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedBuilderMeina2 EXTENDS FB_RecipeBase
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{fa0b89f6-ef30-4f8b-ba6b-e1f90d3f2882}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+VAR
+    TotalX, TotalY, Radius : LREAL;
+    Velo : LREAL;
+    localConfig : ST_GantryXYZ_Config;
+	
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Busy := TRUE;
+_Done := FALSE;
+_Error := FALSE;
+Build := FALSE;
+THIS^.UpdateNestingLimits();
+
+IF NOT _Config.IsValid THEN
+    _Busy := FALSE;
+    _Error := TRUE; 
+    Build := FALSE;
+    RETURN;
+END_IF
+
+// Gabaryty i promień
+TotalX := _Config.PanelFrontWidth;
+TotalY := _Config.PanelFrontLength;
+Radius := _Config.Radius;
+
+IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
+IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
+
+// ===================================================
+// Zaczynamy na środku PRAWEJ krawędzi
+// Ruch będzie w kierunku +Y, co da startowy kąt 0 na osi Q.
+// ===================================================
+_Config.NciStartX := TotalX;
+_Config.NciStartY := TotalY / 2.0;
+
+IF _ConfigProvider <> 0 THEN
+    localConfig := _ConfigProvider.Config;
+    Velo := localConfig.CuttingSpeedXY;
+ELSE
+    Velo := 50.0;
+END_IF
+
+// ============================================
+// GENEROWANIE TABELI (Ruch CCW / Lewoskrętnie)
+// ============================================
+_GeometryWriter.Clear();
+_GeometryWriter.EnableTangentialFollowing();
+_GeometryWriter.AddStartPoint(TotalX, TotalY / 2.0);
+
+// 1. Prawa krawędź -> Prawy górny łuk (Tniemy w +Y, Q = 0)
+_GeometryWriter.AddLine(TotalX, TotalY - Radius, Velo);
+IF Radius > 0 THEN
+    // FALSE = G03 = CounterClockwise (Lewoskrętnie)
+    _GeometryWriter.AddArc(TotalX - Radius, TotalY, TotalX - Radius, TotalY - Radius, Velo, FALSE);
+END_IF
+
+// 2. Górna krawędź -> Lewy górny łuk (Tniemy w -X, Q = 90)
+_GeometryWriter.AddLine(Radius, TotalY, Velo);
+IF Radius > 0 THEN
+    _GeometryWriter.AddArc(0.0, TotalY - Radius, Radius, TotalY - Radius, Velo, FALSE);
+END_IF
+
+// 3. Lewa krawędź -> Lewy dolny łuk (Tniemy w -Y, Q = 180)
+_GeometryWriter.AddLine(0.0, Radius, Velo);
+IF Radius > 0 THEN
+    _GeometryWriter.AddArc(Radius, 0.0, Radius, Radius, Velo, FALSE);
+END_IF
+
+// 4. Dolna krawędź -> Prawy dolny łuk (Tniemy w +X, Q = 270)
+_GeometryWriter.AddLine(TotalX - Radius, 0.0, Velo);
+IF Radius > 0 THEN
+    _GeometryWriter.AddArc(TotalX, Radius, TotalX - Radius, Radius, Velo, FALSE);
+END_IF
+
+// Zamknięcie na prawej krawędzi
+_GeometryWriter.AddLine(TotalX, TotalY / 2.0, Velo);
+_GeometryWriter.EndTable();
+
+_Busy := FALSE;
+_Done := TRUE;
+Build := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CalculateFootprint" Id="{9ee51b75-0294-4fb4-bca1-c4a79e66bf68}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_NominalX := 1200;
+_NominalY := 2400;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ExecutionRoute" Id="{2522e725-4c9d-4aa7-9745-528a8d6a0bfc}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{c3e2079d-c741-4220-a7e8-afb21e7ed919}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eFeedTable;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="FB_init" Id="{6b10a622-32ae-4c91-b923-bdb74ea37f6b}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
+_Limits.PanelFrontLength.MaxVal := 2400.0;
+
+_Limits.PanelFrontWidth.MinVal  := 100.0;
+_Limits.PanelFrontWidth.MaxVal  := 1200.0;
+
+_Limits.PanelHeight.MinVal      := 0.0;
+_Limits.PanelHeight.MaxVal      := 0.0;
+
+_Limits.RailHeightCorrection.MinVal := 0.0;
+_Limits.RailHeightCorrection.MaxVal := 0.0;
+
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.GrooveDepthZ.MinVal := 0.0;
+_Limits.GrooveDepthZ.MaxVal := 9.0; 
+
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.Radius.MinVal := 0.0;     
+_Limits.Radius.MaxVal := 600.0;   ]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_FeedBuilderMeina2">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderMeina2.Build">
+      <LineId Id="2078" Count="2" />
+      <LineId Id="2009" Count="1" />
+      <LineId Id="2086" Count="0" />
+      <LineId Id="2081" Count="4" />
+      <LineId Id="2013" Count="59" />
+      <LineId Id="2087" Count="1" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderMeina2.CalculateFootprint">
+      <LineId Id="28" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderMeina2.ExecutionRoute.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderMeina2.FB_init">
+      <LineId Id="31" Count="15" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="53" Count="1" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="73" Count="2" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="77" Count="1" />
+      <LineId Id="76" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
