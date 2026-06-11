@@ -754,6 +754,7 @@ CASE DescendantSequenceState OF
 		ExecutorDrill.AxisX := AxisX;
 		ExecutorDrill.AxisY := AxisY;
 		ExecutorDrill.AxisZ := AxisZ;
+		ExecutorDrill.AxisQ := AxisQ;
 		ExecutorDrill.ConfigProvider := THIS^;
 		
 
@@ -1038,7 +1039,8 @@ ExecutorCutX.RecipeBuilder := _RecipeBuilder;
 ExecutorCutY.RecipeBuilder := _RecipeBuilder;
 ExecutorGrooveXY.RecipeBuilder := _RecipeBuilder;
 ExecutorNCI.RecipeBuilder := _RecipeBuilder;
-ExecTangentialFeed.RecipeBuilder := _RecipeBuilder;]]></ST>
+ExecTangentialFeed.RecipeBuilder := _RecipeBuilder;
+ExecutorDrill.RecipeBuilder := _RecipeBuilder;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -1361,6 +1363,7 @@ END_CASE]]></ST>
       <LineId Id="649" Count="0" />
       <LineId Id="654" Count="0" />
       <LineId Id="651" Count="2" />
+      <LineId Id="664" Count="0" />
       <LineId Id="650" Count="0" />
       <LineId Id="583" Count="50" />
       <LineId Id="639" Count="0" />
@@ -1403,6 +1406,7 @@ END_CASE]]></ST>
       <LineId Id="5" Count="0" />
       <LineId Id="11" Count="0" />
       <LineId Id="14" Count="0" />
+      <LineId Id="17" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.RefAxisX.Get">
       <LineId Id="2" Count="0" />
