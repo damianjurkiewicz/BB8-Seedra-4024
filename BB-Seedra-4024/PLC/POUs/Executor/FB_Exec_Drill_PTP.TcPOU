@@ -30,7 +30,7 @@ localConfig := _ConfigProvider.Config;
 IF iCurrentSegment < 1 THEN iCurrentSegment := 1; END_IF
 IF iCurrentSegment > 32 THEN iCurrentSegment := 32; END_IF
 
-currentHole := _RecipeBuilder.HolesToDrill[iCurrentSegment];
+currentHole := _RecipeBuilder.HolesDrill[iCurrentSegment];
 
 // 3. Oliczenie bezpiecznych poziomów w osi Z 
 MaterialTopZ := localConfig.GlobalOffsetZ + localConfig.RawBoardZ;
@@ -42,7 +42,7 @@ CASE nStep OF
 
     5: // INIT - Aktywacja osi i przygotowanie
         IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
-            IF _RecipeBuilder.HolesCount <= 0 THEN
+            IF _RecipeBuilder.HolesToDrill <= 0 THEN
                 nStep := 1000; // Brak otworów do wiercenia
                 RETURN;
             END_IF;
@@ -110,7 +110,7 @@ CASE nStep OF
             iCurrentSegment := iCurrentSegment + 1;
             
             // Logika zmiany otworu / obsługi MULTIPLEXOWANIA (Nestingu)
-            IF iCurrentSegment > _RecipeBuilder.HolesCount THEN
+            IF iCurrentSegment > _RecipeBuilder.HolesToDrill THEN
                 
                 // CZYSTA PĘTLA NESTINGU (Skończono wszystkie otwory w jednej kopii)
                 iCurrentCopyX := iCurrentCopyX + 1;
