@@ -14,9 +14,26 @@ VAR
     Velo : LREAL;
     localConfig : ST_GantryXYZ_Config;
 	
+    // Zmienne do otworów
+    HoleDistanceFromEdgeOfRail : LREAL := 100.0;
+    SomeFixedDimension         : LREAL := 12.63;
+    PanelRailOffsetX           : LREAL;
+    PanelRailOffsetY           : LREAL;
+    ExtrusionLengthX           : LREAL;
+    ExtrusionLengthY           : LREAL;
+    
+    NumberOfHolesX             : INT := 3;
+    NumberOfHolesY             : INT := 5;
+    HolesSpacingX              : LREAL;
+    HolesSpacingY              : LREAL;
+    
+    i                          : INT;
+    holeIdx                    : INT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Busy := TRUE;
+        <ST><![CDATA[
+
+_Busy := TRUE;
 _Done := FALSE;
 _Error := FALSE;
 Build := FALSE;
@@ -33,23 +50,78 @@ END_IF
 TotalX := _Config.PanelFrontWidth;
 TotalY := _Config.PanelFrontLength;
 Radius := _Config.Radius;
+
 IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
 IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
 
+
 // ===================================================
-// DEFINICJA OTWORÓW (Dla Executor_Drill_PTP)
+// OBLICZENIA DLA SZYN I OTWORÓW
 // ===================================================
-// Deklarujemy, że recepta ma 1 otwór do wywiercenia
-_HolesToDrill := 1; 
-// Ustawiamy pozycję otworu na dokładnym środku wycinanego detalu
-_HolesDrill[1].X := LREAL_TO_REAL(TotalX / 2.0);
-_HolesDrill[1].Y := LREAL_TO_REAL(TotalY / 2.0);
+// Po poprawce: offset X uzależniony od X, a Y od Y
+PanelRailOffsetX := 0.1 * TotalX;
+PanelRailOffsetY := 0.1 * TotalY;
+
+ExtrusionLengthX := TotalX - (2.0 * PanelRailOffsetX);
+ExtrusionLengthY := TotalY - (2.0 * PanelRailOffsetY);
+
+// Wyliczenie rozstawu (Zabezpieczenie przed dzieleniem przez zero, jeśli ktoś wpisze NumberOfHoles = 1)
+IF NumberOfHolesX > 1 THEN
+    HolesSpacingX := (ExtrusionLengthX - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesX - 1);
+ELSE
+    HolesSpacingX := 0.0;
+END_IF
+
+IF NumberOfHolesY > 1 THEN
+    HolesSpacingY := (ExtrusionLengthY - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesY - 1);
+ELSE
+    HolesSpacingY := 0.0;
+END_IF
 
 
 // ===================================================
-// Zaczynamy na środku PRAWEJ krawędzi
-// Ruch będzie w kierunku +Y, co da startowy kąt 0 na osi Q.
+// GENEROWANIE OTWORÓW (Dla Executor_Drill_PTP)
 // ===================================================
+holeIdx := 1;
+
+// 1. Otwór na dokładnym środku wycinanego detalu
+_HolesDrill[holeIdx].X := LREAL_TO_REAL(TotalX / 2.0);
+_HolesDrill[holeIdx].Y := LREAL_TO_REAL(TotalY / 2.0);
+
+// 2. Szyny pionowe (Rail Y1 i Rail Y2)
+FOR i := 1 TO NumberOfHolesY DO
+    // Rail Y1 (Lewa)
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX - SomeFixedDimension);
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
+    
+    // Rail Y2 (Prawa)
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + ExtrusionLengthX + SomeFixedDimension);
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
+END_FOR
+
+// 3. Szyny poziome (Rail X1 i Rail X2)
+FOR i := 1 TO NumberOfHolesX DO
+    // Rail X1 (Dolna)
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY - SomeFixedDimension);
+    
+    // Rail X2 (Górna)
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + ExtrusionLengthY + SomeFixedDimension);
+END_FOR
+
+// Przypisanie całkowitej liczby otworów do recepty
+_HolesToDrill := holeIdx;
+
+
+// ===================================================
+// GENEROWANIE ŚCIEŻKI FREZOWANIA
+// ===================================================
+// Zaczynamy na środku PRAWEJ krawędzi (Ruch +Y, Q = 0)
 _Config.NciStartX := TotalX;
 _Config.NciStartY := TotalY / 2.0;
 
@@ -60,33 +132,29 @@ ELSE
     Velo := 50.0;
 END_IF
 
-// ============================================
-// GENEROWANIE TABELI (Ruch CCW / Lewoskrętnie)
-// ============================================
 _GeometryWriter.Clear();
 _GeometryWriter.EnableTangentialFollowing();
 _GeometryWriter.AddStartPoint(TotalX, TotalY / 2.0);
 
-// 1. Prawa krawędź -> Prawy górny łuk (Tniemy w +Y, Q = 0)
+// 1. Prawa krawędź -> Prawy górny łuk
 _GeometryWriter.AddLine(TotalX, TotalY - Radius, Velo);
 IF Radius > 0 THEN
-    // FALSE = G03 = CounterClockwise (Lewoskrętnie)
     _GeometryWriter.AddArc(TotalX - Radius, TotalY, TotalX - Radius, TotalY - Radius, Velo, FALSE);
 END_IF
 
-// 2. Górna krawędź -> Lewy górny łuk (Tniemy w -X, Q = 90)
+// 2. Górna krawędź -> Lewy górny łuk
 _GeometryWriter.AddLine(Radius, TotalY, Velo);
 IF Radius > 0 THEN
     _GeometryWriter.AddArc(0.0, TotalY - Radius, Radius, TotalY - Radius, Velo, FALSE);
 END_IF
 
-// 3. Lewa krawędź -> Lewy dolny łuk (Tniemy w -Y, Q = 180)
+// 3. Lewa krawędź -> Lewy dolny łuk
 _GeometryWriter.AddLine(0.0, Radius, Velo);
 IF Radius > 0 THEN
     _GeometryWriter.AddArc(Radius, 0.0, Radius, Radius, Velo, FALSE);
 END_IF
 
-// 4. Dolna krawędź -> Prawy dolny łuk (Tniemy w +X, Q = 270)
+// 4. Dolna krawędź -> Prawy dolny łuk
 _GeometryWriter.AddLine(TotalX - Radius, 0.0, Velo);
 IF Radius > 0 THEN
     _GeometryWriter.AddArc(TotalX, Radius, TotalX - Radius, Radius, Velo, FALSE);
@@ -164,7 +232,7 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.Build">
-      <LineId Id="2095" Count="81" />
+      <LineId Id="2463" Count="134" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.CalculateFootprint">
