@@ -33,9 +33,18 @@ END_IF
 TotalX := _Config.PanelFrontWidth;
 TotalY := _Config.PanelFrontLength;
 Radius := _Config.Radius;
-
 IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
 IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
+
+// ===================================================
+// DEFINICJA OTWORÓW (Dla Executor_Drill_PTP)
+// ===================================================
+// Deklarujemy, że recepta ma 1 otwór do wywiercenia
+_HolesToDrill := 1; 
+// Ustawiamy pozycję otworu na dokładnym środku wycinanego detalu
+_HolesDrill[1].X := LREAL_TO_REAL(TotalX / 2.0);
+_HolesDrill[1].Y := LREAL_TO_REAL(TotalY / 2.0);
+
 
 // ===================================================
 // Zaczynamy na środku PRAWEJ krawędzi
@@ -155,12 +164,7 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.Build">
-      <LineId Id="2078" Count="2" />
-      <LineId Id="2009" Count="1" />
-      <LineId Id="2086" Count="0" />
-      <LineId Id="2081" Count="4" />
-      <LineId Id="2013" Count="59" />
-      <LineId Id="2087" Count="1" />
+      <LineId Id="2095" Count="81" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.CalculateFootprint">
