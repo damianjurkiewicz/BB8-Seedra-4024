@@ -1,0 +1,210 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Exec_Drill_PTP_Test" Id="{b2c3d4e5-f6a7-589b-1234-567890abcdef}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Exec_Drill_PTP_Test EXTENDS TcUnit.FB_TestSuite 
+VAR
+    Executor         : FB_Exec_Drill_PTP;
+    Executor_Zero    : FB_Exec_Drill_PTP;
+    Executor_Unhappy : FB_Exec_Drill_PTP;
+    Executor_Nest    : FB_Exec_Drill_PTP;
+
+    MockConfigProvider : FB_MockConfigProvider;
+
+    MockAxisX     : FB_MockAxis := (Name := 'MockX');
+    MockAxisY     : FB_MockAxis := (Name := 'MockY');
+    MockAxisZ     : FB_MockAxis := (Name := 'MockZ');
+    MockAxisZ_Err : FB_MockAxis := (Name := 'MockZ_Err');
+    
+    MockRecipe       : FB_MockRecipe_Drill;
+    MockRecipe_Zero  : FB_MockRecipe_Drill;
+    MockRecipe_Nest  : FB_MockRecipe_Drill;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[Test_ZeroHoles_FinishesImmediately();
+Test_AxisError_AbortsSequence();
+Test_Sequence_ExecutesDrillCorrectly();
+Test_Sequence_ExecutesNestingCorrectly();
+]]></ST>
+    </Implementation>
+    <Method Name="Test_AxisError_AbortsSequence" Id="{c3d4e5f6-1234-5678-9abc-def012345678}">
+      <Declaration><![CDATA[METHOD Test_AxisError_AbortsSequence
+VAR_INST
+    i : INT;
+    TestConfig : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_AxisError_AbortsSequence');
+
+// 1. ARRANGE - Używamy receptury z 2 otworami
+MockRecipe.TestHolesCount := 2;        
+MockRecipe.Build();                       
+
+MockConfigProvider.Config := TestConfig;
+
+Executor_Unhappy.RecipeBuilder  := MockRecipe;
+Executor_Unhappy.ConfigProvider := MockConfigProvider;
+Executor_Unhappy.AxisX          := MockAxisX;
+Executor_Unhappy.AxisY          := MockAxisY;
+Executor_Unhappy.AxisZ          := MockAxisZ_Err; // Oś ulegnie awarii!
+
+MockAxisZ_Err.ForceError := TRUE;
+
+// 2. ACT
+Executor_Unhappy.Execute();
+
+// Puszczamy maszynę stanów na kilka cykli 
+FOR i := 1 TO 10 DO
+    Executor_Unhappy.CyclicLogic();
+END_FOR
+
+// 3. ASSERT
+AssertTrue(Condition := Executor_Unhappy.Error, 
+           Message := 'Executor nie zglosil bledu, gdy os Z (wiertlo) ulegla awarii!');
+AssertFalse(Condition := Executor_Unhappy.Done, 
+            Message := 'Executor zglosil sukces (Done), pomimo bledu osi!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Sequence_ExecutesDrillCorrectly" Id="{d4e5f6a7-2345-6789-abcd-ef0123456789}">
+      <Declaration><![CDATA[METHOD Test_Sequence_ExecutesDrillCorrectly
+VAR_INST
+    Step : INT := 0;
+    TestConfig : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Sequence_ExecutesDrillCorrectly');
+Executor.CyclicLogic();
+
+CASE Step OF
+    0:
+        // 1. ARRANGE
+        MockRecipe.TestHolesCount := 2;
+        MockRecipe.Build(); 
+        
+        TestConfig.GroovingSpeedZ := 10;
+        TestConfig.RapidSpeedX := 10;
+        TestConfig.RapidSpeedY := 10;
+        TestConfig.RapidSpeedZ := 10;
+        TestConfig.GroovingIdleTime := 0.0; // Ucinamy czas oczekiwania, żeby test był natychmiastowy!
+        
+        MockConfigProvider.Config := TestConfig;
+
+        Executor.RecipeBuilder  := MockRecipe;
+        Executor.ConfigProvider := MockConfigProvider;
+        Executor.AxisX          := MockAxisX;
+        Executor.AxisY          := MockAxisY;
+        Executor.AxisZ          := MockAxisZ;
+        
+        Step := 10;
+
+    10:
+        // 2. ACT
+        Executor.Execute();
+        Step := 20;
+        
+    20:
+        // 3. Czekamy na koniec asynchronicznej sekwencji wiercenia
+        IF Executor.Done THEN
+            Step := 30;
+        ELSIF Executor.Error THEN
+            AssertTrue(FALSE, 'Executor zwrocil Error zamiast Done podczas standardowego wiercenia!');
+            TEST_FINISHED();
+        END_IF
+        
+    30:
+        // 4. ASSERT
+        AssertTrue(Condition := Executor.Done, Message := 'Wiercenie nie doszlo do flagi Done');
+        TEST_FINISHED();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_Sequence_ExecutesNestingCorrectly" Id="{e5f6a7b8-3456-789a-bcde-f0123456789a}">
+      <Declaration><![CDATA[METHOD Test_Sequence_ExecutesNestingCorrectly
+VAR_INST
+    Step : INT := 0;
+    TestConfig : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_Sequence_ExecutesNestingCorrectly');
+Executor_Nest.CyclicLogic();
+
+CASE Step OF
+    0:
+        // 1. ARRANGE - 2 otwory, ale aż 4 kopie (2x2 na płycie) -> Łącznie do wykonania 8 wierceń
+        MockRecipe_Nest.TestHolesCount := 2;
+        MockRecipe_Nest.TestCopiesX := 2;
+        MockRecipe_Nest.TestCopiesY := 2;
+        MockRecipe_Nest.Build(); 
+        
+        TestConfig.GroovingSpeedZ := 10;
+        TestConfig.RapidSpeedX := 10;
+        TestConfig.RapidSpeedY := 10;
+        TestConfig.RapidSpeedZ := 10;
+        TestConfig.GroovingIdleTime := 0.0;
+        
+        MockConfigProvider.Config := TestConfig;
+
+        Executor_Nest.RecipeBuilder  := MockRecipe_Nest;
+        Executor_Nest.ConfigProvider := MockConfigProvider;
+        Executor_Nest.AxisX          := MockAxisX;
+        Executor_Nest.AxisY          := MockAxisY;
+        Executor_Nest.AxisZ          := MockAxisZ;
+        
+        Step := 10;
+
+    10:
+        // 2. ACT
+        Executor_Nest.Execute();
+        Step := 20;
+        
+    20:
+        IF Executor_Nest.Done THEN
+            Step := 30;
+        ELSIF Executor_Nest.Error THEN
+            AssertTrue(FALSE, 'Executor zwrocil Error podczas Nestingu!');
+            TEST_FINISHED();
+        END_IF
+        
+    30:
+        // 3. ASSERT
+        AssertTrue(Condition := Executor_Nest.Done, Message := 'Wiercenie (Nesting) nie doszlo do flagi Done');
+        TEST_FINISHED();
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Test_ZeroHoles_FinishesImmediately" Id="{f6a7b8c9-4567-89ab-cdef-0123456789ab}">
+      <Declaration><![CDATA[METHOD Test_ZeroHoles_FinishesImmediately
+VAR_INST
+    i : INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[TEST('Test_ZeroHoles_FinishesImmediately');
+
+// 1. ARRANGE - Udajemy, że nie ma otworów do zrobienia (częsty przypadek dla wielu części)
+MockRecipe_Zero.TestHolesCount := 0;
+MockRecipe_Zero.Build();
+
+Executor_Zero.RecipeBuilder  := MockRecipe_Zero;
+Executor_Zero.ConfigProvider := MockConfigProvider;
+Executor_Zero.AxisX          := MockAxisX;
+Executor_Zero.AxisY          := MockAxisY;
+Executor_Zero.AxisZ          := MockAxisZ;
+
+// 2. ACT
+Executor_Zero.Execute();
+
+// Zgodnie z kodem, przy <= 0 otworów, maszyna przechodzi z 5 od razu na 1000 i zamyka zadanie. Puszczamy na kilka cykli.
+FOR i := 1 TO 5 DO
+    Executor_Zero.CyclicLogic();
+END_FOR
+
+// 3. ASSERT
+AssertTrue(Condition := Executor_Zero.Done, 
+           Message := 'Executor nie zwrocil Done przy 0 otworow do wywiercenia!');
+
+TEST_FINISHED();]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>

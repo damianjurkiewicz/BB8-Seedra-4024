@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_MockRecipe_Drill" Id="{a1b2c3d4-e5f6-4789-9999-000000000099}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_MockRecipe_Drill EXTENDS FB_RecipeBase
+VAR_INPUT
+    TestHolesCount : INT := 2;
+    TestCopiesX    : DINT := 1;
+    TestCopiesY    : DINT := 1;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{a1b2c3d4-e5f6-4789-9999-000000000100}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// Ustawiamy wymiary wirtualnej płyty i limity
+_NominalX := 1000.0;
+_NominalY := 1000.0;
+
+_Config.IsValid := TRUE;
+
+// Wstrzykujemy zadane w teście wartości ilości otworów
+_HolesToDrill := TestHolesCount;
+
+// Sztuczne współrzędne dla max 4 otworów
+IF TestHolesCount >= 1 THEN _HolesDrill[1].X := 10.0; _HolesDrill[1].Y := 10.0; END_IF
+IF TestHolesCount >= 2 THEN _HolesDrill[2].X := 20.0; _HolesDrill[2].Y := 20.0; END_IF
+IF TestHolesCount >= 3 THEN _HolesDrill[3].X := 30.0; _HolesDrill[3].Y := 30.0; END_IF
+IF TestHolesCount >= 4 THEN _HolesDrill[4].X := 40.0; _HolesDrill[4].Y := 40.0; END_IF
+
+// Symulacja wyliczonego Nestingu (ilości sztuk)
+_ActualCopiesX := TestCopiesX;
+_ActualCopiesY := TestCopiesY;
+
+_Done := TRUE;
+_Busy := FALSE;
+Build := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+  </POU>
+</TcPlcObject>
