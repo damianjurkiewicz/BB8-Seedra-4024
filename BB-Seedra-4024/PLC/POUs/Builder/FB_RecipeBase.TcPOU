@@ -16,6 +16,9 @@ VAR
     _SegmentsCutY           : ARRAY [1..32] OF ST_CutSegment;
     _SegmentsGroove         : ARRAY [1..32] OF ST_CutSegment;
 	_HolesDrill 			: ARRAY [1..32] OF ST_PointXY;
+	_ShapeStart         	: ARRAY [1..32] OF ST_PointXY;
+	_ShapesCount        	: INT := 1;
+    _CurrentShapeIndex  	: INT := 1;
 	_HolesToDrill   		: INT;
     _SegmentsToCutX         : INT;
     _SegmentsToCutY         : INT;
@@ -174,6 +177,25 @@ END_VAR
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[_ConfigProvider := ConfigProvider;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="CurrentShapeIndex" Id="{26917ea1-1cef-41af-a616-e7c3bffaf80f}">
+      <Declaration><![CDATA[PROPERTY CurrentShapeIndex : INT]]></Declaration>
+      <Get Name="Get" Id="{2e3bb86d-b7ac-4e77-8962-142bcaba5f0e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[CurrentShapeIndex := _CurrentShapeIndex;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{d4715697-fd64-40db-8769-f30824d5d94b}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_CurrentShapeIndex := CurrentShapeIndex;]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -407,6 +429,28 @@ END_VAR
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[SegmentsToGroove := _SegmentsToGroove;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ShapesCount" Id="{ddd120b9-00cd-4b1c-b2b1-0fde6185de6f}">
+      <Declaration><![CDATA[PROPERTY ShapesCount : INT]]></Declaration>
+      <Get Name="Get" Id="{f3cff4d1-f4e1-44c8-8b4a-4d472803af48}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ShapesCount := _ShapesCount;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Property Name="ShapeStart" Id="{52d57a51-14a0-4aab-abe9-db16b054b96d}">
+      <Declaration><![CDATA[PROPERTY ShapeStart : REFERENCE TO ARRAY [1..32] OF ST_PointXY]]></Declaration>
+      <Get Name="Get" Id="{130de704-36d0-4d0c-80da-43de01c2c5c4}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ShapeStart REF= _ShapeStart;]]></ST>
         </Implementation>
       </Get>
     </Property>
@@ -667,6 +711,12 @@ END_CASE]]></ST>
     <LineIds Name="FB_RecipeBase.ConfigProvider.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
+    <LineIds Name="FB_RecipeBase.CurrentShapeIndex.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.CurrentShapeIndex.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
     <LineIds Name="FB_RecipeBase.Done.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
@@ -731,6 +781,12 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.SegmentsToGroove.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.ShapesCount.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.ShapeStart.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.UpdateNestingLimits">

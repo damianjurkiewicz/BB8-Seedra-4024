@@ -124,7 +124,7 @@ END_VAR
 Clear := NOT fbFeedPrep.bError;]]></ST>
       </Implementation>
     </Method>
-    <Method Name="CyclicLogic" Id="{e1b2c3d4-e5f6-4789-9999-000000000041}">
+<Method Name="CyclicLogic" Id="{e1b2c3d4-e5f6-4789-9999-000000000041}">
       <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
 VAR_INST
     localConfig   : ST_GantryXYZ_Config;
@@ -132,6 +132,7 @@ VAR_INST
     MaterialTopZ  : REAL;
     SafeZ         : REAL;
     TargetZ       : REAL;
+    iCurrentShape : INT := 1;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[SUPER^.CyclicLogic();
@@ -161,6 +162,7 @@ CASE nStep OF
 
                 iCurrentCopyX := 1;
                 iCurrentCopyY := 1;
+                iCurrentShape := 1;
 
                 _AxisX.Velocity := localConfig.RapidSpeedX;
                 _AxisY.Velocity := localConfig.RapidSpeedY;
@@ -171,24 +173,19 @@ CASE nStep OF
             END_IF
         END_IF
 
-8: 
+    8: 
         localConfig := _ConfigProvider.Config;
-		// Wyliczamy aktualny offset dla tej konkretnej kopii (Nesting + GlobalOffset maszyny)
 		_CurrentOffsetX := (iCurrentCopyX - 1) * _RecipeBuilder.FootprintX + localConfig.GlobalOffsetX;
 		_CurrentOffsetY := (iCurrentCopyY - 1) * _RecipeBuilder.FootprintY + localConfig.GlobalOffsetY;
 		
-		// PRZEBUDOWUJEMY TABELĘ DLA OBECNEJ KOPII
+        _RecipeBuilder.CurrentShapeIndex := iCurrentShape;
 		_RecipeBuilder.Build();
 		nStep := 85;
 
 	85:
-		// Czekamy na koniec budowania (Build() jest synchroniczny więc zajmie max 1 cykl)
 		IF _RecipeBuilder.Done THEN
-			// Odświeżamy config z buildera, bo NciStartX na pewno został przeliczony
 			recipeConfig := _RecipeBuilder.Config;
-			
-			// NciStartX jest lokalny, MoveToXY z klasy bazowej doda Nesting + Global (czyli ustawi nas idealnie w AddStartPoint)
-			MoveToXY(recipeConfig.NciStartX, recipeConfig.NciStartY, 0.0, 0.0);
+			MoveToXY(_RecipeBuilder.ShapeStart[iCurrentShape].X, _RecipeBuilder.ShapeStart[iCurrentShape].Y, 0.0, 0.0);
 			_AxisQ.MoveAbsolute(0.0, 0);
 			nStep := 9;
 		ELSIF _RecipeBuilder.Error THEN
@@ -202,6 +199,7 @@ CASE nStep OF
             localConfig := _ConfigProvider.Config;
             MaterialTopZ := localConfig.GlobalOffsetZ + localConfig.RawBoardZ;
             SafeZ := MaterialTopZ + localConfig.SafeClearanceZ;
+
             IF _AxisZ.MoveAbsolute(SafeZ, 0) THEN
                 nStep := 10;
             END_IF
@@ -267,7 +265,13 @@ CASE nStep OF
 
     90: 
         IF NOT _NciChannel.IsGrouped THEN
-            nStep := 110;
+            iCurrentShape := iCurrentShape + 1;
+            IF iCurrentShape > _RecipeBuilder.ShapesCount THEN
+                iCurrentShape := 1;
+                nStep := 110;
+            ELSE
+                nStep := 8;
+            END_IF
         END_IF
 
     110:

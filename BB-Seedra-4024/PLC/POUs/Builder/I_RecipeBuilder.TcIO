@@ -45,6 +45,15 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Property Name="CurrentShapeIndex" Id="{fa7261aa-e06e-4f22-af4b-c9b719b7c69c}">
+      <Declaration><![CDATA[PROPERTY CurrentShapeIndex : INT]]></Declaration>
+      <Get Name="Get" Id="{2888ad5b-001d-420d-bec8-0a39a1cc7a45}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{02af1e86-9e93-4fd7-b11c-d73e4cbd7eea}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="Done" Id="{e09b3c59-4d66-4bec-b5f8-a0864915d785}">
       <Declaration><![CDATA[PROPERTY Done : BOOL]]></Declaration>
       <Get Name="Get" Id="{2fe5a509-c50d-4bcd-96cf-e3705a06840a}">
@@ -159,6 +168,18 @@
     <Property Name="SegmentsToGroove" Id="{e5f6a7b8-5555-4666-f777-a8b9c0d1e2f3}">
       <Declaration><![CDATA[PROPERTY SegmentsToGroove : INT]]></Declaration>
       <Get Name="Get" Id="{f6a7b8c9-6666-4777-a888-b9c0d1e2f3a4}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="ShapesCount" Id="{00942edb-d36f-44ab-889c-dace6b6d5434}">
+      <Declaration><![CDATA[PROPERTY ShapesCount : INT]]></Declaration>
+      <Get Name="Get" Id="{a3248a25-b594-4ebb-b093-4700ac37a735}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+    </Property>
+    <Property Name="ShapeStart" Id="{540dd0aa-e7e6-491a-9583-5b8dbcbddb5c}">
+      <Declaration><![CDATA[PROPERTY ShapeStart : REFERENCE TO ARRAY [1..32] OF ST_PointXY]]></Declaration>
+      <Get Name="Get" Id="{e6a47c82-1c16-495e-b031-da26fa9d562d}">
         <Declaration><![CDATA[]]></Declaration>
       </Get>
     </Property>
