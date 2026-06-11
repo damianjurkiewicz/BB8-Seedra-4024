@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Exec_Drill_PTP" Id="{0b9a0366-70d9-4b28-a177-9f201261d675}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Exec_Drill_PTP EXTENDS FB_ExecutorBase
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="CyclicLogic" Id="{86898483-4c05-44c3-8b47-0b85a98d5096}">
+      <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
+VAR_INST
+    currentHole   : ST_PointXY;
+    localConfig   : ST_GantryXYZ_Config;
+    recipeConfig  : ST_RecipeBuilder_Config;
+    
+    MaterialTopZ  : REAL;
+    SafeZ         : REAL;
+    TargetZ       : REAL;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// 1. Zabezpieczenia i cykliczny timer z klasy bazowej
+StepTimer();
+IF _RecipeBuilder = 0 OR _ConfigProvider = 0 THEN RETURN; END_IF
+
+// 2. Cache'owanie danych wejściowych
+localConfig := _ConfigProvider.Config;
+
+// Zabezpieczenie zakresu tablicy
+IF iCurrentSegment < 1 THEN iCurrentSegment := 1; END_IF
+IF iCurrentSegment > 32 THEN iCurrentSegment := 32; END_IF
+
+currentHole := _RecipeBuilder.HolesToDrill[iCurrentSegment];
+
+// 3. Oliczenie bezpiecznych poziomów w osi Z 
+MaterialTopZ := localConfig.GlobalOffsetZ + localConfig.RawBoardZ;
+SafeZ := MaterialTopZ + localConfig.SafeClearanceZ;
+
+
+CASE nStep OF
+    0: // IDLE
+
+    5: // INIT - Aktywacja osi i przygotowanie
+        IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
+            IF _RecipeBuilder.HolesCount <= 0 THEN
+                nStep := 1000; // Brak otworów do wiercenia
+                RETURN;
+            END_IF;
+           
+            _AxisX.Velocity := localConfig.RapidSpeedX;
+            _AxisY.Velocity := localConfig.RapidSpeedY;
+            _AxisZ.Velocity := localConfig.RapidSpeedZ;
+
+            iCurrentSegment := 1;
+            
+            IF NOT _AxisX.Busy AND NOT _AxisY.Busy AND NOT _AxisZ.Busy THEN
+                nStep := 10;
+            END_IF     
+        END_IF
+
+    // -------- Dojazd XY nad punkt otworu --------
+    10:
+        // MoveToXY z FB_ExecutorBase automatycznie doliczy offsety z nestingu (iCurrentCopyX/Y)
+        MoveToXY(currentHole.X, currentHole.Y, 0.0, 0.0);
+        nStep := 20;
+
+    20: // Czekamy na pozycje XY
+        IF _AxisX.Error OR _AxisY.Error THEN 
+            nStep := 999;
+        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN 
+            // Ustawiamy prędkość roboczą dla wiertła (zapożyczona z grooving)
+            _AxisZ.Velocity := localConfig.GroovingSpeedZ; 
+            nStep := 30;
+        END_IF
+
+    // -------- Zjazd Z (Wiercenie) --------
+    30:
+        recipeConfig := _RecipeBuilder.Config;
+        
+        // Zjazd w dół na głębokość frezowania (lub dodanego DrillDepthZ)
+        TargetZ := MaterialTopZ - recipeConfig.GrooveDepthZ; 
+        _AxisZ.MoveAbsolute(TargetZ, 0);
+        nStep := 40;
+
+    40: // Czekamy aż wrzeciono wejdzie w materiał
+        IF _AxisZ.Error THEN 
+            nStep := 999;
+        ELSIF _AxisZ.InPosition THEN
+            nStep := 50;
+        END_IF
+            
+    50: // Czekanie na dnie otworu (tzw. Dwell time, by oczyścić wióry)
+        StepTimer(IN := TRUE, PT := REAL_TO_TIME(localConfig.GroovingIdleTime * 1000.0));
+        IF StepTimer.Q THEN
+            StepTimer(IN := FALSE);
+            nStep := 60;
+        END_IF
+
+    // -------- Szybki wyjazd z materiału --------
+    60:
+        _AxisZ.Velocity := localConfig.RapidSpeedZ;
+        _AxisZ.MoveAbsolute(SafeZ, 0);
+        nStep := 70;
+
+    70: // Czekamy na wyjazd osi Z
+        IF _AxisZ.Error THEN 
+            nStep := 999;
+        ELSIF _AxisZ.InPosition THEN
+            // Krok zakończony - idziemy do następnego otworu
+            iCurrentSegment := iCurrentSegment + 1;
+            
+            // Logika zmiany otworu / obsługi MULTIPLEXOWANIA (Nestingu)
+            IF iCurrentSegment > _RecipeBuilder.HolesCount THEN
+                
+                // CZYSTA PĘTLA NESTINGU (Skończono wszystkie otwory w jednej kopii)
+                iCurrentCopyX := iCurrentCopyX + 1;
+                
+                IF iCurrentCopyX > _RecipeBuilder.ActualCopiesX THEN
+                    iCurrentCopyX := 1;
+                    iCurrentCopyY := iCurrentCopyY + 1;
+                    
+                    IF iCurrentCopyY > _RecipeBuilder.ActualCopiesY THEN
+                        // Wiercenie wszystkich kopii zakończone
+                        nStep := 1000;
+                    ELSE
+                        // Przejście do następnego rzędu w Y
+                        iCurrentSegment := 1;
+                        nStep := 10;
+                    END_IF
+                ELSE
+                    // Przejście do następnego elementu w osi X
+                    iCurrentSegment := 1;
+                    nStep := 10;
+                END_IF
+            ELSE
+                // Kolejny otwór w tej samej sztuce
+                nStep := 10;
+            END_IF
+        END_IF
+
+    // -------- Awaria --------
+    999: 
+        _bBusy  := FALSE;
+        _bError := TRUE; 
+        _bDone  := FALSE;
+        nStep   := 0;
+
+    // -------- Sukces --------
+    1000: 
+        _bBusy := FALSE;
+        _bDone := TRUE;
+        nStep := 0;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_Exec_Drill_PTP">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Exec_Drill_PTP.CyclicLogic">
+      <LineId Id="440" Count="130" />
+      <LineId Id="4" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

@@ -12,12 +12,13 @@ VAR
     _RecipeBuilder      : I_RecipeBuilder;
     ipSubModules_Init   : ARRAY[1..Parameters_PackML_Base.MAX_NO_OF_SUBMODULES] OF I_PackML_BaseModule := [];
 
-	ExecutorCutX : FB_Exec_Pneumatic_PTP;
-	ExecutorCutY : FB_Exec_Pneumatic_PTP;	
+	ExecutorCutX 		: FB_Exec_Pneumatic_PTP;
+	ExecutorCutY 		: FB_Exec_Pneumatic_PTP;	
 	ExecutorGrooveXY	: FB_Exec_Spindle_PTP;
+	ExecutorDrill 		: FB_Exec_Drill_PTP;
 	ExecTangentialFeed	: FB_Exec_Tangential_FeedTable;
 	
-	ExecutorNCI : FB_Exec_Spindle_GCodeXYZ;
+	ExecutorNCI 		: FB_Exec_Spindle_GCodeXYZ;
 	
 	_Limits : ST_GantryXYZ_Limits;
 
@@ -155,6 +156,7 @@ E_PMLUnitMode.ePMLUnitMode_Production:
                 ExecutorGrooveXY.Abort();
                 ExecutorNCI.Abort();
                 ExecTangentialFeed.Abort();
+				ExecutorDrill.Abort();
                 
                 SequenceState := 30;
             END_IF
@@ -383,7 +385,7 @@ ExecutorCutY.CyclicLogic();
 ExecutorGrooveXY.CyclicLogic();
 ExecutorNCI.CyclicLogic();
 ExecTangentialFeed.CyclicLogic();
-
+ExecutorDrill.CyclicLogic();
 
 //Set the current alarm severity for this module
 _CurrentAlarmSeverity := F_GetMaxSeverityRaised(Alarms := GantryAlarms, CurrentSeverity := _CurrentAlarmSeverity);
@@ -479,7 +481,7 @@ END_VAR]]></Declaration>
                 IF ExecutorGrooveXY.Execute() THEN SequenceState := 35; END_IF
             35: 
                 IF ExecutorGrooveXY.Done THEN 
-                    SequenceState := 100; // Skok do Fazy 2 (Docinki)
+                    SequenceState := 70; 
                 ELSIF ExecutorGrooveXY.Error THEN
                     RaiseAlarmWithStrings(GantryAlarms[1], 'Blad w Executorze PTP', '');
                     ChangeState(E_PMLCommand.ePMLCommand_Abort);
@@ -491,7 +493,7 @@ END_VAR]]></Declaration>
                 IF ExecutorNCI.Execute() THEN SequenceState := 45; END_IF
             45:
                 IF ExecutorNCI.Done THEN 
-                    SequenceState := 100; // Skok do Fazy 2 (Docinki)
+                    SequenceState := 70;
                 ELSIF ExecutorNCI.Error THEN
                     RaiseAlarmWithStrings(GantryAlarms[1], 'Krytyczny Blad NCI G-Code', '');
                     ChangeState(E_PMLCommand.ePMLCommand_Abort);
@@ -503,12 +505,32 @@ END_VAR]]></Declaration>
                 IF ExecTangentialFeed.Execute() THEN SequenceState := 65; END_IF
             65:
                 IF ExecTangentialFeed.Done THEN 
-                    SequenceState := 100; // Skok do Fazy 2 (Docinki)
+                    SequenceState := 70;
                 ELSIF ExecTangentialFeed.Error THEN
                     RaiseAlarmWithStrings(GantryAlarms[1], 'Krytyczny Blad NCI FeedTable', '');
                     ChangeState(E_PMLCommand.ePMLCommand_Abort);
                     SequenceState := 999; 
                 END_IF
+
+				
+			// ========================================================
+			// FAZA 1.5: WIERCENIE OTWORÓW (Opcjonalne dla każdej recepty)
+			// ========================================================
+			70:
+				IF ExecutorDrill.Execute() THEN 
+					ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Faza 1.5 - Start operacji wiercenia otworów', '');
+					SequenceState := 75;
+				END_IF
+			75:
+				IF ExecutorDrill.Done THEN 
+					SequenceState := 100; // Sukces -> Przejście do Fazy 2 (Docinki pneumatyczne)
+				ELSIF ExecutorDrill.Error THEN
+					RaiseAlarmWithStrings(GantryAlarms[1], 'Krytyczny Blad Executora Wiercenia', '');
+					ChangeState(E_PMLCommand.ePMLCommand_Abort);
+					SequenceState := 999; 
+				END_IF	
+				
+				
 
             // ========================================================
             // FAZA 2: DOCINKA PNEUMATYCZNA (Wspólna dla wszystkich)
@@ -727,6 +749,12 @@ CASE DescendantSequenceState OF
 		ExecTangentialFeed.AxisQ 		  := AxisQ;
 		ExecTangentialFeed.NciChannel     := NciChannelTangential; 
 		ExecTangentialFeed.ConfigProvider := THIS^;
+		
+		// Wstrzykiwanie zależności do Executora Drill PTP
+		ExecutorDrill.AxisX := AxisX;
+		ExecutorDrill.AxisY := AxisY;
+		ExecutorDrill.AxisZ := AxisZ;
+		ExecutorDrill.ConfigProvider := THIS^;
 		
 
 		// Wstrzyknięcie strategii resetu sprzętowego
@@ -1198,7 +1226,9 @@ END_CASE]]></ST>
       <LineId Id="401" Count="0" />
       <LineId Id="461" Count="50" />
       <LineId Id="533" Count="0" />
-      <LineId Id="512" Count="13" />
+      <LineId Id="512" Count="5" />
+      <LineId Id="541" Count="0" />
+      <LineId Id="518" Count="7" />
       <LineId Id="118" Count="0" />
       <LineId Id="181" Count="2" />
       <LineId Id="198" Count="0" />
@@ -1295,7 +1325,13 @@ END_CASE]]></ST>
     <LineIds Name="FB_GantryXYZ.Execute">
       <LineId Id="750" Count="13" />
       <LineId Id="1044" Count="51" />
-      <LineId Id="794" Count="94" />
+      <LineId Id="794" Count="40" />
+      <LineId Id="1118" Count="0" />
+      <LineId Id="1099" Count="0" />
+      <LineId Id="1103" Count="14" />
+      <LineId Id="1102" Count="0" />
+      <LineId Id="1100" Count="1" />
+      <LineId Id="835" Count="53" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.FB_init">
@@ -1321,7 +1357,12 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
       <LineId Id="517" Count="24" />
-      <LineId Id="546" Count="87" />
+      <LineId Id="546" Count="36" />
+      <LineId Id="649" Count="0" />
+      <LineId Id="654" Count="0" />
+      <LineId Id="651" Count="2" />
+      <LineId Id="650" Count="0" />
+      <LineId Id="583" Count="50" />
       <LineId Id="639" Count="0" />
       <LineId Id="635" Count="3" />
       <LineId Id="2" Count="0" />

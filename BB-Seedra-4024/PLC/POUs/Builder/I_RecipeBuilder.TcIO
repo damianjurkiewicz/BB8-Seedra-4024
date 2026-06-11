@@ -96,6 +96,24 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Property Name="HolesCount" Id="{00dcb715-64ce-492e-9e67-b50c838c1693}">
+      <Declaration><![CDATA[PROPERTY HolesCount : INT]]></Declaration>
+      <Get Name="Get" Id="{90bf7f9c-2a31-4ed8-8928-88c7f9f98356}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{5f0e3592-6e14-40b0-adf9-bfb60b51b53e}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
+    <Property Name="HolesToDrill" Id="{444fc5fe-9152-4ad9-900c-81717334843f}">
+      <Declaration><![CDATA[PROPERTY HolesToDrill : REFERENCE TO ARRAY [1..32] OF ST_PointXY;]]></Declaration>
+      <Get Name="Get" Id="{f77b18ec-e030-4941-a5d0-463fd5ae46b3}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Get>
+      <Set Name="Set" Id="{bc288ecd-ee6b-491f-afe0-56a030e48b02}">
+        <Declaration><![CDATA[]]></Declaration>
+      </Set>
+    </Property>
     <Property Name="Limits" Id="{cb52d8bb-7c49-4fc2-8442-7c9db617c87d}">
       <Declaration><![CDATA[PROPERTY Limits : ST_Recipe_Limits]]></Declaration>
       <Get Name="Get" Id="{b51051d6-7967-4941-b388-23830aee7422}">

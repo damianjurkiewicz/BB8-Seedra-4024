@@ -15,6 +15,8 @@ VAR
     _SegmentsCutX           : ARRAY [1..32] OF ST_CutSegment;
     _SegmentsCutY           : ARRAY [1..32] OF ST_CutSegment;
     _SegmentsGroove         : ARRAY [1..32] OF ST_CutSegment;
+	_HolesToDrill 			: ARRAY [1..32] OF ST_PointXY;
+	_HolesCount   			: INT;
     _SegmentsToCutX         : INT;
     _SegmentsToCutY         : INT;
     _SegmentsToGroove       : INT;
@@ -278,6 +280,44 @@ END_VAR
 ]]></Declaration>
         <Implementation>
           <ST><![CDATA[_GeometryWriter := GeometryWriter;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="HolesCount" Id="{0da1219c-5551-48b2-8898-9bdf935c4a67}">
+      <Declaration><![CDATA[PROPERTY HolesCount : INT]]></Declaration>
+      <Get Name="Get" Id="{98d6479b-e543-4802-b7d4-dfa0834b198e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{b63a3805-5a5e-497a-80e5-6a6f9660526a}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="HolesToDrill" Id="{33a6c722-63d3-4021-9875-0f4e89b1bc5f}">
+      <Declaration><![CDATA[PROPERTY HolesToDrill : REFERENCE TO ARRAY [1..32] OF ST_PointXY]]></Declaration>
+      <Get Name="Get" Id="{353ebf4d-ee7a-4628-96f6-0d8b60355f97}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{259a0ffe-2d8b-42d5-84c9-887141bc06c0}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[]]></ST>
         </Implementation>
       </Set>
     </Property>
@@ -674,6 +714,18 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.GeometryWriter.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.HolesCount.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.HolesCount.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.HolesToDrill.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.HolesToDrill.Set">
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.Limits.Get">
