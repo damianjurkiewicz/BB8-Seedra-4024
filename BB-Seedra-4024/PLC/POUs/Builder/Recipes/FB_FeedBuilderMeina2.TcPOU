@@ -31,9 +31,7 @@ VAR
     holeIdx                    : INT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[
-
-_Busy := TRUE;
+        <ST><![CDATA[_Busy := TRUE;
 _Done := FALSE;
 _Error := FALSE;
 Build := FALSE;
@@ -119,11 +117,13 @@ _HolesToDrill := holeIdx;
 
 
 // ===================================================
-// GENEROWANIE ŚCIEŻKI FREZOWANIA
+// DEFINICJA ILOŚCI I PUNKTÓW STARTOWYCH (Dla FeedTable)
 // ===================================================
+_ShapesCount := 1;
+
 // Zaczynamy na środku PRAWEJ krawędzi (Ruch +Y, Q = 0)
-_Config.NciStartX := TotalX;
-_Config.NciStartY := TotalY / 2.0;
+_ShapeStart[1].X := TotalX;
+_ShapeStart[1].Y := TotalY / 2.0;
 
 IF _ConfigProvider <> 0 THEN
     localConfig := _ConfigProvider.Config;
@@ -134,34 +134,40 @@ END_IF
 
 _GeometryWriter.Clear();
 _GeometryWriter.EnableTangentialFollowing();
-_GeometryWriter.AddStartPoint(TotalX, TotalY / 2.0);
 
-// 1. Prawa krawędź -> Prawy górny łuk
-_GeometryWriter.AddLine(TotalX, TotalY - Radius, Velo);
-IF Radius > 0 THEN
-    _GeometryWriter.AddArc(TotalX - Radius, TotalY, TotalX - Radius, TotalY - Radius, Velo, FALSE);
-END_IF
+// RYSOWANIE TYLKO TEGO KSZTAŁTU, O KTÓRY PROSI EXECUTOR
+CASE _CurrentShapeIndex OF
+    1:
+        _GeometryWriter.AddStartPoint(_ShapeStart[1].X, _ShapeStart[1].Y);
 
-// 2. Górna krawędź -> Lewy górny łuk
-_GeometryWriter.AddLine(Radius, TotalY, Velo);
-IF Radius > 0 THEN
-    _GeometryWriter.AddArc(0.0, TotalY - Radius, Radius, TotalY - Radius, Velo, FALSE);
-END_IF
+        // 1. Prawa krawędź -> Prawy górny łuk
+        _GeometryWriter.AddLine(TotalX, TotalY - Radius, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(TotalX - Radius, TotalY, TotalX - Radius, TotalY - Radius, Velo, FALSE);
+        END_IF
 
-// 3. Lewa krawędź -> Lewy dolny łuk
-_GeometryWriter.AddLine(0.0, Radius, Velo);
-IF Radius > 0 THEN
-    _GeometryWriter.AddArc(Radius, 0.0, Radius, Radius, Velo, FALSE);
-END_IF
+        // 2. Górna krawędź -> Lewy górny łuk
+        _GeometryWriter.AddLine(Radius, TotalY, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(0.0, TotalY - Radius, Radius, TotalY - Radius, Velo, FALSE);
+        END_IF
 
-// 4. Dolna krawędź -> Prawy dolny łuk
-_GeometryWriter.AddLine(TotalX - Radius, 0.0, Velo);
-IF Radius > 0 THEN
-    _GeometryWriter.AddArc(TotalX, Radius, TotalX - Radius, Radius, Velo, FALSE);
-END_IF
+        // 3. Lewa krawędź -> Lewy dolny łuk
+        _GeometryWriter.AddLine(0.0, Radius, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(Radius, 0.0, Radius, Radius, Velo, FALSE);
+        END_IF
 
-// Zamknięcie na prawej krawędzi
-_GeometryWriter.AddLine(TotalX, TotalY / 2.0, Velo);
+        // 4. Dolna krawędź -> Prawy dolny łuk
+        _GeometryWriter.AddLine(TotalX - Radius, 0.0, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(TotalX, Radius, TotalX - Radius, Radius, Velo, FALSE);
+        END_IF
+
+        // Zamknięcie na prawej krawędzi
+        _GeometryWriter.AddLine(TotalX, TotalY / 2.0, Velo);
+END_CASE
+
 _GeometryWriter.EndTable();
 
 _Busy := FALSE;
@@ -232,7 +238,7 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.Build">
-      <LineId Id="2463" Count="134" />
+      <LineId Id="2619" Count="140" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.CalculateFootprint">

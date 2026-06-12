@@ -33,8 +33,13 @@ END_IF
 TotalX := _Config.Diameter;
 Radius := TotalX / 2.0;
 
-_Config.NciStartX := TotalX;
-_Config.NciStartY := Radius - LeadInY;
+// ===================================================
+// DEFINICJA ILOŚCI I PUNKTÓW STARTOWYCH
+// ===================================================
+_ShapesCount := 1; 
+
+_ShapeStart[1].X := TotalX;
+_ShapeStart[1].Y := Radius - LeadInY;
 
 IF _ConfigProvider <> 0 THEN
     localConfig := _ConfigProvider.Config;
@@ -46,11 +51,15 @@ END_IF
 _GeometryWriter.Clear();
 _GeometryWriter.EnableTangentialFollowing();
 
-_GeometryWriter.AddStartPoint(TotalX, Radius - LeadInY); 
-_GeometryWriter.AddLine(TotalX, Radius, Velo); 
-_GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, FALSE);
-_GeometryWriter.AddArc(TotalX, Radius, Radius, Radius, Velo, FALSE);
-_GeometryWriter.AddLine(TotalX, Radius + LeadOutY, Velo); 
+// RYSOWANIE TYLKO TEGO KSZTAŁTU, O KTÓRY PROSI EXECUTOR
+CASE _CurrentShapeIndex OF
+    1:
+        _GeometryWriter.AddStartPoint(_ShapeStart[1].X, _ShapeStart[1].Y); 
+        _GeometryWriter.AddLine(TotalX, Radius, Velo); 
+        _GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, FALSE);
+        _GeometryWriter.AddArc(TotalX, Radius, Radius, Radius, Velo, FALSE);
+        _GeometryWriter.AddLine(TotalX, Radius + LeadOutY, Velo); 
+END_CASE
 
 _GeometryWriter.EndTable();
 
@@ -101,7 +110,7 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderCircle.Build">
-      <LineId Id="2218" Count="38" />
+      <LineId Id="2264" Count="47" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderCircle.CalculateFootprint">

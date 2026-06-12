@@ -13,6 +13,11 @@ VAR
     TotalX, TotalY, Radius : LREAL;
     Velo : LREAL;
     localConfig : ST_GantryXYZ_Config;
+	SmallRadius : LREAL;
+    SmallMinX   : LREAL;
+    SmallMaxX   : LREAL;
+    SmallMinY   : LREAL;
+    SmallMaxY   : LREAL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[_Busy := TRUE;
@@ -36,13 +41,6 @@ Radius := _Config.Radius;
 IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
 IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
 
-// ===================================================
-// Zaczynamy na środku PRAWEJ krawędzi
-// Ruch będzie w kierunku +Y, co da startowy kąt 0 na osi Q.
-// ===================================================
-_Config.NciStartX := TotalX;
-_Config.NciStartY := TotalY / 2.0;
-
 IF _ConfigProvider <> 0 THEN
     localConfig := _ConfigProvider.Config;
     Velo := localConfig.CuttingSpeedXY;
@@ -50,40 +48,70 @@ ELSE
     Velo := 50.0;
 END_IF
 
+// ===================================================
+// DEFINICJA ILOŚCI I PUNKTÓW STARTOWYCH
+// ===================================================
+_ShapesCount := 1; 
+
+// Kształt 1: Zewnętrzny prostokąt (100%) - Zaczynamy na środku PRAWEJ krawędzi
+_ShapeStart[1].X := TotalX;
+_ShapeStart[1].Y := TotalY / 2.0;
+
+// Obliczenia dla małego prostokąta (50% wielkości, wyśrodkowany)
+SmallMinX := TotalX * 0.25;
+SmallMaxX := TotalX * 0.75;
+SmallMinY := TotalY * 0.25;
+SmallMaxY := TotalY * 0.75;
+SmallRadius := Radius * 0.5;
+
+// Kształt 2: Wewnętrzny prostokąt (50%) - Zaczynamy na środku PRAWEJ krawędzi
+_ShapeStart[2].X := SmallMaxX;
+_ShapeStart[2].Y := TotalY / 2.0;
+
+
 // ============================================
 // GENEROWANIE TABELI (Ruch CCW / Lewoskrętnie)
 // ============================================
 _GeometryWriter.Clear();
 _GeometryWriter.EnableTangentialFollowing();
-_GeometryWriter.AddStartPoint(TotalX, TotalY / 2.0);
 
-// 1. Prawa krawędź -> Prawy górny łuk (Tniemy w +Y, Q = 0)
-_GeometryWriter.AddLine(TotalX, TotalY - Radius, Velo);
-IF Radius > 0 THEN
-    // FALSE = G03 = CounterClockwise (Lewoskrętnie)
-    _GeometryWriter.AddArc(TotalX - Radius, TotalY, TotalX - Radius, TotalY - Radius, Velo, FALSE);
-END_IF
+CASE _CurrentShapeIndex OF
+    1:
+        // ----------------------------------------------------
+        // RYSOWANIE DUŻEGO PROSTOKĄTA (KSZTAŁT 1)
+        // ----------------------------------------------------
+        _GeometryWriter.AddStartPoint(_ShapeStart[1].X, _ShapeStart[1].Y);
 
-// 2. Górna krawędź -> Lewy górny łuk (Tniemy w -X, Q = 90)
-_GeometryWriter.AddLine(Radius, TotalY, Velo);
-IF Radius > 0 THEN
-    _GeometryWriter.AddArc(0.0, TotalY - Radius, Radius, TotalY - Radius, Velo, FALSE);
-END_IF
+        // 1. Prawa krawędź -> Prawy górny łuk (Tniemy w +Y, Q = 0)
+        _GeometryWriter.AddLine(TotalX, TotalY - Radius, Velo);
+        IF Radius > 0 THEN
+            // FALSE = G03 = CounterClockwise (Lewoskrętnie)
+            _GeometryWriter.AddArc(TotalX - Radius, TotalY, TotalX - Radius, TotalY - Radius, Velo, FALSE);
+        END_IF
 
-// 3. Lewa krawędź -> Lewy dolny łuk (Tniemy w -Y, Q = 180)
-_GeometryWriter.AddLine(0.0, Radius, Velo);
-IF Radius > 0 THEN
-    _GeometryWriter.AddArc(Radius, 0.0, Radius, Radius, Velo, FALSE);
-END_IF
+        // 2. Górna krawędź -> Lewy górny łuk (Tniemy w -X, Q = 90)
+        _GeometryWriter.AddLine(Radius, TotalY, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(0.0, TotalY - Radius, Radius, TotalY - Radius, Velo, FALSE);
+        END_IF
 
-// 4. Dolna krawędź -> Prawy dolny łuk (Tniemy w +X, Q = 270)
-_GeometryWriter.AddLine(TotalX - Radius, 0.0, Velo);
-IF Radius > 0 THEN
-    _GeometryWriter.AddArc(TotalX, Radius, TotalX - Radius, Radius, Velo, FALSE);
-END_IF
+        // 3. Lewa krawędź -> Lewy dolny łuk (Tniemy w -Y, Q = 180)
+        _GeometryWriter.AddLine(0.0, Radius, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(Radius, 0.0, Radius, Radius, Velo, FALSE);
+        END_IF
 
-// Zamknięcie na prawej krawędzi
-_GeometryWriter.AddLine(TotalX, TotalY / 2.0, Velo);
+        // 4. Dolna krawędź -> Prawy dolny łuk (Tniemy w +X, Q = 270)
+        _GeometryWriter.AddLine(TotalX - Radius, 0.0, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(TotalX, Radius, TotalX - Radius, Radius, Velo, FALSE);
+        END_IF
+
+        // Zamknięcie na prawej krawędzi
+        _GeometryWriter.AddLine(TotalX, TotalY / 2.0, Velo);
+
+END_CASE
+
 _GeometryWriter.EndTable();
 
 _Busy := FALSE;
@@ -154,12 +182,8 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderRoundedRect.Build">
-      <LineId Id="2078" Count="2" />
-      <LineId Id="2009" Count="1" />
-      <LineId Id="2086" Count="0" />
-      <LineId Id="2081" Count="4" />
-      <LineId Id="2013" Count="59" />
-      <LineId Id="2087" Count="1" />
+      <LineId Id="2102" Count="88" />
+      <LineId Id="2224" Count="6" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderRoundedRect.CalculateFootprint">
