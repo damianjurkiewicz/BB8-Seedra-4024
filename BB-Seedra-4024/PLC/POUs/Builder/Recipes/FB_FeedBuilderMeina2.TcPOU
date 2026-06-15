@@ -78,7 +78,7 @@ END_IF
 
 
 // ===================================================
-// GENEROWANIE OTWORÓW (Dla Executor_Drill_PTP)
+// GENEROWANIE OTWORÓW (Zoptymalizowana ścieżka po obwodzie)
 // ===================================================
 holeIdx := 1;
 
@@ -86,27 +86,29 @@ holeIdx := 1;
 _HolesDrill[holeIdx].X := LREAL_TO_REAL(TotalX / 2.0);
 _HolesDrill[holeIdx].Y := LREAL_TO_REAL(TotalY / 2.0);
 
-// 2. Szyny pionowe (Rail Y1 i Rail Y2)
-FOR i := 1 TO NumberOfHolesY DO
-    // Rail Y1 (Lewa)
+// 2. Rail Y1 (Lewa) - Ruch z GÓRY na DÓŁ
+FOR i := NumberOfHolesY TO 1 BY -1 DO
     holeIdx := holeIdx + 1;
     _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX - SomeFixedDimension);
     _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
-    
-    // Rail Y2 (Prawa)
+END_FOR
+
+// 3. Rail X1 (Dolna) - Ruch z LEWEJ do PRAWEJ
+FOR i := 1 TO NumberOfHolesX DO
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY - SomeFixedDimension);
+END_FOR
+
+// 4. Rail Y2 (Prawa) - Ruch z DOŁU do GÓRY
+FOR i := 1 TO NumberOfHolesY DO
     holeIdx := holeIdx + 1;
     _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + ExtrusionLengthX + SomeFixedDimension);
     _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
 END_FOR
 
-// 3. Szyny poziome (Rail X1 i Rail X2)
-FOR i := 1 TO NumberOfHolesX DO
-    // Rail X1 (Dolna)
-    holeIdx := holeIdx + 1;
-    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
-    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY - SomeFixedDimension);
-    
-    // Rail X2 (Górna)
+// 5. Rail X2 (Górna) - Ruch z PRAWEJ do LEWEJ
+FOR i := NumberOfHolesX TO 1 BY -1 DO
     holeIdx := holeIdx + 1;
     _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
     _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + ExtrusionLengthY + SomeFixedDimension);
@@ -238,7 +240,9 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.Build">
-      <LineId Id="2619" Count="140" />
+      <LineId Id="2619" Count="45" />
+      <LineId Id="2781" Count="37" />
+      <LineId Id="2701" Count="58" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.CalculateFootprint">
