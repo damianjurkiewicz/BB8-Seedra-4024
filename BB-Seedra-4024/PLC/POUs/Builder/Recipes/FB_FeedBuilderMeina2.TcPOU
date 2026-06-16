@@ -142,33 +142,34 @@ CASE _CurrentShapeIndex OF
     1:
         _GeometryWriter.AddStartPoint(_ShapeStart[1].X, _ShapeStart[1].Y);
 
-        // 1. Najazd z punktu 0,0 i jazda wzdłuż dolnej krawędzi (oś X)
-        _GeometryWriter.AddLine(TotalX - Radius, 0.0, Velo);
+        // 1. Najazd z 0,0 i jazda W GÓRĘ wzdłuż lewej krawędzi 
+        // (Ruch +Y, Q=0 -> Zgodnie z osią noża, w 100% bezpieczne)
+        _GeometryWriter.AddLine(0.0, TotalY - Radius, Velo);
         IF Radius > 0 THEN
-            // Prawy dolny łuk
-            _GeometryWriter.AddArc(TotalX, Radius, TotalX - Radius, Radius, Velo, FALSE);
+            // Lewy górny łuk (Zgodnie z zegarem -> TRUE)
+            _GeometryWriter.AddArc(Radius, TotalY, Radius, TotalY - Radius, Velo, TRUE);
         END_IF
 
-        // 2. Prawa krawędź (oś Y)
-        _GeometryWriter.AddLine(TotalX, TotalY - Radius, Velo);
+        // 2. Górna krawędź (Ruch po osi X w prawo)
+        _GeometryWriter.AddLine(TotalX - Radius, TotalY, Velo);
         IF Radius > 0 THEN
             // Prawy górny łuk
-            _GeometryWriter.AddArc(TotalX - Radius, TotalY, TotalX - Radius, TotalY - Radius, Velo, FALSE);
+            _GeometryWriter.AddArc(TotalX, TotalY - Radius, TotalX - Radius, TotalY - Radius, Velo, TRUE);
         END_IF
 
-        // 3. Górna krawędź (powrót po osi X)
-        _GeometryWriter.AddLine(Radius, TotalY, Velo);
+        // 3. Prawa krawędź (Ruch po osi Y w dół)
+        _GeometryWriter.AddLine(TotalX, Radius, Velo);
         IF Radius > 0 THEN
-            // Lewy górny łuk
-            _GeometryWriter.AddArc(0.0, TotalY - Radius, Radius, TotalY - Radius, Velo, FALSE);
+            // Prawy dolny łuk
+            _GeometryWriter.AddArc(TotalX - Radius, 0.0, TotalX - Radius, Radius, Velo, TRUE);
         END_IF
 
-        // 4. Lewa krawędź (powrót po osi Y w dół)
-        _GeometryWriter.AddLine(0.0, Radius, Velo);
+        // 4. Dolna krawędź (Ruch po osi X w lewo)
+        _GeometryWriter.AddLine(Radius, 0.0, Velo);
         IF Radius > 0 THEN
-            // Ostatnie zaokrąglenie (wycięcie lewego dolnego rogu)
-            // Zamyka obwód detalu kończąc ruch w punkcie (Radius, 0.0)
-            _GeometryWriter.AddArc(Radius, 0.0, Radius, Radius, Velo, FALSE);
+            // Ostatnie zaokrąglenie - wycięcie lewego dolnego rogu
+            // Ścieżka zamyka się idealnie w punkcie (0.0, Radius)
+            _GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, TRUE);
         END_IF
 END_CASE
 
@@ -242,7 +243,9 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.Build">
-      <LineId Id="2840" Count="144" />
+      <LineId Id="2840" Count="106" />
+      <LineId Id="3006" Count="34" />
+      <LineId Id="2981" Count="3" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.CalculateFootprint">
