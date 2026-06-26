@@ -29,6 +29,18 @@ VAR
     
     i                          : INT;
     holeIdx                    : INT;
+	
+	RailSlot  : LREAL := 29.0;
+	BigSlot   : LREAL := 200.0;
+	SmallSlot : LREAL := 100.0;
+
+// Zmienne pomocnicze do generowania ścieżek
+	sx : LREAL;
+	sy : LREAL;
+	dx : LREAL;
+	dy : LREAL;
+	r_val : LREAL;
+	
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[_Busy := TRUE;
@@ -117,15 +129,34 @@ END_FOR
 // Przypisanie całkowitej liczby otworów do recepty
 _HolesToDrill := holeIdx;
 
-
 // ===================================================
 // DEFINICJA ILOŚCI I PUNKTÓW STARTOWYCH (Dla FeedTable)
 // ===================================================
-_ShapesCount := 1;
+_ShapesCount := 6; // 1 główny panel + 5 nowych wycięć z tabeli
 
-// Zaczynamy w punkcie 0,0 (wkłucie w odpad poza promienieniem)
+// 1. Kształt główny
 _ShapeStart[1].X := 0.0;
 _ShapeStart[1].Y := 0.0;
+
+// 2. No. 1
+_ShapeStart[2].X := 1030.0;
+_ShapeStart[2].Y := 0.0;
+
+// 3. No. 2
+_ShapeStart[3].X := 1090.0;
+_ShapeStart[3].Y := 0.0;
+
+// 4. No. 3
+_ShapeStart[4].X := 210.0;
+_ShapeStart[4].Y := 2200.0;
+
+// 5. No. 4
+_ShapeStart[5].X := 410.0;
+_ShapeStart[5].Y := 2150.0;
+
+// 6. No. 5
+_ShapeStart[6].X := 810.0;
+_ShapeStart[6].Y := 2150.0;
 
 IF _ConfigProvider <> 0 THEN
     localConfig := _ConfigProvider.Config;
@@ -137,47 +168,104 @@ END_IF
 _GeometryWriter.Clear();
 _GeometryWriter.EnableTangentialFollowing();
 
-// RYSOWANIE TYLKO TEGO KSZTAŁTU, O KTÓRY PROSI EXECUTOR
+// Reset zmiennych pomocniczych przed każdym wywołaniem
+sx := 0.0; sy := 0.0; dx := 0.0; dy := 0.0; r_val := 0.0;
+
+// RYSOWANIE KSZTAŁTU ZGODNIE Z INDEKSEM
 CASE _CurrentShapeIndex OF
     1:
+        // ==========================================
+        // KSZTAŁT 1 (Główny panel - Twój stary kod)
+        // ==========================================
         _GeometryWriter.AddStartPoint(_ShapeStart[1].X, _ShapeStart[1].Y);
 
-        // 1. Najazd z 0,0 i jazda W GÓRĘ wzdłuż lewej krawędzi 
-        // (Ruch +Y, Q=0 -> Zgodnie z osią noża, w 100% bezpieczne)
         _GeometryWriter.AddLine(0.0, TotalY - Radius, Velo);
         IF Radius > 0 THEN
-            // Lewy górny łuk (Zgodnie z zegarem -> TRUE)
             _GeometryWriter.AddArc(Radius, TotalY, Radius, TotalY - Radius, Velo, TRUE);
         END_IF
 
-        // 2. Górna krawędź (Ruch po osi X w prawo)
         _GeometryWriter.AddLine(TotalX - Radius, TotalY, Velo);
         IF Radius > 0 THEN
-            // Prawy górny łuk
             _GeometryWriter.AddArc(TotalX, TotalY - Radius, TotalX - Radius, TotalY - Radius, Velo, TRUE);
         END_IF
 
-        // 3. Prawa krawędź (Ruch po osi Y w dół)
         _GeometryWriter.AddLine(TotalX, Radius, Velo);
         IF Radius > 0 THEN
-            // Prawy dolny łuk
             _GeometryWriter.AddArc(TotalX - Radius, 0.0, TotalX - Radius, Radius, Velo, TRUE);
         END_IF
 
-        // 4. Dolna krawędź (Ruch po osi X w lewo)
         _GeometryWriter.AddLine(Radius, 0.0, Velo);
         IF Radius > 0 THEN
-            // Ostatnie zaokrąglenie - wycięcie lewego dolnego rogu
-            // Ścieżka zamyka się idealnie w punkcie (0.0, Radius)
             _GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, TRUE);
         END_IF
+
+    2, 3, 4, 5, 6:
+        // ==========================================
+        // KSZTAŁTY OD 2 DO 6 (Z tabeli)
+        // ==========================================
+        // Przypisanie współrzędnych startowych dla aktualnego kształtu
+        sx := _ShapeStart[_CurrentShapeIndex].X;
+        sy := _ShapeStart[_CurrentShapeIndex].Y;
+        r_val := 10.0; // Promień jest równy 10 dla wszystkich slotów
+
+        // Dobór wymiarów na podstawie tego, który numer wycinamy
+        IF _CurrentShapeIndex = 2 THEN
+            dx := RailSlot;
+            dy := ExtrusionLengthY;
+        ELSIF _CurrentShapeIndex = 3 THEN
+            dx := RailSlot;
+            dy := ExtrusionLengthX;
+        ELSIF _CurrentShapeIndex = 4 THEN
+            dx := SmallSlot;
+            dy := SmallSlot;
+        ELSIF _CurrentShapeIndex = 5 THEN
+            dx := BigSlot;
+            dy := BigSlot;
+        ELSIF _CurrentShapeIndex = 6 THEN
+            dx := BigSlot;
+            dy := BigSlot;
+        END_IF
+
+        // Wygenerowanie geometrycznej ścieżki (z absolutnym offsetem sx, sy)
+        // Wkłuwamy się w lewym dolnym rogu (w odpad)
+        _GeometryWriter.AddStartPoint(sx, sy);
+
+        // 1. Lewa krawędź w górę
+        _GeometryWriter.AddLine(sx, sy + dy - r_val, Velo);
+        IF r_val > 0 THEN
+            // Lewy górny łuk
+            _GeometryWriter.AddArc(sx + r_val, sy + dy, sx + r_val, sy + dy - r_val, Velo, TRUE);
+        END_IF
+
+        // 2. Górna krawędź w prawo
+        _GeometryWriter.AddLine(sx + dx - r_val, sy + dy, Velo);
+        IF r_val > 0 THEN
+            // Prawy górny łuk
+            _GeometryWriter.AddArc(sx + dx, sy + dy - r_val, sx + dx - r_val, sy + dy - r_val, Velo, TRUE);
+        END_IF
+
+        // 3. Prawa krawędź w dół
+        _GeometryWriter.AddLine(sx + dx, sy + r_val, Velo);
+        IF r_val > 0 THEN
+            // Prawy dolny łuk
+            _GeometryWriter.AddArc(sx + dx - r_val, sy, sx + dx - r_val, sy + r_val, Velo, TRUE);
+        END_IF
+
+        // 4. Dolna krawędź w lewo i zamknięcie
+        _GeometryWriter.AddLine(sx + r_val, sy, Velo);
+        IF r_val > 0 THEN
+            // Lewy dolny łuk
+            _GeometryWriter.AddArc(sx, sy + r_val, sx + r_val, sy + r_val, Velo, TRUE);
+        END_IF
+
 END_CASE
 
 _GeometryWriter.EndTable();
 
 _Busy := FALSE;
 _Done := TRUE;
-Build := TRUE;]]></ST>
+Build := TRUE;
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="CalculateFootprint" Id="{9ee51b75-0294-4fb4-bca1-c4a79e66bf68}">
@@ -243,9 +331,9 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.Build">
-      <LineId Id="2840" Count="106" />
-      <LineId Id="3006" Count="34" />
-      <LineId Id="2981" Count="3" />
+      <LineId Id="2840" Count="85" />
+      <LineId Id="3062" Count="134" />
+      <LineId Id="2926" Count="0" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2.CalculateFootprint">
