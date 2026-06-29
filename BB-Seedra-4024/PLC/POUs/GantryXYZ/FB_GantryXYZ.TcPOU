@@ -254,6 +254,9 @@ END_VAR]]></Declaration>
 		AxisY.Reset();
 		AxisZ.Reset();
         AxisQ.Reset(); 
+		AxisX.Axis.PlcToNc.ExtSetPos := 2;
+		AxisY.Axis.PlcToNc.ExtSetPos := 2;
+		
         
         NciChannel.ResetChannel();
         NciChannelTangential.ResetChannel();
@@ -1108,7 +1111,11 @@ END_VAR
                 
             30:   
                 fbHomeStratQ.Execute();
-				SequenceState := 31;
+                DelayTimer(IN := TRUE, PT := T#700MS);
+                IF DelayTimer.Q THEN
+                    DelayTimer(IN := FALSE); 
+                    SequenceState := 31;
+                END_IF
 				
 			31:	
 				IF fbHomeStratQ.Done THEN
@@ -1117,16 +1124,24 @@ END_VAR
 			
 			32: 
 		    	fbHomeStratZ.Execute();
-                SequenceState := 34;
+                DelayTimer(IN := TRUE, PT := T#700MS);
+                IF DelayTimer.Q THEN
+                    DelayTimer(IN := FALSE); 
+                    SequenceState := 34;
+                END_IF
 
             34:     
-                fbHomeStratY.Execute();
-                SequenceState := 38;
+				fbHomeStratY.Execute();    
+                DelayTimer(IN := TRUE, PT := T#700MS);
+                IF DelayTimer.Q THEN
+                    DelayTimer(IN := FALSE); 
+                    SequenceState := 38;
+                END_IF
 
 
             38: 
 				fbHomeStratX.Execute();    
-                DelayTimer(IN := TRUE, PT := T#500MS);
+                DelayTimer(IN := TRUE, PT := T#700MS);
                 IF DelayTimer.Q THEN
                     DelayTimer(IN := FALSE); 
                     SequenceState := 44;
@@ -1261,7 +1276,11 @@ END_CASE]]></ST>
       <LineId Id="41" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
-      <LineId Id="182" Count="18" />
+      <LineId Id="182" Count="8" />
+      <LineId Id="235" Count="0" />
+      <LineId Id="237" Count="0" />
+      <LineId Id="236" Count="0" />
+      <LineId Id="191" Count="9" />
       <LineId Id="202" Count="2" />
       <LineId Id="209" Count="4" />
       <LineId Id="215" Count="3" />
@@ -1417,14 +1436,17 @@ END_CASE]]></ST>
       <LineId Id="1521" Count="23" />
       <LineId Id="1551" Count="7" />
       <LineId Id="1689" Count="0" />
+      <LineId Id="1726" Count="3" />
       <LineId Id="1697" Count="0" />
       <LineId Id="1695" Count="1" />
       <LineId Id="1692" Count="2" />
       <LineId Id="1641" Count="0" />
       <LineId Id="1681" Count="0" />
       <LineId Id="1684" Count="0" />
+      <LineId Id="1722" Count="3" />
       <LineId Id="1688" Count="0" />
-      <LineId Id="1656" Count="2" />
+      <LineId Id="1656" Count="1" />
+      <LineId Id="1713" Count="4" />
       <LineId Id="1662" Count="3" />
       <LineId Id="1671" Count="0" />
       <LineId Id="1666" Count="3" />
