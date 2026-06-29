@@ -41,6 +41,10 @@ VAR
 	dy : LREAL;
 	r_val : LREAL;
 	
+	PanelGap : LREAL := 20.0; 
+    X_Offset : LREAL;
+    p        : INT;
+	
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[_Busy := TRUE;

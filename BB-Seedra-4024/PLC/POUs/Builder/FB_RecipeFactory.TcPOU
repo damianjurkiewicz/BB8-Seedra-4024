@@ -18,7 +18,7 @@ VAR
     BuilderMeina2_3Circles    : FB_FeedBuilderMeina2_3Circles;
     BuilderMeina2_2Squares    : FB_FeedBuilderMeina2_2Squares;
     BuilderMeina2_2Circles    : FB_FeedBuilderMeina2_2Circles;
-    BuilderMeina2_2Rectangles : FB_FeedMeina2_2000x500;
+    BuilderMeina2_2000x500    : FB_FeedMeina2_2000x500;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -72,8 +72,8 @@ END_VAR]]></Declaration>
     E_RecipeID.eMeina2_2Circles:    
 		GetBuilder := BuilderMeina2_2Circles;
 		
-    E_RecipeID.eMeina2_2Rectangles: 
-		GetBuilder := BuilderMeina2_2Rectangles;
+    E_RecipeID.eMeina2_2000x500: 
+		GetBuilder := BuilderMeina2_2000x500;
         
 ELSE
     GetBuilder := 0; 
@@ -129,8 +129,8 @@ BuilderMeina2_2Squares.ConfigProvider := ConfigProvider;
 BuilderMeina2_2Circles.Config       := Config;
 BuilderMeina2_2Circles.ConfigProvider := ConfigProvider;
 
-BuilderMeina2_2Rectangles.Config    := Config;
-BuilderMeina2_2Rectangles.ConfigProvider := ConfigProvider;    
+BuilderMeina2_2000x500.Config    := Config;
+BuilderMeina2_2000x500.ConfigProvider := ConfigProvider;    
 ]]></ST>
       </Implementation>
     </Method>
@@ -155,46 +155,14 @@ BuilderMeina2_3Squares.Config    := Config;
 BuilderMeina2_3Circles.Config    := Config;
 BuilderMeina2_2Squares.Config    := Config;
 BuilderMeina2_2Circles.Config    := Config;
-BuilderMeina2_2Rectangles.Config := Config;]]></ST>
+BuilderMeina2_2000x500.Config := Config;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeFactory">
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.GetBuilder">
-      <LineId Id="31" Count="11" />
-      <LineId Id="46" Count="0" />
-      <LineId Id="49" Count="0" />
-      <LineId Id="48" Count="0" />
-      <LineId Id="54" Count="1" />
-      <LineId Id="53" Count="0" />
-      <LineId Id="60" Count="1" />
-      <LineId Id="59" Count="0" />
-      <LineId Id="66" Count="0" />
-      <LineId Id="65" Count="0" />
-      <LineId Id="67" Count="0" />
-      <LineId Id="71" Count="0" />
-      <LineId Id="73" Count="0" />
-      <LineId Id="79" Count="0" />
-      <LineId Id="86" Count="0" />
-      <LineId Id="74" Count="0" />
-      <LineId Id="80" Count="0" />
-      <LineId Id="87" Count="0" />
-      <LineId Id="75" Count="0" />
-      <LineId Id="81" Count="0" />
-      <LineId Id="88" Count="0" />
-      <LineId Id="76" Count="0" />
-      <LineId Id="82" Count="0" />
-      <LineId Id="89" Count="0" />
-      <LineId Id="77" Count="0" />
-      <LineId Id="83" Count="0" />
-      <LineId Id="90" Count="0" />
-      <LineId Id="78" Count="0" />
-      <LineId Id="84" Count="0" />
-      <LineId Id="91" Count="0" />
-      <LineId Id="72" Count="0" />
-      <LineId Id="85" Count="0" />
-      <LineId Id="43" Count="2" />
+      <LineId Id="95" Count="47" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.InitializeFactory">
