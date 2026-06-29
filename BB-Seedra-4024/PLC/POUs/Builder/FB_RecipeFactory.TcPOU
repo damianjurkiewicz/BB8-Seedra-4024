@@ -11,6 +11,14 @@ VAR
 	BuilderRoundedRect 		: FB_FeedBuilderRoundedRect;
 	BuilderFeedCircle  		: FB_FeedBuilderCircle;
 	BuilderMeina2			: FB_FeedBuilderMeina2;
+	
+	BuilderMeina2_5Squares    : FB_FeedBuilderMeina2_5Squares;
+    BuilderMeina2_5Circles    : FB_FeedBuilderMeina2_5Circles;
+    BuilderMeina2_3Squares    : FB_FeedBuilderMeina2_3Squares;
+    BuilderMeina2_3Circles    : FB_FeedBuilderMeina2_3Circles;
+    BuilderMeina2_2Squares    : FB_FeedBuilderMeina2_2Squares;
+    BuilderMeina2_2Circles    : FB_FeedBuilderMeina2_2Circles;
+    BuilderMeina2_2Rectangles : FB_FeedBuilderMeina2_2Rectangles;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -45,6 +53,27 @@ END_VAR]]></Declaration>
 
 	E_RecipeID.eMeina2:
 		GetBuilder := BuilderMeina2;   
+		
+	E_RecipeID.eMeina2_5Squares:    
+		GetBuilder := BuilderMeina2_5Squares;
+		
+    E_RecipeID.eMeina2_5Circles:    
+		GetBuilder := BuilderMeina2_5Circles;
+		
+    E_RecipeID.eMeina2_3Squares:    
+		GetBuilder := BuilderMeina2_3Squares;
+		
+    E_RecipeID.eMeina2_3Circles:    
+		GetBuilder := BuilderMeina2_3Circles;
+		
+    E_RecipeID.eMeina2_2Squares:    
+		GetBuilder := BuilderMeina2_2Squares;
+		
+    E_RecipeID.eMeina2_2Circles:    
+		GetBuilder := BuilderMeina2_2Circles;
+		
+    E_RecipeID.eMeina2_2Rectangles: 
+		GetBuilder := BuilderMeina2_2Rectangles;
         
 ELSE
     GetBuilder := 0; 
@@ -80,7 +109,28 @@ BuilderFeedCircle.Config 			:= Config;
 BuilderFeedCircle.ConfigProvider 	:= ConfigProvider;
 
 BuilderMeina2.Config				:= Config;    
-BuilderMeina2.ConfigProvider		:= ConfigProvider;    
+BuilderMeina2.ConfigProvider		:= ConfigProvider;
+
+BuilderMeina2_5Squares.Config       := Config;
+BuilderMeina2_5Squares.ConfigProvider := ConfigProvider;
+
+BuilderMeina2_5Circles.Config       := Config;
+BuilderMeina2_5Circles.ConfigProvider := ConfigProvider;
+
+BuilderMeina2_3Squares.Config       := Config;
+BuilderMeina2_3Squares.ConfigProvider := ConfigProvider;
+
+BuilderMeina2_3Circles.Config       := Config;
+BuilderMeina2_3Circles.ConfigProvider := ConfigProvider;
+
+BuilderMeina2_2Squares.Config       := Config;
+BuilderMeina2_2Squares.ConfigProvider := ConfigProvider;
+
+BuilderMeina2_2Circles.Config       := Config;
+BuilderMeina2_2Circles.ConfigProvider := ConfigProvider;
+
+BuilderMeina2_2Rectangles.Config    := Config;
+BuilderMeina2_2Rectangles.ConfigProvider := ConfigProvider;    
 ]]></ST>
       </Implementation>
     </Method>
@@ -98,7 +148,14 @@ BuilderCircle.Config 		:= Config;
 BuilderRectangle.Config 	:= Config;   
 BuilderRoundedRect.Config 	:= Config;      
 BuilderFeedCircle.Config 	:= Config; 
-BuilderMeina2.Config		:= Config;                 ]]></ST>
+BuilderMeina2.Config		:= Config;                 
+BuilderMeina2_5Squares.Config    := Config;
+BuilderMeina2_5Circles.Config    := Config;
+BuilderMeina2_3Squares.Config    := Config;
+BuilderMeina2_3Circles.Config    := Config;
+BuilderMeina2_2Squares.Config    := Config;
+BuilderMeina2_2Circles.Config    := Config;
+BuilderMeina2_2Rectangles.Config := Config;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeFactory">
@@ -116,6 +173,27 @@ BuilderMeina2.Config		:= Config;                 ]]></ST>
       <LineId Id="66" Count="0" />
       <LineId Id="65" Count="0" />
       <LineId Id="67" Count="0" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="73" Count="0" />
+      <LineId Id="79" Count="0" />
+      <LineId Id="86" Count="0" />
+      <LineId Id="74" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="87" Count="0" />
+      <LineId Id="75" Count="0" />
+      <LineId Id="81" Count="0" />
+      <LineId Id="88" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="89" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="83" Count="0" />
+      <LineId Id="90" Count="0" />
+      <LineId Id="78" Count="0" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="91" Count="0" />
+      <LineId Id="72" Count="0" />
+      <LineId Id="85" Count="0" />
       <LineId Id="43" Count="2" />
       <LineId Id="5" Count="0" />
     </LineIds>
@@ -139,6 +217,8 @@ BuilderMeina2.Config		:= Config;                 ]]></ST>
       <LineId Id="52" Count="0" />
       <LineId Id="51" Count="0" />
       <LineId Id="49" Count="0" />
+      <LineId Id="64" Count="19" />
+      <LineId Id="63" Count="0" />
       <LineId Id="44" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.UpdateConfig">
@@ -149,6 +229,8 @@ BuilderMeina2.Config		:= Config;                 ]]></ST>
       <LineId Id="20" Count="0" />
       <LineId Id="24" Count="0" />
       <LineId Id="28" Count="0" />
+      <LineId Id="33" Count="5" />
+      <LineId Id="32" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

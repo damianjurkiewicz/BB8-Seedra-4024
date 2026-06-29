@@ -1,0 +1,358 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_FeedBuilderMeina2_2Circles" Id="{5f04b475-a319-4c69-9102-e08c82db3946}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedBuilderMeina2_2Circles EXTENDS FB_RecipeBase
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{20c5dbe8-ae65-4fcc-b5f3-0b128bb22a55}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+VAR
+    TotalX, TotalY, Radius : LREAL;
+    Velo : LREAL;
+    localConfig : ST_GantryXYZ_Config;
+	
+    // Zmienne do otworów
+    HoleDistanceFromEdgeOfRail : LREAL := 100.0;
+    SomeFixedDimension         : LREAL := 12.63;
+    PanelRailOffsetX           : LREAL;
+    PanelRailOffsetY           : LREAL;
+    ExtrusionLengthX           : LREAL;
+    ExtrusionLengthY           : LREAL;
+    
+    NumberOfHolesX             : INT := 3;
+    NumberOfHolesY             : INT := 5;
+    HolesSpacingX              : LREAL;
+    HolesSpacingY              : LREAL;
+    
+    i                          : INT;
+    holeIdx                    : INT;
+	
+	RailSlot  : LREAL := 29.0;
+	BigSlot   : LREAL := 200.0;
+	SmallSlot : LREAL := 100.0;
+
+// Zmienne pomocnicze do generowania ścieżek
+	sx : LREAL;
+	sy : LREAL;
+	dx : LREAL;
+	dy : LREAL;
+	r_val : LREAL;
+	
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Busy := TRUE;
+_Done := FALSE;
+_Error := FALSE;
+Build := FALSE;
+THIS^.UpdateNestingLimits();
+
+IF NOT _Config.IsValid THEN
+    _Busy := FALSE;
+    _Error := TRUE; 
+    Build := FALSE;
+    RETURN;
+END_IF
+
+// Gabaryty i promień
+TotalX := _Config.PanelFrontWidth;
+TotalY := _Config.PanelFrontLength;
+Radius := _Config.Radius;
+
+IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
+IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
+
+
+// ===================================================
+// OBLICZENIA DLA SZYN I OTWORÓW
+// ===================================================
+// Po poprawce: offset X uzależniony od X, a Y od Y
+PanelRailOffsetX := 0.1 * TotalX;
+PanelRailOffsetY := 0.1 * TotalY;
+
+ExtrusionLengthX := TotalX - (2.0 * PanelRailOffsetX);
+ExtrusionLengthY := TotalY - (2.0 * PanelRailOffsetY);
+
+// Wyliczenie rozstawu (Zabezpieczenie przed dzieleniem przez zero, jeśli ktoś wpisze NumberOfHoles = 1)
+IF NumberOfHolesX > 1 THEN
+    HolesSpacingX := (ExtrusionLengthX - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesX - 1);
+ELSE
+    HolesSpacingX := 0.0;
+END_IF
+
+IF NumberOfHolesY > 1 THEN
+    HolesSpacingY := (ExtrusionLengthY - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesY - 1);
+ELSE
+    HolesSpacingY := 0.0;
+END_IF
+
+
+// ===================================================
+// GENEROWANIE OTWORÓW (Zoptymalizowana ścieżka po obwodzie)
+// ===================================================
+holeIdx := 1;
+
+// 1. Otwór na dokładnym środku wycinanego detalu
+_HolesDrill[holeIdx].X := LREAL_TO_REAL(TotalX / 2.0);
+_HolesDrill[holeIdx].Y := LREAL_TO_REAL(TotalY / 2.0);
+
+// 2. Rail Y1 (Lewa) - Ruch z GÓRY na DÓŁ
+FOR i := NumberOfHolesY TO 1 BY -1 DO
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX - SomeFixedDimension);
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
+END_FOR
+
+// 3. Rail X1 (Dolna) - Ruch z LEWEJ do PRAWEJ
+FOR i := 1 TO NumberOfHolesX DO
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY - SomeFixedDimension);
+END_FOR
+
+// 4. Rail Y2 (Prawa) - Ruch z DOŁU do GÓRY
+FOR i := 1 TO NumberOfHolesY DO
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + ExtrusionLengthX + SomeFixedDimension);
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
+END_FOR
+
+// 5. Rail X2 (Górna) - Ruch z PRAWEJ do LEWEJ
+FOR i := NumberOfHolesX TO 1 BY -1 DO
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + ExtrusionLengthY + SomeFixedDimension);
+END_FOR
+
+// Przypisanie całkowitej liczby otworów do recepty
+_HolesToDrill := holeIdx;
+
+// ===================================================
+// DEFINICJA ILOŚCI I PUNKTÓW STARTOWYCH (Dla FeedTable)
+// ===================================================
+_ShapesCount := 6; // 1 główny panel + 5 nowych wycięć z tabeli
+
+// 1. Kształt główny
+_ShapeStart[1].X := 0.0;
+_ShapeStart[1].Y := 0.0;
+
+// 2. No. 1
+_ShapeStart[2].X := 1030.0;
+_ShapeStart[2].Y := 0.0;
+
+// 3. No. 2
+_ShapeStart[3].X := 1090.0;
+_ShapeStart[3].Y := 0.0;
+
+// 4. No. 3
+_ShapeStart[4].X := 210.0;
+_ShapeStart[4].Y := 2200.0;
+
+// 5. No. 4
+_ShapeStart[5].X := 410.0;
+_ShapeStart[5].Y := 2150.0;
+
+// 6. No. 5
+_ShapeStart[6].X := 810.0;
+_ShapeStart[6].Y := 2150.0;
+
+IF _ConfigProvider <> 0 THEN
+    localConfig := _ConfigProvider.Config;
+    Velo := localConfig.CuttingSpeedXY;
+ELSE
+    Velo := 50.0;
+END_IF
+
+_GeometryWriter.Clear();
+_GeometryWriter.EnableTangentialFollowing();
+
+// Reset zmiennych pomocniczych przed każdym wywołaniem
+sx := 0.0; sy := 0.0; dx := 0.0; dy := 0.0; r_val := 0.0;
+
+// RYSOWANIE KSZTAŁTU ZGODNIE Z INDEKSEM
+CASE _CurrentShapeIndex OF
+    1:
+        // ==========================================
+        // KSZTAŁT 1 (Główny panel - Twój stary kod)
+        // ==========================================
+        _GeometryWriter.AddStartPoint(_ShapeStart[1].X, _ShapeStart[1].Y);
+
+        _GeometryWriter.AddLine(0.0, TotalY - Radius, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(Radius, TotalY, Radius, TotalY - Radius, Velo, TRUE);
+        END_IF
+
+        _GeometryWriter.AddLine(TotalX - Radius, TotalY, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(TotalX, TotalY - Radius, TotalX - Radius, TotalY - Radius, Velo, TRUE);
+        END_IF
+
+        _GeometryWriter.AddLine(TotalX, Radius, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(TotalX - Radius, 0.0, TotalX - Radius, Radius, Velo, TRUE);
+        END_IF
+
+        _GeometryWriter.AddLine(Radius, 0.0, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, TRUE);
+        END_IF
+
+    2, 3, 4, 5, 6:
+        // ==========================================
+        // KSZTAŁTY OD 2 DO 6 (Z tabeli)
+        // ==========================================
+        // Przypisanie współrzędnych startowych dla aktualnego kształtu
+        sx := _ShapeStart[_CurrentShapeIndex].X;
+        sy := _ShapeStart[_CurrentShapeIndex].Y;
+        r_val := 10.0; // Promień jest równy 10 dla wszystkich slotów
+
+        // Dobór wymiarów na podstawie tego, który numer wycinamy
+        IF _CurrentShapeIndex = 2 THEN
+            dx := RailSlot;
+            dy := ExtrusionLengthY;
+        ELSIF _CurrentShapeIndex = 3 THEN
+            dx := RailSlot;
+            dy := ExtrusionLengthX;
+        ELSIF _CurrentShapeIndex = 4 THEN
+            dx := SmallSlot;
+            dy := SmallSlot;
+        ELSIF _CurrentShapeIndex = 5 THEN
+            dx := BigSlot;
+            dy := BigSlot;
+        ELSIF _CurrentShapeIndex = 6 THEN
+            dx := BigSlot;
+            dy := BigSlot;
+        END_IF
+
+        // Wygenerowanie geometrycznej ścieżki (z absolutnym offsetem sx, sy)
+        // Wkłuwamy się w lewym dolnym rogu (w odpad)
+        _GeometryWriter.AddStartPoint(sx, sy);
+
+        // 1. Lewa krawędź w górę
+        _GeometryWriter.AddLine(sx, sy + dy - r_val, Velo);
+        IF r_val > 0 THEN
+            // Lewy górny łuk
+            _GeometryWriter.AddArc(sx + r_val, sy + dy, sx + r_val, sy + dy - r_val, Velo, TRUE);
+        END_IF
+
+        // 2. Górna krawędź w prawo
+        _GeometryWriter.AddLine(sx + dx - r_val, sy + dy, Velo);
+        IF r_val > 0 THEN
+            // Prawy górny łuk
+            _GeometryWriter.AddArc(sx + dx, sy + dy - r_val, sx + dx - r_val, sy + dy - r_val, Velo, TRUE);
+        END_IF
+
+        // 3. Prawa krawędź w dół
+        _GeometryWriter.AddLine(sx + dx, sy + r_val, Velo);
+        IF r_val > 0 THEN
+            // Prawy dolny łuk
+            _GeometryWriter.AddArc(sx + dx - r_val, sy, sx + dx - r_val, sy + r_val, Velo, TRUE);
+        END_IF
+
+        // 4. Dolna krawędź w lewo i zamknięcie
+        _GeometryWriter.AddLine(sx + r_val, sy, Velo);
+        IF r_val > 0 THEN
+            // Lewy dolny łuk
+            _GeometryWriter.AddArc(sx, sy + r_val, sx + r_val, sy + r_val, Velo, TRUE);
+        END_IF
+
+END_CASE
+
+_GeometryWriter.EndTable();
+
+_Busy := FALSE;
+_Done := TRUE;
+Build := TRUE;
+]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CalculateFootprint" Id="{aafff46b-b42f-437a-bdf0-494cd1dd090c}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_NominalX := 1200;
+_NominalY := 2400;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ExecutionRoute" Id="{74ea0253-667d-41c4-b140-e4c051720fee}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{d8d11c37-9574-4bf1-b4a8-d81dee87de79}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eFeedTable;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="FB_init" Id="{1e443ab1-3439-498b-8c5d-1c6a90c64c6d}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
+_Limits.PanelFrontLength.MaxVal := 2400.0;
+
+_Limits.PanelFrontWidth.MinVal  := 100.0;
+_Limits.PanelFrontWidth.MaxVal  := 1200.0;
+
+_Limits.PanelHeight.MinVal      := 0.0;
+_Limits.PanelHeight.MaxVal      := 0.0;
+
+_Limits.RailHeightCorrection.MinVal := 0.0;
+_Limits.RailHeightCorrection.MaxVal := 0.0;
+
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.GrooveDepthZ.MinVal := 0.0;
+_Limits.GrooveDepthZ.MaxVal := 9.0; 
+
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.Radius.MinVal := 10.0;     
+_Limits.Radius.MaxVal := 600.0;   ]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_FeedBuilderMeina2_2Circles">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderMeina2_2Circles.Build">
+      <LineId Id="2840" Count="85" />
+      <LineId Id="3062" Count="134" />
+      <LineId Id="2926" Count="0" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderMeina2_2Circles.CalculateFootprint">
+      <LineId Id="28" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderMeina2_2Circles.ExecutionRoute.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderMeina2_2Circles.FB_init">
+      <LineId Id="31" Count="15" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="53" Count="1" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="73" Count="2" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="77" Count="1" />
+      <LineId Id="76" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

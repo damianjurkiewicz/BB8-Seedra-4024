@@ -20,7 +20,7 @@ VAR
 	Machine_HMI : ST_Machine_HMI;
 	
 	sSelectedRecipeName : STRING(50);
-	aRecipeNames : ARRAY[0..10] OF STRING(50);
+	aRecipeNames : ARRAY[0..30] OF STRING(50);
 
 
 END_VAR
@@ -220,7 +220,15 @@ aRecipeNames[E_RecipeID.eCircle]  		:= 'NCI Circle';
 aRecipeNames[E_RecipeID.eRectangle]		:= 'Rectangle';
 aRecipeNames[E_RecipeID.eRoundedRect]	:= 'Rounded Rect';
 aRecipeNames[E_RecipeID.eFeedCircle]	:= 'Feed Circle';
-aRecipeNames[E_RecipeID.eMeina2]		:= 'Meina2';
+aRecipeNames[E_RecipeID.eMeina2]		:= 'Meina';
+aRecipeNames[E_RecipeID.eMeina2_5Squares]    := 'Meina - 5 Squares';
+aRecipeNames[E_RecipeID.eMeina2_5Circles]    := 'Meina - 5 Circles';
+aRecipeNames[E_RecipeID.eMeina2_3Squares]    := 'Meina - 3 Squares';
+aRecipeNames[E_RecipeID.eMeina2_3Circles]    := 'Meina - 3 Circles';
+aRecipeNames[E_RecipeID.eMeina2_2Squares]    := 'Meina - 2 Squares';
+aRecipeNames[E_RecipeID.eMeina2_2Circles]    := 'Meina - 2 Circles';
+aRecipeNames[E_RecipeID.eMeina2_2Rectangles] := 'Meina - 2 Rectangles';
+
 
 sSelectedRecipeName := aRecipeNames[GantryXYZ.ProgramIdRequested];
 
@@ -561,6 +569,9 @@ END_IF]]></ST>
       <LineId Id="84" Count="0" />
       <LineId Id="92" Count="0" />
       <LineId Id="100" Count="0" />
+      <LineId Id="110" Count="5" />
+      <LineId Id="109" Count="0" />
+      <LineId Id="108" Count="0" />
       <LineId Id="67" Count="0" />
       <LineId Id="61" Count="0" />
       <LineId Id="10" Count="0" />

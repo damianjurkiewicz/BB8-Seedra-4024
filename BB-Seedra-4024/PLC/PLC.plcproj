@@ -58,6 +58,27 @@
     <Compile Include="POUs\Builder\I_GeometryWriter.TcIO">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderMeina2_2Circles.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderMeina2_2Rectangles.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderMeina2_3Squares.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderMeina2_3Circles.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderMeina2_2Squares.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderMeina2_5Squares.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderMeina2_5Circles.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderRoundedRect.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -299,6 +320,34 @@
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
     <Compile Include="VISUs\Modes\ProductionMode\V_ProductionFeedCircle.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionMeina2_5Squares.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionMeina2_5Circles.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionMeina2_3Squares.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionMeina2_3Circles.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionMeina2_2Squares.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionMeina2_2Circles.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionMeina2_2Rectangles.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
