@@ -10,9 +10,9 @@ VAR
 	BuilderRectangle 		: FB_RecipeBuilderRectangle;
 	BuilderRoundedRect 		: FB_FeedBuilderRoundedRect;
 	BuilderFeedCircle  		: FB_FeedBuilderCircle;
-	BuilderMeina2			: FB_FeedBuilderMeina2;
+	BuilderMeina2_2000x1000	: FB_FeedMeina2_2000x1000;
 	
-	BuilderMeina2_5Squares    : FB_FeedBuilderMeina2_5Squares;
+	BuilderMeina2_5Squares    : FB_FeedMeina2_500x500;
     BuilderMeina2_5Circles    : FB_FeedBuilderMeina2_5Circles;
     BuilderMeina2_3Squares    : FB_FeedBuilderMeina2_3Squares;
     BuilderMeina2_3Circles    : FB_FeedBuilderMeina2_3Circles;
@@ -52,7 +52,7 @@ END_VAR]]></Declaration>
         GetBuilder := BuilderFeedCircle;        
 
 	E_RecipeID.eMeina2:
-		GetBuilder := BuilderMeina2;   
+		GetBuilder := BuilderMeina2_2000x1000;   
 		
 	E_RecipeID.eMeina2_5Squares:    
 		GetBuilder := BuilderMeina2_5Squares;
@@ -108,8 +108,8 @@ BuilderRoundedRect.ConfigProvider 	:= ConfigProvider;
 BuilderFeedCircle.Config 			:= Config;                    
 BuilderFeedCircle.ConfigProvider 	:= ConfigProvider;
 
-BuilderMeina2.Config				:= Config;    
-BuilderMeina2.ConfigProvider		:= ConfigProvider;
+BuilderMeina2_2000x1000.Config				:= Config;    
+BuilderMeina2_2000x1000.ConfigProvider		:= ConfigProvider;
 
 BuilderMeina2_5Squares.Config       := Config;
 BuilderMeina2_5Squares.ConfigProvider := ConfigProvider;
@@ -148,7 +148,7 @@ BuilderCircle.Config 		:= Config;
 BuilderRectangle.Config 	:= Config;   
 BuilderRoundedRect.Config 	:= Config;      
 BuilderFeedCircle.Config 	:= Config; 
-BuilderMeina2.Config		:= Config;                 
+BuilderMeina2_2000x1000.Config		:= Config;                 
 BuilderMeina2_5Squares.Config    := Config;
 BuilderMeina2_5Circles.Config    := Config;
 BuilderMeina2_3Squares.Config    := Config;
