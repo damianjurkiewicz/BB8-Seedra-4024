@@ -57,8 +57,8 @@ IF NOT _Config.IsValid THEN
 END_IF
 
 // Gabaryty i promień
-TotalX := _Config.PanelFrontWidth;
-TotalY := _Config.PanelFrontLength;
+TotalX := 1000;
+TotalY := 2000;
 Radius := _Config.Radius;
 
 IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
