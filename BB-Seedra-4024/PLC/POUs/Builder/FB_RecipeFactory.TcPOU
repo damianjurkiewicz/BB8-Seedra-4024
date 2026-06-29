@@ -16,7 +16,7 @@ VAR
     BuilderMeina2_5Circles    : FB_FeedBuilderMeina2_5Circles;
     BuilderMeina2_3Squares    : FB_FeedBuilderMeina2_3Squares;
     BuilderMeina2_3Circles    : FB_FeedBuilderMeina2_3Circles;
-    BuilderMeina2_2Squares    : FB_FeedBuilderMeina2_2Squares;
+    BuilderMeina2_1000x1000   : FB_FeedMeina2_1000x1000;
     BuilderMeina2_2Circles    : FB_FeedBuilderMeina2_2Circles;
     BuilderMeina2_2000x500    : FB_FeedMeina2_2000x500;
 END_VAR]]></Declaration>
@@ -66,8 +66,8 @@ END_VAR]]></Declaration>
     E_RecipeID.eMeina2_3Circles:    
 		GetBuilder := BuilderMeina2_3Circles;
 		
-    E_RecipeID.eMeina2_2Squares:    
-		GetBuilder := BuilderMeina2_2Squares;
+    E_RecipeID.eMeina2_1000x1000:    
+		GetBuilder := BuilderMeina2_1000x1000;
 		
     E_RecipeID.eMeina2_2Circles:    
 		GetBuilder := BuilderMeina2_2Circles;
@@ -123,8 +123,8 @@ BuilderMeina2_3Squares.ConfigProvider := ConfigProvider;
 BuilderMeina2_3Circles.Config       := Config;
 BuilderMeina2_3Circles.ConfigProvider := ConfigProvider;
 
-BuilderMeina2_2Squares.Config       := Config;
-BuilderMeina2_2Squares.ConfigProvider := ConfigProvider;
+BuilderMeina2_1000x1000.Config       := Config;
+BuilderMeina2_1000x1000.ConfigProvider := ConfigProvider;
 
 BuilderMeina2_2Circles.Config       := Config;
 BuilderMeina2_2Circles.ConfigProvider := ConfigProvider;
@@ -153,7 +153,7 @@ BuilderMeina2_5Squares.Config    := Config;
 BuilderMeina2_5Circles.Config    := Config;
 BuilderMeina2_3Squares.Config    := Config;
 BuilderMeina2_3Circles.Config    := Config;
-BuilderMeina2_2Squares.Config    := Config;
+BuilderMeina2_1000x1000.Config    := Config;
 BuilderMeina2_2Circles.Config    := Config;
 BuilderMeina2_2000x500.Config := Config;]]></ST>
       </Implementation>
@@ -162,7 +162,7 @@ BuilderMeina2_2000x500.Config := Config;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.GetBuilder">
-      <LineId Id="95" Count="47" />
+      <LineId Id="146" Count="47" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.InitializeFactory">
