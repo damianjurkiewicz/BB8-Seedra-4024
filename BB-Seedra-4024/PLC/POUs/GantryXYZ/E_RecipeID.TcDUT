@@ -4,22 +4,22 @@
     <Declaration><![CDATA[{attribute 'qualified_only'}
 TYPE E_RecipeId :
 (
-    eNone        := 0, 
-    eBorgoFlaps  := 1,
-    eBorgoWings  := 2,
-    eArona       := 3,
-	eCircle 	 := 4,
-	eRectangle   := 5,
-	eRoundedRect := 6,
-	eFeedCircle  := 7,
-	eMeina2		 := 8,
-	eMeina2_500x500    := 9,
-    eMeina2_5Circles    := 10,
-    eMeina2_3Squares    := 11,
-    eMeina2_3Circles    := 12,
-    eMeina2_1000x1000    := 13,
-    eMeina2_1000x1000_Circles    := 14,
-    eMeina2_2000x500 := 15
+    eNone        						:= 0, 
+    ePTPBorgoFlaps  					:= 1,
+    ePTPBorgoWings  					:= 2,
+    ePTPArona       					:= 3,
+	eNCICircle 	 						:= 4,
+	ePTPRectangle   					:= 5,
+	eFeedRoundedRectangle 				:= 6,
+	eFeedCircle  						:= 7,
+	eFeedMeina2_2000x1000				:= 8,
+	eFeedMeina2_500x500    				:= 9,
+    eFeedMeina2_500x500_Circles    		:= 10,
+    eFeedMeina2_750x750    				:= 11,
+    eFeedMeina2_750x750_Circles    		:= 12,
+    eFeedMeina2_1000x1000    			:= 13,
+    eFeedMeina2_1000x1000_Circles    	:= 14,
+    eFeedMeina2_2000x500 				:= 15
 ) := eNone; 
 END_TYPE]]></Declaration>
   </DUT>

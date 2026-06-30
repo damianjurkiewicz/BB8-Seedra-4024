@@ -38,11 +38,11 @@ iMockProvider := MockProvider;
 Factory.InitializeFactory(Config := TestConfig, ConfigProvider := iMockProvider);
 
 // Wyciągamy instancje z fabryki
-BuilderWings     := Factory.GetBuilder(E_RecipeID.eBorgoWings);
-BuilderFlaps     := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
-BuilderArona     := Factory.GetBuilder(E_RecipeID.eArona);
-BuilderCircle    := Factory.GetBuilder(E_RecipeID.eCircle);
-BuilderRectangle := Factory.GetBuilder(E_RecipeID.eRectangle);
+BuilderWings     := Factory.GetBuilder(E_RecipeID.ePTPBorgoWings);
+BuilderFlaps     := Factory.GetBuilder(E_RecipeID.ePTPBorgoFlaps);
+BuilderArona     := Factory.GetBuilder(E_RecipeID.ePTPArona);
+BuilderCircle    := Factory.GetBuilder(E_RecipeID.eNCICircle);
+BuilderRectangle := Factory.GetBuilder(E_RecipeID.ePTPRectangle);
 
 // 3. ASSERT
 AssertTrue(Condition := (BuilderWings.ConfigProvider = iMockProvider),
@@ -72,11 +72,11 @@ END_VAR]]></Declaration>
         <ST><![CDATA[TEST('Test_ReturnsCorrectBuilder');
 
 // 1. ACT - Prosimy fabrykę o wszystkie wspierane przepisy
-BuilderWings     := Factory.GetBuilder(E_RecipeID.eBorgoWings);
-BuilderFlaps     := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
-BuilderArona     := Factory.GetBuilder(E_RecipeID.eArona);
-BuilderCircle    := Factory.GetBuilder(E_RecipeID.eCircle);
-BuilderRectangle := Factory.GetBuilder(E_RecipeID.eRectangle);
+BuilderWings     := Factory.GetBuilder(E_RecipeID.ePTPBorgoWings);
+BuilderFlaps     := Factory.GetBuilder(E_RecipeID.ePTPBorgoFlaps);
+BuilderArona     := Factory.GetBuilder(E_RecipeID.ePTPArona);
+BuilderCircle    := Factory.GetBuilder(E_RecipeID.eNCICircle);
+BuilderRectangle := Factory.GetBuilder(E_RecipeID.ePTPRectangle);
 
 // 2. ASSERT - Sprawdzamy, czy żaden z nich nie jest pusty (0)
 AssertTrue(Condition := (BuilderWings <> 0), Message := 'Fabryka zwrocila 0 dla eBorgoWings!');
@@ -133,9 +133,9 @@ TestConfig.PanelHeight := 111.0;
 Factory.UpdateConfig(TestConfig);
 
 // 3. Wyciągamy instancje z fabryki
-BuilderWings := Factory.GetBuilder(E_RecipeID.eBorgoWings);
-BuilderFlaps := Factory.GetBuilder(E_RecipeID.eBorgoFlaps);
-BuilderArona := Factory.GetBuilder(E_RecipeID.eArona);
+BuilderWings := Factory.GetBuilder(E_RecipeID.ePTPBorgoWings);
+BuilderFlaps := Factory.GetBuilder(E_RecipeID.ePTPBorgoFlaps);
+BuilderArona := Factory.GetBuilder(E_RecipeID.ePTPArona);
 
 // Zgrywamy konfigurację z właściwości interfejsów do zmiennych lokalnych
 ActualConfigWings := BuilderWings.Config;

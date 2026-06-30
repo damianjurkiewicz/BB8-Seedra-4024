@@ -3,7 +3,7 @@
   <POU Name="FB_FeedBuilderRoundedRect_Test" Id="{f5d21a52-b886-4f4f-b673-1e515ec1e300}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedBuilderRoundedRect_Test EXTENDS TcUnit.FB_TestSuite
 VAR
-    Builder    : FB_FeedRoundedRect;
+    Builder    : FB_FeedRoundedRectangle;
     MockWriter : FB_MockGeometryWriter;
     Config     : ST_RecipeBuilder_Config;
 END_VAR
