@@ -61,18 +61,27 @@ IF NOT _Config.IsValid THEN
     RETURN;
 END_IF
 
-// Wymiary bazowe kwadratów: 750x750
-TotalX := 750.0;
-TotalY := 750.0;
+// ===================================================
+// NOWE GEOMETRIE DLA TRZECH KWADRATÓW 750x750
+// ===================================================
+TotalX := 750.0; 
+TotalY := 750.0; 
+Radius := _Config.Radius;
 
+IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
+IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
+
+// Przerwa między panelami (20 mm) w osi Y
 PanelGap := 20.0; 
 
+// Offsety dla szyn
 PanelRailOffsetX := 0.1 * TotalX;
 PanelRailOffsetY := 0.1 * TotalY;
 
 ExtrusionLengthX := TotalX - (2.0 * PanelRailOffsetX);
 ExtrusionLengthY := TotalY - (2.0 * PanelRailOffsetY);
 
+// Wyliczenie rozstawu otworów
 IF NumberOfHolesX > 1 THEN
     HolesSpacingX := (ExtrusionLengthX - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesX - 1);
 ELSE
@@ -85,34 +94,43 @@ ELSE
     HolesSpacingY := 0.0;
 END_IF
 
+
+// ===================================================
+// GENEROWANIE OTWORÓW DLA TRZECH PANELÓW
+// ===================================================
 holeIdx := 0; 
 
+// Pętla dla 3 paneli: 0, 1, 2
 FOR p := 0 TO 2 DO
     Y_Offset := INT_TO_LREAL(p) * (TotalY + PanelGap);
 
+    // 1. Otwór na dokładnym środku danego panelu
     holeIdx := holeIdx + 1;
-    // Otwór centralny na środku kwadratu
     _HolesDrill[holeIdx].X := LREAL_TO_REAL(TotalX / 2.0);
     _HolesDrill[holeIdx].Y := LREAL_TO_REAL((TotalY / 2.0) + Y_Offset);
 
+    // 2. Rail Y1 (Lewa)
     FOR i := NumberOfHolesY TO 1 BY -1 DO
         holeIdx := holeIdx + 1;
         _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX - SomeFixedDimension);
         _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY) + Y_Offset);
     END_FOR
 
+    // 3. Rail X1 (Dolna)
     FOR i := 1 TO NumberOfHolesX DO
         holeIdx := holeIdx + 1;
         _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
         _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY - SomeFixedDimension + Y_Offset);
     END_FOR
 
+    // 4. Rail Y2 (Prawa)
     FOR i := 1 TO NumberOfHolesY DO
         holeIdx := holeIdx + 1;
         _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + ExtrusionLengthX + SomeFixedDimension);
         _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY) + Y_Offset);
     END_FOR
 
+    // 5. Rail X2 (Górna)
     FOR i := NumberOfHolesX TO 1 BY -1 DO
         holeIdx := holeIdx + 1;
         _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
@@ -122,21 +140,26 @@ END_FOR
 
 _HolesToDrill := holeIdx;
 
-_ShapesCount := 8; 
+// ===================================================
+// DEFINICJA ILOŚCI I PUNKTÓW STARTOWYCH
+// ===================================================
+_ShapesCount := 8;
 
-// Start w prawym dolnym rogu pierwszego kwadratu (minus LeadIn)
-_ShapeStart[1].X := TotalX;
-_ShapeStart[1].Y := 0.0 - LeadInY;
+// 1. Kształt główny - Panel Dolny
+_ShapeStart[1].X := 0.0;
+_ShapeStart[1].Y := 0.0;
 
-// Start drugiego kwadratu
-_ShapeStart[2].X := TotalX;
-_ShapeStart[2].Y := (TotalY + PanelGap) - LeadInY;
+// 2. Kształt główny - Panel Środkowy
+_ShapeStart[2].X := 0.0;
+_ShapeStart[2].Y := TotalY + PanelGap; // offset 770.0
 
-// Start trzeciego kwadratu
-_ShapeStart[3].X := TotalX;
-_ShapeStart[3].Y := 2.0 * (TotalY + PanelGap) - LeadInY;
+// 3. Kształt główny - Panel Górny
+_ShapeStart[3].X := 0.0;
+_ShapeStart[3].Y := 2.0 * (TotalY + PanelGap); // offset 1540.0
 
-// Pozostałe kształty (bez zmian)
+// ===================================================
+// WSPÓŁRZĘDNE SLOTÓW PRZYWRÓCONE Z PIERWSZEGO PROGRAMU
+// ===================================================
 _ShapeStart[4].X := 900.0;
 _ShapeStart[4].Y := 125.0;
 
@@ -152,6 +175,7 @@ _ShapeStart[7].Y := 220.0;
 _ShapeStart[8].X := 920.0;
 _ShapeStart[8].Y := 20.0;
 
+
 IF _ConfigProvider <> 0 THEN
     localConfig := _ConfigProvider.Config;
     Velo := localConfig.CuttingSpeedXY;
@@ -164,32 +188,37 @@ _GeometryWriter.EnableTangentialFollowing();
 
 sx := 0.0; sy := 0.0; dx := 0.0; dy := 0.0; r_val := 0.0;
 
+// RYSOWANIE KSZTAŁTU ZGODNIE Z INDEKSEM
 CASE _CurrentShapeIndex OF
-    // Obsługa cięcia 3 kwadratów
+    
+    // Cięcie trzech paneli (kwadratów)
     1, 2, 3:
-        Y_Offset := INT_TO_LREAL(_CurrentShapeIndex - 1) * (TotalY + PanelGap);
+        sx := _ShapeStart[_CurrentShapeIndex].X;
+        sy := _ShapeStart[_CurrentShapeIndex].Y;
 
-        _GeometryWriter.AddStartPoint(_ShapeStart[_CurrentShapeIndex].X, _ShapeStart[_CurrentShapeIndex].Y); 
-        
-        // Wejście (Lead-In) do prawego dolnego rogu
-        _GeometryWriter.AddLine(TotalX, 0.0 + Y_Offset, Velo); 
-        
-        // Krawędź prawa (w górę)
-        _GeometryWriter.AddLine(TotalX, TotalY + Y_Offset, Velo);
-        
-        // Krawędź górna (w lewo)
-        _GeometryWriter.AddLine(0.0, TotalY + Y_Offset, Velo);
-        
-        // Krawędź lewa (w dół)
-        _GeometryWriter.AddLine(0.0, 0.0 + Y_Offset, Velo);
-        
-        // Krawędź dolna (w prawo, zamknięcie kwadratu)
-        _GeometryWriter.AddLine(TotalX, 0.0 + Y_Offset, Velo);
-        
-        // Wyjście (Lead-Out) w dół, ucieczka od materiału
-        _GeometryWriter.AddLine(TotalX, 0.0 - LeadOutY + Y_Offset, Velo); 
+        _GeometryWriter.AddStartPoint(sx, sy);
 
-    // Obsługa pozostałych wycięć (bez zmian)
+        _GeometryWriter.AddLine(sx, sy + TotalY - Radius, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(sx + Radius, sy + TotalY, sx + Radius, sy + TotalY - Radius, Velo, TRUE);
+        END_IF
+
+        _GeometryWriter.AddLine(sx + TotalX - Radius, sy + TotalY, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(sx + TotalX, sy + TotalY - Radius, sx + TotalX - Radius, sy + TotalY - Radius, Velo, TRUE);
+        END_IF
+
+        _GeometryWriter.AddLine(sx + TotalX, sy + Radius, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(sx + TotalX - Radius, sy, sx + TotalX - Radius, sy + Radius, Velo, TRUE);
+        END_IF
+
+        _GeometryWriter.AddLine(sx + Radius, sy, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(sx, sy + Radius, sx + Radius, sy + Radius, Velo, TRUE);
+        END_IF
+
+    // Wycięcia wewnętrzne z odpowiednio przypisaną logiką
     4, 5, 6, 7, 8:
         sx := _ShapeStart[_CurrentShapeIndex].X;
         sy := _ShapeStart[_CurrentShapeIndex].Y;
@@ -306,7 +335,7 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2_3Squares.Build">
-      <LineId Id="3230" Count="191" />
+      <LineId Id="3678" Count="220" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2_3Squares.CalculateFootprint">
