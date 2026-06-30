@@ -11,10 +11,14 @@
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR
     TotalX, TotalY, Radius : LREAL;
-    Velo : LREAL;
-    localConfig : ST_GantryXYZ_Config;
-	
-    // Zmienne do otworów
+    CircleRadius           : LREAL;
+    Velo                   : LREAL;
+    localConfig            : ST_GantryXYZ_Config;
+    
+    PanelGap               : LREAL;
+    Y_Offset               : LREAL;
+    p                      : INT;
+
     HoleDistanceFromEdgeOfRail : LREAL := 100.0;
     SomeFixedDimension         : LREAL := 12.63;
     PanelRailOffsetX           : LREAL;
@@ -29,18 +33,19 @@ VAR
     
     i                          : INT;
     holeIdx                    : INT;
-	
-	RailSlot  : LREAL := 29.0;
-	BigSlot   : LREAL := 200.0;
-	SmallSlot : LREAL := 100.0;
+    
+    RailSlot  : LREAL := 29.0;
+    BigSlot   : LREAL := 200.0;
+    SmallSlot : LREAL := 100.0;
 
-// Zmienne pomocnicze do generowania ścieżek
-	sx : LREAL;
-	sy : LREAL;
-	dx : LREAL;
-	dy : LREAL;
-	r_val : LREAL;
-	
+    LeadInY   : LREAL := 10.0;
+    LeadOutY  : LREAL := 10.0;
+
+    sx : LREAL;
+    sy : LREAL;
+    dx : LREAL;
+    dy : LREAL;
+    r_val : LREAL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[_Busy := TRUE;
@@ -56,26 +61,19 @@ IF NOT _Config.IsValid THEN
     RETURN;
 END_IF
 
-// Gabaryty i promień
-TotalX := _Config.PanelFrontWidth;
-TotalY := _Config.PanelFrontLength;
-Radius := _Config.Radius;
+// Zmiana rozmiaru na 750mm
+TotalX := 750.0;
+TotalY := 750.0;
+CircleRadius := TotalX / 2.0;
 
-IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
-IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
+PanelGap := 20.0; 
 
-
-// ===================================================
-// OBLICZENIA DLA SZYN I OTWORÓW
-// ===================================================
-// Po poprawce: offset X uzależniony od X, a Y od Y
 PanelRailOffsetX := 0.1 * TotalX;
 PanelRailOffsetY := 0.1 * TotalY;
 
 ExtrusionLengthX := TotalX - (2.0 * PanelRailOffsetX);
 ExtrusionLengthY := TotalY - (2.0 * PanelRailOffsetY);
 
-// Wyliczenie rozstawu (Zabezpieczenie przed dzieleniem przez zero, jeśli ktoś wpisze NumberOfHoles = 1)
 IF NumberOfHolesX > 1 THEN
     HolesSpacingX := (ExtrusionLengthX - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesX - 1);
 ELSE
@@ -88,75 +86,74 @@ ELSE
     HolesSpacingY := 0.0;
 END_IF
 
+holeIdx := 0; 
 
-// ===================================================
-// GENEROWANIE OTWORÓW (Zoptymalizowana ścieżka po obwodzie)
-// ===================================================
-holeIdx := 1;
+// Pętla zmieniona na 3 elementy (0 DO 2)
+FOR p := 0 TO 2 DO
+    Y_Offset := INT_TO_LREAL(p) * (TotalY + PanelGap);
 
-// 1. Otwór na dokładnym środku wycinanego detalu
-_HolesDrill[holeIdx].X := LREAL_TO_REAL(TotalX / 2.0);
-_HolesDrill[holeIdx].Y := LREAL_TO_REAL(TotalY / 2.0);
-
-// 2. Rail Y1 (Lewa) - Ruch z GÓRY na DÓŁ
-FOR i := NumberOfHolesY TO 1 BY -1 DO
     holeIdx := holeIdx + 1;
-    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX - SomeFixedDimension);
-    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(TotalX / 2.0);
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL((TotalY / 2.0) + Y_Offset);
+
+    FOR i := NumberOfHolesY TO 1 BY -1 DO
+        holeIdx := holeIdx + 1;
+        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX - SomeFixedDimension);
+        _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY) + Y_Offset);
+    END_FOR
+
+    FOR i := 1 TO NumberOfHolesX DO
+        holeIdx := holeIdx + 1;
+        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
+        _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY - SomeFixedDimension + Y_Offset);
+    END_FOR
+
+    FOR i := 1 TO NumberOfHolesY DO
+        holeIdx := holeIdx + 1;
+        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + ExtrusionLengthX + SomeFixedDimension);
+        _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY) + Y_Offset);
+    END_FOR
+
+    FOR i := NumberOfHolesX TO 1 BY -1 DO
+        holeIdx := holeIdx + 1;
+        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
+        _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + ExtrusionLengthY + SomeFixedDimension + Y_Offset);
+    END_FOR
 END_FOR
 
-// 3. Rail X1 (Dolna) - Ruch z LEWEJ do PRAWEJ
-FOR i := 1 TO NumberOfHolesX DO
-    holeIdx := holeIdx + 1;
-    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
-    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY - SomeFixedDimension);
-END_FOR
-
-// 4. Rail Y2 (Prawa) - Ruch z DOŁU do GÓRY
-FOR i := 1 TO NumberOfHolesY DO
-    holeIdx := holeIdx + 1;
-    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + ExtrusionLengthX + SomeFixedDimension);
-    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
-END_FOR
-
-// 5. Rail X2 (Górna) - Ruch z PRAWEJ do LEWEJ
-FOR i := NumberOfHolesX TO 1 BY -1 DO
-    holeIdx := holeIdx + 1;
-    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
-    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + ExtrusionLengthY + SomeFixedDimension);
-END_FOR
-
-// Przypisanie całkowitej liczby otworów do recepty
 _HolesToDrill := holeIdx;
 
-// ===================================================
-// DEFINICJA ILOŚCI I PUNKTÓW STARTOWYCH (Dla FeedTable)
-// ===================================================
-_ShapesCount := 6; // 1 główny panel + 5 nowych wycięć z tabeli
+// Liczba kształtów to teraz 8 (3 kółka + 5 dotychczasowych profili/otworów)
+_ShapesCount := 8; 
 
-// 1. Kształt główny
-_ShapeStart[1].X := 0.0;
-_ShapeStart[1].Y := 0.0;
+// Kółko 1
+_ShapeStart[1].X := TotalX;
+_ShapeStart[1].Y := CircleRadius - LeadInY;
 
-// 2. No. 1
-_ShapeStart[2].X := 1030.0;
-_ShapeStart[2].Y := 0.0;
+// Kółko 2
+_ShapeStart[2].X := TotalX;
+_ShapeStart[2].Y := TotalY + PanelGap + CircleRadius - LeadInY;
 
-// 3. No. 2
-_ShapeStart[3].X := 1090.0;
-_ShapeStart[3].Y := 0.0;
+// Kółko 3
+_ShapeStart[3].X := TotalX;
+_ShapeStart[3].Y := 2.0 * (TotalY + PanelGap) + CircleRadius - LeadInY;
 
-// 4. No. 3
-_ShapeStart[4].X := 210.0;
-_ShapeStart[4].Y := 2200.0;
+// Pozostałe kształty przesunięte na indeksy 4-8 
+// UWAGA: Stałe współrzędne > 750 (np. 900.0) mogą wymagać Twojej poprawki do nowego wymiaru TotalX/Y
+_ShapeStart[4].X := 900.0;
+_ShapeStart[4].Y := 125.0;
 
-// 5. No. 4
-_ShapeStart[5].X := 410.0;
-_ShapeStart[5].Y := 2150.0;
+_ShapeStart[5].X := 900.0;
+_ShapeStart[5].Y := 875.0;
 
-// 6. No. 5
-_ShapeStart[6].X := 810.0;
-_ShapeStart[6].Y := 2150.0;
+_ShapeStart[6].X := 870.0;
+_ShapeStart[6].Y := 520.0;
+
+_ShapeStart[7].X := 870.0;
+_ShapeStart[7].Y := 220.0;
+
+_ShapeStart[8].X := 920.0;
+_ShapeStart[8].Y := 20.0;
 
 IF _ConfigProvider <> 0 THEN
     localConfig := _ConfigProvider.Config;
@@ -168,93 +165,61 @@ END_IF
 _GeometryWriter.Clear();
 _GeometryWriter.EnableTangentialFollowing();
 
-// Reset zmiennych pomocniczych przed każdym wywołaniem
 sx := 0.0; sy := 0.0; dx := 0.0; dy := 0.0; r_val := 0.0;
 
-// RYSOWANIE KSZTAŁTU ZGODNIE Z INDEKSEM
 CASE _CurrentShapeIndex OF
-    1:
-        // ==========================================
-        // KSZTAŁT 1 (Główny panel - Twój stary kod)
-        // ==========================================
-        _GeometryWriter.AddStartPoint(_ShapeStart[1].X, _ShapeStart[1].Y);
+    // Obsługa cięcia 3 kółek w ten sam sposób
+    1, 2, 3:
+        Y_Offset := INT_TO_LREAL(_CurrentShapeIndex - 1) * (TotalY + PanelGap);
 
-        _GeometryWriter.AddLine(0.0, TotalY - Radius, Velo);
-        IF Radius > 0 THEN
-            _GeometryWriter.AddArc(Radius, TotalY, Radius, TotalY - Radius, Velo, TRUE);
-        END_IF
+        _GeometryWriter.AddStartPoint(_ShapeStart[_CurrentShapeIndex].X, _ShapeStart[_CurrentShapeIndex].Y); 
+        _GeometryWriter.AddLine(TotalX, CircleRadius + Y_Offset, Velo); 
+        _GeometryWriter.AddArc(0.0, CircleRadius + Y_Offset, CircleRadius, CircleRadius + Y_Offset, Velo, FALSE);
+        _GeometryWriter.AddArc(TotalX, CircleRadius + Y_Offset, CircleRadius, CircleRadius + Y_Offset, Velo, FALSE);
+        _GeometryWriter.AddLine(TotalX, CircleRadius + LeadOutY + Y_Offset, Velo); 
 
-        _GeometryWriter.AddLine(TotalX - Radius, TotalY, Velo);
-        IF Radius > 0 THEN
-            _GeometryWriter.AddArc(TotalX, TotalY - Radius, TotalX - Radius, TotalY - Radius, Velo, TRUE);
-        END_IF
-
-        _GeometryWriter.AddLine(TotalX, Radius, Velo);
-        IF Radius > 0 THEN
-            _GeometryWriter.AddArc(TotalX - Radius, 0.0, TotalX - Radius, Radius, Velo, TRUE);
-        END_IF
-
-        _GeometryWriter.AddLine(Radius, 0.0, Velo);
-        IF Radius > 0 THEN
-            _GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, TRUE);
-        END_IF
-
-    2, 3, 4, 5, 6:
-        // ==========================================
-        // KSZTAŁTY OD 2 DO 6 (Z tabeli)
-        // ==========================================
-        // Przypisanie współrzędnych startowych dla aktualnego kształtu
+    // Obsługa pozostałych wycięć
+    4, 5, 6, 7, 8:
         sx := _ShapeStart[_CurrentShapeIndex].X;
         sy := _ShapeStart[_CurrentShapeIndex].Y;
-        r_val := 10.0; // Promień jest równy 10 dla wszystkich slotów
+        r_val := 10.0;
 
-        // Dobór wymiarów na podstawie tego, który numer wycinamy
-        IF _CurrentShapeIndex = 2 THEN
+        IF _CurrentShapeIndex = 4 THEN
             dx := RailSlot;
             dy := ExtrusionLengthY;
-        ELSIF _CurrentShapeIndex = 3 THEN
+        ELSIF _CurrentShapeIndex = 5 THEN
             dx := RailSlot;
-            dy := ExtrusionLengthX;
-        ELSIF _CurrentShapeIndex = 4 THEN
+            dy := ExtrusionLengthX; 
+        ELSIF _CurrentShapeIndex = 6 THEN
             dx := SmallSlot;
             dy := SmallSlot;
-        ELSIF _CurrentShapeIndex = 5 THEN
+        ELSIF _CurrentShapeIndex = 7 THEN
             dx := BigSlot;
             dy := BigSlot;
-        ELSIF _CurrentShapeIndex = 6 THEN
+        ELSIF _CurrentShapeIndex = 8 THEN
             dx := BigSlot;
             dy := BigSlot;
         END_IF
 
-        // Wygenerowanie geometrycznej ścieżki (z absolutnym offsetem sx, sy)
-        // Wkłuwamy się w lewym dolnym rogu (w odpad)
         _GeometryWriter.AddStartPoint(sx, sy);
 
-        // 1. Lewa krawędź w górę
         _GeometryWriter.AddLine(sx, sy + dy - r_val, Velo);
         IF r_val > 0 THEN
-            // Lewy górny łuk
             _GeometryWriter.AddArc(sx + r_val, sy + dy, sx + r_val, sy + dy - r_val, Velo, TRUE);
         END_IF
 
-        // 2. Górna krawędź w prawo
         _GeometryWriter.AddLine(sx + dx - r_val, sy + dy, Velo);
         IF r_val > 0 THEN
-            // Prawy górny łuk
             _GeometryWriter.AddArc(sx + dx, sy + dy - r_val, sx + dx - r_val, sy + dy - r_val, Velo, TRUE);
         END_IF
 
-        // 3. Prawa krawędź w dół
         _GeometryWriter.AddLine(sx + dx, sy + r_val, Velo);
         IF r_val > 0 THEN
-            // Prawy dolny łuk
             _GeometryWriter.AddArc(sx + dx - r_val, sy, sx + dx - r_val, sy + r_val, Velo, TRUE);
         END_IF
 
-        // 4. Dolna krawędź w lewo i zamknięcie
         _GeometryWriter.AddLine(sx + r_val, sy, Velo);
         IF r_val > 0 THEN
-            // Lewy dolny łuk
             _GeometryWriter.AddArc(sx, sy + r_val, sx + r_val, sy + r_val, Velo, TRUE);
         END_IF
 
@@ -264,8 +229,7 @@ _GeometryWriter.EndTable();
 
 _Busy := FALSE;
 _Done := TRUE;
-Build := TRUE;
-]]></ST>
+Build := TRUE;]]></ST>
       </Implementation>
     </Method>
     <Method Name="CalculateFootprint" Id="{3574da9d-4b8a-441e-a2e2-40ddce951262}">
@@ -331,9 +295,7 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2_3Circles.Build">
-      <LineId Id="2840" Count="85" />
-      <LineId Id="3062" Count="134" />
-      <LineId Id="2926" Count="0" />
+      <LineId Id="3230" Count="180" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2_3Circles.CalculateFootprint">
