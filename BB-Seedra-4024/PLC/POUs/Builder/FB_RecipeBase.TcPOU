@@ -12,11 +12,11 @@ VAR
 	_Limits : ST_Recipe_Limits;
 
     // --- NOWE ZMIENNE DO PRZECHOWYWANIA SEGMENTÓW ---
-    _SegmentsCutX           : ARRAY [1..32] OF ST_CutSegment;
-    _SegmentsCutY           : ARRAY [1..32] OF ST_CutSegment;
-    _SegmentsGroove         : ARRAY [1..32] OF ST_CutSegment;
-	_HolesDrill 			: ARRAY [1..32] OF ST_PointXY;
-	_ShapeStart         	: ARRAY [1..32] OF ST_PointXY;
+    _SegmentsCutX           : ARRAY [1..100] OF ST_CutSegment;
+    _SegmentsCutY           : ARRAY [1..100] OF ST_CutSegment;
+    _SegmentsGroove         : ARRAY [1..100] OF ST_CutSegment;
+	_HolesDrill 			: ARRAY [1..100] OF ST_PointXY;
+	_ShapeStart         	: ARRAY [1..100] OF ST_PointXY;
 	_ShapesCount        	: INT := 1;
     _CurrentShapeIndex  	: INT := 1;
 	_HolesToDrill   		: INT;
