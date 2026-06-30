@@ -146,14 +146,14 @@ _ShapeStart[4].Y := 125.0;
 _ShapeStart[5].X := 900.0;
 _ShapeStart[5].Y := 875.0;
 
-_ShapeStart[6].X := 870.0;
-_ShapeStart[6].Y := 520.0;
+_ShapeStart[6].X := 920.0;
+_ShapeStart[6].Y := 20.0;
 
 _ShapeStart[7].X := 870.0;
 _ShapeStart[7].Y := 220.0;
 
-_ShapeStart[8].X := 920.0;
-_ShapeStart[8].Y := 20.0;
+_ShapeStart[8].X := 870.0;
+_ShapeStart[8].Y := 520.0;
 
 IF _ConfigProvider <> 0 THEN
     localConfig := _ConfigProvider.Config;
@@ -295,7 +295,9 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2_3Circles.Build">
-      <LineId Id="3230" Count="180" />
+      <LineId Id="3230" Count="96" />
+      <LineId Id="3450" Count="0" />
+      <LineId Id="3328" Count="82" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedBuilderMeina2_3Circles.CalculateFootprint">
