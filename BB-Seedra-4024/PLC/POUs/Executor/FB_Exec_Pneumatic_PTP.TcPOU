@@ -53,14 +53,14 @@ localConfig := _ConfigProvider.Config;
 // ========================================================
 CASE CutDirection OF
     E_CutDirection.eCutX:
-        IF iCurrentSegment < 1 OR iCurrentSegment > 32 THEN iCurrentSegment := 1; END_IF
+        IF iCurrentSegment < 1 OR iCurrentSegment > 1000 THEN iCurrentSegment := 1; END_IF
         currentSeg    := _RecipeBuilder.SegmentsCutX[iCurrentSegment];
         totalSegments := _RecipeBuilder.SegmentsToCutX;
         offsetX       := localConfig.CutterXOffsetX;
         offsetY       := localConfig.CutterXOffsetY;
         
     E_CutDirection.eCutY:
-        IF iCurrentSegment < 1 OR iCurrentSegment > 32 THEN iCurrentSegment := 1; END_IF
+        IF iCurrentSegment < 1 OR iCurrentSegment > 1000 THEN iCurrentSegment := 1; END_IF
         currentSeg    := _RecipeBuilder.SegmentsCutY[iCurrentSegment];
         totalSegments := _RecipeBuilder.SegmentsToCutY;
         offsetX       := localConfig.CutterYOffsetX;

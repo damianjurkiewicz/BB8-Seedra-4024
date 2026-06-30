@@ -28,7 +28,7 @@ localConfig := _ConfigProvider.Config;
 
 // Zabezpieczenie zakresu tablicy
 IF iCurrentSegment < 1 THEN iCurrentSegment := 1; END_IF
-IF iCurrentSegment > 32 THEN iCurrentSegment := 32; END_IF
+IF iCurrentSegment > 1000 THEN iCurrentSegment := 1000; END_IF
 
 currentHole := _RecipeBuilder.HolesDrill[iCurrentSegment];
 
