@@ -306,7 +306,7 @@ END_VAR
       </Set>
     </Property>
     <Property Name="HolesDrill" Id="{33a6c722-63d3-4021-9875-0f4e89b1bc5f}">
-      <Declaration><![CDATA[PROPERTY HolesDrill : REFERENCE TO ARRAY [1..32] OF ST_PointXY]]></Declaration>
+      <Declaration><![CDATA[PROPERTY HolesDrill : REFERENCE TO ARRAY [1..100] OF ST_PointXY]]></Declaration>
       <Get Name="Get" Id="{353ebf4d-ee7a-4628-96f6-0d8b60355f97}">
         <Declaration><![CDATA[VAR
 END_VAR
@@ -361,7 +361,7 @@ END_VAR
       </Get>
     </Property>
     <Property Name="SegmentsCutX" Id="{3184be54-f03a-4975-8cf1-db07c128d253}">
-      <Declaration><![CDATA[PROPERTY SegmentsCutX : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
+      <Declaration><![CDATA[PROPERTY SegmentsCutX : REFERENCE TO ARRAY [1..100] OF ST_CutSegment]]></Declaration>
       <Get Name="Get" Id="{0f425160-36a8-4f28-99b9-e92bc5ef61d9}">
         <Declaration><![CDATA[VAR
 END_VAR
@@ -372,7 +372,7 @@ END_VAR
       </Get>
     </Property>
     <Property Name="SegmentsCutY" Id="{7e96d748-34eb-4d02-bea9-39c6162fca26}">
-      <Declaration><![CDATA[PROPERTY SegmentsCutY : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
+      <Declaration><![CDATA[PROPERTY SegmentsCutY : REFERENCE TO ARRAY [1..100] OF ST_CutSegment]]></Declaration>
       <Get Name="Get" Id="{18ebbd77-7872-47d5-b7ea-e1c19856104e}">
         <Declaration><![CDATA[VAR
 END_VAR
@@ -383,7 +383,7 @@ END_VAR
       </Get>
     </Property>
     <Property Name="SegmentsGroove" Id="{ef32f872-b41e-411a-89df-3b90001a16fb}">
-      <Declaration><![CDATA[PROPERTY SegmentsGroove : REFERENCE TO ARRAY [1..32] OF ST_CutSegment]]></Declaration>
+      <Declaration><![CDATA[PROPERTY SegmentsGroove : REFERENCE TO ARRAY [1..100] OF ST_CutSegment]]></Declaration>
       <Get Name="Get" Id="{9f573555-28d1-42d5-8de5-c6e1c98b00d0}">
         <Declaration><![CDATA[VAR
 END_VAR
@@ -444,7 +444,7 @@ END_VAR
       </Get>
     </Property>
     <Property Name="ShapeStart" Id="{52d57a51-14a0-4aab-abe9-db16b054b96d}">
-      <Declaration><![CDATA[PROPERTY ShapeStart : REFERENCE TO ARRAY [1..32] OF ST_PointXY]]></Declaration>
+      <Declaration><![CDATA[PROPERTY ShapeStart : REFERENCE TO ARRAY [1..100] OF ST_PointXY]]></Declaration>
       <Get Name="Get" Id="{130de704-36d0-4d0c-80da-43de01c2c5c4}">
         <Declaration><![CDATA[VAR
 END_VAR
