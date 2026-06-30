@@ -12,13 +12,13 @@ VAR
 	BuilderFeedCircle  		: FB_FeedBuilderCircle;
 	BuilderMeina2_2000x1000	: FB_FeedMeina2_2000x1000;
 	
-	BuilderMeina2_5Squares    : FB_FeedMeina2_500x500;
-    BuilderMeina2_5Circles    : FB_FeedBuilderMeina2_5Circles;
-    BuilderMeina2_3Squares    : FB_FeedBuilderMeina2_3Squares;
-    BuilderMeina2_3Circles    : FB_FeedBuilderMeina2_3Circles;
-    BuilderMeina2_1000x1000   : FB_FeedMeina2_1000x1000;
-    BuilderMeina2_2Circles    : FB_FeedBuilderMeina2_2Circles;
-    BuilderMeina2_2000x500    : FB_FeedMeina2_2000x500;
+	BuilderMeina2_5Squares    			: FB_FeedMeina2_500x500;
+    BuilderMeina2_5Circles    			: FB_FeedBuilderMeina2_5Circles;
+    BuilderMeina2_3Squares    			: FB_FeedBuilderMeina2_3Squares;
+    BuilderMeina2_3Circles    			: FB_FeedBuilderMeina2_3Circles;
+    BuilderMeina2_1000x1000   			: FB_FeedMeina2_1000x1000;
+    BuilderMeina2_1000x1000_Circles    	: FB_BuilderMeina2_1000x1000_Circles;
+    BuilderMeina2_2000x500    			: FB_FeedMeina2_2000x500;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -69,8 +69,8 @@ END_VAR]]></Declaration>
     E_RecipeID.eMeina2_1000x1000:    
 		GetBuilder := BuilderMeina2_1000x1000;
 		
-    E_RecipeID.eMeina2_2Circles:    
-		GetBuilder := BuilderMeina2_2Circles;
+    E_RecipeID.eMeina2_1000x1000_Circles:    
+		GetBuilder := BuilderMeina2_1000x1000_Circles;
 		
     E_RecipeID.eMeina2_2000x500: 
 		GetBuilder := BuilderMeina2_2000x500;
@@ -126,8 +126,8 @@ BuilderMeina2_3Circles.ConfigProvider := ConfigProvider;
 BuilderMeina2_1000x1000.Config       := Config;
 BuilderMeina2_1000x1000.ConfigProvider := ConfigProvider;
 
-BuilderMeina2_2Circles.Config       := Config;
-BuilderMeina2_2Circles.ConfigProvider := ConfigProvider;
+BuilderMeina2_1000x1000_Circles.Config       := Config;
+BuilderMeina2_1000x1000_Circles.ConfigProvider := ConfigProvider;
 
 BuilderMeina2_2000x500.Config    := Config;
 BuilderMeina2_2000x500.ConfigProvider := ConfigProvider;    
@@ -154,7 +154,7 @@ BuilderMeina2_5Circles.Config    := Config;
 BuilderMeina2_3Squares.Config    := Config;
 BuilderMeina2_3Circles.Config    := Config;
 BuilderMeina2_1000x1000.Config    := Config;
-BuilderMeina2_2Circles.Config    := Config;
+BuilderMeina2_1000x1000_Circles.Config    := Config;
 BuilderMeina2_2000x500.Config := Config;]]></ST>
       </Implementation>
     </Method>
@@ -162,7 +162,7 @@ BuilderMeina2_2000x500.Config := Config;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.GetBuilder">
-      <LineId Id="146" Count="47" />
+      <LineId Id="197" Count="47" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.InitializeFactory">
