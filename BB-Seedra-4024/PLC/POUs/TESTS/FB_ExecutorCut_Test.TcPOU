@@ -14,12 +14,12 @@ VAR
     MockAxisY    : FB_MockAxis := (Name := 'MockY');
     MockAxisZ    : FB_MockAxis := (Name := 'MockZ');
     
-    TestRecipe   : FB_RecipeBuilderBorgoWings;
+    TestRecipe   : FB_PTPBorgoWings;
 
 	
 	Executor_Zero       : FB_Exec_Pneumatic_PTP;
     MockCylinder_Zero   : FB_MockCylinder;
-    BuilderArona        : FB_RecipeBuilderArona; // Arona to nasza wydmuszka, zwraca 0 segmentów!
+    BuilderArona        : FB_PTPArona; // Arona to nasza wydmuszka, zwraca 0 segmentów!
 
     Executor_AxisErr    : FB_Exec_Pneumatic_PTP;
     MockAxisX_Err       : FB_MockAxis;
@@ -146,7 +146,7 @@ VAR_INST
     TestConfig   : ST_GantryXYZ_Config;
     
 
-    LocalTestRecipe : FB_RecipeBuilderBorgoWings;
+    LocalTestRecipe : FB_PTPBorgoWings;
     LocalConfigProvider : FB_MockConfigProvider;
 END_VAR]]></Declaration>
       <Implementation>

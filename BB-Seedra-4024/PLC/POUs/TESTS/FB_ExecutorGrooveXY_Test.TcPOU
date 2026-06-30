@@ -18,8 +18,8 @@ VAR
     MockAxisZ_Err : FB_MockAxis := (Name := 'MockZ_Err'); // Złośliwa oś Z
     
     // Budowniczowie receptur
-    TestRecipe   : FB_RecipeBuilderBorgoWings; // Posiada 4 frezowania
-    BuilderArona : FB_RecipeBuilderArona;      // Wydmuszka, posiada 0 frezowań
+    TestRecipe   : FB_PTPBorgoWings; // Posiada 4 frezowania
+    BuilderArona : FB_PTPArona;      // Wydmuszka, posiada 0 frezowań
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[Test_AxisError_AbortsSequence();

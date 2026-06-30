@@ -3,11 +3,11 @@
   <POU Name="FB_RecipeBuilder_Test" Id="{ede2b717-c9c9-439b-9f45-ba86089b083e}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilder_Test EXTENDS TcUnit.FB_TestSuite
 VAR
-    BuilderArona 		: FB_RecipeBuilderArona;
-    BuilderBorgoFlaps 	: FB_RecipeBuilderBorgoFlaps;
-	BuilderBorgoWings 	: FB_RecipeBuilderBorgoWings; 
-	BuilderCircle 		: FB_NCIBuilderCircle;
-	BuilderRectangle    : FB_RecipeBuilderRectangle;
+    BuilderArona 		: FB_PTPArona;
+    BuilderBorgoFlaps 	: FB_PTPBorgoFlaps;
+	BuilderBorgoWings 	: FB_PTPBorgoWings; 
+	BuilderCircle 		: FB_NCICircle;
+	BuilderRectangle    : FB_PTPRectangle;
     Config  			: ST_RecipeBuilder_Config;
 END_VAR]]></Declaration>
     <Implementation>
@@ -414,7 +414,7 @@ TEST_FINISHED();]]></ST>
     <Method Name="Test_GlobalOffset_Reduces_MaxCopies" Id="{593b9c31-c36d-4ad8-a81a-6167338e3125}">
       <Declaration><![CDATA[METHOD Test_GlobalOffset_Reduces_MaxCopies
 VAR_INST 
-    LocalBuilder       : FB_RecipeBuilderBorgoWings;
+    LocalBuilder       : FB_PTPBorgoWings;
     MockConfigProvider : FB_MockConfigProvider;
 END_VAR
 VAR 

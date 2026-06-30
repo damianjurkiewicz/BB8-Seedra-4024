@@ -58,16 +58,16 @@
     <Compile Include="POUs\Builder\I_GeometryWriter.TcIO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_BuilderMeina2_1000x1000_Circles.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_1000x1000_Circles.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_2000x500.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderMeina2_3Squares.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_750x750.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderMeina2_3Circles.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_750x750_Circles.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_1000x1000.TcPOU">
@@ -79,28 +79,28 @@
     <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_500x500_Circles.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderRoundedRect.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_FeedRoundedRect.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_FeedBuilderCircle.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_FeedCircle.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_2000x1000.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderArona.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_PTPArona.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_NCIBuilderCircle.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_NCICircle.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderRectangle.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_PTPRectangle.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderBorgoFlaps.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_PTPBorgoFlaps.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_RecipeBuilderBorgoWings.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_PTPBorgoWings.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Components\FB_Cylinder.TcPOU">
@@ -371,7 +371,7 @@
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
-    <Compile Include="VISUs\Modes\ProductionMode\V_ProductionMeina2.TcVIS">
+    <Compile Include="VISUs\Modes\ProductionMode\V_Meina2_2000x1000.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>

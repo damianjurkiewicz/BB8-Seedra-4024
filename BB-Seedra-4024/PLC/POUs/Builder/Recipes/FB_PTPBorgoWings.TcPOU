@@ -1,21 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_RecipeBuilderBorgoFlaps" Id="{1389b747-8c88-4122-8f76-112cbf46c424}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderBorgoFlaps EXTENDS FB_RecipeBase
+  <POU Name="FB_PTPBorgoWings" Id="{3f83a514-1f2f-4e3d-921c-ca7c0b60e17f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_PTPBorgoWings EXTENDS FB_RecipeBase
 
 
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="Build" Id="{a7636aac-6540-4877-9111-d7366342a8fe}">
+    <Method Name="Build" Id="{c08ade7c-db75-4c50-8457-5bb392619adf}">
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR_INST
     TotalY          : REAL;
     TotalX          : REAL;
     ShorterY        : REAL;
     ShorterX        : REAL;
-END_VAR]]></Declaration>
+END_VAR
+]]></Declaration>
       <Implementation>
         <ST><![CDATA[_Busy := TRUE;
 _Done := FALSE;
@@ -90,16 +91,16 @@ _SegmentsCutX[4].Stop.X  := -_Config.CuttingOverpass;
 _SegmentsCutX[4].Start.Y := _Config.PanelHeight;
 _SegmentsCutX[4].Stop.Y  := _Config.PanelHeight;
 
-// Panel Dimensions 
+// Panel Dimensions Shorter Flaps
 _SegmentsCutX[5].Start.X := TotalX + _Config.CuttingOverpass;
 _SegmentsCutX[5].Stop.X  := -_Config.CuttingOverpass;
-_SegmentsCutX[5].Start.Y := TotalY;
-_SegmentsCutX[5].Stop.Y  := TotalY;
+_SegmentsCutX[5].Start.Y := TotalY - _Config.RailHeightCorrection;
+_SegmentsCutX[5].Stop.Y  := TotalY - _Config.RailHeightCorrection;
 
 _SegmentsCutX[6].Start.X := TotalX + _Config.CuttingOverpass;
 _SegmentsCutX[6].Stop.X  := -_Config.CuttingOverpass;
-_SegmentsCutX[6].Start.Y := 0;
-_SegmentsCutX[6].Stop.Y  := 0;
+_SegmentsCutX[6].Start.Y := _Config.RailHeightCorrection;
+_SegmentsCutX[6].Stop.Y  := _Config.RailHeightCorrection;
 
 // ------------------------------------
 // 3. Cięcie w osi Y (Cut Y)
@@ -127,14 +128,14 @@ _SegmentsCutY[4].Stop.X  := _Config.PanelHeight;
 _SegmentsCutY[4].Start.Y := _Config.PanelHeight;
 _SegmentsCutY[4].Stop.Y  := -_Config.CuttingOverpass;
 
-// Panel Dimensions Shorter Wings
-_SegmentsCutY[5].Start.X := TotalX - _Config.RailHeightCorrection;
-_SegmentsCutY[5].Stop.X  := TotalX - _Config.RailHeightCorrection;
+// Panel Dimensions
+_SegmentsCutY[5].Start.X := TotalX;
+_SegmentsCutY[5].Stop.X  := TotalX;
 _SegmentsCutY[5].Start.Y := TotalY + _Config.CuttingOverpass;
 _SegmentsCutY[5].Stop.Y  := -_Config.CuttingOverpass;
 
-_SegmentsCutY[6].Start.X := _Config.RailHeightCorrection;
-_SegmentsCutY[6].Stop.X  := _Config.RailHeightCorrection;
+_SegmentsCutY[6].Start.X := 0;
+_SegmentsCutY[6].Stop.X  := 0;
 _SegmentsCutY[6].Start.Y := TotalY + _Config.CuttingOverpass;
 _SegmentsCutY[6].Stop.Y  := -_Config.CuttingOverpass;
 
@@ -144,20 +145,20 @@ _Done := TRUE;
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
-    <Method Name="CalculateFootprint" Id="{9729302b-8841-4a61-a0ae-d9106fc641a1}">
+    <Method Name="CalculateFootprint" Id="{d0703fd7-54d2-42a5-810a-5faa421e709f}">
       <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
 VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[// BorgoWings wie, że jego wymiar powiększa się o ścianki zagięcia:
-_NominalX := _Config.PanelFrontWidth  + 2.0 * _Config.PanelHeight; 
+_NominalX := _Config.PanelFrontWidth  + 2.0 * _Config.PanelHeight;
 _NominalY := _Config.PanelFrontLength + 2.0 * _Config.PanelHeight;]]></ST>
       </Implementation>
     </Method>
-    <Property Name="ExecutionRoute" Id="{0305d75c-974a-4eab-a51e-af357ba6ad95}">
+    <Property Name="ExecutionRoute" Id="{f37987ed-0c72-45f4-b183-c93ca21c5023}">
       <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
-      <Get Name="Get" Id="{656fd98a-8440-4295-ade6-b1b129d2e1b8}">
+      <Get Name="Get" Id="{8ba68219-65a5-4342-9f6c-c297de6ba924}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -166,7 +167,7 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
-    <Method Name="FB_init" Id="{4a0331ae-cce1-43c4-8f3f-519ce38c4c04}">
+    <Method Name="FB_init" Id="{166bcf26-5e69-4b30-9881-84478d8b0138}">
       <Declaration><![CDATA[METHOD FB_init : BOOL
 VAR_INPUT
 	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
@@ -175,13 +176,13 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
-_Limits.PanelFrontLength.MaxVal := 2400.0;
+_Limits.PanelFrontLength.MaxVal := 1234.0;
 
 _Limits.PanelFrontWidth.MinVal  := 100.0;
-_Limits.PanelFrontWidth.MaxVal  := 1200.0;
+_Limits.PanelFrontWidth.MaxVal  := 1234.0;
 
-_Limits.PanelHeight.MinVal      := 40.0;
-_Limits.PanelHeight.MaxVal      := 100.0;
+_Limits.PanelHeight.MinVal      := 0.0;
+_Limits.PanelHeight.MaxVal      := 1234.0;
 
 _Limits.RailHeightCorrection.MinVal := 12.0;
 _Limits.RailHeightCorrection.MaxVal := 14.0;
@@ -196,31 +197,38 @@ _Limits.GrooveDepthZ.MinVal := 0.0;
 _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_RecipeBuilderBorgoFlaps">
+    <LineIds Name="FB_PTPBorgoWings">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderBorgoFlaps.Build">
-      <LineId Id="843" Count="2" />
-      <LineId Id="721" Count="0" />
-      <LineId Id="846" Count="0" />
+    <LineIds Name="FB_PTPBorgoWings.Build">
       <LineId Id="722" Count="2" />
-      <LineId Id="847" Count="4" />
-      <LineId Id="728" Count="108" />
-      <LineId Id="852" Count="1" />
+      <LineId Id="702" Count="0" />
+      <LineId Id="725" Count="0" />
+      <LineId Id="703" Count="2" />
+      <LineId Id="726" Count="4" />
+      <LineId Id="709" Count="5" />
+      <LineId Id="685" Count="0" />
+      <LineId Id="683" Count="0" />
+      <LineId Id="681" Count="0" />
+      <LineId Id="569" Count="99" />
+      <LineId Id="731" Count="1" />
       <LineId Id="11" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderBorgoFlaps.CalculateFootprint">
-      <LineId Id="6" Count="1" />
+    <LineIds Name="FB_PTPBorgoWings.CalculateFootprint">
+      <LineId Id="9" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderBorgoFlaps.ExecutionRoute.Get">
+    <LineIds Name="FB_PTPBorgoWings.ExecutionRoute.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderBorgoFlaps.FB_init">
-      <LineId Id="27" Count="15" />
-      <LineId Id="24" Count="0" />
-      <LineId Id="49" Count="1" />
-      <LineId Id="48" Count="0" />
+    <LineIds Name="FB_PTPBorgoWings.FB_init">
+      <LineId Id="9" Count="9" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="25" Count="0" />
+      <LineId Id="27" Count="3" />
+      <LineId Id="26" Count="0" />
+      <LineId Id="37" Count="1" />
+      <LineId Id="36" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_NCIBuilderCircle" Id="{5dbcf7b2-1c2b-4fc5-ae62-5e1b9342eaeb}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_NCIBuilderCircle EXTENDS FB_RecipeBase
+  <POU Name="FB_NCICircle" Id="{5dbcf7b2-1c2b-4fc5-ae62-5e1b9342eaeb}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NCICircle EXTENDS FB_RecipeBase
 
 ]]></Declaration>
     <Implementation>
@@ -207,10 +207,10 @@ _Limits.Diameter.MinVal := 10;
 _Limits.Diameter.MaxVal := 600;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_NCIBuilderCircle">
+    <LineIds Name="FB_NCICircle">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_NCIBuilderCircle.Build">
+    <LineIds Name="FB_NCICircle.Build">
       <LineId Id="1344" Count="3" />
       <LineId Id="1580" Count="7" />
       <LineId Id="1599" Count="6" />
@@ -225,14 +225,14 @@ _Limits.Diameter.MaxVal := 600;]]></ST>
       <LineId Id="1429" Count="1" />
       <LineId Id="11" Count="0" />
     </LineIds>
-    <LineIds Name="FB_NCIBuilderCircle.CalculateFootprint">
+    <LineIds Name="FB_NCICircle.CalculateFootprint">
       <LineId Id="15" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_NCIBuilderCircle.ExecutionRoute.Get">
+    <LineIds Name="FB_NCICircle.ExecutionRoute.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_NCIBuilderCircle.FB_init">
+    <LineIds Name="FB_NCICircle.FB_init">
       <LineId Id="31" Count="15" />
       <LineId Id="28" Count="0" />
       <LineId Id="53" Count="1" />

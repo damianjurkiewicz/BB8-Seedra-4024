@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_RecipeBuilderRectangle" Id="{6c4812e0-2124-4ebf-9425-648a799633b0}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeBuilderRectangle EXTENDS FB_RecipeBase
+  <POU Name="FB_PTPArona" Id="{a7865aba-34a9-4367-9b70-65119865d0af}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_PTPArona EXTENDS FB_RecipeBase
 
 
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="Build" Id="{383e92b6-e22e-4900-a8ba-78049e770f6e}">
+    <Method Name="Build" Id="{888409fe-0b8e-46d6-8abb-5ebdab25e661}">
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR_INST
     TotalY          : REAL;
@@ -21,6 +21,7 @@ END_VAR]]></Declaration>
 _Done := FALSE;
 _Error := FALSE;
 Build := FALSE;
+// 1. Zlecenie przeliczenia gabarytów, footrpintu i limitów klasie bazowej
 THIS^.UpdateNestingLimits();
 
 // 2. Jeśli detal wystaje poza maszynę - przerywamy od razu!
@@ -30,6 +31,7 @@ IF NOT _Config.IsValid THEN
     Build := FALSE;
     RETURN;
 END_IF
+
 // 3. Pobieramy wyliczone gabaryty nominalne do lokalnych zmiennych roboczych
 TotalX   := _NominalX;
 TotalY   := _NominalY; 
@@ -37,8 +39,19 @@ TotalY   := _NominalY;
 // ------------------------------------
 // 1. Segregracja frezowania (Grooving)
 // ------------------------------------
-_SegmentsToGroove := 0;
-     
+_SegmentsToGroove := 2;
+
+_SegmentsGroove[1].Start.X := _Config.PanelHeight;
+_SegmentsGroove[1].Stop.X  := _Config.PanelHeight;
+_SegmentsGroove[1].Start.Y := TotalY;
+_SegmentsGroove[1].Stop.Y  := 0;
+
+_SegmentsGroove[2].Start.X :=  _Config.PanelHeight + 40;    
+_SegmentsGroove[2].Stop.X  :=  _Config.PanelHeight + 40;    
+_SegmentsGroove[2].Start.Y :=  TotalY;
+_SegmentsGroove[2].Stop.Y  :=  0;                      
+
+
 // ------------------------------------
 // 2. Cięcie w osi X (Cut X)
 // ------------------------------------+ 
@@ -76,19 +89,20 @@ _Done := TRUE;
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
-    <Method Name="CalculateFootprint" Id="{b115e399-8fb8-44ec-a54a-a3f7957f2856}">
+    <Method Name="CalculateFootprint" Id="{330d8601-fd3b-4246-bed6-324b0a3cab48}">
       <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
 VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_NominalX := _Config.PanelFrontWidth;
+        <ST><![CDATA[// BorgoWings wie, że jego wymiar powiększa się o ścianki zagięcia:
+_NominalX := (2.0 * _Config.PanelHeight) + 40.0; 
 _NominalY := _Config.PanelFrontLength;]]></ST>
       </Implementation>
     </Method>
-    <Property Name="ExecutionRoute" Id="{5de48596-9966-4044-9349-927935ea8a70}">
+    <Property Name="ExecutionRoute" Id="{7f69a90b-27cb-4780-8d18-f5335cbac906}">
       <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
-      <Get Name="Get" Id="{70e41018-2eab-4116-a6c6-e2cc04c50b69}">
+      <Get Name="Get" Id="{c5f16da5-eee5-4f57-aa31-bf581754b3b8}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
@@ -97,7 +111,7 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
-    <Method Name="FB_init" Id="{ee63f777-622f-4528-bf37-252b5ad994fe}">
+    <Method Name="FB_init" Id="{fc78a4c1-f2de-4ec3-8288-cc1bf83cb800}">
       <Declaration><![CDATA[METHOD FB_init : BOOL
 VAR_INPUT
 	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
@@ -106,16 +120,16 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 12.0;
-_Limits.PanelFrontLength.MaxVal := 2400.0;
+_Limits.PanelFrontLength.MaxVal := 1234.0;
 
 _Limits.PanelFrontWidth.MinVal  := 12.0;
-_Limits.PanelFrontWidth.MaxVal  := 1200.0;
+_Limits.PanelFrontWidth.MaxVal  := 1234.0;
 
 _Limits.PanelHeight.MinVal      := 12.0;
 _Limits.PanelHeight.MaxVal      := 1234.0;
 
 _Limits.RailHeightCorrection.MinVal := 12.0;
-_Limits.RailHeightCorrection.MaxVal := 13.0;
+_Limits.RailHeightCorrection.MaxVal := 1234.0;
 
 _Limits.CuttingOverpass.MinVal := 0.0;
 _Limits.CuttingOverpass.MaxVal := 50.0;
@@ -127,30 +141,30 @@ _Limits.GrooveDepthZ.MinVal := 0.0;
 _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_RecipeBuilderRectangle">
+    <LineIds Name="FB_PTPArona">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderRectangle.Build">
-      <LineId Id="727" Count="2" />
+    <LineIds Name="FB_PTPArona.Build">
+      <LineId Id="728" Count="2" />
+      <LineId Id="727" Count="0" />
       <LineId Id="605" Count="3" />
-      <LineId Id="730" Count="4" />
-      <LineId Id="613" Count="3" />
-      <LineId Id="620" Count="4" />
-      <LineId Id="634" Count="0" />
-      <LineId Id="646" Count="14" />
+      <LineId Id="731" Count="4" />
+      <LineId Id="612" Count="4" />
+      <LineId Id="620" Count="15" />
+      <LineId Id="645" Count="15" />
       <LineId Id="682" Count="15" />
       <LineId Id="720" Count="0" />
-      <LineId Id="735" Count="1" />
+      <LineId Id="736" Count="1" />
       <LineId Id="11" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderRectangle.CalculateFootprint">
-      <LineId Id="7" Count="0" />
+    <LineIds Name="FB_PTPArona.CalculateFootprint">
+      <LineId Id="6" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderRectangle.ExecutionRoute.Get">
+    <LineIds Name="FB_PTPArona.ExecutionRoute.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_RecipeBuilderRectangle.FB_init">
+    <LineIds Name="FB_PTPArona.FB_init">
       <LineId Id="31" Count="15" />
       <LineId Id="28" Count="0" />
       <LineId Id="53" Count="1" />

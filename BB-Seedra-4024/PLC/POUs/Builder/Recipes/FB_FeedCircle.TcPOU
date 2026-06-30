@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_FeedBuilderCircle" Id="{e9adcfe5-7e4a-4852-a853-8210a47fd80c}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedBuilderCircle EXTENDS FB_RecipeBase
+  <POU Name="FB_FeedCircle" Id="{e9adcfe5-7e4a-4852-a853-8210a47fd80c}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedCircle EXTENDS FB_RecipeBase
 
 ]]></Declaration>
     <Implementation>
@@ -106,21 +106,21 @@ _Limits.GroovingOverpass.MinVal := 0.0;
 _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_FeedBuilderCircle">
+    <LineIds Name="FB_FeedCircle">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedBuilderCircle.Build">
+    <LineIds Name="FB_FeedCircle.Build">
       <LineId Id="2264" Count="47" />
       <LineId Id="11" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedBuilderCircle.CalculateFootprint">
+    <LineIds Name="FB_FeedCircle.CalculateFootprint">
       <LineId Id="32" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedBuilderCircle.ExecutionRoute.Get">
+    <LineIds Name="FB_FeedCircle.ExecutionRoute.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedBuilderCircle.FB_init">
+    <LineIds Name="FB_FeedCircle.FB_init">
       <LineId Id="82" Count="2" />
       <LineId Id="90" Count="2" />
       <LineId Id="63" Count="0" />

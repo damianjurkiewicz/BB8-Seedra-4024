@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_FeedBuilderRoundedRect" Id="{1ddf87ea-7324-49e6-913d-124770f09345}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedBuilderRoundedRect EXTENDS FB_RecipeBase
+  <POU Name="FB_FeedRoundedRect" Id="{1ddf87ea-7324-49e6-913d-124770f09345}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedRoundedRect EXTENDS FB_RecipeBase
 
 ]]></Declaration>
     <Implementation>
@@ -178,22 +178,22 @@ _Limits.Radius.MinVal := 0.0;
 _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_FeedBuilderRoundedRect">
+    <LineIds Name="FB_FeedRoundedRect">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedBuilderRoundedRect.Build">
+    <LineIds Name="FB_FeedRoundedRect.Build">
       <LineId Id="2102" Count="88" />
       <LineId Id="2224" Count="6" />
       <LineId Id="11" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedBuilderRoundedRect.CalculateFootprint">
+    <LineIds Name="FB_FeedRoundedRect.CalculateFootprint">
       <LineId Id="28" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedBuilderRoundedRect.ExecutionRoute.Get">
+    <LineIds Name="FB_FeedRoundedRect.ExecutionRoute.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedBuilderRoundedRect.FB_init">
+    <LineIds Name="FB_FeedRoundedRect.FB_init">
       <LineId Id="31" Count="15" />
       <LineId Id="28" Count="0" />
       <LineId Id="53" Count="1" />

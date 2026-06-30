@@ -3,21 +3,23 @@
   <POU Name="FB_RecipeFactory" Id="{eb67f754-8d88-44c2-acf6-733dd105dd46}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_RecipeFactory
 VAR
-    BuilderWings 			: FB_RecipeBuilderBorgoWings;
-    BuilderFlaps 			: FB_RecipeBuilderBorgoFlaps;
-    BuilderArona 			: FB_RecipeBuilderArona;
-	BuilderCircle 			: FB_NCIBuilderCircle;
-	BuilderRectangle 		: FB_RecipeBuilderRectangle;
-	BuilderRoundedRect 		: FB_FeedBuilderRoundedRect;
-	BuilderFeedCircle  		: FB_FeedBuilderCircle;
-	BuilderMeina2_2000x1000	: FB_FeedMeina2_2000x1000;
+    BuilderWings 			: FB_PTPBorgoWings;
+    BuilderFlaps 			: FB_PTPBorgoFlaps;
+    BuilderArona 			: FB_PTPArona;
+	BuilderRectangle 		: FB_PTPRectangle;
 	
+	BuilderCircle 			: FB_NCICircle;
+	
+	BuilderRoundedRect 		: FB_FeedRoundedRect;	
+	BuilderFeedCircle  		: FB_FeedCircle;
+	
+	BuilderMeina2_2000x1000				: FB_FeedMeina2_2000x1000;
 	BuilderMeina2_5Squares    			: FB_FeedMeina2_500x500;
     BuilderMeina2_500x500_Circles    	: FB_FeedMeina2_500x500_Circles;
-    BuilderMeina2_3Squares    			: FB_FeedBuilderMeina2_3Squares;
-    BuilderMeina2_3Circles    			: FB_FeedBuilderMeina2_3Circles;
+    BuilderMeina2_3Squares    			: FB_FeedMeina2_750x750;
+    BuilderMeina2_3Circles    			: FB_FeedMeina2_750x750_Circles;
     BuilderMeina2_1000x1000   			: FB_FeedMeina2_1000x1000;
-    BuilderMeina2_1000x1000_Circles    	: FB_BuilderMeina2_1000x1000_Circles;
+    BuilderMeina2_1000x1000_Circles    	: FB_FeedMeina2_1000x1000_Circles;
     BuilderMeina2_2000x500    			: FB_FeedMeina2_2000x500;
 END_VAR]]></Declaration>
     <Implementation>

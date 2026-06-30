@@ -13,7 +13,7 @@ VAR
     MockAxisX        : FB_MockAxis;
     MockAxisY        : FB_MockAxis;
     MockAxisZ        : FB_MockAxis;
-    RecipeBuilder    : FB_RecipeBuilderRectangle;
+    RecipeBuilder    : FB_PTPRectangle;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[Test_Sequence_ExecutesTableCorrectly();

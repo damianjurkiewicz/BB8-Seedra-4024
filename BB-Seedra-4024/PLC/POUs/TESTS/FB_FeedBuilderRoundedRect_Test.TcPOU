@@ -3,7 +3,7 @@
   <POU Name="FB_FeedBuilderRoundedRect_Test" Id="{f5d21a52-b886-4f4f-b673-1e515ec1e300}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedBuilderRoundedRect_Test EXTENDS TcUnit.FB_TestSuite
 VAR
-    Builder    : FB_FeedBuilderRoundedRect;
+    Builder    : FB_FeedRoundedRect;
     MockWriter : FB_MockGeometryWriter;
     Config     : ST_RecipeBuilder_Config;
 END_VAR
@@ -125,5 +125,21 @@ AssertEquals_INT(Expected := 5,
 TEST_FINISHED();]]></ST>
       </Implementation>
     </Method>
+    <LineIds Name="FB_FeedBuilderRoundedRect_Test">
+      <LineId Id="3" Count="1" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderRoundedRect_Test.Test_Calculates_Footprint_And_StartPoint">
+      <LineId Id="3" Count="33" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderRoundedRect_Test.Test_Generates_Lines_And_Arcs_With_Radius">
+      <LineId Id="3" Count="25" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedBuilderRoundedRect_Test.Test_Zero_Radius_Generates_Only_Lines">
+      <LineId Id="3" Count="24" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
   </POU>
 </TcPlcObject>
