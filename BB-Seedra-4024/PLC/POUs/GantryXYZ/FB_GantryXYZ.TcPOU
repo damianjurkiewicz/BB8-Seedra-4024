@@ -952,7 +952,7 @@ IF SpeedZ <= 0.0 THEN
     IF AxisZ.AxisParameters.fRefVeloSearch > 0.0 THEN
         SpeedZ := (AxisZ.AxisParameters.fRefVeloSearch);
     ELSE
-        SpeedZ := 10.0;
+        SpeedZ := 5.0;
     END_IF
 END_IF
 
