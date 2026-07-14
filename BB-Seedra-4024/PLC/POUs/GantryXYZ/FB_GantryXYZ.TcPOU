@@ -1091,17 +1091,20 @@ END_VAR
                     SequenceState := 25;
                 END_IF
         
-            25:
-                IF NOT AxisZ.Busy THEN
-                    IF NOT IsZAboveMaterial() THEN
-                        MoveZToSafePosition();
-                        DelayTimer(IN := FALSE);
-                        SequenceState := 27;
-                    ELSE
-                        SequenceState := 30;
-                    END_IF
-                END_IF
-                         
+			25:
+				IF NOT AxisZ.Busy THEN
+					IF AxisZ.Axis.Status.Homed THEN
+						IF NOT IsZAboveMaterial() THEN
+							MoveZToSafePosition();
+							DelayTimer(IN := FALSE);
+							SequenceState := 27;
+						ELSE
+							SequenceState := 30;
+						END_IF
+					ELSE
+						SequenceState := 30;
+					END_IF
+				END_IF
             27:
                 IF AxisZ.InPosition THEN
                     SequenceState := 30;
@@ -1479,7 +1482,11 @@ END_CASE]]></ST>
     <LineIds Name="FB_GantryXYZ.Resetting">
       <LineId Id="1513" Count="7" />
       <LineId Id="1636" Count="0" />
-      <LineId Id="1521" Count="23" />
+      <LineId Id="1521" Count="12" />
+      <LineId Id="1738" Count="1" />
+      <LineId Id="1741" Count="8" />
+      <LineId Id="1752" Count="1" />
+      <LineId Id="1544" Count="0" />
       <LineId Id="1551" Count="7" />
       <LineId Id="1689" Count="0" />
       <LineId Id="1726" Count="3" />
