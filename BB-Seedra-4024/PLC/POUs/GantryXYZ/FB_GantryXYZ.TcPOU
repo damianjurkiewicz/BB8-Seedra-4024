@@ -844,7 +844,7 @@ ProfilesY[E_MachineProfile.eHoming].Jerk         := 500.0;
 // --- OŚ Z ---
 ProfilesZ[E_MachineProfile.eHoming].SoftLimitMin := -100.0;
 ProfilesZ[E_MachineProfile.eHoming].SoftLimitMax := 100.0;
-ProfilesZ[E_MachineProfile.eHoming].Acceleration := 100.0;
+ProfilesZ[E_MachineProfile.eHoming].Acceleration := 10.0;
 ProfilesZ[E_MachineProfile.eHoming].Deceleration := 100.0;
 ProfilesZ[E_MachineProfile.eHoming].Jerk         := 200.0;
 
@@ -876,7 +876,7 @@ ProfilesY[E_MachineProfile.eProduction].Jerk         := 15000.0;
 // --- OŚ Z ---
 ProfilesZ[E_MachineProfile.eProduction].SoftLimitMin := -10.0;
 ProfilesZ[E_MachineProfile.eProduction].SoftLimitMax := 90.0;
-ProfilesZ[E_MachineProfile.eProduction].Acceleration := 200.0;
+ProfilesZ[E_MachineProfile.eProduction].Acceleration := 10.0;
 ProfilesZ[E_MachineProfile.eProduction].Deceleration := 200.0;
 ProfilesZ[E_MachineProfile.eProduction].Jerk         := 300.0;
 
@@ -907,7 +907,7 @@ ProfilesY[E_MachineProfile.eManual].Jerk         := 2000.0;
 // --- OŚ Z ---
 ProfilesZ[E_MachineProfile.eManual].SoftLimitMin := -20.0;
 ProfilesZ[E_MachineProfile.eManual].SoftLimitMax := 100.0;
-ProfilesZ[E_MachineProfile.eManual].Acceleration := 200.0;
+ProfilesZ[E_MachineProfile.eManual].Acceleration := 10.0;
 ProfilesZ[E_MachineProfile.eManual].Deceleration := 200.0;
 ProfilesZ[E_MachineProfile.eManual].Jerk         := 300.0;
 
@@ -1013,7 +1013,7 @@ END_IF
 IF AxisZ.AxisParameters.fRefVeloSearch > 0.0 THEN
     fbHomeStratZ.HomingVelocity := AxisZ.AxisParameters.fRefVeloSearch;
 ELSE
-    fbHomeStratZ.HomingVelocity := 20.0;
+    fbHomeStratZ.HomingVelocity := 5.0;
 END_IF
 
 fbHomeStratX.ReferencePosition := AxisX.AxisParameters.fEncRefPosition;
@@ -1211,6 +1211,7 @@ CASE _CurrentMode OF
                 // W trakcie bazowania osie mają inne limity i spokojnie przyspieszają
                 ApplyProfile(E_MachineProfile.eHoming);
                 
+
             E_PMLState.ePMLState_Starting, 
             E_PMLState.ePMLState_Execute:
                 // Przed startem lub w trakcie pracy ładujemy agresywny profil produkcyjny
@@ -1219,18 +1220,63 @@ CASE _CurrentMode OF
             E_PMLState.ePMLState_Aborting:
                 // Gdy maszyna wpada w awarię, możemy zapiąć profil z ekstremalnie wysoką Deceleracją!
                 ApplyProfile(E_MachineProfile.eProduction); // Albo stworzyć nowy profil eEmergency!
-                
+			E_PMLState.ePMLState_Stopped:
+				ApplyProfile(E_MachineProfile.eHoming);				
+			E_PMLState.ePMLState_Aborted:
+				ApplyProfile(E_MachineProfile.eHoming);
         END_CASE
         
     // ==========================================
     // TRYB RĘCZNY / SERWISOWY
     // ==========================================
-    E_PMLUnitMode.ePMLUnitMode_Manual, 
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+	      
+          CASE _CurrentState OF
+            
+            E_PMLState.ePMLState_Resetting:
+                // W trakcie bazowania osie mają inne limity i spokojnie przyspieszają
+                ApplyProfile(E_MachineProfile.eHoming);
+                
+            E_PMLState.ePMLState_Starting, 
+            E_PMLState.ePMLState_Execute:
+                // Przed startem lub w trakcie pracy ładujemy agresywny profil produkcyjny
+                ApplyProfile(E_MachineProfile.eProduction);
+                
+            E_PMLState.ePMLState_Aborting:
+                // Gdy maszyna wpada w awarię, możemy zapiąć profil z ekstremalnie wysoką Deceleracją!
+                ApplyProfile(E_MachineProfile.eProduction); // Albo stworzyć nowy profil eEmergency!
+			E_PMLState.ePMLState_Aborted:
+				ApplyProfile(E_MachineProfile.eHoming);
+				
+			E_PMLState.ePMLState_Stopped:
+				ApplyProfile(E_MachineProfile.eHoming);	
+                
+        END_CASE
     E_PMLUnitMode.ePMLUnitMode_Maintenance:
         
-        // Niezależnie od stanu, w trybie ręcznym zawsze blokujemy maszynę w bezpiecznym profilu
-        ApplyProfile(E_MachineProfile.eManual);
-
+      
+        CASE _CurrentState OF
+            
+            E_PMLState.ePMLState_Resetting:
+                // W trakcie bazowania osie mają inne limity i spokojnie przyspieszają
+                ApplyProfile(E_MachineProfile.eHoming);
+                
+            E_PMLState.ePMLState_Starting, 
+            E_PMLState.ePMLState_Execute:
+                // Przed startem lub w trakcie pracy ładujemy agresywny profil produkcyjny
+                ApplyProfile(E_MachineProfile.eProduction);
+                
+            E_PMLState.ePMLState_Aborting:
+                // Gdy maszyna wpada w awarię, możemy zapiąć profil z ekstremalnie wysoką Deceleracją!
+                ApplyProfile(E_MachineProfile.eProduction); // Albo stworzyć nowy profil eEmergency!
+				
+			E_PMLState.ePMLState_Aborted:
+				ApplyProfile(E_MachineProfile.eHoming);
+			
+			E_PMLState.ePMLState_Stopped:
+				ApplyProfile(E_MachineProfile.eHoming);	
+                
+        END_CASE
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -1461,7 +1507,26 @@ END_CASE]]></ST>
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.StateChanged">
-      <LineId Id="6" Count="35" />
+      <LineId Id="6" Count="15" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="22" Count="8" />
+      <LineId Id="107" Count="2" />
+      <LineId Id="31" Count="5" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="70" Count="13" />
+      <LineId Id="102" Count="1" />
+      <LineId Id="110" Count="2" />
+      <LineId Id="84" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="37" Count="1" />
+      <LineId Id="58" Count="0" />
+      <LineId Id="85" Count="13" />
+      <LineId Id="104" Count="2" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="115" Count="0" />
+      <LineId Id="114" Count="0" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="41" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

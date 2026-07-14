@@ -2893,10 +2893,11 @@ External Setpoint Generation:
 						<Velo RefSearch="5" RefSync="2" SlowManual="5" FastManual="10" Maximum="20"/>
 						<TargetPosControl Range="0.1"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
+						<ParameterChanged>6</ParameterChanged>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="4">
-						<EncPara ScaleFactorNumerator="12" ScaleFactorDenominator="12800" Inverse="true" MaxCount="#xffffffff">
-							<Inc RefPosition="42" RefMode="1"/>
+						<EncPara ScaleFactorNumerator="2" ScaleFactorDenominator="12800" Inverse="true" MaxCount="#xffffffff">
+							<Inc RefPosition="41" RefMode="1"/>
 						</EncPara>
 						<Vars VarGrpType="1">
 							<Name>Inputs</Name>
@@ -3433,7 +3434,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{F2DD65BF-BCEB-355C-D01A-9709295EBE09}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{C77243CF-BB6A-46FE-4037-697E9B67CCEF}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
