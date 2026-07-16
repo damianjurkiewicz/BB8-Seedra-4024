@@ -3437,7 +3437,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{19654430-1C4A-459A-D49F-55381C274A72}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{C4892B24-097B-1241-F3CD-03A5C3017281}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -6057,7 +6057,7 @@ Bit 8 - 15 : reserved]]></Comment>
 							<SyncMan>001080002600010001000000400080008000001026010000</SyncMan>
 							<SyncMan>801080002200010002000000400080008000801022010000</SyncMan>
 							<SyncMan>00110a002400010003000000000000000600001124010000</SyncMan>
-							<SyncMan>80110a002000010004000000000000000a00801120010000</SyncMan>
+							<SyncMan>80110c002000010004000000000000000a00801120010000</SyncMan>
 							<Fmmu>0000000000000000001100020100000001000000000000000000000000000000</Fmmu>
 							<Fmmu>0000000000000000801100010100000002000000000000000000000000000000</Fmmu>
 							<Fmmu>00000000000000000d0800010100000003000000000000000000000000000000</Fmmu>
@@ -6117,7 +6117,7 @@ Bit 14 - 15 : reserved]]></Comment>
 									<Type>DINT</Type>
 								</Entry>
 							</Pdo>
-							<Pdo Name="DRV Torque actual value" Index="#x1a03" Flags="#x0010">
+							<Pdo Name="DRV Torque actual value" Index="#x1a03" Flags="#x0010" SyncMan="3">
 								<Entry Name="Torque actual value" BitLen="16" Index="#x6010" Sub="#x08">
 									<Type>INT</Type>
 								</Entry>
@@ -8210,6 +8210,7 @@ Bit 8 - 15 : reserved]]></Comment>
 		<OwnerA Name="TINC^NC-Task 1 SAF^Axes^Axis Y">
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 6 (EL7221-9014)">
 				<Link VarA="Drive^Inputs^In^nDataIn1" VarB="DRV Following error actual value^Following error actual value"/>
+				<Link VarA="Drive^Inputs^In^nDataIn3[0]" VarB="DRV Torque actual value^Torque actual value"/>
 				<Link VarA="Drive^Inputs^In^nDcOutputTime" VarB="InfoData^DcOutputShift"/>
 				<Link VarA="Drive^Inputs^In^nState1" VarB="DRV Statusword^Statusword"/>
 				<Link VarA="Drive^Inputs^In^nState2" VarB="DRV Statusword^Statusword" Size="8" OffsB="8"/>
