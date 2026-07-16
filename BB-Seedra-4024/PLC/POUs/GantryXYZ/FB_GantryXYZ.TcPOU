@@ -44,10 +44,10 @@ VAR
 	
 	
 	// [Typ osi: 1=X, 2=Y, 3=Z] , [Typ profilu z Enuma]
-	ProfilesX : ARRAY[E_MachineProfile.eHoming..E_MachineProfile.eManual] OF ST_AxisProfile;
-	ProfilesY : ARRAY[E_MachineProfile.eHoming..E_MachineProfile.eManual] OF ST_AxisProfile;
-	ProfilesZ : ARRAY[E_MachineProfile.eHoming..E_MachineProfile.eManual] OF ST_AxisProfile;
-	ProfilesQ : ARRAY[E_MachineProfile.eHoming..E_MachineProfile.eManual] OF ST_AxisProfile;
+	ProfilesX : ARRAY[E_MachineProfile.eProduction..E_MachineProfile.eManual] OF ST_AxisProfile;
+	ProfilesY : ARRAY[E_MachineProfile.eProduction..E_MachineProfile.eManual] OF ST_AxisProfile;
+	ProfilesZ : ARRAY[E_MachineProfile.eProduction..E_MachineProfile.eManual] OF ST_AxisProfile;
+	ProfilesQ : ARRAY[E_MachineProfile.eProduction..E_MachineProfile.eManual] OF ST_AxisProfile;
 	
 	// Flagi określające typ napędu dla konkretnej osi (TRUE = SoE/AX5000, FALSE = CoE)
     AxisX_IsSoE : BOOL := FALSE;
@@ -200,18 +200,20 @@ SUPER^.Aborting();]]></ST>
       </Implementation>
     </Method>
     <Method Name="ApplyProfile" Id="{4f1c09f3-f65c-4d5f-b754-c9973148d42b}">
-      <Declaration><![CDATA[METHOD ApplyProfile
+      <Declaration><![CDATA[//Homing always uses Acc, Decc, Jerk directly from the Parameters. Default Acc, Default Decc, Default Jerk for each axis.
+METHOD ApplyProfile
 VAR_INPUT
-	RequestedProfile : E_MachineProfile;
+    RequestedProfile : E_MachineProfile;
 END_VAR
+
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, ProfilesX[RequestedProfile].SoftLimitMin);
+        <ST><![CDATA[
+AxisX.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, ProfilesX[RequestedProfile].SoftLimitMin);
 AxisX.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, ProfilesX[RequestedProfile].SoftLimitMax);
 AxisX.Acceleration := ProfilesX[RequestedProfile].Acceleration;
 AxisX.Deceleration := ProfilesX[RequestedProfile].Deceleration;
 AxisX.Jerk         := ProfilesX[RequestedProfile].Jerk;
-
 
 AxisY.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, ProfilesY[RequestedProfile].SoftLimitMin);
 AxisY.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, ProfilesY[RequestedProfile].SoftLimitMax);
@@ -219,13 +221,11 @@ AxisY.Acceleration := ProfilesY[RequestedProfile].Acceleration;
 AxisY.Deceleration := ProfilesY[RequestedProfile].Deceleration;
 AxisY.Jerk         := ProfilesY[RequestedProfile].Jerk;
 
-
 AxisZ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, ProfilesZ[RequestedProfile].SoftLimitMin);
 AxisZ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, ProfilesZ[RequestedProfile].SoftLimitMax);
 AxisZ.Acceleration := ProfilesZ[RequestedProfile].Acceleration;
 AxisZ.Deceleration := ProfilesZ[RequestedProfile].Deceleration;
 AxisZ.Jerk         := ProfilesZ[RequestedProfile].Jerk;
-
 
 AxisQ.WriteParameter(MC_AxisParameter.AxisMinSoftPosLimit, ProfilesQ[RequestedProfile].SoftLimitMin);
 AxisQ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, ProfilesQ[RequestedProfile].SoftLimitMax);
@@ -360,8 +360,6 @@ END_VAR]]></Declaration>
     _InitComplete := Initialize();
     RETURN;
 END_IF
-
-
 
 SUPER^.CyclicLogic();
 
@@ -824,96 +822,65 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// ===============================================================================
-// PROFIL 1: HOMING (Otwarte limity do bazowania, powolne i miękkie ruchy)
-// ===============================================================================
-// --- OŚ X ---
-ProfilesX[E_MachineProfile.eHoming].SoftLimitMin := -1250.0;
-ProfilesX[E_MachineProfile.eHoming].SoftLimitMax := 1250.0;
-ProfilesX[E_MachineProfile.eHoming].Acceleration := 200.0;
-ProfilesX[E_MachineProfile.eHoming].Deceleration := 200.0;
-ProfilesX[E_MachineProfile.eHoming].Jerk         := 500.0;
-
-// --- OŚ Y ---
-ProfilesY[E_MachineProfile.eHoming].SoftLimitMin := -2300.0;
-ProfilesY[E_MachineProfile.eHoming].SoftLimitMax := 2300.0;
-ProfilesY[E_MachineProfile.eHoming].Acceleration := 200.0;
-ProfilesY[E_MachineProfile.eHoming].Deceleration := 200.0;
-ProfilesY[E_MachineProfile.eHoming].Jerk         := 500.0;
-
-// --- OŚ Z ---
-ProfilesZ[E_MachineProfile.eHoming].SoftLimitMin := -100.0;
-ProfilesZ[E_MachineProfile.eHoming].SoftLimitMax := 100.0;
-ProfilesZ[E_MachineProfile.eHoming].Acceleration := 10.0;
-ProfilesZ[E_MachineProfile.eHoming].Deceleration := 100.0;
-ProfilesZ[E_MachineProfile.eHoming].Jerk         := 200.0;
-
-// --- OŚ Q ---
-ProfilesQ[E_MachineProfile.eHoming].SoftLimitMin := -300.0;
-ProfilesQ[E_MachineProfile.eHoming].SoftLimitMax := 300.0;
-ProfilesQ[E_MachineProfile.eHoming].Acceleration := 15000.0;
-ProfilesQ[E_MachineProfile.eHoming].Deceleration := 15000.0;
-ProfilesQ[E_MachineProfile.eHoming].Jerk         := 48322.8;
-
-
-// ===============================================================================
-// PROFIL 2: PRODUCTION (Wąskie limity dla bezpieczeństwa, wysoka dynamika pracy)
-// ===============================================================================
+        <ST><![CDATA[
+// ========================
+// PROFILE 2: PRODUCTION
+// ========================
 // --- OŚ X ---
 ProfilesX[E_MachineProfile.eProduction].SoftLimitMin := -20.0;
 ProfilesX[E_MachineProfile.eProduction].SoftLimitMax := 1200.0;
-ProfilesX[E_MachineProfile.eProduction].Acceleration := 1500.0;
-ProfilesX[E_MachineProfile.eProduction].Deceleration := 8000.0;
-ProfilesX[E_MachineProfile.eProduction].Jerk         := 15000.0;
+ProfilesX[E_MachineProfile.eProduction].Acceleration := 100.0;
+ProfilesX[E_MachineProfile.eProduction].Deceleration := 100.0;
+ProfilesX[E_MachineProfile.eProduction].Jerk         := 500.0;
 
 // --- OŚ Y ---
 ProfilesY[E_MachineProfile.eProduction].SoftLimitMin := -20.0;
 ProfilesY[E_MachineProfile.eProduction].SoftLimitMax := 2200.0;
-ProfilesY[E_MachineProfile.eProduction].Acceleration := 1500.0;
-ProfilesY[E_MachineProfile.eProduction].Deceleration := 8000.0;
-ProfilesY[E_MachineProfile.eProduction].Jerk         := 15000.0;
+ProfilesY[E_MachineProfile.eProduction].Acceleration := 100.0;
+ProfilesY[E_MachineProfile.eProduction].Deceleration := 100.0;
+ProfilesY[E_MachineProfile.eProduction].Jerk         := 500.0;
 
 // --- OŚ Z ---
 ProfilesZ[E_MachineProfile.eProduction].SoftLimitMin := -10.0;
 ProfilesZ[E_MachineProfile.eProduction].SoftLimitMax := 90.0;
 ProfilesZ[E_MachineProfile.eProduction].Acceleration := 10.0;
-ProfilesZ[E_MachineProfile.eProduction].Deceleration := 200.0;
-ProfilesZ[E_MachineProfile.eProduction].Jerk         := 300.0;
+ProfilesZ[E_MachineProfile.eProduction].Deceleration := 10.0;
+ProfilesZ[E_MachineProfile.eProduction].Jerk         := 50.0;
 
 // --- OŚ Q ---
-ProfilesQ[E_MachineProfile.eProduction].SoftLimitMin := -300.0;
-ProfilesQ[E_MachineProfile.eProduction].SoftLimitMax := 300.0;
+ProfilesQ[E_MachineProfile.eProduction].SoftLimitMin := -3600.0;
+ProfilesQ[E_MachineProfile.eProduction].SoftLimitMax := 3600.0;
 ProfilesQ[E_MachineProfile.eProduction].Acceleration := 15000.0;
 ProfilesQ[E_MachineProfile.eProduction].Deceleration := 15000.0;
 ProfilesQ[E_MachineProfile.eProduction].Jerk         := 48322.8;
 
-// ===============================================================================
-// PROFIL 3: MANUAL (Jogowanie, otwarte limity, umiarkowana dynamika dla operatora)
-// ===============================================================================
+// ==================
+// PROFIL 3: MANUAL 
+// ==================
 // --- OŚ X ---
 ProfilesX[E_MachineProfile.eManual].SoftLimitMin := -50.0;
 ProfilesX[E_MachineProfile.eManual].SoftLimitMax := 1250.0;
 ProfilesX[E_MachineProfile.eManual].Acceleration := 500.0;
-ProfilesX[E_MachineProfile.eManual].Deceleration := 1000.0;  
+ProfilesX[E_MachineProfile.eManual].Deceleration := 500.0;  
 ProfilesX[E_MachineProfile.eManual].Jerk         := 2000.0;
 
 // --- OŚ Y ---
 ProfilesY[E_MachineProfile.eManual].SoftLimitMin := -100.0;
 ProfilesY[E_MachineProfile.eManual].SoftLimitMax := 2500.0;
 ProfilesY[E_MachineProfile.eManual].Acceleration := 500.0;
-ProfilesY[E_MachineProfile.eManual].Deceleration := 1000.0;
-ProfilesY[E_MachineProfile.eManual].Jerk         := 2000.0;
+ProfilesY[E_MachineProfile.eManual].Deceleration := 500.0;
+ProfilesY[E_MachineProfile.eManual].Jerk         := 1000.0;
 
 // --- OŚ Z ---
 ProfilesZ[E_MachineProfile.eManual].SoftLimitMin := -20.0;
 ProfilesZ[E_MachineProfile.eManual].SoftLimitMax := 100.0;
-ProfilesZ[E_MachineProfile.eManual].Acceleration := 10.0;
-ProfilesZ[E_MachineProfile.eManual].Deceleration := 200.0;
-ProfilesZ[E_MachineProfile.eManual].Jerk         := 300.0;
+ProfilesZ[E_MachineProfile.eManual].Acceleration := 50.0;
+ProfilesZ[E_MachineProfile.eManual].Deceleration := 50.0;
+ProfilesZ[E_MachineProfile.eManual].Jerk         := 200.0;
 
 // --- OŚ Q ---
-ProfilesQ[E_MachineProfile.eManual].SoftLimitMin := -300.0;
-ProfilesQ[E_MachineProfile.eManual].SoftLimitMax := 300.0;
+ProfilesQ[E_MachineProfile.eManual].SoftLimitMin := -3600.0;
+ProfilesQ[E_MachineProfile.eManual].SoftLimitMax := 3600.0;
 ProfilesQ[E_MachineProfile.eManual].Acceleration := 15000.0;
 ProfilesQ[E_MachineProfile.eManual].Deceleration := 15000.0;
 ProfilesQ[E_MachineProfile.eManual].Jerk         := 48322.8;]]></ST>
@@ -932,6 +899,21 @@ IF AxisZ.Axis.NcToPlc.ActPos >= MaterialTopZ THEN
 ELSE
     IsZAboveMaterial := FALSE;
 END_IF]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="ModeChanged" Id="{dd2368e5-1dac-4ade-acc6-9c359df4e400}">
+      <Declaration><![CDATA[// Called one Cycle on State Change
+METHOD PROTECTED ModeChanged
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[SUPER^.ModeChanged();
+CASE _CurrentMode OF
+    E_PMLUnitMode.ePMLUnitMode_Production:
+		ApplyProfile(E_MachineProfile.eProduction);	      
+    E_PMLUnitMode.ePMLUnitMode_Manual:
+		ApplyProfile(E_MachineProfile.eManual);
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="MoveZToSafePosition" Id="{acabef9e-913d-43a5-abe7-a6cc0b93fa0e}">
@@ -1198,88 +1180,20 @@ METHOD PROTECTED StateChanged
 VAR_INPUT
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Wywołujemy kod bazowy frameworka
-SUPER^.StateChanged();
+        <ST><![CDATA[SUPER^.StateChanged();
 
-// Centralne zarządzanie dynamiką na podstawie nowo osiągniętego stanu maszyny!
-CASE _CurrentMode OF
-    
-    // ==========================================
-    // TRYB PRODUKCYJNY
-    // ==========================================
-    E_PMLUnitMode.ePMLUnitMode_Production:
-        CASE _CurrentState OF
-            
-            E_PMLState.ePMLState_Resetting:
-                // W trakcie bazowania osie mają inne limity i spokojnie przyspieszają
-                ApplyProfile(E_MachineProfile.eHoming);
-                
-
-            E_PMLState.ePMLState_Starting, 
-            E_PMLState.ePMLState_Execute:
-                // Przed startem lub w trakcie pracy ładujemy agresywny profil produkcyjny
-                ApplyProfile(E_MachineProfile.eProduction);
-                
-            E_PMLState.ePMLState_Aborting:
-                // Gdy maszyna wpada w awarię, możemy zapiąć profil z ekstremalnie wysoką Deceleracją!
-                ApplyProfile(E_MachineProfile.eProduction); // Albo stworzyć nowy profil eEmergency!
-			E_PMLState.ePMLState_Stopped:
-				ApplyProfile(E_MachineProfile.eHoming);				
-			E_PMLState.ePMLState_Aborted:
-				ApplyProfile(E_MachineProfile.eHoming);
-        END_CASE
-        
-    // ==========================================
-    // TRYB RĘCZNY / SERWISOWY
-    // ==========================================
-    E_PMLUnitMode.ePMLUnitMode_Manual:
-	      
-          CASE _CurrentState OF
-            
-            E_PMLState.ePMLState_Resetting:
-                // W trakcie bazowania osie mają inne limity i spokojnie przyspieszają
-                ApplyProfile(E_MachineProfile.eHoming);
-                
-            E_PMLState.ePMLState_Starting, 
-            E_PMLState.ePMLState_Execute:
-                // Przed startem lub w trakcie pracy ładujemy agresywny profil produkcyjny
-                ApplyProfile(E_MachineProfile.eProduction);
-                
-            E_PMLState.ePMLState_Aborting:
-                // Gdy maszyna wpada w awarię, możemy zapiąć profil z ekstremalnie wysoką Deceleracją!
-                ApplyProfile(E_MachineProfile.eProduction); // Albo stworzyć nowy profil eEmergency!
-			E_PMLState.ePMLState_Aborted:
-				ApplyProfile(E_MachineProfile.eHoming);
-				
-			E_PMLState.ePMLState_Stopped:
-				ApplyProfile(E_MachineProfile.eHoming);	
-                
-        END_CASE
-    E_PMLUnitMode.ePMLUnitMode_Maintenance:
-        
-      
-        CASE _CurrentState OF
-            
-            E_PMLState.ePMLState_Resetting:
-                // W trakcie bazowania osie mają inne limity i spokojnie przyspieszają
-                ApplyProfile(E_MachineProfile.eHoming);
-                
-            E_PMLState.ePMLState_Starting, 
-            E_PMLState.ePMLState_Execute:
-                // Przed startem lub w trakcie pracy ładujemy agresywny profil produkcyjny
-                ApplyProfile(E_MachineProfile.eProduction);
-                
-            E_PMLState.ePMLState_Aborting:
-                // Gdy maszyna wpada w awarię, możemy zapiąć profil z ekstremalnie wysoką Deceleracją!
-                ApplyProfile(E_MachineProfile.eProduction); // Albo stworzyć nowy profil eEmergency!
-				
-			E_PMLState.ePMLState_Aborted:
-				ApplyProfile(E_MachineProfile.eHoming);
-			
-			E_PMLState.ePMLState_Stopped:
-				ApplyProfile(E_MachineProfile.eHoming);	
-                
-        END_CASE
+CASE _CurrentMode OF    
+//    E_PMLUnitMode.ePMLUnitMode_Production:
+//   CASE _CurrentState OF
+//            E_PMLState.ePMLState_Resetting:
+//            	ApplyProfile(E_MachineProfile.eHoming);
+//        	  END_CASE
+//    E_PMLUnitMode.ePMLUnitMode_Manual:
+//				;
+//        END_CASE
+//    E_PMLUnitMode.ePMLUnitMode_Maintenance:
+//				;   
+//        END_CASE
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -1318,10 +1232,10 @@ END_CASE]]></ST>
       <LineId Id="29" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.ApplyProfile">
-      <LineId Id="8" Count="17" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="31" Count="5" />
-      <LineId Id="30" Count="0" />
+      <LineId Id="148" Count="5" />
+      <LineId Id="155" Count="5" />
+      <LineId Id="162" Count="5" />
+      <LineId Id="169" Count="5" />
       <LineId Id="41" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
@@ -1363,10 +1277,7 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.CyclicLogic">
-      <LineId Id="3" Count="3" />
-      <LineId Id="20" Count="0" />
-      <LineId Id="26" Count="0" />
-      <LineId Id="7" Count="1" />
+      <LineId Id="3" Count="5" />
       <LineId Id="41" Count="2" />
       <LineId Id="40" Count="0" />
       <LineId Id="78" Count="0" />
@@ -1439,12 +1350,29 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.InitProfiles">
-      <LineId Id="131" Count="91" />
+      <LineId Id="235" Count="3" />
+      <LineId Id="166" Count="27" />
+      <LineId Id="233" Count="1" />
+      <LineId Id="232" Count="0" />
+      <LineId Id="231" Count="0" />
+      <LineId Id="230" Count="0" />
+      <LineId Id="199" Count="19" />
+      <LineId Id="226" Count="0" />
+      <LineId Id="220" Count="2" />
       <LineId Id="129" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.IsZAboveMaterial">
       <LineId Id="11" Count="5" />
       <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_GantryXYZ.ModeChanged">
+      <LineId Id="5" Count="0" />
+      <LineId Id="80" Count="0" />
+      <LineId Id="85" Count="0" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="110" Count="0" />
+      <LineId Id="132" Count="0" />
+      <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.MoveZToSafePosition">
       <LineId Id="65" Count="12" />
@@ -1514,25 +1442,17 @@ END_CASE]]></ST>
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.StateChanged">
-      <LineId Id="6" Count="15" />
-      <LineId Id="101" Count="0" />
-      <LineId Id="22" Count="8" />
-      <LineId Id="107" Count="2" />
-      <LineId Id="31" Count="5" />
-      <LineId Id="46" Count="0" />
-      <LineId Id="70" Count="13" />
-      <LineId Id="102" Count="1" />
-      <LineId Id="110" Count="2" />
+      <LineId Id="7" Count="0" />
+      <LineId Id="9" Count="1" />
+      <LineId Id="15" Count="1" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="20" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="36" Count="0" />
       <LineId Id="84" Count="0" />
       <LineId Id="45" Count="0" />
-      <LineId Id="37" Count="1" />
-      <LineId Id="58" Count="0" />
-      <LineId Id="85" Count="13" />
-      <LineId Id="104" Count="2" />
-      <LineId Id="113" Count="0" />
-      <LineId Id="115" Count="0" />
-      <LineId Id="114" Count="0" />
-      <LineId Id="99" Count="0" />
+      <LineId Id="119" Count="0" />
+      <LineId Id="142" Count="0" />
       <LineId Id="41" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>

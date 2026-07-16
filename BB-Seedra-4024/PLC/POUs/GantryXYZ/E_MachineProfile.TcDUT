@@ -5,9 +5,8 @@
 {attribute 'strict'}
 TYPE E_MachineProfile :
 (
-    eHoming,        // Otwarte limity, spokojna jazda
-    eProduction,    // Zamknięte limity, ostra jazda (Aggressive)
-    eManual         // Ograniczone limity, spokojny Jog
+    eProduction,    
+    eManual         
 );
 END_TYPE]]></Declaration>
   </DUT>
