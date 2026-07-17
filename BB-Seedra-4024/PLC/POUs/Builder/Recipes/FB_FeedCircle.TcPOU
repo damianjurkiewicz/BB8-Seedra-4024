@@ -99,6 +99,8 @@ END_VAR
       <Implementation>
         <ST><![CDATA[_Limits.Diameter.MinVal := 10.0;
 _Limits.Diameter.MaxVal := 1200.0;
+_Limits.Radius.MinVal := 10.0;
+_Limits.Radius.MaxVal := 100;
 
 _Limits.CuttingOverpass.MinVal := 0.0;
 _Limits.CuttingOverpass.MaxVal := 50.0;
@@ -121,7 +123,9 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedCircle.FB_init">
-      <LineId Id="82" Count="2" />
+      <LineId Id="82" Count="1" />
+      <LineId Id="98" Count="1" />
+      <LineId Id="84" Count="0" />
       <LineId Id="90" Count="2" />
       <LineId Id="63" Count="0" />
     </LineIds>

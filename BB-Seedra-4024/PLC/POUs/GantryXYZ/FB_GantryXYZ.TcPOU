@@ -607,8 +607,8 @@ _Limits.CutterXOffsetX.MinVal := -200.0;   _Limits.CutterXOffsetX.MaxVal := 200.
 _Limits.CutterXOffsetY.MinVal := -200.0;   _Limits.CutterXOffsetY.MaxVal := 200.0;
 _Limits.CutterYOffsetX.MinVal := -200.0;   _Limits.CutterYOffsetX.MaxVal := 200.0;
 _Limits.CutterYOffsetY.MinVal := -200.0;   _Limits.CutterYOffsetY.MaxVal := 200.0;
-_Limits.GlobalOffsetX.MinVal   := -500.0;   _Limits.GlobalOffsetX.MaxVal   := 500.0;
-_Limits.GlobalOffsetY.MinVal   := -500.0;   _Limits.GlobalOffsetY.MaxVal   := 500.0;
+_Limits.GlobalOffsetX.MinVal   := -20.0;   _Limits.GlobalOffsetX.MaxVal   := 1000.0;
+_Limits.GlobalOffsetY.MinVal   := -20.0;   _Limits.GlobalOffsetY.MaxVal   := 2000.0;
 _Limits.GlobalOffsetZ.MinVal   := -5.0;     _Limits.GlobalOffsetZ.MaxVal   := 5.0;
 _Limits.CuttingSpeedXY.MinVal  := 1.0;     _Limits.CuttingSpeedXY.MaxVal  := 100.0;
 _Limits.GroovingSpeedXY.MinVal := 1.0;     _Limits.GroovingSpeedXY.MaxVal := 100.0;
@@ -620,9 +620,9 @@ _Limits.CuttingIdleTime.MinVal  := 0.0;    _Limits.CuttingIdleTime.MaxVal  := 10
 _Limits.GroovingIdleTime.MinVal := 0.0;    _Limits.GroovingIdleTime.MaxVal := 10.0;
 _Limits.RawBoardX.MinVal       := 200.0;   _Limits.RawBoardX.MaxVal       := 1220.0;
 _Limits.RawBoardY.MinVal       := 200.0;   _Limits.RawBoardY.MaxVal       := 2440.0;
-_Limits.RawBoardZ.MinVal       := 1.0;     _Limits.RawBoardZ.MaxVal       := 12.0;
-_Limits.SafeClearanceZ.MinVal  := 1.0;     _Limits.SafeClearanceZ.MaxVal  := 100.0;
-_Limits.RapidSpeedQ.MinVal 	   := 1.0; 	   _Limits.RapidSpeedQ.MaxVal := 1080.0; 
+_Limits.RawBoardZ.MinVal       := 1.0;     _Limits.RawBoardZ.MaxVal       := 18.0;
+_Limits.SafeClearanceZ.MinVal  := 1.0;     _Limits.SafeClearanceZ.MaxVal  := 5.0;
+_Limits.RapidSpeedQ.MinVal 	   := 360; 	   _Limits.RapidSpeedQ.MaxVal := 2160.0; 
 
 
 InitProfiles();]]></ST>
