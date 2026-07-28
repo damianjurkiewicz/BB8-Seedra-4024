@@ -228,6 +228,7 @@ aRecipeNames[E_RecipeID.eFeedMeina2_750x750_Circles]   	:= 'Meina Circles 750';
 aRecipeNames[E_RecipeID.eFeedMeina2_1000x1000]    		:= 'Meina Squares 1000x1000';
 aRecipeNames[E_RecipeID.eFeedMeina2_1000x1000_Circles]  := 'Meina Circles 1000x1000';
 aRecipeNames[E_RecipeID.eFeedMeina2_2000x500] 			:= 'Meina Rectangles 2000x500';
+aRecipeNames[E_RecipeID.eFeedMeina2_Samples] 			:= 'Meina Samples';
 
 
 sSelectedRecipeName := aRecipeNames[GantryXYZ.ProgramIdRequested];
@@ -571,6 +572,7 @@ END_IF]]></ST>
       <LineId Id="100" Count="0" />
       <LineId Id="110" Count="5" />
       <LineId Id="109" Count="0" />
+      <LineId Id="123" Count="0" />
       <LineId Id="108" Count="0" />
       <LineId Id="67" Count="0" />
       <LineId Id="61" Count="0" />

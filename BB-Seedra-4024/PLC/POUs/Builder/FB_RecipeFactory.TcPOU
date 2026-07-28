@@ -21,6 +21,8 @@ VAR
     BuilderMeina2_1000x1000   			: FB_FeedMeina2_1000x1000;
     BuilderMeina2_1000x1000_Circles    	: FB_FeedMeina2_1000x1000_Circles;
     BuilderMeina2_2000x500    			: FB_FeedMeina2_2000x500;
+	
+	BuilderMeina2_Samples				: FB_FeedMeina2_Samples;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -76,6 +78,9 @@ END_VAR]]></Declaration>
 		
     E_RecipeID.eFeedMeina2_2000x500: 
 		GetBuilder := BuilderMeina2_2000x500;
+		
+	E_RecipeID.eFeedMeina2_Samples: 
+		GetBuilder := BuilderMeina2_Samples;	
         
 ELSE
     GetBuilder := 0; 
@@ -133,6 +138,9 @@ BuilderMeina2_1000x1000_Circles.ConfigProvider := ConfigProvider;
 
 BuilderMeina2_2000x500.Config    := Config;
 BuilderMeina2_2000x500.ConfigProvider := ConfigProvider;    
+
+BuilderMeina2_Samples.Config    := Config;
+BuilderMeina2_Samples.ConfigProvider := ConfigProvider;    
 ]]></ST>
       </Implementation>
     </Method>
@@ -157,14 +165,17 @@ BuilderMeina2_3Squares.Config    := Config;
 BuilderMeina2_3Circles.Config    := Config;
 BuilderMeina2_1000x1000.Config    := Config;
 BuilderMeina2_1000x1000_Circles.Config    := Config;
-BuilderMeina2_2000x500.Config := Config;]]></ST>
+BuilderMeina2_2000x500.Config := Config;
+BuilderMeina2_Samples.Config := Config;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeFactory">
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.GetBuilder">
-      <LineId Id="1019" Count="47" />
+      <LineId Id="1019" Count="44" />
+      <LineId Id="1070" Count="2" />
+      <LineId Id="1064" Count="2" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.InitializeFactory">
@@ -189,6 +200,8 @@ BuilderMeina2_2000x500.Config := Config;]]></ST>
       <LineId Id="49" Count="0" />
       <LineId Id="64" Count="19" />
       <LineId Id="63" Count="0" />
+      <LineId Id="89" Count="1" />
+      <LineId Id="88" Count="0" />
       <LineId Id="44" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.UpdateConfig">
@@ -201,6 +214,7 @@ BuilderMeina2_2000x500.Config := Config;]]></ST>
       <LineId Id="28" Count="0" />
       <LineId Id="33" Count="5" />
       <LineId Id="32" Count="0" />
+      <LineId Id="42" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

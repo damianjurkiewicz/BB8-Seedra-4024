@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_FeedMeina2_Samples" Id="{a4077330-6da6-413f-a705-3e06a762c716}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedMeina2_Samples EXTENDS FB_RecipeBase
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{35e58042-1596-4d98-b2a8-ce51c28b018b}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+VAR
+    TotalX : REAL;
+    TotalY : REAL;
+    Radius : REAL;
+    Velo   : REAL;
+    localConfig : ST_GantryXYZ_Config;
+
+    PanelRailOffsetX : REAL;
+    PanelRailOffsetY : REAL;
+    ExtrusionLengthX : REAL;
+    ExtrusionLengthY : REAL;
+    
+    NumberOfHolesX : INT := 2; 
+    NumberOfHolesY : INT := 2;
+    HoleDistanceFromEdgeOfRail : REAL := 25.0;
+    SomeFixedDimension : REAL := 12.63; 
+    
+    HolesSpacingX : LREAL;
+    HolesSpacingY : LREAL;
+    
+    holeIdx : INT;
+    i       : INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Busy := TRUE;
+_Done := FALSE;
+_Error := FALSE;
+Build := FALSE;
+THIS^.UpdateNestingLimits();
+
+IF NOT _Config.IsValid THEN
+    _Busy := FALSE;
+    _Error := TRUE; 
+    Build := FALSE;
+    RETURN;
+END_IF
+
+// ===================================================
+// GABARYTY I PRĘDKOŚĆ
+// ===================================================
+TotalX := _Config.PanelFrontWidth;
+TotalY := _Config.PanelFrontLength;
+Radius := _Config.Radius;
+
+IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
+IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
+
+IF _ConfigProvider <> 0 THEN
+    localConfig := _ConfigProvider.Config;
+    Velo := localConfig.CuttingSpeedXY;
+ELSE
+    Velo := 50.0;
+END_IF
+
+// ===================================================
+// WYLICZENIE ROZSTAWU OTWORÓW DLA JEDNEGO PANELU
+// ===================================================
+// Offsety dla szyn (10% z każdego brzegu tak jak we wzorcu)
+PanelRailOffsetX := 80;
+PanelRailOffsetY := 80;
+
+ExtrusionLengthX := TotalX - (2.0 * PanelRailOffsetX);
+ExtrusionLengthY := TotalY - (2.0 * PanelRailOffsetY);
+
+IF NumberOfHolesX > 1 THEN
+    HolesSpacingX := (ExtrusionLengthX - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesX - 1);
+ELSE
+    HolesSpacingX := 0.0;
+END_IF
+
+IF NumberOfHolesY > 1 THEN
+    HolesSpacingY := (ExtrusionLengthY - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesY - 1);
+ELSE
+    HolesSpacingY := 0.0;
+END_IF
+
+// ===================================================
+// PRZYPISANIE WSPÓŁRZĘDNYCH OTWORÓW (Po 2 na krawędź)
+// ===================================================
+holeIdx := 0; 
+
+// 1. Rail Y1 (Lewa)
+FOR i := NumberOfHolesY TO 1 BY -1 DO
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX - SomeFixedDimension);
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
+END_FOR
+
+// 2. Rail X1 (Dolna)
+FOR i := 1 TO NumberOfHolesX DO
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY - SomeFixedDimension);
+END_FOR
+
+// 3. Rail Y2 (Prawa)
+FOR i := 1 TO NumberOfHolesY DO
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + ExtrusionLengthX + SomeFixedDimension);
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
+END_FOR
+
+// 4. Rail X2 (Górna)
+FOR i := NumberOfHolesX TO 1 BY -1 DO
+    holeIdx := holeIdx + 1;
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
+    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + ExtrusionLengthY + SomeFixedDimension);
+END_FOR
+
+_HolesToDrill := holeIdx; // Wynik to dokładnie 8 otworów
+
+// ===================================================
+// DEFINICJA KSZTAŁTU (Tylko 1 główny prostokąt)
+// ===================================================
+_ShapesCount := 1; 
+
+// Zaczynamy na środku PRAWEJ krawędzi
+_ShapeStart[1].X := TotalX;
+_ShapeStart[1].Y := TotalY / 2.0;
+
+// ============================================
+// GENEROWANIE TABELI (Ruch CCW / Lewoskrętnie)
+// ============================================
+_GeometryWriter.Clear();
+_GeometryWriter.EnableTangentialFollowing();
+
+CASE _CurrentShapeIndex OF
+    1:
+        _GeometryWriter.AddStartPoint(_ShapeStart[1].X, _ShapeStart[1].Y);
+
+        // 1. Prawa krawędź
+        _GeometryWriter.AddLine(TotalX, TotalY - Radius, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(TotalX - Radius, TotalY, TotalX - Radius, TotalY - Radius, Velo, FALSE);
+        END_IF
+
+        // 2. Górna krawędź
+        _GeometryWriter.AddLine(Radius, TotalY, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(0.0, TotalY - Radius, Radius, TotalY - Radius, Velo, FALSE);
+        END_IF
+
+        // 3. Lewa krawędź
+        _GeometryWriter.AddLine(0.0, Radius, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(Radius, 0.0, Radius, Radius, Velo, FALSE);
+        END_IF
+
+        // 4. Dolna krawędź
+        _GeometryWriter.AddLine(TotalX - Radius, 0.0, Velo);
+        IF Radius > 0 THEN
+            _GeometryWriter.AddArc(TotalX, Radius, TotalX - Radius, Radius, Velo, FALSE);
+        END_IF
+
+        // Zamknięcie do połowy prawej krawędzi
+        _GeometryWriter.AddLine(TotalX, TotalY / 2.0, Velo);
+
+END_CASE
+
+_GeometryWriter.EndTable();
+
+_Busy := FALSE;
+_Done := TRUE;
+Build := TRUE;]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CalculateFootprint" Id="{4d610f70-d11a-4c8d-ad96-42f8336ecc4f}">
+      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_NominalX := _Config.PanelFrontWidth;
+_NominalY := _Config.PanelFrontLength;]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ExecutionRoute" Id="{3da0d898-d982-4548-8e68-e062b575b330}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{054dbd75-ee81-49d9-bf90-24228ef6af44}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eFeedTable;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <Method Name="FB_init" Id="{4a8dd755-d76d-4103-ac21-7d6dba934f79}">
+      <Declaration><![CDATA[METHOD FB_init : BOOL
+VAR_INPUT
+	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
+	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
+_Limits.PanelFrontLength.MaxVal := 2400.0;
+
+_Limits.PanelFrontWidth.MinVal  := 100.0;
+_Limits.PanelFrontWidth.MaxVal  := 1200.0;
+
+_Limits.PanelHeight.MinVal      := 0.0;
+_Limits.PanelHeight.MaxVal      := 0.0;
+
+_Limits.RailHeightCorrection.MinVal := 0.0;
+_Limits.RailHeightCorrection.MaxVal := 0.0;
+
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.GrooveDepthZ.MinVal := 0.0;
+_Limits.GrooveDepthZ.MaxVal := 9.0; 
+
+_Limits.CuttingOverpass.MinVal := 0.0;
+_Limits.CuttingOverpass.MaxVal := 50.0;
+_Limits.GroovingOverpass.MinVal := 0.0;
+_Limits.GroovingOverpass.MaxVal := 50.0;
+
+_Limits.Radius.MinVal := 10.0;     
+_Limits.Radius.MaxVal := 600.0;   ]]></ST>
+      </Implementation>
+    </Method>
+    <LineIds Name="FB_FeedMeina2_Samples">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedMeina2_Samples.Build">
+      <LineId Id="2711" Count="138" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedMeina2_Samples.CalculateFootprint">
+      <LineId Id="28" Count="0" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedMeina2_Samples.ExecutionRoute.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_FeedMeina2_Samples.FB_init">
+      <LineId Id="31" Count="15" />
+      <LineId Id="28" Count="0" />
+      <LineId Id="53" Count="1" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="73" Count="2" />
+      <LineId Id="71" Count="0" />
+      <LineId Id="77" Count="1" />
+      <LineId Id="76" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

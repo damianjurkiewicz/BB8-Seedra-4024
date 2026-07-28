@@ -88,6 +88,9 @@
     <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_2000x1000.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_Samples.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_PTPArona.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -312,6 +315,10 @@
       <ExcludeFromBuild>false</ExcludeFromBuild>
     </Compile>
     <Compile Include="VISUs\Modes\ProductionMode\V_Builders.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_Meina2_Samples.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>

@@ -3437,7 +3437,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{03A38426-4BCF-F339-9D65-3E5120587857}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{3D8DE96C-0387-7D11-B2A3-867A7AE21C66}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -8160,15 +8160,11 @@ Bit 8 - 15 : reserved]]></Comment>
 		<MappingInfo Identifier="{05000010-2001-0850-1000-040300205008}" Id="#x02030060" Watchdog="14000000040000000400000004000000"/>
 		<MappingInfo Identifier="{03040050-0050-0304-5000-040350000403}" Id="#x02030030" Watchdog="04000000040000000400000004000000"/>
 		<OwnerA Name="TIID^Device 3 (EtherCAT)">
-			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 10 (EL2904)">
-				<Link VarA="Term 1 (EK1100)^Term 8 (EL6900)^ConnectionInputs^TwinSafeGroup1.Term 10 (EL2904) - Module 1 (FSOES)_3 TxPDO" VarB="Module 1 (FSOES)^RxPDO^FSOE"/>
-			</OwnerB>
 			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 8 (EL6900)">
+				<Link VarA="Term 1 (EK1100)^Term 10 (EL2904)^Module 1 (FSOES)^RxPDO^FSOE" VarB="ConnectionInputs^TwinSafeGroup1.Term 10 (EL2904) - Module 1 (FSOES)_3 TxPDO"/>
 				<Link VarA="Term 1 (EK1100)^Term 10 (EL2904)^Module 1 (FSOES)^TxPDO^FSOE" VarB="ConnectionOutputs^TwinSafeGroup1.Term 10 (EL2904) - Module 1 (FSOES)_3 RxPDO"/>
 				<Link VarA="Term 1 (EK1100)^Term 9 (EL1904)^Module 1 (FSOES)^RxPDO^FSOE" VarB="ConnectionInputs^TwinSafeGroup1.Term 9 (EL1904) - Module 1 (FSOES)_2 TxPDO"/>
-			</OwnerB>
-			<OwnerB Name="TIID^Device 3 (EtherCAT)^Term 1 (EK1100)^Term 9 (EL1904)">
-				<Link VarA="Term 1 (EK1100)^Term 8 (EL6900)^ConnectionOutputs^TwinSafeGroup1.Term 9 (EL1904) - Module 1 (FSOES)_2 RxPDO" VarB="Module 1 (FSOES)^TxPDO^FSOE"/>
+				<Link VarA="Term 1 (EK1100)^Term 9 (EL1904)^Module 1 (FSOES)^TxPDO^FSOE" VarB="ConnectionOutputs^TwinSafeGroup1.Term 9 (EL1904) - Module 1 (FSOES)_2 RxPDO"/>
 			</OwnerB>
 		</OwnerA>
 		<OwnerA Name="TINC^NC-Task 1 SAF^Axes^Axis Q">
