@@ -77,7 +77,7 @@ CASE nStep OF
     // -------- Zjazd Z (Zanurzenie noża w gąbce) --------
     30:
         recipeConfig := _RecipeBuilder.Config;
-        TargetZ := MaterialTopZ - recipeConfig.GrooveDepthZ;
+        TargetZ := MaterialTopZ - 2.0;
         _AxisZ.MoveAbsolute(TargetZ, 0);
         nStep := 40;
 
