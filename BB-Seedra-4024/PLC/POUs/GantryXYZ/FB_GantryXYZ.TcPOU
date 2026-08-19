@@ -713,7 +713,6 @@ CASE DescendantSequenceState OF
 		fbHomeStratZ.Axis := AxisZ;
 		fbHomeStratQ.Axis := AxisQ;
 		
-		
 		// Wstrzyknięcie strategii do osi (Dependency Injection)
 		AxisX.HomeMethod := fbHomeStratX;
 		AxisY.HomeMethod := fbHomeStratY;
@@ -740,6 +739,7 @@ CASE DescendantSequenceState OF
 		ExecutorNCI.AxisX          := AxisX;
 		ExecutorNCI.AxisY          := AxisY;
 		ExecutorNCI.AxisZ          := AxisZ;
+		ExecutorNCI.AxisQ          := AxisQ;
 		ExecutorNCI.NciChannel     := NciChannel; // Twój nowy kanał
 		ExecutorNCI.ConfigProvider := THIS^;
 		
@@ -757,7 +757,6 @@ CASE DescendantSequenceState OF
 		ExecutorDrill.AxisZ := AxisZ;
 		ExecutorDrill.AxisQ := AxisQ;
 		ExecutorDrill.ConfigProvider := THIS^;
-		
 
 		// Wstrzyknięcie strategii resetu sprzętowego
 		// Oś X
@@ -774,9 +773,7 @@ CASE DescendantSequenceState OF
 		IF AxisZ_IsSoE THEN
 			AxisZ.ResetMethod := ResetStratZ;
 		END_IF
-		
-		
-	
+			
 		// Wstrzykiwanie zależności do Executora Groove XY
 		ExecutorGrooveXY.AxisX         := AxisX;
 		ExecutorGrooveXY.AxisY         := AxisY;
@@ -787,13 +784,13 @@ CASE DescendantSequenceState OF
 		NciChannel.stAxisIds.nX := AxisX.Axis.NcToPlc.AxisId;
 		NciChannel.stAxisIds.nY := AxisY.Axis.NcToPlc.AxisId;
 		NciChannel.stAxisIds.nZ := AxisZ.Axis.NcToPlc.AxisId;
+		NciChannel.stAxisIds.nQ1 := AxisQ.Axis.NcToPlc.AxisId;
 
 		// Dla kanału tangencjalnego 
 		NciChannelTangential.stAxisIds.nX  := AxisX.Axis.NcToPlc.AxisId;
 		NciChannelTangential.stAxisIds.nY  := AxisY.Axis.NcToPlc.AxisId;
 		NciChannelTangential.stAxisIds.nZ  := AxisZ.Axis.NcToPlc.AxisId;
 		NciChannelTangential.stAxisIds.nQ1 := AxisQ.Axis.NcToPlc.AxisId;
-
 		
         DescendantSequenceState := DescendantSequenceState + 10;
 		//initialize persistent
@@ -1338,13 +1335,20 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Initialize">
       <LineId Id="517" Count="24" />
-      <LineId Id="546" Count="36" />
+      <LineId Id="547" Count="25" />
+      <LineId Id="675" Count="0" />
+      <LineId Id="573" Count="9" />
       <LineId Id="649" Count="0" />
       <LineId Id="654" Count="0" />
       <LineId Id="651" Count="2" />
       <LineId Id="664" Count="0" />
       <LineId Id="650" Count="0" />
-      <LineId Id="583" Count="50" />
+      <LineId Id="584" Count="15" />
+      <LineId Id="601" Count="0" />
+      <LineId Id="603" Count="9" />
+      <LineId Id="674" Count="0" />
+      <LineId Id="613" Count="5" />
+      <LineId Id="620" Count="13" />
       <LineId Id="639" Count="0" />
       <LineId Id="635" Count="3" />
       <LineId Id="2" Count="0" />

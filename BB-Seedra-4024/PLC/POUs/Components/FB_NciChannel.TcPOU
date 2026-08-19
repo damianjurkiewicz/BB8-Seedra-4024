@@ -14,7 +14,7 @@ VAR
     stPlcToNci AT %Q* : PLCTONC_NCICHANNEL_REF;
 
     // Bloki systemowe Beckhoffa do obsługi grupy
-    fbBuildGroup    : CfgBuild3DGroup;
+	fbBuildExtGroup : CfgBuildExt3DGroup;
     fbUngroup       : CfgReconfigGroup;
     
     // Bloki systemowe do obsługi programu i ruchu (nowe wersje Ex)
@@ -40,12 +40,13 @@ END_VAR]]></Declaration>
 _Error := FALSE; 
 _ErrorId := 0;
 
-fbBuildGroup(
+fbBuildExtGroup(
     bExecute := TRUE,
     nGroupId := nGroupId,
     nXAxisId := stAxisIds.nX,
     nYAxisId := stAxisIds.nY,
-    nZAxisId := stAxisIds.nZ
+    nZAxisId := stAxisIds.nZ,
+    nQ1AxisId := stAxisIds.nQ1
 );]]></ST>
       </Implementation>
     </Method>
@@ -88,7 +89,7 @@ SUPER^.CyclicLogic();
 stPlcToNci.ChnAxesOvr := 1000000;
 
 // --- ODŚWIEŻANIE BLOKÓW SYSTEMOWYCH ---
-fbBuildGroup(tTimeOut := T#2S);
+fbBuildExtGroup(tTimeOut := T#2S);
 fbUngroup(tTimeOut := T#2S);
 
 
@@ -134,12 +135,12 @@ ELSIF fbUngroup.bBusy = FALSE AND fbUngroup.bExecute THEN
 END_IF
 
 
-IF fbBuildGroup.bErr THEN
+IF fbBuildExtGroup.bErr THEN
     _Error := TRUE;
-    _ErrorId := fbBuildGroup.nErrId;
-ELSIF fbBuildGroup.bBusy = FALSE AND fbBuildGroup.bExecute THEN
+    _ErrorId := fbBuildExtGroup.nErrId;
+ELSIF fbBuildExtGroup.bBusy = FALSE AND fbBuildExtGroup.bExecute THEN
     _IsGrouped := TRUE;
-    fbBuildGroup(bExecute := FALSE);
+    fbBuildExtGroup(bExecute := FALSE);
 END_IF
 
 // Podobnie dla ładowania programu
@@ -282,7 +283,7 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.BuildGroup">
-      <LineId Id="61" Count="9" />
+      <LineId Id="72" Count="10" />
       <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.ChannelError.Get">

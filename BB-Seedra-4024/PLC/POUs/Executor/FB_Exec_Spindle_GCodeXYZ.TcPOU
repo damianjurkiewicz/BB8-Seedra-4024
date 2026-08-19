@@ -50,69 +50,38 @@ StepTimer();
 
 // Zabezpieczenie przed brakiem wstrzykniętych referencji
 IF nStep > 0 THEN
-    IF _RecipeBuilder = 0 OR _ConfigProvider = 0 OR _NciChannel = 0 THEN
-        ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'ExecutorNCI: BRAK REFERENCJI (Builder/Provider/NCI)!', '');
-        nStep := 999;
-    END_IF
+	IF _RecipeBuilder = 0 OR _ConfigProvider = 0 OR _NciChannel = 0 OR _AxisX = 0 OR _AxisY = 0 OR _AxisZ = 0 OR _AxisQ = 0 THEN
+		IF nStep > 0 THEN
+			ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'ExecutorNCI: BRAK KRYTYCZNYCH REFERENCJI (Builder/Provider/NCI/Osie)!', '');
+			nStep := 999;
+		END_IF
+		RETURN; 
+	END_IF
 END_IF
 
 CASE nStep OF
     0: // IDLE
 
-    5: // INIT - Załączanie osi i start pętli
-        IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() THEN
-            IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error THEN
-                nStep := 999;
-            ELSIF _AxisX.Enabled AND _AxisY.Enabled AND _AxisZ.Enabled THEN
-                _bBusy := TRUE;
-                
-                // Odczyt właściwości (Properties) do lokalnych zmiennych pomocniczych!
-                machineConfig := _ConfigProvider.Config;
-                recipeConfig  := _RecipeBuilder.Config;
-                
-                // Upewniamy się, że startujemy od pierwszej kopii
-                iCurrentCopyX := 1;
-                iCurrentCopyY := 1;
-                
-                // Bezpieczne użycie zmiennych lokalnych
-                _AxisX.Velocity := machineConfig.RapidSpeedX;
-                _AxisY.Velocity := machineConfig.RapidSpeedY;
-                _AxisZ.Velocity := machineConfig.RapidSpeedZ;
-                
-                nStep := 8;
-            END_IF
-        END_IF
-
-    // ==========================================================
-    // PĘTLA NESTINGU - START
-    // ==========================================================
-	8: // 1. Dojazd PTP do punktu startowego NCI dla danej kopii
-        // PTP automatycznie doda offsety nestingu do tego punktu!
-        MoveToXY(recipeConfig.NciStartX, recipeConfig.NciStartY, 0.0, 0.0);
-        nStep := 9;
-
-   	9: // Czekamy na dojazd osi XY
-        IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error THEN
-            nStep := 999;
-        ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN
-            
-            machineConfig := _ConfigProvider.Config;
-            
-            // OBLICZAMY ABSOLUTNĄ POZYCJĘ GÓRY MATERIAŁU I BEZPIECZNĄ WYSOKOŚĆ
-            MaterialTopZ := machineConfig.GlobalOffsetZ + machineConfig.RawBoardZ;
-            SafeZ := MaterialTopZ + machineConfig.SafeClearanceZ;
-            
-            // Podnosimy / Ustawiamy Z na bezpieczną pozycję absolutną
-            _AxisZ.MoveAbsolute(SafeZ, 0);
-            nStep := 10;
-        END_IF
-        
-    10: // Czekamy aż podniesie się Z
-        IF _AxisZ.Error THEN
-            nStep := 999;
-        ELSIF _AxisZ.InPosition THEN
-            nStep := 20;
-        END_IF
+	5: // INIT - Załączanie osi i start
+		IF _AxisX.Enable() AND _AxisY.Enable() AND _AxisZ.Enable() AND _AxisQ.Enable() THEN 
+			IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error OR _AxisQ.Error THEN 
+				nStep := 999;
+			ELSIF _AxisX.Enabled AND _AxisY.Enabled AND _AxisZ.Enabled AND _AxisQ.Enabled THEN 
+				_bBusy := TRUE;
+								 
+				// Odczyt właściwości (Properties) do lokalnych zmiennych pomocniczych!
+				machineConfig := _ConfigProvider.Config;
+				recipeConfig  := _RecipeBuilder.Config;
+								 
+				// Bezpieczne użycie zmiennych lokalnych
+				_AxisX.Velocity := machineConfig.RapidSpeedX;
+				_AxisY.Velocity := machineConfig.RapidSpeedY;
+				_AxisZ.Velocity := machineConfig.RapidSpeedZ;
+				_AxisQ.Velocity := machineConfig.RapidSpeedQ; 
+											 
+				nStep := 20;
+			END_IF
+		END_IF
 
 	20: // 2. Zbudowanie grupy NCI
 		_NciChannel.BuildGroup();
@@ -141,57 +110,27 @@ CASE nStep OF
         _NciChannel.Start();
         StepTimer(IN:=FALSE);
         nStep := 70;
-
+	
 	70: // 4. Czekamy na koniec programu (M30)
         IF _NciChannel.ChannelError THEN 
             nStep := 999;
         ELSIF _NciChannel.IsReady THEN 
-            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Executor: Program NCI zakonczony (M30). Resetowanie kanalu...', '');
-            
-            // --- POPRAWKA: NAJPIERW CZYŚCIMY KANAŁ ---
-            _NciChannel.ResetChannel(); 
-            // -----------------------------------------
-            
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Executor: Program NCI zakonczony (M30). Rozpinam grupe...', '');
             nStep := 80;
         END_IF
 
-	80: // 5. Rozwiązanie grupy, uwalniamy osie z powrotem do trybu PTP
+    80: // 5. Rozwiązanie grupy, uwalniamy osie z powrotem do trybu PTP
         _NciChannel.Ungroup();
         nStep := 90;
 
-    90: // Czekamy na potwierdzenie od NC (rozpięcie)
+	90: // 6. Reset kanału i zakończenie pracy
         IF NOT _NciChannel.IsGrouped THEN
-            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Executor: Osie uwolnione do trybu PTP. Przechodze do Nestingu.', '');
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Executor: Osie uwolnione do trybu PTP. Resetuje kanal.', '');
+            _NciChannel.ResetChannel(); 
             
-            // --- TUTAJ JEST KLUCZ! ---
-            nStep := 110; // Idziemy do logiki nestingu zamiast kończyć program!
-            // -------------------------
+            nStep := 1000; 
         END_IF
-
-    // ==========================================================
-    // MULTIPLEXOWANIE (PRZESKOK DO KOLEJNEJ KOPII)
-    // ==========================================================
-    110: 
-		 ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Zaczynam Nesting', '');
-        iCurrentCopyX := iCurrentCopyX + 1;
         
-        IF iCurrentCopyX > _RecipeBuilder.ActualCopiesX THEN
-            iCurrentCopyX := 1;
-            iCurrentCopyY := iCurrentCopyY + 1;
-            
-            IF iCurrentCopyY > _RecipeBuilder.ActualCopiesY THEN
-                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Zrobiono wszystkie kopie na płycie', '');
-                nStep := 1000;
-            ELSE
-                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Nowy rząd (Y), wracamy do dojazdu PTP', '');
-                nStep := 8; 
-            END_IF
-        ELSE
-             	ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Kolejny detal w rzędzie (X), wracamy do dojazdu PTP', '');	
-            	nStep := 8; 
-        END_IF
-
-
     999: // ERROR HANDLING
         _bBusy := FALSE;
         _bError := TRUE;
@@ -202,7 +141,7 @@ CASE nStep OF
         nStep := 0;
 
     1000: // ZAKOŃCZONO SUKCESEM
-        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecutorNCI: Wszystkie kopie wykonane pomyslnie.', '');
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecutorNCI: Program wykonany pomyslnie.', '');
         _bBusy := FALSE;
         _bDone := TRUE;
         nStep := 0;
@@ -237,20 +176,8 @@ END_VAR
       <LineId Id="3" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Spindle_GCodeXYZ.CyclicLogic">
-      <LineId Id="615" Count="40" />
-      <LineId Id="851" Count="1" />
-      <LineId Id="657" Count="2" />
-      <LineId Id="776" Count="13" />
-      <LineId Id="668" Count="8" />
-      <LineId Id="865" Count="1" />
-      <LineId Id="687" Count="25" />
-      <LineId Id="813" Count="12" />
-      <LineId Id="838" Count="12" />
-      <LineId Id="736" Count="3" />
-      <LineId Id="836" Count="0" />
-      <LineId Id="740" Count="10" />
-      <LineId Id="835" Count="0" />
-      <LineId Id="752" Count="21" />
+      <LineId Id="973" Count="37" />
+      <LineId Id="1038" Count="62" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Spindle_GCodeXYZ.NciChannel.Get">
