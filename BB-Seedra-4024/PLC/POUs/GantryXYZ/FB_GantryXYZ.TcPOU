@@ -789,7 +789,7 @@ CASE DescendantSequenceState OF
 		// Dla kanału tangencjalnego 
 		NciChannelTangential.stAxisIds.nX  := AxisX.Axis.NcToPlc.AxisId;
 		NciChannelTangential.stAxisIds.nY  := AxisY.Axis.NcToPlc.AxisId;
-		NciChannelTangential.stAxisIds.nZ  := AxisZ.Axis.NcToPlc.AxisId;
+		NciChannelTangential.stAxisIds.nZ  := 0;
 		NciChannelTangential.stAxisIds.nQ1 := AxisQ.Axis.NcToPlc.AxisId;
 		
         DescendantSequenceState := DescendantSequenceState + 10;
