@@ -2598,7 +2598,7 @@ External Setpoint Generation:
 					<AxisPara>
 						<General UnitName="°"/>
 						<Dynamic Acceleration="15000" Deceleration="15000" Jerk="45000"/>
-						<Velo RefSearch="720" RefSync="90" SlowManual="30" FastManual="180" Fast="10738.39" Maximum="10738.4"/>
+						<Velo RefSearch="720" RefSync="90" SlowManual="30" FastManual="180" Fast="10738.39" Maximum="10000"/>
 						<TargetPosControl Range="0.1"/>
 						<BacklashCompensation Range="0.2"/>
 						<OtherSettings AllowMotionCmdToSlave="true" PulseDistancePos="9" PulseDistanceNeg="9"/>
@@ -2666,7 +2666,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="11812.229" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="11000" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -2745,7 +2745,7 @@ External Setpoint Generation:
 					<Name>Axis Y</Name>
 					<AxisPara>
 						<Dynamic Acceleration="100" Deceleration="100" Jerk="200"/>
-						<Velo RefSearch="50" RefSync="10" SlowManual="5" FastManual="80" Fast="429.536" Maximum="429.536"/>
+						<Velo RefSearch="50" RefSync="10" SlowManual="5" FastManual="80" Fast="429.536" Maximum="400"/>
 						<TargetPosControl Range="0.1"/>
 						<BacklashCompensation Range="0.1"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
@@ -2814,7 +2814,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="472.4896" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="420" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -2892,7 +2892,7 @@ External Setpoint Generation:
 					<Name>Axis Z</Name>
 					<AxisPara>
 						<Dynamic AccelerationMaximum="1200" DecelerationMaximum="1200" Acceleration="20" Deceleration="20" Jerk="80"/>
-						<Velo RefSearch="5" RefSync="2" SlowManual="5" FastManual="10" Maximum="20"/>
+						<Velo RefSearch="5" RefSync="2" SlowManual="5" FastManual="10" Maximum="15"/>
 						<TargetPosControl Range="0.1"/>
 						<BacklashCompensation Range="0.1"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
@@ -2959,7 +2959,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="24">
 						<DrvPara Inverse="true">
-							<Analog VeloReferenz="20" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="16" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -3054,7 +3054,7 @@ External Setpoint Generation:
 					<Name>Axis X</Name>
 					<AxisPara>
 						<Dynamic Acceleration="100" Deceleration="100" Jerk="200"/>
-						<Velo RefSearch="50" RefSync="10" SlowManual="5" FastManual="80" Fast="536.92" Maximum="536.92"/>
+						<Velo RefSearch="50" RefSync="10" SlowManual="5" FastManual="80" Fast="536.92" Maximum="300"/>
 						<TargetPosControl Range="0.1"/>
 						<BacklashCompensation Range="0.067"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
@@ -3123,7 +3123,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="590.612" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="320" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -3437,7 +3437,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{FF643FA8-E413-B5C7-32A9-70B4A7A8C1D4}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{FDE932D7-D9DA-CE2B-15FC-588E3B242B38}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">

@@ -22,13 +22,12 @@ END_VAR]]></Declaration>
 
 CASE nBuildStep OF
     0:
-
         _Busy := TRUE;
         _Done := FALSE;
         _Error := FALSE;
-		_nLinesToWrite := 0;
+        _nLinesToWrite := 0;
         
-        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Rozpoczynam budowanie relatywnego G-Code dla ruchu osi X', '');
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Budowanie G-Code (Z=8, F1500)', '');
         
         THIS^.UpdateNestingLimits();
         IF NOT _Config.IsValid THEN
@@ -39,24 +38,52 @@ CASE nBuildStep OF
             RETURN;
         END_IF
         
+        // --- BUFOR G-CODE ---
+        _aGCodeBuffer[1]  := '(1001)$N';
+        _aGCodeBuffer[2]  := 'N0 G01 X353.45 Y31.297 Z26 F3000$N';
+        _aGCodeBuffer[3]  := 'N1 Z11 F400$N';
+        _aGCodeBuffer[4]  := 'N2 Z8.02 F400$N';
+        _aGCodeBuffer[5]  := 'N3 Z8 F400$N';
+        _aGCodeBuffer[6]  := 'N4 G01 Z16 F400$N';
+        _aGCodeBuffer[7]  := 'N5 G01 Q1=76.398 F1500$N';
+        _aGCodeBuffer[8]  := 'N6 G01 Z8 F400$N';
+        _aGCodeBuffer[9]  := 'N7 G03 X223.057 Y46.847 Q1=90. I-130.393 J-538.901 F1500$N';
+        _aGCodeBuffer[10] := 'N8 G01 F1500$N';
+        _aGCodeBuffer[11] := 'N9 G03 X1.924 Y0.841 Q1=113.505 J-554.451 F1500$N';
+        _aGCodeBuffer[12] := 'N10 G01 Z16 F400$N';
+        _aGCodeBuffer[13] := 'N11 G01 Q1=-246.386 F1500$N';
+        _aGCodeBuffer[14] := 'N12 G01 Z8 F400$N';
+        _aGCodeBuffer[15] := 'N13 X0 Y0 F1500$N';
+        _aGCodeBuffer[16] := 'N14 G01 Z16 F400$N';
+        _aGCodeBuffer[17] := 'N15 G01 Q1=-66.083 F1500$N';
+        _aGCodeBuffer[18] := 'N16 G01 Z8 F400$N';
+        _aGCodeBuffer[19] := 'N17 X1.072 Y0.476 F1500$N';
+        _aGCodeBuffer[20] := 'N18 Q1=-65.888$N';
+        _aGCodeBuffer[21] := 'N19 G03 X11.318 Y309.932 Q1=62.095 I-70.372 J157.228 F1500$N';
+        _aGCodeBuffer[22] := 'N20 G01 Z16 F400$N';
+        _aGCodeBuffer[23] := 'N21 G01 Q1=-111.277 F1500$N';
+        _aGCodeBuffer[24] := 'N22 G01 Z8 F400$N';
+        _aGCodeBuffer[25] := 'N23 G03 X287.283 Y286.554 Q1=-78.407 I177.609 J456.078 F1500$N';
+        _aGCodeBuffer[26] := 'N24 G01 Z16 F400$N';
+        _aGCodeBuffer[27] := 'N25 G01 Q1=-226.626 F1500$N';
+        _aGCodeBuffer[28] := 'N26 G01 Z8 F400$N';
+        _aGCodeBuffer[29] := 'N27 G03 X353.45 Y31.297 Q1=-104.31 I103.369 J-109.409 F1500$N';
+        _aGCodeBuffer[30] := 'N28 G01 Z11 F400$N';
+        _aGCodeBuffer[31] := 'N29 Z26 F400$N';
+        _aGCodeBuffer[32] := 'N30 G01 Z16 F400$N';
         
-        _aGCodeBuffer[1] := 'G91$N';         
-        _aGCodeBuffer[2] := 'G01 Q1=180.0 F100$N';
-        _aGCodeBuffer[3] := 'G90$N'; 
-        _aGCodeBuffer[4] := 'M30$N'; 
+        _nLinesToWrite := 32; 
         
-        _nLinesToWrite := 4; 
-        
-
-        FOR i := (_nLinesToWrite + 1) TO 20 DO
+        // Czyszczenie reszty bufora
+        FOR i := (_nLinesToWrite + 1) TO 60 DO 
             _aGCodeBuffer[i] := '';
         END_FOR
         
         nBuildStep := 10;
 
     10:
-        IF THIS^.WriteGCodeFile('TestMoveX.nc') THEN
-            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Zapisano plik TestMoveX.nc', '');
+        IF THIS^.WriteGCodeFile('TangentialCut.nc') THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Zapisano plik TangentialCut.nc', '');
             nBuildStep := 1000;
         END_IF
 
@@ -127,14 +154,7 @@ _Limits.Diameter.MaxVal := 600;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCICircle.Build">
-      <LineId Id="1628" Count="7" />
-      <LineId Id="1717" Count="0" />
-      <LineId Id="1636" Count="11" />
-      <LineId Id="1673" Count="1" />
-      <LineId Id="1716" Count="0" />
-      <LineId Id="1689" Count="2" />
-      <LineId Id="1693" Count="9" />
-      <LineId Id="1704" Count="10" />
+      <LineId Id="2719" Count="74" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCICircle.CalculateFootprint">

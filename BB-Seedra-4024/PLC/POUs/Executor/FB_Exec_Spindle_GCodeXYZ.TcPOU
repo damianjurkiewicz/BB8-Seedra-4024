@@ -77,11 +77,34 @@ CASE nStep OF
 				_AxisX.Velocity := machineConfig.RapidSpeedX;
 				_AxisY.Velocity := machineConfig.RapidSpeedY;
 				_AxisZ.Velocity := machineConfig.RapidSpeedZ;
-				_AxisQ.Velocity := machineConfig.RapidSpeedQ; 
+				_AxisQ.Velocity := machineConfig.RapidSpeedQ; // <-- DODANO Q
 											 
-				nStep := 20;
+				nStep := 8;
 			END_IF
 		END_IF
+
+	8: // 1. Dojazd PTP do punktu startowego NCI
+       
+        nStep := 9;
+
+	9: 
+		IF _AxisX.Error OR _AxisY.Error OR _AxisZ.Error OR _AxisQ.Error THEN 
+			nStep := 999;
+		ELSIF _AxisX.InPosition AND _AxisY.InPosition THEN
+			
+			machineConfig := _ConfigProvider.Config;
+			
+			_AxisQ.MoveAbsolute(0,0);
+
+			nStep := 10;
+		END_IF
+        
+    10: // Czekamy aż podniesie się Z
+        IF _AxisQ.Error THEN
+            nStep := 999;
+        ELSIF _AxisQ.InPosition THEN
+            nStep := 20;
+        END_IF
 
 	20: // 2. Zbudowanie grupy NCI
 		_NciChannel.BuildGroup();
@@ -176,8 +199,7 @@ END_VAR
       <LineId Id="3" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Spindle_GCodeXYZ.CyclicLogic">
-      <LineId Id="973" Count="37" />
-      <LineId Id="1038" Count="62" />
+      <LineId Id="1984" Count="123" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Spindle_GCodeXYZ.NciChannel.Get">
