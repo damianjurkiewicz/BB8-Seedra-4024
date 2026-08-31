@@ -40,7 +40,7 @@ VAR
     fbAppendLine    : ItpPpgAppendGenericBlock;
     fbCloseFile     : ItpPpgCloseMain;
     
-    _aGCodeBuffer   : ARRAY[1..500] OF STRING(255); // Bufor dla Buildera (max 500 linii)
+    _aGCodeBuffer   : ARRAY[1..600] OF STRING(255); 
     _nLinesToWrite  : INT;                          // Ile linii z bufora zapisać
     _nFileWriteStep : INT := 0;                     // Krok maszyny stanów zapisu
     _sGCodeFilePath : STRING(255);                  // Ścieżka pliku

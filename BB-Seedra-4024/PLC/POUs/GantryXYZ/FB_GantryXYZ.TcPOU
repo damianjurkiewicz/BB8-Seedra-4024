@@ -826,16 +826,16 @@ END_VAR
 // --- OŚ X ---
 ProfilesX[E_MachineProfile.eProduction].SoftLimitMin := -20.0;
 ProfilesX[E_MachineProfile.eProduction].SoftLimitMax := 1200.0;
-ProfilesX[E_MachineProfile.eProduction].Acceleration := 100.0;
-ProfilesX[E_MachineProfile.eProduction].Deceleration := 100.0;
-ProfilesX[E_MachineProfile.eProduction].Jerk         := 500.0;
+ProfilesX[E_MachineProfile.eProduction].Acceleration := 2000.0;
+ProfilesX[E_MachineProfile.eProduction].Deceleration := 2000.0;
+ProfilesX[E_MachineProfile.eProduction].Jerk         := 15000.0;
 
 // --- OŚ Y ---
 ProfilesY[E_MachineProfile.eProduction].SoftLimitMin := -20.0;
 ProfilesY[E_MachineProfile.eProduction].SoftLimitMax := 2200.0;
-ProfilesY[E_MachineProfile.eProduction].Acceleration := 100.0;
-ProfilesY[E_MachineProfile.eProduction].Deceleration := 100.0;
-ProfilesY[E_MachineProfile.eProduction].Jerk         := 500.0;
+ProfilesY[E_MachineProfile.eProduction].Acceleration := 2000.0;
+ProfilesY[E_MachineProfile.eProduction].Deceleration := 2000.0;
+ProfilesY[E_MachineProfile.eProduction].Jerk         := 15000.0;
 
 // --- OŚ Z ---
 ProfilesZ[E_MachineProfile.eProduction].SoftLimitMin := -10.0;

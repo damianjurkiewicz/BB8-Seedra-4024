@@ -2744,10 +2744,9 @@ External Setpoint Generation:
 				<Axis Id="2" CreateSymbols="true" AxisType="1">
 					<Name>Axis Y</Name>
 					<AxisPara>
-						<Dynamic Acceleration="100" Deceleration="100" Jerk="200"/>
+						<Dynamic Acceleration="1000" Deceleration="1000" Jerk="10000" ToleranceBallAuxAxis="10"/>
 						<Velo RefSearch="50" RefSync="10" SlowManual="5" FastManual="80" Fast="429.536" Maximum="400"/>
 						<TargetPosControl Range="0.1"/>
-						<BacklashCompensation Range="0.1"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
@@ -2891,10 +2890,9 @@ External Setpoint Generation:
 				<Axis Id="9" CreateSymbols="true" AxisType="1" GroupId="13">
 					<Name>Axis Z</Name>
 					<AxisPara>
-						<Dynamic AccelerationMaximum="1200" DecelerationMaximum="1200" Acceleration="20" Deceleration="20" Jerk="80"/>
+						<Dynamic AccelerationMaximum="1200" DecelerationMaximum="1200" Acceleration="20" Deceleration="20" Jerk="80" ToleranceBallAuxAxis="2"/>
 						<Velo RefSearch="5" RefSync="2" SlowManual="5" FastManual="10" Maximum="15"/>
 						<TargetPosControl Range="0.1"/>
-						<BacklashCompensation Range="0.1"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="4">
@@ -3053,10 +3051,9 @@ External Setpoint Generation:
 				<Axis Id="3" CreateSymbols="true" AxisType="1" GroupId="6">
 					<Name>Axis X</Name>
 					<AxisPara>
-						<Dynamic Acceleration="100" Deceleration="100" Jerk="200"/>
+						<Dynamic Acceleration="1000" Deceleration="1000" Jerk="10000" ToleranceBallAuxAxis="10"/>
 						<Velo RefSearch="50" RefSync="10" SlowManual="5" FastManual="80" Fast="536.92" Maximum="300"/>
 						<TargetPosControl Range="0.1"/>
-						<BacklashCompensation Range="0.067"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
@@ -3437,7 +3434,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{39BDA5CC-8994-EDBC-08C4-7B749D0CB546}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{3B591922-DDD8-2888-A229-D56D65FC2398}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">

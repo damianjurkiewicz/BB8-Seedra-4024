@@ -148,10 +148,10 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
+        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 50.0;
 _Limits.PanelFrontLength.MaxVal := 2400.0;
 
-_Limits.PanelFrontWidth.MinVal  := 100.0;
+_Limits.PanelFrontWidth.MinVal  := 50.0;
 _Limits.PanelFrontWidth.MaxVal  := 1200.0;
 
 _Limits.PanelHeight.MinVal      := 0.0;
