@@ -1,0 +1,170 @@
+Build := FALSE;
+
+CASE nBuildStep OF
+    0:
+        _Busy := TRUE;
+        _Done := FALSE;
+        _Error := FALSE;
+        _nLinesToWrite := 0;
+        
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Budowanie G-Code (Z=8, F1500)', '');
+        
+        THIS^.UpdateNestingLimits();
+        IF NOT _Config.IsValid THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'NCIBuilder: Walidacja nie przeszla! Ustawiam ERROR.', '');
+            _Busy := FALSE;
+            _Error := TRUE;
+            Build := FALSE;
+            RETURN;
+        END_IF
+        
+        // --- BUFOR G-CODE ---
+        _aGCodeBuffer[1]   := '(1001)$N';
+        _aGCodeBuffer[2]   := 'N0 G01 X16.005 Y43.953 Z28 F400$N';
+        _aGCodeBuffer[3]   := 'N1 G01 Q1=-180. F12000$N';
+        _aGCodeBuffer[4]   := 'N2 G01 Z8 F400$N';
+        _aGCodeBuffer[5]   := 'N3 Y12.093 F1500$N';
+        _aGCodeBuffer[6]   := 'N4 G01 Z18 F400$N';
+        _aGCodeBuffer[7]   := 'N5 G01 Q1=-90. F12000$N';
+        _aGCodeBuffer[8]   := 'N6 G01 Z8 F400$N';
+        _aGCodeBuffer[9]   := 'N7 X19.995 F1500$N';
+        _aGCodeBuffer[10]  := 'N8 G01 Z18 F400$N';
+        _aGCodeBuffer[11]  := 'N9 G01 Q1=0. F12000$N';
+        _aGCodeBuffer[12]  := 'N10 G01 Z8 F400$N';
+        _aGCodeBuffer[13]  := 'N11 Y92.083 F1500$N';
+        _aGCodeBuffer[14]  := 'N12 G01 Z18 F400$N';
+        _aGCodeBuffer[15]  := 'N13 G01 Q1=90. F12000$N';
+        _aGCodeBuffer[16]  := 'N14 G01 Z8 F400$N';
+        _aGCodeBuffer[17]  := 'N15 X16.005 F1500$N';
+        _aGCodeBuffer[18]  := 'N16 G01 Z18 F400$N';
+        _aGCodeBuffer[19]  := 'N17 G01 Q1=180. F12000$N';
+        _aGCodeBuffer[20]  := 'N18 G01 Z8 F400$N';
+        _aGCodeBuffer[21]  := 'N19 Y43.953 F1500$N';
+        _aGCodeBuffer[22]  := 'N20 Z18 F400$N';
+        _aGCodeBuffer[23]  := 'N21 X54.021 Y72.79 F2000$N';
+        _aGCodeBuffer[24]  := 'N22 G01 Q1=90. F12000$N';
+        _aGCodeBuffer[25]  := 'N23 G01 Z8 F400$N';
+        _aGCodeBuffer[26]  := 'N24 G03 Y36.8 Q1=270. J-17.995 F1500$N';
+        _aGCodeBuffer[27]  := 'N25 Y72.79 Q1=450. J17.995 F1500$N';
+        _aGCodeBuffer[28]  := 'N26 G01 Z18 F400$N';
+        _aGCodeBuffer[29]  := 'N27 X96.443 Y63.279 F2000$N';
+        _aGCodeBuffer[30]  := 'N28 G01 Q1=360. F12000$N';
+        _aGCodeBuffer[31]  := 'N29 G01 Z8 F400$N';
+        _aGCodeBuffer[32]  := 'N30 Y79.328 F1500$N';
+        _aGCodeBuffer[33]  := 'N31 G01 Z18 F400$N';
+        _aGCodeBuffer[34]  := 'N32 G01 Q1=270.026 F12000$N';
+        _aGCodeBuffer[35]  := 'N33 G01 Z8 F400$N';
+        _aGCodeBuffer[36]  := 'N34 X107.344 Y79.333 F1500$N';
+        _aGCodeBuffer[37]  := 'N35 G01 Z18 F400$N';
+        _aGCodeBuffer[38]  := 'N36 G01 Q1=191.577 F12000$N';
+        _aGCodeBuffer[39]  := 'N37 G01 Z8 F400$N';
+        _aGCodeBuffer[40]  := 'N38 X108.339 Y74.477 F1500$N';
+        _aGCodeBuffer[41]  := 'N39 Q1=195.179 F12000$N';
+        _aGCodeBuffer[42]  := 'N40 X109.637 Y69.693 F1500$N';
+        _aGCodeBuffer[43]  := 'N41 Q1=198.781 F12000$N';
+        _aGCodeBuffer[44]  := 'N42 X111.233 Y64.999 F1500$N';
+        _aGCodeBuffer[45]  := 'N43 Q1=202.383 F12000$N';
+        _aGCodeBuffer[46]  := 'N44 X113.12 Y60.416 F1500$N';
+        _aGCodeBuffer[47]  := 'N45 Q1=205.985 F12000$N';
+        _aGCodeBuffer[48]  := 'N46 X115.292 Y55.96 F1500$N';
+        _aGCodeBuffer[49]  := 'N47 Q1=209.587 F12000$N';
+        _aGCodeBuffer[50]  := 'N48 X117.74 Y51.649 F1500$N';
+        _aGCodeBuffer[51]  := 'N49 Q1=213.188 F12000$N';
+        _aGCodeBuffer[52]  := 'N50 X120.453 Y47.501 F1500$N';
+        _aGCodeBuffer[53]  := 'N51 Q1=216.79 F12000$N';
+        _aGCodeBuffer[54]  := 'N52 X123.422 Y43.531 F1500$N';
+        _aGCodeBuffer[55]  := 'N53 Q1=222.811 F12000$N';
+        _aGCodeBuffer[56]  := 'N54 G02 X124.082 Y41.639 Q1=175.653 I-1.838 J-1.703 F1500$N';
+        _aGCodeBuffer[57]  := 'N55 G01 Q1=179.901 F12000$N';
+        _aGCodeBuffer[58]  := 'N56 G02 X122.726 Y33.034 Q1=162.194 I-28.298 J0.049 F1500$N';
+        _aGCodeBuffer[59]  := 'N57 G01 Q1=153.406 F12000$N';
+        _aGCodeBuffer[60]  := 'N58 G02 X104.492 Y27.546 Q1=60.095 I-11.707 J5.861 F1500$N';
+        _aGCodeBuffer[61]  := 'N59 G01 Q1=64.069 F12000$N';
+        _aGCodeBuffer[62]  := 'N60 G02 X98.805 Y33.393 Q1=24.352 I5.25 J10.797 F1500$N';
+        _aGCodeBuffer[63]  := 'N61 G01 Q1=17.533 F12000$N';
+        _aGCodeBuffer[64]  := 'N62 G02 X97.527 Y43.068 Q1=-2.484 I26.774 J8.458 F1500$N';
+        _aGCodeBuffer[65]  := 'N63 G01 Q1=3.871 F12000$N';
+        _aGCodeBuffer[66]  := 'N64 G02 X96.468 Y63.28 Q1=2.127 I663.315 J44.884 F1500$N';
+        _aGCodeBuffer[67]  := 'N65 G01 Z18 F400$N';
+        _aGCodeBuffer[68]  := 'N66 G01 Q1=92.125 F12000$N';
+        _aGCodeBuffer[69]  := 'N67 G01 Z8 F400$N';
+        _aGCodeBuffer[70]  := 'N68 X96.443 Y63.279 Z16.002 F400$N';
+        _aGCodeBuffer[71]  := 'N69 Z18 F400$N';
+        _aGCodeBuffer[72]  := 'N70 X151.232 Y45.688 F2000$N';
+        _aGCodeBuffer[73]  := 'N71 G01 Q1=180. F12000$N';
+        _aGCodeBuffer[74]  := 'N72 G01 Z8 F400$N';
+        _aGCodeBuffer[75]  := 'N73 Y34.904 F1500$N';
+        _aGCodeBuffer[76]  := 'N74 G01 Z18 F400$N';
+        _aGCodeBuffer[77]  := 'N75 G01 Q1=270. F12000$N';
+        _aGCodeBuffer[78]  := 'N76 G01 Z8 F400$N';
+        _aGCodeBuffer[79]  := 'N77 X271.222 F1500$N';
+        _aGCodeBuffer[80]  := 'N78 G01 Z18 F400$N';
+        _aGCodeBuffer[81]  := 'N79 G01 Q1=360. F12000$N';
+        _aGCodeBuffer[82]  := 'N80 G01 Z8 F400$N';
+        _aGCodeBuffer[83]  := 'N81 Y54.894 F1500$N';
+        _aGCodeBuffer[84]  := 'N82 G01 Z18 F400$N';
+        _aGCodeBuffer[85]  := 'N83 G01 Q1=450. F12000$N';
+        _aGCodeBuffer[86]  := 'N84 G01 Z8 F400$N';
+        _aGCodeBuffer[87]  := 'N85 X151.232 F1500$N';
+        _aGCodeBuffer[88]  := 'N86 G01 Z18 F400$N';
+        _aGCodeBuffer[89]  := 'N87 G01 Q1=540. F12000$N';
+        _aGCodeBuffer[90]  := 'N88 G01 Z8 F400$N';
+        _aGCodeBuffer[91]  := 'N89 Y45.688 F1500$N';
+        _aGCodeBuffer[92]  := 'N90 Z18 F400$N';
+        _aGCodeBuffer[93]  := 'N91 X85.221 Y188.878 F2000$N';
+        _aGCodeBuffer[94]  := 'N92 G01 Q1=450. F12000$N';
+        _aGCodeBuffer[95]  := 'N93 G01 Z8 F400$N';
+        _aGCodeBuffer[96]  := 'N94 G03 Y98.888 Q1=630. J-44.995 F1500$N';
+        _aGCodeBuffer[97]  := 'N95 Y188.878 Q1=810. J44.995 F1500$N';
+        _aGCodeBuffer[98]  := 'N96 G01 Z18 F400$N';
+        _aGCodeBuffer[99]  := 'N97 X173.205 Y149.704 F2000$N';
+        _aGCodeBuffer[100] := 'N98 G01 Q1=900. F12000$N';
+        _aGCodeBuffer[101] := 'N99 G01 Z8 F400$N';
+        _aGCodeBuffer[102] := 'N100 Y108.883 F1500$N';
+        _aGCodeBuffer[103] := 'N101 G03 X183.2 Y98.888 Q1=990. I9.995 F1500$N';
+        _aGCodeBuffer[104] := 'N102 G01 X253.2 F1500$N';
+        _aGCodeBuffer[105] := 'N103 G03 X263.195 Y108.883 Q1=1080. J9.995 F1500$N';
+        _aGCodeBuffer[106] := 'N104 G01 Y178.883 F1500$N';
+        _aGCodeBuffer[107] := 'N105 G03 X253.2 Y188.878 Q1=1170. I-9.995 F1500$N';
+        _aGCodeBuffer[108] := 'N106 G01 X183.2 F1500$N';
+        _aGCodeBuffer[109] := 'N107 G03 X173.205 Y178.883 Q1=1260. J-9.995 F1500$N';
+        _aGCodeBuffer[110] := 'N108 G01 Y149.704 F1500$N';
+        _aGCodeBuffer[111] := 'N109 Z18 F400$N';
+        _aGCodeBuffer[112] := 'N110 X296.995 Y178.706 F2000$N';
+        _aGCodeBuffer[113] := 'N111 G01 Q1=1080. F12000$N';
+        _aGCodeBuffer[114] := 'N112 G01 Z8 F400$N';
+        _aGCodeBuffer[115] := 'N113 Y190 F1500$N';
+        _aGCodeBuffer[116] := 'N114 G03 X277 Y209.995 Q1=1170. I-19.995 F1500$N';
+        _aGCodeBuffer[117] := 'N115 G01 X20 F1500$N';
+        _aGCodeBuffer[118] := 'N116 G03 X0.005 Y190 Q1=1260. J-19.995 F1500$N';
+        _aGCodeBuffer[119] := 'N117 G01 Y20 F1500$N';
+        _aGCodeBuffer[120] := 'N118 G03 X20 Y0.005 Q1=1350. I19.995 F1500$N';
+        _aGCodeBuffer[121] := 'N119 G01 X277 F1500$N';
+        _aGCodeBuffer[122] := 'N120 G03 X296.995 Y20 Q1=1440. J19.995 F1500$N';
+        _aGCodeBuffer[123] := 'N121 G01 Y178.706 F1500$N';
+        _aGCodeBuffer[124] := 'N122 Z18 F400$N';
+        _aGCodeBuffer[125] := 'N123 Z28 F400$N';
+        _aGCodeBuffer[126] := 'N124 G01 Z18 F400$N';
+        
+        _nLinesToWrite := 126; 
+        
+        // Czyszczenie reszty bufora
+        FOR i := (_nLinesToWrite + 1) TO 200 DO 
+            _aGCodeBuffer[i] := '';
+        END_FOR
+        
+        nBuildStep := 10;
+
+    10:
+        IF THIS^.WriteGCodeFile('TangentialCut.nc') THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Zapisano plik TangentialCut.nc', '');
+            nBuildStep := 1000;
+        END_IF
+
+    1000:
+        _Busy := FALSE;
+        _Done := TRUE; 
+        nBuildStep := 0;
+        Build := TRUE;
+        
+END_CASE

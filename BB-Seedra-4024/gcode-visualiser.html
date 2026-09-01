@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>G-Code Visualizer (TwinCAT Tangential Knife)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { display: flex; height: 100vh; background-color: #1a1a1a; color: #ccc; overflow: hidden; }
+        #sidebar { width: 320px; background: #252526; display: flex; flex-direction: column; border-right: 1px solid #333; z-index: 10; overflow-y: auto; }
+        .panel-section { padding: 15px; border-bottom: 1px solid #333; }
+        h2 { font-size: 16px; color: #fff; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input[type="file"] { display: none; }
+        .btn { display: block; width: 100%; padding: 10px; background: #0e639c; color: white; text-align: center; border-radius: 4px; cursor: pointer; font-weight: bold; border: none; transition: background 0.2s; }
+        .btn:hover { background: #1177bb; }
+        
+        .view-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .btn-secondary { background: #333; font-size: 12px; padding: 8px; }
+        .btn-secondary:hover { background: #444; }
+        .btn-home { grid-column: span 2; background: #2d8a4e; }
+        .btn-home:hover { background: #35a85f; }
+
+        .checkbox-container { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; user-select: none; color: #ccc; margin-bottom: 6px; }
+        .checkbox-container input { cursor: pointer; }
+        .feed-color-badge { width: 10px; height: 10px; border-radius: 2px; display: inline-block; border: 1px solid #555; }
+
+        textarea { width: 100%; height: 140px; background: #1e1e1e; color: #d4d4d4; border: 1px solid #3c3c3c; padding: 8px; font-family: monospace; font-size: 11px; resize: vertical; border-radius: 4px; white-space: pre; }
+        
+        .selected-line-box {
+            background: #1e1e1e;
+            border: 1px solid #3c3c3c;
+            border-radius: 4px;
+            padding: 8px 10px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #4ec9b0;
+            word-break: break-all;
+            min-height: 38px;
+            margin-bottom: 8px;
+        }
+
+        .stats { font-size: 13px; line-height: 1.6; color: #aaa; }
+        .stats span { color: #4ec9b0; font-weight: bold; }
+        
+        #viewer-container { flex: 1; position: relative; display: flex; flex-direction: column; }
+        #canvas-wrapper { flex: 1; position: relative; width: 100%; height: 100%; }
+        #canvas3d { width: 100%; height: 100%; display: block; }
+        
+        #overlay { position: absolute; bottom: 20px; right: 20px; background: rgba(0,0,0,0.8); padding: 10px 15px; border-radius: 6px; font-size: 12px; pointer-events: none; border: 1px solid #444; z-index: 10; }
+        .legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .legend-color { width: 12px; height: 12px; border-radius: 2px; }
+        .gradient-bar { width: 120px; height: 10px; border-radius: 2px; background: linear-gradient(to right, #ffffff, #00ff66, #004d1a); border: 1px solid #555; }
+        .gradient-labels { display: flex; justify-content: space-between; width: 120px; font-size: 10px; color: #aaa; margin-top: 2px; }
+
+        #rotation-pad { position: absolute; bottom: 20px; left: 20px; background: rgba(0,0,0,0.8); padding: 10px; border-radius: 8px; border: 1px solid #444; display: grid; grid-template-columns: repeat(3, 36px); gap: 4px; z-index: 10; }
+        .pad-btn { width: 36px; height: 36px; background: #333; color: #fff; border: 1px solid #555; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; user-select: none; }
+        .pad-btn:hover { background: #0e639c; }
+        .pad-btn:active { background: #1177bb; }
+
+        /* Poprawione pozycjonowanie dolnego suwaka */
+        #slider-bar {
+            background: #252526;
+            border-top: 1px solid #333;
+            padding: 10px 20px;
+            z-index: 15;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: bold;
+            color: #ddd;
+        }
+
+        .range-slider-container {
+            position: relative;
+            height: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .slider-track {
+            position: absolute;
+            height: 6px;
+            width: 100%;
+            background: #444;
+            border-radius: 3px;
+        }
+
+        .slider-highlight {
+            position: absolute;
+            height: 6px;
+            background: #0e639c;
+            border-radius: 3px;
+        }
+
+        .range-slider-container input[type="range"] {
+            position: absolute;
+            width: 100%;
+            pointer-events: auto;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 0;
+            background: none;
+            outline: none;
+            margin: 0;
+        }
+
+        .range-slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #4ec9b0;
+            cursor: pointer;
+            border: 2px solid #fff;
+            position: relative;
+            z-index: 20;
+        }
+
+        .range-slider-container input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #4ec9b0;
+            cursor: pointer;
+            border: 2px solid #fff;
+            position: relative;
+            z-index: 20;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+<div id="sidebar">
+    <div class="panel-section">
+        <h2>G-Code File</h2>
+        <label class="btn" for="file-input">Load .nc / .gcode file</label>
+        <input type="file" id="file-input" accept=".nc,.gcode,.tap,.txt">
+    </div>
+
+    <div class="panel-section">
+        <h2>Camera View</h2>
+        <div class="view-btn-grid">
+            <button class="btn btn-secondary" onclick="setView('top')">Top (XY)</button>
+            <button class="btn btn-secondary" onclick="setView('front')">Front (XZ)</button>
+            <button class="btn btn-secondary" onclick="setView('side')">Side (YZ)</button>
+            <button class="btn btn-home" onclick="setView('home')">Home (Isometric)</button>
+        </div>
+    </div>
+
+    <div class="panel-section">
+        <h2>Display Options</h2>
+        <div id="feedrate-checkboxes" style="margin-bottom: 8px;">
+            <div style="font-size: 12px; color: #888; margin-bottom: 4px;">Cutting Moves by Feed (F):</div>
+        </div>
+        <hr style="border: 0; border-top: 1px solid #333; margin: 8px 0;">
+        <label class="checkbox-container">
+            <input type="checkbox" id="toggle-air-moves" checked> Show Air Moves (Z > 10)
+        </label>
+        <label class="checkbox-container">
+            <input type="checkbox" id="toggle-knife-orientation" checked> Show Knife Orientation (Q1)
+        </label>
+        <label class="checkbox-container">
+            <input type="checkbox" id="toggle-z-labels"> Show Z Lift Line Numbers (N)
+        </label>
+        <label class="checkbox-container">
+            <input type="checkbox" id="toggle-q-labels"> Show Knife Angle Line Numbers (N)
+        </label>
+    </div>
+
+    <div class="panel-section">
+        <h2>Selected Line</h2>
+        <div style="font-size: 11px; color: #888; margin-bottom: 4px;">Line <span id="selected-line-num" style="color: #fff; font-weight: bold;">-</span>:</div>
+        <div class="selected-line-box" id="selected-line-text">Click path in 3D...</div>
+        <button class="btn btn-secondary" id="copy-line-btn">Copy Line</button>
+    </div>
+
+    <div class="panel-section">
+        <h2>Quick Paste</h2>
+        <textarea id="gcode-text" placeholder="Paste G-code here..."></textarea>
+        <button class="btn btn-secondary" id="parse-text-btn" style="margin-top: 8px; width: 100%;">Visualize Code</button>
+    </div>
+
+    <div class="panel-section stats">
+        <h2>Path Statistics</h2>
+        Trajectory points: <span id="stat-points">0</span><br>
+        Rotations count (Q1): <span id="stat-rotations">0</span><br>
+        Min / Max Feedrate (F): <span id="stat-f">0 / 0</span><br>
+        Min / Max X: <span id="stat-x">0 / 0</span><br>
+        Min / Max Y: <span id="stat-y">0 / 0</span><br>
+        Z Depth (min/max): <span id="stat-z">0 / 0</span>
+    </div>
+</div>
+
+<div id="viewer-container">
+    <div id="canvas-wrapper">
+        <canvas id="canvas3d"></canvas>
+        
+        <div id="rotation-pad">
+            <div></div>
+            <button class="pad-btn" onclick="rotateCamera(0, -15)" title="Rotate Up">▲</button>
+            <div></div>
+            <button class="pad-btn" onclick="rotateCamera(-15, 0)" title="Rotate Left">◄</button>
+            <button class="pad-btn" onclick="setView('home')" title="Reset View">⟲</button>
+            <button class="pad-btn" onclick="rotateCamera(15, 0)" title="Rotate Right">►</button>
+            <div></div>
+            <button class="pad-btn" onclick="rotateCamera(0, 15)" title="Rotate Down">▼</button>
+            <div></div>
+        </div>
+
+        <div id="overlay">
+            <div style="margin-bottom: 6px; font-weight: bold;">Speed (Feedrate F):</div>
+            <div style="margin-bottom: 8px;">
+                <div class="gradient-bar"></div>
+                <div class="gradient-labels">
+                    <span>Slow (White)</span>
+                    <span>Fast (Dark Green)</span>
+                </div>
+            </div>
+            <div class="legend-item"><div class="legend-color" style="background:#ffaa00"></div> Air moves (Z > 10)</div>
+            <div class="legend-item"><div class="legend-color" style="background:#ff0055"></div> Knife orientation (Q1 Angle)</div>
+        </div>
+    </div>
+
+    <!-- Pasek suwaka umieszczony na dole pod oknem 3D -->
+    <div id="slider-bar">
+        <div class="slider-header">
+            <span>Range: Line <span id="slider-start-val" style="color: #4ec9b0;">0</span> to <span id="slider-end-val" style="color: #4ec9b0;">0</span></span>
+            <span style="color: #888;">Total Lines: <span id="slider-total-val">0</span></span>
+        </div>
+        <div class="range-slider-container">
+            <div class="slider-track"></div>
+            <div class="slider-highlight" id="slider-highlight"></div>
+            <input type="range" id="range-start" min="0" max="100" value="0">
+            <input type="range" id="range-end" min="0" max="100" value="100">
+        </div>
+    </div>
+</div>
+
+<script>
+    const wrapper = document.getElementById('canvas-wrapper');
+    const canvas = document.getElementById('canvas3d');
+    const textarea = document.getElementById('gcode-text');
+    
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x1e1e1e);
+
+    const camera = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.1, 10000);
+    
+    let currentTarget = new THREE.Vector3(0, 0, 0);
+    let defaultDistance = 300;
+
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+    renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    
+    controls.enableRotate = false;
+    controls.enablePan = true;
+    controls.enableZoom = true;
+    controls.screenSpacePanning = true;
+
+    controls.mouseButtons = {
+        LEFT: THREE.MOUSE.PAN,
+        MIDDLE: THREE.MOUSE.DOLLY,
+        RIGHT: THREE.MOUSE.PAN
+    };
+
+    const gridHelper = new THREE.GridHelper(500, 50, 0x444444, 0x222222);
+    gridHelper.rotation.x = Math.PI / 2;
+    scene.add(gridHelper);
+
+    let feedGroupsMap = new Map(); 
+
+    let airGroup = new THREE.Group();
+    let qArrowsGroup = new THREE.Group();
+    let zLabelsGroup = new THREE.Group();
+    let qLabelsGroup = new THREE.Group();
+
+    zLabelsGroup.visible = false;
+    qLabelsGroup.visible = false;
+
+    scene.add(airGroup);
+    scene.add(qArrowsGroup);
+    scene.add(zLabelsGroup);
+    scene.add(qLabelsGroup);
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.params.Line.threshold = 1.5;
+
+    const mouse = new THREE.Vector2();
+    let selectedGCodeText = "";
+
+    let hoveredObject = null;
+    let originalMaterial = null;
+    let originalScale = null;
+    const highlightMaterial = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 3 });
+
+    let totalGCodeLines = 0;
+
+    function setInitialCamera() {
+        camera.position.set(currentTarget.x + 100, currentTarget.y - 200, currentTarget.z + 200);
+        camera.up.set(0, 0, 1);
+        controls.target.copy(currentTarget);
+        controls.update();
+    }
+    setInitialCamera();
+
+    function rotateCamera(angleDegX, angleDegY) {
+        const angleRadX = (angleDegX * Math.PI) / 180;
+        const angleRadY = (angleDegY * Math.PI) / 180;
+
+        const offset = camera.position.clone().sub(controls.target);
+        offset.applyAxisAngle(new THREE.Vector3(0, 0, 1), angleRadX);
+        
+        const right = new THREE.Vector3().crossVectors(camera.up, offset).normalize();
+        const testOffset = offset.clone().applyAxisAngle(right, angleRadY);
+        
+        if (testOffset.z >= 0.1) {
+            offset.copy(testOffset);
+        }
+
+        camera.position.copy(controls.target).add(offset);
+        controls.update();
+    }
+
+    function setView(viewType) {
+        const dist = defaultDistance;
+        camera.up.set(0, 0, 1);
+
+        switch (viewType) {
+            case 'top':
+                camera.position.set(currentTarget.x, currentTarget.y - 0.001, currentTarget.z + dist);
+                break;
+            case 'front':
+                camera.position.set(currentTarget.x, currentTarget.y - dist, currentTarget.z + 0.1);
+                break;
+            case 'side':
+                camera.position.set(currentTarget.x + dist, currentTarget.y, currentTarget.z + 0.1);
+                break;
+            case 'home':
+            default:
+                camera.position.set(currentTarget.x + dist * 0.6, currentTarget.y - dist * 0.8, currentTarget.z + dist * 0.8);
+                break;
+        }
+        controls.target.copy(currentTarget);
+        controls.update();
+    }
+
+    function createTextSprite(text, lineIndex, bgColor = 'rgba(255, 170, 0, 0.9)') {
+        const canvasText = document.createElement('canvas');
+        const ctx = canvasText.getContext('2d');
+        canvasText.width = 128;
+        canvasText.height = 64;
+
+        ctx.fillStyle = bgColor;
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        
+        ctx.beginPath();
+        ctx.roundRect(4, 4, 120, 56, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = 'Bold 28px Monospace';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, 64, 32);
+
+        const texture = new THREE.CanvasTexture(canvasText);
+        const spriteMaterial = new THREE.SpriteMaterial({ map: texture, depthTest: false });
+        const sprite = new THREE.Sprite(spriteMaterial);
+        
+        sprite.scale.set(12, 6, 1);
+        sprite.userData = { lineIndex: lineIndex };
+
+        return sprite;
+    }
+
+    function displaySelectedLine(lineIndex) {
+        const text = textarea.value;
+        const lines = text.split('\n');
+
+        if (lineIndex < 0 || lineIndex >= lines.length) return;
+
+        const lineContent = lines[lineIndex].trim();
+        selectedGCodeText = lineContent;
+
+        document.getElementById('selected-line-num').innerText = lineIndex + 1;
+        document.getElementById('selected-line-text').innerText = lineContent || '(Empty line)';
+    }
+
+    function getColorForFeedrate(f, minF, maxF) {
+        if (minF === maxF) return new THREE.Color(0x00ff66);
+
+        let t = (f - minF) / (maxF - minF);
+        t = Math.max(0, Math.min(1, t));
+
+        const r = 1.0 - t * 1.0;
+        const g = 1.0 - t * 0.7;
+        const b = 1.0 - t * 0.9;
+
+        return new THREE.Color(r, g, b);
+    }
+
+    function getClickableObjects() {
+        let clickable = [];
+        feedGroupsMap.forEach((grp) => {
+            if (grp.visible) clickable.push(...grp.children);
+        });
+        if (airGroup.visible) clickable.push(...airGroup.children);
+        if (qArrowsGroup.visible) clickable.push(...qArrowsGroup.children);
+        if (zLabelsGroup.visible) clickable.push(...zLabelsGroup.children);
+        if (qLabelsGroup.visible) clickable.push(...qLabelsGroup.children);
+
+        return clickable.filter(obj => obj.visible);
+    }
+
+    // Obsługa HOVER
+    canvas.addEventListener('mousemove', (event) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / canvas.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / canvas.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(getClickableObjects(), true);
+
+        if (intersects.length > 0) {
+            let targetObj = intersects[0].object;
+            
+            while (targetObj && (targetObj.userData.lineIndex === undefined) && targetObj.parent) {
+                targetObj = targetObj.parent;
+            }
+
+            if (hoveredObject !== targetObj) {
+                resetHoveredObject();
+
+                if (targetObj && targetObj.userData && targetObj.userData.lineIndex !== undefined) {
+                    hoveredObject = targetObj;
+                    canvas.style.cursor = 'pointer';
+
+                    if (hoveredObject.isLine) {
+                        originalMaterial = hoveredObject.material;
+                        hoveredObject.material = highlightMaterial;
+                    } else if (hoveredObject.isSprite) {
+                        originalScale = hoveredObject.scale.clone();
+                        hoveredObject.scale.multiplyScalar(1.2);
+                    }
+                }
+            }
+        } else {
+            resetHoveredObject();
+        }
+    });
+
+    function resetHoveredObject() {
+        if (hoveredObject) {
+            if (hoveredObject.isLine && originalMaterial) {
+                hoveredObject.material = originalMaterial;
+            } else if (hoveredObject.isSprite && originalScale) {
+                hoveredObject.scale.copy(originalScale);
+            }
+            hoveredObject = null;
+            originalMaterial = null;
+            originalScale = null;
+            canvas.style.cursor = 'default';
+        }
+    }
+
+    // Obsługa KLIKNIĘCIA
+    canvas.addEventListener('click', (event) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / canvas.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / canvas.height) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObjects(getClickableObjects(), true);
+
+        if (intersects.length > 0) {
+            let clickedObject = intersects[0].object;
+            
+            while (clickedObject && (clickedObject.userData.lineIndex === undefined) && clickedObject.parent) {
+                clickedObject = clickedObject.parent;
+            }
+
+            if (clickedObject && clickedObject.userData && clickedObject.userData.lineIndex !== undefined) {
+                displaySelectedLine(clickedObject.userData.lineIndex);
+            }
+        }
+    });
+
+    document.getElementById('copy-line-btn').addEventListener('click', () => {
+        if (!selectedGCodeText) return;
+        
+        navigator.clipboard.writeText(selectedGCodeText).then(() => {
+            const btn = document.getElementById('copy-line-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            btn.style.background = "#2d8a4e";
+            setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.background = "#333";
+            }, 1200);
+        });
+    });
+
+    // OBSŁUGA DUAL RANGE SLIDERA
+    const rangeStartInput = document.getElementById('range-start');
+    const rangeEndInput = document.getElementById('range-end');
+    const sliderHighlight = document.getElementById('slider-highlight');
+    const sliderStartVal = document.getElementById('slider-start-val');
+    const sliderEndVal = document.getElementById('slider-end-val');
+
+    function updateSliderUI() {
+        let minVal = parseInt(rangeStartInput.value);
+        let maxVal = parseInt(rangeEndInput.value);
+
+        if (minVal > maxVal) {
+            let tmp = minVal;
+            minVal = maxVal;
+            maxVal = tmp;
+        }
+
+        const total = totalGCodeLines > 0 ? totalGCodeLines : 1;
+        const leftPercent = (minVal / total) * 100;
+        const rightPercent = (maxVal / total) * 100;
+
+        sliderHighlight.style.left = leftPercent + '%';
+        sliderHighlight.style.width = (rightPercent - leftPercent) + '%';
+
+        sliderStartVal.innerText = minVal + 1;
+        sliderEndVal.innerText = maxVal + 1;
+
+        filterPathByLineRange(minVal, maxVal);
+    }
+
+    rangeStartInput.addEventListener('input', () => {
+        if (parseInt(rangeStartInput.value) > parseInt(rangeEndInput.value)) {
+            rangeStartInput.value = rangeEndInput.value;
+        }
+        updateSliderUI();
+    });
+
+    rangeEndInput.addEventListener('input', () => {
+        if (parseInt(rangeEndInput.value) < parseInt(rangeStartInput.value)) {
+            rangeEndInput.value = rangeStartInput.value;
+        }
+        updateSliderUI();
+    });
+
+    function filterPathByLineRange(minLine, maxLine) {
+        const processGroup = (group) => {
+            group.children.forEach(child => {
+                if (child.userData && child.userData.lineIndex !== undefined) {
+                    const idx = child.userData.lineIndex;
+                    child.visible = (idx >= minLine && idx <= maxLine);
+                }
+            });
+        };
+
+        feedGroupsMap.forEach(grp => processGroup(grp));
+        processGroup(airGroup);
+        processGroup(qArrowsGroup);
+        processGroup(zLabelsGroup);
+        processGroup(qLabelsGroup);
+    }
+
+    window.addEventListener('resize', () => {
+        camera.aspect = wrapper.clientWidth / wrapper.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
+    });
+
+    function clearGroup(group) {
+        while(group.children.length > 0) {
+            group.remove(group.children[0]);
+        }
+    }
+
+    function parseGCode(gcode) {
+        resetHoveredObject();
+        feedGroupsMap.forEach((grp) => scene.remove(grp));
+        feedGroupsMap.clear();
+
+        clearGroup(airGroup);
+        clearGroup(qArrowsGroup);
+        clearGroup(zLabelsGroup);
+        clearGroup(qLabelsGroup);
+
+        document.getElementById('selected-line-num').innerText = '-';
+        document.getElementById('selected-line-text').innerText = 'Click path in 3D...';
+        selectedGCodeText = "";
+
+        const lines = gcode.split('\n');
+        totalGCodeLines = lines.length;
+
+        rangeStartInput.min = 0;
+        rangeStartInput.max = totalGCodeLines - 1;
+        rangeStartInput.value = 0;
+
+        rangeEndInput.min = 0;
+        rangeEndInput.max = totalGCodeLines - 1;
+        rangeEndInput.value = totalGCodeLines - 1;
+
+        document.getElementById('slider-total-val').innerText = totalGCodeLines;
+
+        let minF = Infinity, maxF = -Infinity;
+        let tempF = 1000;
+        const detectedFeedrates = new Set();
+        
+        for (let i = 0; i < lines.length; i++) {
+            let line = lines[i].trim().toUpperCase();
+            if (line.startsWith('(') || line.startsWith(';') || line === '') continue;
+            
+            const fMatch = line.match(/F([-+]?[0-9]*\.?[0-9]+)/);
+            if (fMatch) tempF = parseFloat(fMatch[1]);
+
+            if (!line.includes('G00') && !line.includes('G0')) {
+                minF = Math.min(minF, tempF);
+                maxF = Math.max(maxF, tempF);
+                detectedFeedrates.add(tempF);
+            }
+        }
+        if (minF === Infinity) { minF = 0; maxF = 1000; detectedFeedrates.add(1000); }
+
+        const feedContainer = document.getElementById('feedrate-checkboxes');
+        feedContainer.innerHTML = '<div style="font-size: 12px; color: #888; margin-bottom: 4px;">Cutting Moves by Feed (F):</div>';
+
+        const sortedFeeds = Array.from(detectedFeedrates).sort((a, b) => a - b);
+        
+        sortedFeeds.forEach((fVal) => {
+            const grp = new THREE.Group();
+            scene.add(grp);
+            feedGroupsMap.set(fVal, grp);
+
+            const c = getColorForFeedrate(fVal, minF, maxF);
+            const hexColor = '#' + c.getHexString();
+
+            const lbl = document.createElement('label');
+            lbl.className = 'checkbox-container';
+            lbl.innerHTML = `
+                <input type="checkbox" checked data-feed="${fVal}">
+                <span class="feed-color-badge" style="background:${hexColor}"></span>
+                F${fVal}
+            `;
+            
+            lbl.querySelector('input').addEventListener('change', (e) => {
+                const targetF = parseFloat(e.target.getAttribute('data-feed'));
+                if (feedGroupsMap.has(targetF)) {
+                    feedGroupsMap.get(targetF).visible = e.target.checked;
+                }
+            });
+
+            feedContainer.appendChild(lbl);
+        });
+
+        let curX = 0, curY = 0, curZ = 0, curQ = 0, curF = tempF;
+        let motionMode = 'G01';
+        let pointsCount = 0;
+        let rotations = 0;
+
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+        let minZ = Infinity, maxZ = -Infinity;
+
+        const rapidMaterial = new THREE.LineBasicMaterial({ color: 0xffaa00 });
+
+        for (let i = 0; i < lines.length; i++) {
+            let originalLine = lines[i].trim();
+            let line = originalLine.toUpperCase();
+            if (line.startsWith('(') || line.startsWith(';') || line === '') continue;
+
+            const nMatch = line.match(/^N([0-9]+)/);
+            const lineLabel = nMatch ? `N${nMatch[1]}` : `N${i + 1}`;
+
+            if (line.includes('G00') || line.includes('G0')) motionMode = 'G00';
+            if (line.includes('G01') || line.includes('G1')) motionMode = 'G01';
+            if (line.includes('G02') || line.includes('G2')) motionMode = 'G02';
+            if (line.includes('G03') || line.includes('G3')) motionMode = 'G03';
+
+            let prevX = curX, prevY = curY, prevZ = curZ;
+
+            const xMatch = line.match(/X([-+]?[0-9]*\.?[0-9]+)/);
+            const yMatch = line.match(/Y([-+]?[0-9]*\.?[0-9]+)/);
+            const zMatch = line.match(/Z([-+]?[0-9]*\.?[0-9]+)/);
+            const qMatch = line.match(/Q1=([-+]?[0-9]*\.?[0-9]+)/);
+            const fMatch = line.match(/F([-+]?[0-9]*\.?[0-9]+)/);
+            const iMatch = line.match(/I([-+]?[0-9]*\.?[0-9]+)/);
+            const jMatch = line.match(/J([-+]?[0-9]*\.?[0-9]+)/);
+
+            if (xMatch) curX = parseFloat(xMatch[1]);
+            if (yMatch) curY = parseFloat(yMatch[1]);
+            if (zMatch) curZ = parseFloat(zMatch[1]);
+            if (fMatch) curF = parseFloat(fMatch[1]);
+            
+            if (qMatch) {
+                curQ = parseFloat(qMatch[1]);
+                rotations++;
+                
+                const arrowLength = 6;
+                const rad = (curQ + 90) * (Math.PI / 180);
+                const dir = new THREE.Vector3(Math.cos(rad), Math.sin(rad), 0);
+                const origin = new THREE.Vector3(curX, curY, curZ);
+                const arrowHelper = new THREE.ArrowHelper(dir, origin, arrowLength, 0xff0055, 1.5, 0.8);
+                arrowHelper.userData = { lineIndex: i };
+                qArrowsGroup.add(arrowHelper);
+
+                const qSprite = createTextSprite(lineLabel, i, 'rgba(255, 0, 85, 0.9)');
+                qSprite.position.set(curX + Math.cos(rad) * (arrowLength + 4), curY + Math.sin(rad) * (arrowLength + 4), curZ);
+                qLabelsGroup.add(qSprite);
+            }
+
+            minX = Math.min(minX, curX); maxX = Math.max(maxX, curX);
+            minY = Math.min(minY, curY); maxY = Math.max(maxY, curY);
+            minZ = Math.min(minZ, curZ); maxZ = Math.max(maxZ, curZ);
+
+            const isCutting = curZ <= 10 && motionMode !== 'G00';
+            
+            let mat;
+            let targetGroup;
+
+            if (isCutting) {
+                const segColor = getColorForFeedrate(curF, minF, maxF);
+                mat = new THREE.LineBasicMaterial({ color: segColor });
+                targetGroup = feedGroupsMap.get(curF) || airGroup;
+            } else {
+                mat = rapidMaterial;
+                targetGroup = airGroup;
+            }
+
+            if (prevX !== curX || prevY !== curY || prevZ !== curZ) {
+                const isPureZLift = (prevX === curX && prevY === curY && curZ > prevZ);
+
+                if (isPureZLift) {
+                    const sprite = createTextSprite(lineLabel, i, 'rgba(255, 170, 0, 0.9)');
+                    sprite.position.set(curX + 3, curY + 3, (prevZ + curZ) / 2);
+                    zLabelsGroup.add(sprite);
+                }
+
+                let lineMesh;
+
+                if (motionMode === 'G02' || motionMode === 'G03') {
+                    const I = iMatch ? parseFloat(iMatch[1]) : 0;
+                    const J = jMatch ? parseFloat(jMatch[1]) : 0;
+
+                    const centerX = prevX + I;
+                    const centerY = prevY + J;
+
+                    const startAngle = Math.atan2(prevY - centerY, prevX - centerX);
+                    let endAngle = Math.atan2(curY - centerY, curX - centerX);
+
+                    const isClockwise = (motionMode === 'G02');
+
+                    if (isClockwise && endAngle >= startAngle) endAngle -= 2 * Math.PI;
+                    if (!isClockwise && endAngle <= startAngle) endAngle += 2 * Math.PI;
+
+                    const arcPoints = [];
+                    const segments = 20;
+                    for (let s = 0; s <= segments; s++) {
+                        const alpha = s / segments;
+                        const angle = startAngle + alpha * (endAngle - startAngle);
+                        const px = centerX + Math.cos(angle) * Math.hypot(I, J);
+                        const py = centerY + Math.sin(angle) * Math.hypot(I, J);
+                        const pz = prevZ + alpha * (curZ - prevZ);
+                        arcPoints.push(new THREE.Vector3(px, py, pz));
+                    }
+
+                    const geometry = new THREE.BufferGeometry().setFromPoints(arcPoints);
+                    lineMesh = new THREE.Line(geometry, mat);
+                } else {
+                    const geometry = new THREE.BufferGeometry().setFromPoints([
+                        new THREE.Vector3(prevX, prevY, prevZ),
+                        new THREE.Vector3(curX, curY, curZ)
+                    ]);
+                    lineMesh = new THREE.Line(geometry, mat);
+                }
+
+                lineMesh.userData = { lineIndex: i };
+                targetGroup.add(lineMesh);
+
+                pointsCount++;
+            }
+        }
+
+        updateSliderUI();
+
+        if (minX !== Infinity) {
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+            const centerZ = (minZ + maxZ) / 2;
+            
+            currentTarget.set(centerX, centerY, centerZ);
+            
+            const sizeX = maxX - minX;
+            const sizeY = maxY - minY;
+            const maxDimension = Math.max(sizeX, sizeY, 50);
+            defaultDistance = maxDimension * 1.5;
+
+            setView('home');
+            
+            document.getElementById('stat-points').innerText = pointsCount;
+            document.getElementById('stat-rotations').innerText = rotations;
+            document.getElementById('stat-f').innerText = `${minF.toFixed(0)} / ${maxF.toFixed(0)}`;
+            document.getElementById('stat-x').innerText = `${minX.toFixed(1)} / ${maxX.toFixed(1)}`;
+            document.getElementById('stat-y').innerText = `${minY.toFixed(1)} / ${maxY.toFixed(1)}`;
+            document.getElementById('stat-z').innerText = `${minZ.toFixed(1)} / ${maxZ.toFixed(1)}`;
+        }
+    }
+
+    document.getElementById('toggle-air-moves').addEventListener('change', (e) => {
+        airGroup.visible = e.target.checked;
+    });
+
+    document.getElementById('toggle-knife-orientation').addEventListener('change', (e) => {
+        qArrowsGroup.visible = e.target.checked;
+    });
+
+    document.getElementById('toggle-z-labels').addEventListener('change', (e) => {
+        zLabelsGroup.visible = e.target.checked;
+    });
+
+    document.getElementById('toggle-q-labels').addEventListener('change', (e) => {
+        qLabelsGroup.visible = e.target.checked;
+    });
+
+    document.getElementById('file-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            textarea.value = evt.target.result;
+            parseGCode(evt.target.result);
+        };
+        reader.readAsText(file);
+    });
+
+    document.getElementById('parse-text-btn').addEventListener('click', () => {
+        parseGCode(textarea.value);
+    });
+
+    textarea.addEventListener('auxclick', (e) => { if (e.button === 1) e.preventDefault(); });
+    textarea.addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); });
+
+    function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+    }
+    animate();
+</script>
+</body>
+</html>
