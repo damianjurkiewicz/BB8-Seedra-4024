@@ -2597,11 +2597,13 @@ External Setpoint Generation:
 					<Name>Axis Q</Name>
 					<AxisPara>
 						<General UnitName="°"/>
-						<Dynamic Acceleration="15000" Deceleration="15000" Jerk="48322.755"/>
-						<Velo RefSearch="107.3839" RefSync="107.3839" SlowManual="536.9195" FastManual="3221.517" Fast="10738.39" Maximum="10738.39"/>
+						<Dynamic Acceleration="15000" Deceleration="15000" Jerk="48322.8"/>
+						<Velo RefSearch="1800" RefSync="360" SlowManual="360" FastManual="1800" Fast="10738.39" Maximum="10738.4"/>
 						<TargetPosControl Range="0.1"/>
 						<BacklashCompensation Range="0.2"/>
-						<OtherSettings AllowMotionCmdToSlave="true" PulseDistancePos="9" PulseDistanceNeg="9"/>
+						<OtherSettings AllowMotionCmdToSlave="true" PulseDistancePos="30" PulseDistanceNeg="30"/>
+						<ParameterChanged>9</ParameterChanged>
+						<ParameterChanged>6</ParameterChanged>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
 						<EncPara ScaleFactorNumerator="360" ScaleFactorDenominator="3145728" MaxCount="#xffffffff">
@@ -2745,7 +2747,7 @@ External Setpoint Generation:
 					<Name>Axis Y</Name>
 					<AxisPara>
 						<Dynamic Acceleration="644.304" Deceleration="644.304" Jerk="1932.912"/>
-						<Velo RefSearch="4.29536" RefSync="4.29536" SlowManual="5" FastManual="30" Fast="429.536" Maximum="429.536"/>
+						<Velo RefSearch="20" RefSync="10" SlowManual="5" FastManual="30" Fast="429.536" Maximum="429.536"/>
 						<TargetPosControl Range="0.1"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
@@ -2888,10 +2890,10 @@ External Setpoint Generation:
 				<Axis Id="9" CreateSymbols="true" AxisType="1" GroupId="13">
 					<Name>Axis Z</Name>
 					<AxisPara>
-						<Dynamic AccelerationMaximum="1200" DecelerationMaximum="1200" Acceleration="20" Deceleration="20" Jerk="80" ToleranceBallAuxAxis="2"/>
-						<Velo RefSearch="5" RefSync="2" SlowManual="5" FastManual="10" Fast="15" Maximum="15"/>
+						<Dynamic AccelerationMaximum="1200" DecelerationMaximum="1200" Acceleration="100" Deceleration="100" Jerk="400" ToleranceBallAuxAxis="2"/>
+						<Velo RefSearch="8" RefSync="5" SlowManual="5" FastManual="9" Fast="9" Maximum="9"/>
 						<TargetPosControl Range="0.1"/>
-						<OtherSettings AllowMotionCmdToSlave="true"/>
+						<OtherSettings AllowMotionCmdToSlave="true" PulseDistancePos="2" PulseDistanceNeg="2"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="4">
 						<EncPara ScaleFactorNumerator="2" ScaleFactorDenominator="12800" Inverse="true" MaxCount="#xffffffff">
@@ -2955,7 +2957,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="24">
 						<DrvPara Inverse="true">
-							<Analog VeloReferenz="20" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="12" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -3050,7 +3052,7 @@ External Setpoint Generation:
 					<Name>Axis X</Name>
 					<AxisPara>
 						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14" ToleranceBallAuxAxis="10"/>
-						<Velo RefSearch="5.3692" RefSync="5.3692" SlowManual="5" FastManual="30" Fast="536.92" Maximum="536.92"/>
+						<Velo RefSearch="20" RefSync="10" SlowManual="5" FastManual="30" Fast="536.92" Maximum="536.92"/>
 						<TargetPosControl Range="0.1"/>
 						<BacklashCompensation Range="0.1"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
@@ -3303,6 +3305,7 @@ External Setpoint Generation:
 							<Encoder NoMotionWindow="1" NoMotionFilterTime="0.01"/>
 							<Fifo FifoDimension="1" FifoLength="1000" FifoOverrideType="2" FifoOverrideChangeTime="1" TimeUnitFifo="0.01"/>
 							<Kinematic/>
+							<ParameterChanged>1285</ParameterChanged>
 						</Parameter>
 					</Group>
 					<Interpreter>
