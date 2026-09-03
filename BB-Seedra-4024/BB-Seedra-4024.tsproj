@@ -2597,10 +2597,9 @@ External Setpoint Generation:
 					<Name>Axis Q</Name>
 					<AxisPara>
 						<General UnitName="°"/>
-						<Dynamic Acceleration="5000" Deceleration="5000" Jerk="10000"/>
-						<Velo RefSearch="720" RefSync="90" SlowManual="30" FastManual="180" Fast="10738.39" Maximum="10000"/>
-						<PositionAreaControl Enable="false"/>
-						<TargetPosControl Enable="false" Range="0.1"/>
+						<Dynamic Acceleration="15000" Deceleration="15000" Jerk="48322.755"/>
+						<Velo RefSearch="107.3839" RefSync="107.3839" SlowManual="536.9195" FastManual="3221.517" Fast="10738.39" Maximum="10738.39"/>
+						<TargetPosControl Range="0.1"/>
 						<BacklashCompensation Range="0.2"/>
 						<OtherSettings AllowMotionCmdToSlave="true" PulseDistancePos="9" PulseDistanceNeg="9"/>
 					</AxisPara>
@@ -2667,7 +2666,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="12000" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="11812.229" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -2723,7 +2722,7 @@ External Setpoint Generation:
 					</Drive>
 					<Controller Name="Ctrl" CtrType="1">
 						<CtrPara PriorControlFactor="1">
-							<PosDiffControl Enable="false" Range="40"/>
+							<PosDiffControl Range="1"/>
 							<Observer BandWidth="20"/>
 						</CtrPara>
 					</Controller>
@@ -2745,16 +2744,14 @@ External Setpoint Generation:
 				<Axis Id="2" CreateSymbols="true" AxisType="1">
 					<Name>Axis Y</Name>
 					<AxisPara>
-						<Dynamic Acceleration="1000" Deceleration="1000" Jerk="10000" ToleranceBallAuxAxis="10"/>
-						<Velo RefSearch="50" RefSync="10" SlowManual="5" FastManual="80" Fast="429.536" Maximum="400"/>
+						<Dynamic Acceleration="644.304" Deceleration="644.304" Jerk="1932.912"/>
+						<Velo RefSearch="4.29536" RefSync="4.29536" SlowManual="5" FastManual="30" Fast="429.536" Maximum="429.536"/>
 						<PositionAreaControl Enable="false"/>
 						<TargetPosControl Enable="false" Range="0.1"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="4.8" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
-							<SoftEndMinControl Enable="true" Range="-3000"/>
-							<SoftEndMaxControl Enable="true" Range="3000"/>
+						<EncPara ScaleFactorNumerator="120" ScaleFactorDenominator="26214400" MaxCount="#xffffffff">
 							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
 						</EncPara>
 						<Vars VarGrpType="1">
@@ -2815,7 +2812,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="420" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="472.4896" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -2894,7 +2891,7 @@ External Setpoint Generation:
 					<Name>Axis Z</Name>
 					<AxisPara>
 						<Dynamic AccelerationMaximum="1200" DecelerationMaximum="1200" Acceleration="20" Deceleration="20" Jerk="80" ToleranceBallAuxAxis="2"/>
-						<Velo RefSearch="5" RefSync="2" SlowManual="5" FastManual="10" Maximum="15"/>
+						<Velo RefSearch="5" RefSync="2" SlowManual="5" FastManual="10" Fast="15" Maximum="15"/>
 						<TargetPosControl Range="0.1"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
@@ -2960,7 +2957,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="24">
 						<DrvPara Inverse="true">
-							<Analog VeloReferenz="16" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="20" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -3054,16 +3051,14 @@ External Setpoint Generation:
 				<Axis Id="3" CreateSymbols="true" AxisType="1" GroupId="6">
 					<Name>Axis X</Name>
 					<AxisPara>
-						<Dynamic Acceleration="1000" Deceleration="1000" Jerk="10000" ToleranceBallAuxAxis="10"/>
-						<Velo RefSearch="50" RefSync="10" SlowManual="5" FastManual="80" Fast="536.92" Maximum="300"/>
+						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14" ToleranceBallAuxAxis="10"/>
+						<Velo RefSearch="5.3692" RefSync="5.3692" SlowManual="5" FastManual="30" Fast="536.92" Maximum="536.92"/>
 						<PositionAreaControl Enable="false"/>
 						<TargetPosControl Enable="false" Range="0.1"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="6" ScaleFactorDenominator="1048576" MaxCount="#xffffffff">
-							<SoftEndMinControl Enable="true" Range="-2000"/>
-							<SoftEndMaxControl Enable="true" Range="2000"/>
+						<EncPara ScaleFactorNumerator="120" ScaleFactorDenominator="20971520" MaxCount="#xffffffff">
 							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
 						</EncPara>
 						<Vars VarGrpType="1">
@@ -3124,7 +3119,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="320" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="590.612" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -3439,7 +3434,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{292C346C-31B7-3206-E6FD-B92164F4AF0C}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{58A6E32B-E4B7-A623-267F-662B77B4D2F3}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -4993,8 +4988,8 @@ External Setpoint Generation:
 							<MBoxUserCmdData>020003000a0000001f00000000000000000000000000000000000000000000002010700b02000000e803445256204f757470757473202f20546f72717565206c696d69746174696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000a0000003700000000000000000000000000000000000000000000002010801302000000640044525620416d706c69666965722053657474696e6773202f2043757272656e74206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000a00000033000000000000000000000000000000000000000000000020108012020000000a0044525620416d706c69666965722053657474696e6773202f2043757272656e74206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c00000038000000000000000000000000000000000000000000000020108015040000006004000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c00000034000000000000000000000000000000000000000000000020108014040000002800000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c00000038000000000000000000000000000000000000000000000020108015040000002001000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c00000034000000000000000000000000000000000000000000000020108014040000009600000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000900000027000000000000000000000000000000000000000000000020008001010000000046422053657474696e6773202f20496e7665727420666565646261636b20646972656374696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>0200030009000000200000000000000000000000000000000000000000000000201070030100000008445256204f757470757473202f204d6f646573206f66206f7065726174696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000c00000038000000000000000000000000000000000000000000000020108017040000009001000044525620416d706c69666965722053657474696e6773202f20506f736974696f6e206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
@@ -5972,11 +5967,11 @@ Bit 8 - 15 : reserved]]></Comment>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>4.8</Value>
+													<Value>120</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
-													<Value>1</Value>
+													<Value>25</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioLoadSide</PropertyName>
@@ -5992,11 +5987,11 @@ Bit 8 - 15 : reserved]]></Comment>
 												</Parameter>
 												<Parameter>
 													<PropertyName>MaxMoveDistance</PropertyName>
-													<Value>0</Value>
+													<Value>100</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>LoadInertiaMass</PropertyName>
-													<Value>0</Value>
+													<Value>3.3E-05</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>MaxApplicationTorqueForce</PropertyName>
@@ -6084,8 +6079,8 @@ Bit 8 - 15 : reserved]]></Comment>
 							<MBoxUserCmdData>020003000a0000001f00000000000000000000000000000000000000000000002010700b02000000e803445256204f757470757473202f20546f72717565206c696d69746174696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000a0000003700000000000000000000000000000000000000000000002010801302000000640044525620416d706c69666965722053657474696e6773202f2043757272656e74206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000a0000003300000000000000000000000000000000000000000000002010801202000000050044525620416d706c69666965722053657474696e6773202f2043757272656e74206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c00000038000000000000000000000000000000000000000000000020108015040000009600000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c00000034000000000000000000000000000000000000000000000020108014040000003200000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c00000038000000000000000000000000000000000000000000000020108015040000000302000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c00000034000000000000000000000000000000000000000000000020108014040000009600000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000900000027000000000000000000000000000000000000000000000020008001010000000046422053657474696e6773202f20496e7665727420666565646261636b20646972656374696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>0200030009000000200000000000000000000000000000000000000000000000201070030100000008445256204f757470757473202f204d6f646573206f66206f7065726174696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000c0000003800000000000000000000000000000000000000000000002010801704000000e803000044525620416d706c69666965722053657474696e6773202f20506f736974696f6e206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
@@ -7060,11 +7055,11 @@ Bit 8 - 15 : reserved]]></Comment>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>6</Value>
+													<Value>120</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
-													<Value>1</Value>
+													<Value>20</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioLoadSide</PropertyName>
@@ -7080,11 +7075,11 @@ Bit 8 - 15 : reserved]]></Comment>
 												</Parameter>
 												<Parameter>
 													<PropertyName>MaxMoveDistance</PropertyName>
-													<Value>0</Value>
+													<Value>100</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>LoadInertiaMass</PropertyName>
-													<Value>0</Value>
+													<Value>1.6E-05</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>MaxApplicationTorqueForce</PropertyName>
@@ -7170,13 +7165,14 @@ Bit 8 - 15 : reserved]]></Comment>
 							<MBoxUserCmdData>020003000a0000003000000000000000000000000000000000000000000000002011802d020000001a04445256204d6f746f722053657474696e6773202f204d6f746f7220746865726d616c2074696d6520636f6e7374616e7400</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000c0000002b00000000000000000000000000000000000000000000002011801b0400000001150000445256204d6f746f722053657474696e6773202f204d6f746f72207370656564206c696d69746174696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000a0000001f00000000000000000000000000000000000000000000002010700b02000000e803445256204f757470757473202f20546f72717565206c696d69746174696f6e00</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000a0000003700000000000000000000000000000000000000000000002010801302000000530044525620416d706c69666965722053657474696e6773202f2043757272656e74206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000a0000003300000000000000000000000000000000000000000000002010801202000000050044525620416d706c69666965722053657474696e6773202f2043757272656e74206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c00000038000000000000000000000000000000000000000000000020108015040000009600000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c00000034000000000000000000000000000000000000000000000020108014040000005000000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000a0000003700000000000000000000000000000000000000000000002010801302000000640044525620416d706c69666965722053657474696e6773202f2043757272656e74206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000a00000033000000000000000000000000000000000000000000000020108012020000000a0044525620416d706c69666965722053657474696e6773202f2043757272656e74206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c00000038000000000000000000000000000000000000000000000020108015040000006d01000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c00000034000000000000000000000000000000000000000000000020108014040000009600000044525620416d706c69666965722053657474696e6773202f2056656c6f63697479206c6f6f7020696e74656772616c2074696d6500</MBoxUserCmdData>
 							<MBoxUserCmdData>020003000900000027000000000000000000000000000000000000000000000020008001010000000046422053657474696e6773202f20496e7665727420666565646261636b20646972656374696f6e00</MBoxUserCmdData>
 							<MBoxUserCmdData>0200030009000000200000000000000000000000000000000000000000000000201070030100000008445256204f757470757473202f204d6f646573206f66206f7065726174696f6e00</MBoxUserCmdData>
-							<MBoxUserCmdData>020003000c00000038000000000000000000000000000000000000000000000020108017040000002003000044525620416d706c69666965722053657474696e6773202f20506f736974696f6e206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000c0000003800000000000000000000000000000000000000000000002010801704000000b80b000044525620416d706c69666965722053657474696e6773202f20506f736974696f6e206c6f6f702070726f706f7274696f6e616c206761696e00</MBoxUserCmdData>
+							<MBoxUserCmdData>020003000900000033000000000000000000000000000000000000000000000020108057010000006444525620416d706c69666965722053657474696e6773202f2056656c6f63697479206665656420666f7277617264206761696e00</MBoxUserCmdData>
 							<Pdo Name="FB Position" Index="#x1a00" Flags="#x0010" SyncMan="3">
 								<Entry Name="Position" BitLen="32" Index="#x6000" Sub="#x11">
 									<Type>UDINT</Type>
