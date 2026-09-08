@@ -784,7 +784,7 @@
               </Parameter>
               <Parameter>
                 <PropertyName>FeedConstant</PropertyName>
-                <Value>120</Value>
+                <Value>119.8</Value>
               </Parameter>
               <Parameter>
                 <PropertyName>GearRatioMotorSide</PropertyName>
@@ -891,11 +891,11 @@
       <ProcessData>
         <Send>
           <BitStart>664</BitStart>
-          <BitLength>80</BitLength>
+          <BitLength>48</BitLength>
         </Send>
         <Recv>
           <BitStart>664</BitStart>
-          <BitLength>96</BitLength>
+          <BitLength>80</BitLength>
         </Recv>
         <Sm2>
           <Type>Outputs</Type>
@@ -904,7 +904,6 @@
           <ControlByte>36</ControlByte>
           <Enable>1</Enable>
           <Pdo>5632</Pdo>
-          <Pdo>5633</Pdo>
           <Pdo>5638</Pdo>
         </Sm2>
         <Sm3>
@@ -915,7 +914,6 @@
           <Enable>1</Enable>
           <Pdo>6656</Pdo>
           <Pdo>6657</Pdo>
-          <Pdo>6659</Pdo>
           <Pdo>6662</Pdo>
         </Sm3>
         <TxPdo Fixed="true" Sm="3">
@@ -981,7 +979,7 @@ Bit 14 - 15 : reserved</Comment>
             <DataType>DINT</DataType>
           </Entry>
         </TxPdo>
-        <TxPdo Fixed="true" Sm="3">
+        <TxPdo Fixed="true">
           <Index>#x1a03</Index>
           <Name>DRV Torque actual value</Name>
           <Entry>
@@ -990,14 +988,6 @@ Bit 14 - 15 : reserved</Comment>
             <BitLen>16</BitLen>
             <Name>Torque actual value</Name>
             <DataType>INT</DataType>
-            <AdsInfo>
-              <AmsAddress>
-                <AmsPort>11</AmsPort>
-              </AmsAddress>
-              <IndexGroup>50593824</IndexGroup>
-              <IndexOffset>-2147483559</IndexOffset>
-              <Length>2</Length>
-            </AdsInfo>
           </Entry>
         </TxPdo>
         <TxPdo Fixed="true">
@@ -1036,7 +1026,7 @@ Bit 14 - 15 : reserved</Comment>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593824</IndexGroup>
-              <IndexOffset>-2147483557</IndexOffset>
+              <IndexOffset>-2147483559</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -1204,7 +1194,7 @@ Bit 8 - 15 : reserved</Comment>
             </AdsInfo>
           </Entry>
         </RxPdo>
-        <RxPdo Fixed="true" Sm="2">
+        <RxPdo Fixed="true">
           <Index>#x1601</Index>
           <Name>DRV Target velocity</Name>
           <Entry>
@@ -1213,14 +1203,6 @@ Bit 8 - 15 : reserved</Comment>
             <BitLen>32</BitLen>
             <Name>Target velocity</Name>
             <DataType>DINT</DataType>
-            <AdsInfo>
-              <AmsAddress>
-                <AmsPort>11</AmsPort>
-              </AmsAddress>
-              <IndexGroup>50593824</IndexGroup>
-              <IndexOffset>-2130706347</IndexOffset>
-              <Length>4</Length>
-            </AdsInfo>
           </Entry>
         </RxPdo>
         <RxPdo Fixed="true">
@@ -1281,7 +1263,7 @@ Bit 8 - 15 : reserved</Comment>
                 <AmsPort>11</AmsPort>
               </AmsAddress>
               <IndexGroup>50593824</IndexGroup>
-              <IndexOffset>-2130706343</IndexOffset>
+              <IndexOffset>-2130706347</IndexOffset>
               <Length>4</Length>
             </AdsInfo>
           </Entry>
@@ -1405,7 +1387,7 @@ Bit 8 - 15 : reserved</Comment>
               <Pdo ChannelNo="1">#x1a01</Pdo>
             </Sm>
           </AlternativeSmMapping>
-          <AlternativeSmMapping>
+          <AlternativeSmMapping Selected="true">
             <Name>Cyclic synchronous position mode (CSP)</Name>
             <Sm No="2">
               <Pdo ChannelNo="1">#x1600</Pdo>
@@ -1454,7 +1436,7 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>7186</Index>
               <SubIndex>0</SubIndex>
-              <Data>0300001601160616</Data>
+              <Data>020000160616</Data>
             </InitCmd>
             <InitCmd Fixed="true" CompleteAccess="true">
               <Transition>PS</Transition>
@@ -1463,7 +1445,7 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>7187</Index>
               <SubIndex>0</SubIndex>
-              <Data>0400001a011a031a061a</Data>
+              <Data>0300001a011a061a</Data>
             </InitCmd>
             <InitCmd>
               <Transition>IP</Transition>
@@ -1614,7 +1596,7 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>32784</Index>
               <SubIndex>18</SubIndex>
-              <Data>0500</Data>
+              <Data>0a00</Data>
             </InitCmd>
             <InitCmd>
               <Transition>PS</Transition>
@@ -1659,7 +1641,7 @@ Bit 8 - 15 : reserved</Comment>
               <Ccs>1</Ccs>
               <Index>32784</Index>
               <SubIndex>23</SubIndex>
-              <Data>e8030000</Data>
+              <Data>a00f0000</Data>
             </InitCmd>
             <InitCmd>
               <Transition>PS</Transition>
@@ -1678,6 +1660,15 @@ Bit 8 - 15 : reserved</Comment>
               <Index>32768</Index>
               <SubIndex>19</SubIndex>
               <Data>0c</Data>
+            </InitCmd>
+            <InitCmd>
+              <Transition>PS</Transition>
+              <Comment><![CDATA[DRV Amplifier Settings / Velocity feed forward gain]]></Comment>
+              <Timeout>0</Timeout>
+              <Ccs>1</Ccs>
+              <Index>32784</Index>
+              <SubIndex>87</SubIndex>
+              <Data>64</Data>
             </InitCmd>
           </InitCmds>
           <CanOpenType>39</CanOpenType>
@@ -2028,7 +2019,7 @@ Bit 8 - 15 : reserved</Comment>
           <Cmd>5</Cmd>
           <Adp>1006</Adp>
           <Ado>2064</Ado>
-          <Data>00110a0024000100</Data>
+          <Data>0011060024000100</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -2038,7 +2029,7 @@ Bit 8 - 15 : reserved</Comment>
           <Cmd>5</Cmd>
           <Adp>1006</Adp>
           <Ado>2072</Ado>
-          <Data>80110c0020000100</Data>
+          <Data>80110a0020000100</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -2048,7 +2039,7 @@ Bit 8 - 15 : reserved</Comment>
           <Cmd>5</Cmd>
           <Adp>1006</Adp>
           <Ado>1536</Ado>
-          <Data>0c0000010a0000070011000201000000</Data>
+          <Data>0c000001060000070011000201000000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>
@@ -2058,7 +2049,7 @@ Bit 8 - 15 : reserved</Comment>
           <Cmd>5</Cmd>
           <Adp>1006</Adp>
           <Ado>1552</Ado>
-          <Data>0c0000010c0000078011000101000000</Data>
+          <Data>0c0000010a0000078011000101000000</Data>
           <Cnt>1</Cnt>
           <Retries>3</Retries>
         </InitCmd>

@@ -53,9 +53,9 @@ END_IF
 // ===================================================
 _ShapesCount := 1; 
 
-// Kształt 1: Zewnętrzny prostokąt (100%) - Zaczynamy na środku PRAWEJ krawędzi
+// Kształt 1: Zewnętrzny prostokąt (100%) - Zaczynamy na prawej krawędzi, od promienia (prawy dolny róg)
 _ShapeStart[1].X := TotalX;
-_ShapeStart[1].Y := TotalY / 2.0;
+_ShapeStart[1].Y := Radius;
 
 // Obliczenia dla małego prostokąta (50% wielkości, wyśrodkowany)
 SmallMinX := TotalX * 0.25;
@@ -64,9 +64,9 @@ SmallMinY := TotalY * 0.25;
 SmallMaxY := TotalY * 0.75;
 SmallRadius := Radius * 0.5;
 
-// Kształt 2: Wewnętrzny prostokąt (50%) - Zaczynamy na środku PRAWEJ krawędzi
+// Kształt 2: Wewnętrzny prostokąt (50%) - Zaczynamy adekwatnie od promienia
 _ShapeStart[2].X := SmallMaxX;
-_ShapeStart[2].Y := TotalY / 2.0;
+_ShapeStart[2].Y := SmallMinY + SmallRadius;
 
 
 // ============================================
@@ -107,8 +107,8 @@ CASE _CurrentShapeIndex OF
             _GeometryWriter.AddArc(TotalX, Radius, TotalX - Radius, Radius, Velo, FALSE);
         END_IF
 
-        // Zamknięcie na prawej krawędzi
-        _GeometryWriter.AddLine(TotalX, TotalY / 2.0, Velo);
+        // Zamknięcie na prawej krawędzi (powrót do punktu startu)
+        _GeometryWriter.AddLine(TotalX, Radius, Velo);
 
 END_CASE
 
@@ -182,8 +182,7 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedRoundedRectangle.Build">
-      <LineId Id="2102" Count="88" />
-      <LineId Id="2224" Count="6" />
+      <LineId Id="2241" Count="95" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedRoundedRectangle.CalculateFootprint">
