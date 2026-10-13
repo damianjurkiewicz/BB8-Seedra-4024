@@ -2744,14 +2744,14 @@ External Setpoint Generation:
 				<Axis Id="2" CreateSymbols="true" AxisType="1">
 					<Name>Axis Y</Name>
 					<AxisPara>
-						<Dynamic Acceleration="643.23" Deceleration="643.23" Jerk="1929.69"/>
-						<Velo RefSearch="20" RefSync="10" SlowManual="5" FastManual="30" Fast="428.82" Maximum="428.82"/>
+						<Dynamic Acceleration="643.767" Deceleration="643.767" Jerk="1931.301"/>
+						<Velo RefSearch="20" RefSync="10" SlowManual="5" FastManual="30" Fast="429.178" Maximum="429.178"/>
 						<TargetPosControl Range="0.1"/>
 						<BacklashCompensation Range="1"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="119.8" ScaleFactorDenominator="26214400" MaxCount="#xffffffff">
+						<EncPara ScaleFactorNumerator="119.9" ScaleFactorDenominator="26214400" MaxCount="#xffffffff">
 							<ActPosCorrection Enable="true"/>
 							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
 						</EncPara>
@@ -2813,7 +2813,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="471.702" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="472.0958" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -2897,7 +2897,7 @@ External Setpoint Generation:
 					</AxisPara>
 					<Encoder Name="Enc" EncType="4">
 						<EncPara ScaleFactorNumerator="2" ScaleFactorDenominator="12800" Inverse="true" MaxCount="#xffffffff">
-							<Inc RefPosition="34" RefMode="1"/>
+							<Inc RefPosition="31" RefMode="1"/>
 						</EncPara>
 						<Vars VarGrpType="1">
 							<Name>Inputs</Name>
@@ -3051,14 +3051,14 @@ External Setpoint Generation:
 				<Axis Id="3" CreateSymbols="true" AxisType="1" GroupId="6">
 					<Name>Axis X</Name>
 					<AxisPara>
-						<Dynamic Acceleration="804.708" Deceleration="804.708" Jerk="2414.124" ToleranceBallAuxAxis="10"/>
-						<Velo RefSearch="20" RefSync="10" SlowManual="5" FastManual="30" Fast="536.472" Maximum="536.472"/>
+						<Dynamic Acceleration="805.38" Deceleration="805.38" Jerk="2416.14" ToleranceBallAuxAxis="10"/>
+						<Velo RefSearch="20" RefSync="10" SlowManual="5" FastManual="30" Fast="536.92" Maximum="536.92"/>
 						<TargetPosControl Range="0.1"/>
 						<BacklashCompensation Range="0.5"/>
 						<OtherSettings AllowMotionCmdToSlave="true"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
-						<EncPara ScaleFactorNumerator="119.9" ScaleFactorDenominator="20971520" MaxCount="#xffffffff">
+						<EncPara ScaleFactorNumerator="120" ScaleFactorDenominator="20971520" MaxCount="#xffffffff">
 							<ActPosCorrection Enable="true"/>
 							<Inc RefSearchInverse="true" RefSyncInverse="false" RefMode="1"/>
 						</EncPara>
@@ -3120,7 +3120,7 @@ External Setpoint Generation:
 					</Encoder>
 					<Drive Name="Drive" DrvType="16">
 						<DrvPara MaxCount="#xffffffff" DriveControlDWord="#x00020100">
-							<Analog VeloReferenz="590.1192" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
+							<Analog VeloReferenz="590.612" VeloScale="32" TorqueSetpointScale="10" ScaleFactorActTorque="0.1"/>
 							<TimeComp TaskDelayCycles="1"/>
 						</DrvPara>
 						<Vars VarGrpType="1">
@@ -3436,7 +3436,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{5229DEF8-A52B-0C92-8241-A69D889381ED}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{B528C48A-1F6A-5240-3EC5-3528BCFF8615}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -5969,7 +5969,7 @@ Bit 8 - 15 : reserved]]></Comment>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>119.8</Value>
+													<Value>119.9</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>
@@ -7062,7 +7062,7 @@ Bit 8 - 15 : reserved]]></Comment>
 												</Parameter>
 												<Parameter>
 													<PropertyName>FeedConstant</PropertyName>
-													<Value>119.9</Value>
+													<Value>120</Value>
 												</Parameter>
 												<Parameter>
 													<PropertyName>GearRatioMotorSide</PropertyName>

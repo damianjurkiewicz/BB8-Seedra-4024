@@ -38,8 +38,9 @@ Radius := TotalX / 2.0;
 // ===================================================
 _ShapesCount := 1; 
 
+// Start bezpośrednio w skrajnym prawym punkcie koła (X = Diameter, Y = Radius)
 _ShapeStart[1].X := TotalX;
-_ShapeStart[1].Y := Radius - LeadInY;
+_ShapeStart[1].Y := Radius;
 
 IF _ConfigProvider <> 0 THEN
     localConfig := _ConfigProvider.Config;
@@ -51,14 +52,14 @@ END_IF
 _GeometryWriter.Clear();
 _GeometryWriter.EnableTangentialFollowing();
 
-// RYSOWANIE TYLKO TEGO KSZTAŁTU, O KTÓRY PROSI EXECUTOR
+// RYSOWANIE KOŁA BEZPOŚREDNIO OD KRAWĘDZI
 CASE _CurrentShapeIndex OF
     1:
         _GeometryWriter.AddStartPoint(_ShapeStart[1].X, _ShapeStart[1].Y); 
-        _GeometryWriter.AddLine(TotalX, Radius, Velo); 
+        // Pierwsze półkole: do (0, Radius), środkiem jest (Radius, Radius)
         _GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, FALSE);
+        // Drugie półkole: do (TotalX, Radius), powrót do punktu startowego
         _GeometryWriter.AddArc(TotalX, Radius, Radius, Radius, Velo, FALSE);
-        _GeometryWriter.AddLine(TotalX, Radius + LeadOutY, Velo); 
 END_CASE
 
 _GeometryWriter.EndTable();
@@ -112,7 +113,7 @@ _Limits.GroovingOverpass.MaxVal := 50.0;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedCircle.Build">
-      <LineId Id="2264" Count="47" />
+      <LineId Id="2319" Count="48" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedCircle.CalculateFootprint">
