@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_FeedMeina2_500x500" Id="{55576838-7eac-41b8-bcab-a7bf7fbec968}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedMeina2_500x500 EXTENDS FB_RecipeBase
+  <POU Name="FB_Meina2_500x500" Id="{55576838-7eac-41b8-bcab-a7bf7fbec968}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Meina2_500x500 EXTENDS FB_RecipeBase
 
 ]]></Declaration>
     <Implementation>
@@ -341,21 +341,21 @@ _Limits.Radius.MinVal := 10.0;
 _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_FeedMeina2_500x500">
+    <LineIds Name="FB_Meina2_500x500">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedMeina2_500x500.Build">
+    <LineIds Name="FB_Meina2_500x500.Build">
       <LineId Id="3241" Count="224" />
       <LineId Id="11" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedMeina2_500x500.CalculateFootprint">
+    <LineIds Name="FB_Meina2_500x500.CalculateFootprint">
       <LineId Id="28" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedMeina2_500x500.ExecutionRoute.Get">
+    <LineIds Name="FB_Meina2_500x500.ExecutionRoute.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedMeina2_500x500.FB_init">
+    <LineIds Name="FB_Meina2_500x500.FB_init">
       <LineId Id="31" Count="15" />
       <LineId Id="28" Count="0" />
       <LineId Id="53" Count="1" />
