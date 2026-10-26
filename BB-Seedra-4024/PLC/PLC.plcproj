@@ -314,6 +314,9 @@
       <SubType>Code</SubType>
       <ExcludeFromBuild>false</ExcludeFromBuild>
     </Compile>
+    <Compile Include="VISUs\GlobalImages.TcIPO">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="VISUs\Modes\ProductionMode\V_Builders.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
@@ -432,6 +435,10 @@
     <Folder Include="VISUs\Modes\ProductionMode" />
   </ItemGroup>
   <ItemGroup>
+    <PlaceholderReference Include="CmpBitmapPool">
+      <DefaultResolution>CmpBitmapPool, * (System)</DefaultResolution>
+      <Namespace>CmpBitmapPool</Namespace>
+    </PlaceholderReference>
     <PlaceholderReference Include="SPT Base Types">
       <DefaultResolution>SPT Base Types, * (Beckhoff Automation LLC)</DefaultResolution>
       <Namespace>SPT_BaseTypes</Namespace>
@@ -514,6 +521,7 @@
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_PlcInterpolation">
       <DefaultResolution>Tc2_PlcInterpolation, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_PlcInterpolation</Namespace>
     </PlaceholderReference>
     <PlaceholderReference Include="Tc2_Standard">
       <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
