@@ -1,20 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_Meina2_500x500" Id="{55576838-7eac-41b8-bcab-a7bf7fbec968}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_Meina2_500x500 EXTENDS FB_RecipeBase
+  <POU Name="FB_NCIMeina2_750x750" Id="{a8c4b86e-8df8-4a14-8cba-d1e882919a1a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NCIMeina2_750x750 EXTENDS FB_RecipeBase
 
 ]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
-    <Method Name="Build" Id="{dfa8aa9e-d1ba-4342-be9a-7fd13ab5c17a}">
+    <Method Name="Build" Id="{27883d0c-6773-4d2e-8efb-5447266139e5}">
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR
     TotalX, TotalY, Radius : LREAL;
-    Velo : LREAL;
-    localConfig : ST_GantryXYZ_Config;
-	
-    // Zmienne do otworów
+    CircleRadius           : LREAL;
+    Velo                   : LREAL;
+    localConfig            : ST_GantryXYZ_Config;
+    
+    PanelGap               : LREAL;
+    Y_Offset               : LREAL;
+    p                      : INT;
+
     HoleDistanceFromEdgeOfRail : LREAL := 100.0;
     SomeFixedDimension         : LREAL := 12.63;
     PanelRailOffsetX           : LREAL;
@@ -29,29 +33,19 @@ VAR
     
     i                          : INT;
     holeIdx                    : INT;
-	
-	RailSlot  : LREAL := 29.0;
-	BigSlot   : LREAL := 200.0;
-	SmallSlot : LREAL := 100.0;
+    
+    RailSlot  : LREAL := 29.0;
+    BigSlot   : LREAL := 200.0;
+    SmallSlot : LREAL := 100.0;
 
-	PanelW : ARRAY[1..5] OF LREAL;
-    PanelH : ARRAY[1..5] OF LREAL;
-    PanelR : ARRAY[1..5] OF LREAL;
-    X_Offset : LREAL;
-    Y_Offset : LREAL;
-    p : INT;
+    LeadInY   : LREAL := 10.0;
+    LeadOutY  : LREAL := 10.0;
 
-    // Stały wymiar szczelin ekstruzyjnych
-    BaseExtrusion : LREAL;
-	
-	
-// Zmienne pomocnicze do generowania ścieżek
-	sx : LREAL;
-	sy : LREAL;
-	dx : LREAL;
-	dy : LREAL;
-	r_val : LREAL;
-	
+    sx : LREAL;
+    sy : LREAL;
+    dx : LREAL;
+    dy : LREAL;
+    r_val : LREAL;
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[_Busy := TRUE;
@@ -68,94 +62,78 @@ IF NOT _Config.IsValid THEN
 END_IF
 
 // ===================================================
-// DEFINICJA PANELI GŁÓWNYCH (1 duży + 4 małe)
+// NOWE GEOMETRIE DLA TRZECH KWADRATÓW 750x750
 // ===================================================
-// 1. Duży kwadrat (Oryginał)
-_ShapeStart[1].X := 0.0;     _ShapeStart[1].Y := 0.0;
-PanelW[1] := 1000.0;         PanelH[1] := 1000.0;
-PanelR[1] := _Config.Radius; 
+TotalX := 750.0; 
+TotalY := 750.0; 
+Radius := _Config.Radius;
 
-// 2. Mały kwadrat 1
-_ShapeStart[2].X := 0.0;     _ShapeStart[2].Y := 1020.0;
-PanelW[2] := 500.0;          PanelH[2] := 500.0;
-PanelR[2] := 10.0;
+IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
+IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
 
-// 3. Mały kwadrat 2
-_ShapeStart[3].X := 0.0;     _ShapeStart[3].Y := 1540.0;
-PanelW[3] := 500.0;          PanelH[3] := 500.0;
-PanelR[3] := 10.0;
+// Przerwa między panelami (20 mm) w osi Y
+PanelGap := 20.0; 
 
-// 4. Mały kwadrat 3
-_ShapeStart[4].X := 520.0;   _ShapeStart[4].Y := 1020.0;
-PanelW[4] := 500.0;          PanelH[4] := 500.0;
-PanelR[4] := 10.0;
+// Offsety dla szyn
+PanelRailOffsetX := 0.1 * TotalX;
+PanelRailOffsetY := 0.1 * TotalY;
 
-// 5. Mały kwadrat 4
-_ShapeStart[5].X := 520.0;   _ShapeStart[5].Y := 1540.0;
-PanelW[5] := 500.0;          PanelH[5] := 500.0;
-PanelR[5] := 10.0;
+ExtrusionLengthX := TotalX - (2.0 * PanelRailOffsetX);
+ExtrusionLengthY := TotalY - (2.0 * PanelRailOffsetY);
+
+// Wyliczenie rozstawu otworów
+IF NumberOfHolesX > 1 THEN
+    HolesSpacingX := (ExtrusionLengthX - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesX - 1);
+ELSE
+    HolesSpacingX := 0.0;
+END_IF
+
+IF NumberOfHolesY > 1 THEN
+    HolesSpacingY := (ExtrusionLengthY - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesY - 1);
+ELSE
+    HolesSpacingY := 0.0;
+END_IF
+
 
 // ===================================================
-// GENEROWANIE OTWORÓW DLA WSZYSTKICH 5 PANELI
+// GENEROWANIE OTWORÓW DLA TRZECH PANELÓW
 // ===================================================
 holeIdx := 0; 
 
-FOR p := 1 TO 5 DO
-    // Pobranie wymiarów dla aktualnie obliczanego panelu
-    TotalX := PanelW[p];
-    TotalY := PanelH[p];
-    X_Offset := _ShapeStart[p].X;
-    Y_Offset := _ShapeStart[p].Y;
+// Pętla dla 3 paneli: 0, 1, 2
+FOR p := 0 TO 2 DO
+    Y_Offset := INT_TO_LREAL(p) * (TotalY + PanelGap);
 
-    // Offsety i wyliczenia proporcjonalne do wymiarów konkretnego panelu
-    PanelRailOffsetX := 0.1 * TotalX;
-    PanelRailOffsetY := 0.1 * TotalY;
-
-    ExtrusionLengthX := TotalX - (2.0 * PanelRailOffsetX);
-    ExtrusionLengthY := TotalY - (2.0 * PanelRailOffsetY);
-
-    IF NumberOfHolesX > 1 THEN
-        HolesSpacingX := (ExtrusionLengthX - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesX - 1);
-    ELSE
-        HolesSpacingX := 0.0;
-    END_IF
-
-    IF NumberOfHolesY > 1 THEN
-        HolesSpacingY := (ExtrusionLengthY - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesY - 1);
-    ELSE
-        HolesSpacingY := 0.0;
-    END_IF
-
-    // 1. Otwór na środku danego panelu
+    // 1. Otwór na dokładnym środku danego panelu
     holeIdx := holeIdx + 1;
-    _HolesDrill[holeIdx].X := LREAL_TO_REAL((TotalX / 2.0) + X_Offset);
+    _HolesDrill[holeIdx].X := LREAL_TO_REAL(TotalX / 2.0);
     _HolesDrill[holeIdx].Y := LREAL_TO_REAL((TotalY / 2.0) + Y_Offset);
 
     // 2. Rail Y1 (Lewa)
     FOR i := NumberOfHolesY TO 1 BY -1 DO
         holeIdx := holeIdx + 1;
-        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX - SomeFixedDimension + X_Offset);
+        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX - SomeFixedDimension);
         _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY) + Y_Offset);
     END_FOR
 
     // 3. Rail X1 (Dolna)
     FOR i := 1 TO NumberOfHolesX DO
         holeIdx := holeIdx + 1;
-        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX) + X_Offset);
+        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
         _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY - SomeFixedDimension + Y_Offset);
     END_FOR
 
     // 4. Rail Y2 (Prawa)
     FOR i := 1 TO NumberOfHolesY DO
         holeIdx := holeIdx + 1;
-        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + ExtrusionLengthX + SomeFixedDimension + X_Offset);
+        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + ExtrusionLengthX + SomeFixedDimension);
         _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY) + Y_Offset);
     END_FOR
 
     // 5. Rail X2 (Górna)
     FOR i := NumberOfHolesX TO 1 BY -1 DO
         holeIdx := holeIdx + 1;
-        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX) + X_Offset);
+        _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
         _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + ExtrusionLengthY + SomeFixedDimension + Y_Offset);
     END_FOR
 END_FOR
@@ -163,16 +141,40 @@ END_FOR
 _HolesToDrill := holeIdx;
 
 // ===================================================
-// POZOSTAŁE WYCIĘCIA
+// DEFINICJA ILOŚCI I PUNKTÓW STARTOWYCH
 // ===================================================
-_ShapesCount := 10; // 5 paneli głównych + 5 małych wycięć
+_ShapesCount := 8;
 
-// No. 1 do No. 5 z poprzednich ustawień
-_ShapeStart[6].X := 1030.0; _ShapeStart[6].Y := 0.0;
-_ShapeStart[7].X := 1090.0; _ShapeStart[7].Y := 0.0;
-_ShapeStart[8].X := 210.0;  _ShapeStart[8].Y := 2200.0;
-_ShapeStart[9].X := 410.0;  _ShapeStart[9].Y := 2150.0;
-_ShapeStart[10].X := 810.0; _ShapeStart[10].Y := 2150.0;
+// 1. Kształt główny - Panel Dolny
+_ShapeStart[1].X := 0.0;
+_ShapeStart[1].Y := 0.0;
+
+// 2. Kształt główny - Panel Środkowy
+_ShapeStart[2].X := 0.0;
+_ShapeStart[2].Y := TotalY + PanelGap; // offset 770.0
+
+// 3. Kształt główny - Panel Górny
+_ShapeStart[3].X := 0.0;
+_ShapeStart[3].Y := 2.0 * (TotalY + PanelGap); // offset 1540.0
+
+// ===================================================
+// WSPÓŁRZĘDNE SLOTÓW PRZYWRÓCONE Z PIERWSZEGO PROGRAMU
+// ===================================================
+_ShapeStart[4].X := 900.0;
+_ShapeStart[4].Y := 125.0;
+
+_ShapeStart[5].X := 900.0;
+_ShapeStart[5].Y := 875.0;
+
+_ShapeStart[6].X := 870.0;
+_ShapeStart[6].Y := 520.0;
+
+_ShapeStart[7].X := 870.0;
+_ShapeStart[7].Y := 220.0;
+
+_ShapeStart[8].X := 920.0;
+_ShapeStart[8].Y := 20.0;
+
 
 IF _ConfigProvider <> 0 THEN
     localConfig := _ConfigProvider.Config;
@@ -188,18 +190,11 @@ sx := 0.0; sy := 0.0; dx := 0.0; dy := 0.0; r_val := 0.0;
 
 // RYSOWANIE KSZTAŁTU ZGODNIE Z INDEKSEM
 CASE _CurrentShapeIndex OF
-    1, 2, 3, 4, 5:
-        // ==========================================
-        // RYSOWANIE PANELI (1 Duży + 4 Małe)
-        // ==========================================
+    
+    // Cięcie trzech paneli (kwadratów)
+    1, 2, 3:
         sx := _ShapeStart[_CurrentShapeIndex].X;
         sy := _ShapeStart[_CurrentShapeIndex].Y;
-        TotalX := PanelW[_CurrentShapeIndex];
-        TotalY := PanelH[_CurrentShapeIndex];
-        Radius := PanelR[_CurrentShapeIndex];
-
-        IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
-        IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
 
         _GeometryWriter.AddStartPoint(sx, sy);
 
@@ -223,30 +218,25 @@ CASE _CurrentShapeIndex OF
             _GeometryWriter.AddArc(sx, sy + Radius, sx + Radius, sy + Radius, Velo, TRUE);
         END_IF
 
-    6, 7, 8, 9, 10:
-        // ==========================================
-        // RYSOWANIE WYCIĘĆ NA PROFILE
-        // ==========================================
+    // Wycięcia wewnętrzne z odpowiednio przypisaną logiką
+    4, 5, 6, 7, 8:
         sx := _ShapeStart[_CurrentShapeIndex].X;
         sy := _ShapeStart[_CurrentShapeIndex].Y;
         r_val := 10.0;
 
-        // Stały wymiar dy/dx oparty na panelu 1000x1000: 1000 - 2*(10% z 1000) = 800
-        BaseExtrusion := 800.0; 
-
-        IF _CurrentShapeIndex = 6 THEN
+        IF _CurrentShapeIndex = 4 THEN
             dx := RailSlot;
-            dy := BaseExtrusion;
-        ELSIF _CurrentShapeIndex = 7 THEN
+            dy := ExtrusionLengthY;
+        ELSIF _CurrentShapeIndex = 5 THEN
             dx := RailSlot;
-            dy := BaseExtrusion; 
-        ELSIF _CurrentShapeIndex = 8 THEN
+            dy := ExtrusionLengthX; 
+        ELSIF _CurrentShapeIndex = 6 THEN
             dx := SmallSlot;
             dy := SmallSlot;
-        ELSIF _CurrentShapeIndex = 9 THEN
+        ELSIF _CurrentShapeIndex = 7 THEN
             dx := BigSlot;
             dy := BigSlot;
-        ELSIF _CurrentShapeIndex = 10 THEN
+        ELSIF _CurrentShapeIndex = 8 THEN
             dx := BigSlot;
             dy := BigSlot;
         END_IF
@@ -282,7 +272,7 @@ _Done := TRUE;
 Build := TRUE;]]></ST>
       </Implementation>
     </Method>
-    <Method Name="CalculateFootprint" Id="{51ef9402-89b9-4a0f-aa8f-6c97ea01621c}">
+    <Method Name="CalculateFootprint" Id="{9fd00a8d-ceac-45e1-8d1f-b1241a8f00dd}">
       <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
 VAR_INPUT
 END_VAR
@@ -292,18 +282,18 @@ END_VAR
 _NominalY := 2400;]]></ST>
       </Implementation>
     </Method>
-    <Property Name="ExecutionRoute" Id="{769e0bae-c163-4201-a397-e4a11e8f8fed}">
+    <Property Name="ExecutionRoute" Id="{5dd56840-b5e6-49f4-93e7-474b8facbdca}">
       <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
-      <Get Name="Get" Id="{43526d1a-f06a-41e1-b46f-a5df63c0d3fc}">
+      <Get Name="Get" Id="{07907307-f3ff-49e1-a9c2-6f17a98b2956}">
         <Declaration><![CDATA[VAR
 END_VAR
 ]]></Declaration>
         <Implementation>
-          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.ePTP;]]></ST>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eFeedTable;]]></ST>
         </Implementation>
       </Get>
     </Property>
-    <Method Name="FB_init" Id="{daa1d0e9-b1d9-4e64-a410-5a60a0bc6389}">
+    <Method Name="FB_init" Id="{804879f0-8d8e-4d58-9fbf-04c408b24bef}">
       <Declaration><![CDATA[METHOD FB_init : BOOL
 VAR_INPUT
 	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
@@ -341,21 +331,21 @@ _Limits.Radius.MinVal := 10.0;
 _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_Meina2_500x500">
+    <LineIds Name="FB_NCIMeina2_750x750">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Meina2_500x500.Build">
-      <LineId Id="3241" Count="224" />
+    <LineIds Name="FB_NCIMeina2_750x750.Build">
+      <LineId Id="3678" Count="220" />
       <LineId Id="11" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Meina2_500x500.CalculateFootprint">
+    <LineIds Name="FB_NCIMeina2_750x750.CalculateFootprint">
       <LineId Id="28" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Meina2_500x500.ExecutionRoute.Get">
+    <LineIds Name="FB_NCIMeina2_750x750.ExecutionRoute.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
-    <LineIds Name="FB_Meina2_500x500.FB_init">
+    <LineIds Name="FB_NCIMeina2_750x750.FB_init">
       <LineId Id="31" Count="15" />
       <LineId Id="28" Count="0" />
       <LineId Id="53" Count="1" />
