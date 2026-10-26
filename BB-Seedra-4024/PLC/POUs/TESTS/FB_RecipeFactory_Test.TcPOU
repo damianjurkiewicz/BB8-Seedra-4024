@@ -41,7 +41,7 @@ Factory.InitializeFactory(Config := TestConfig, ConfigProvider := iMockProvider)
 BuilderWings     := Factory.GetBuilder(E_RecipeID.ePTPBorgoWings);
 BuilderFlaps     := Factory.GetBuilder(E_RecipeID.ePTPBorgoFlaps);
 BuilderArona     := Factory.GetBuilder(E_RecipeID.ePTPArona);
-BuilderCircle    := Factory.GetBuilder(E_RecipeID.eNCICircle);
+BuilderCircle    := Factory.GetBuilder(E_RecipeID.eNCITest);
 BuilderRectangle := Factory.GetBuilder(E_RecipeID.ePTPRectangle);
 
 // 3. ASSERT
@@ -75,7 +75,7 @@ END_VAR]]></Declaration>
 BuilderWings     := Factory.GetBuilder(E_RecipeID.ePTPBorgoWings);
 BuilderFlaps     := Factory.GetBuilder(E_RecipeID.ePTPBorgoFlaps);
 BuilderArona     := Factory.GetBuilder(E_RecipeID.ePTPArona);
-BuilderCircle    := Factory.GetBuilder(E_RecipeID.eNCICircle);
+BuilderCircle    := Factory.GetBuilder(E_RecipeID.eNCITest);
 BuilderRectangle := Factory.GetBuilder(E_RecipeID.ePTPRectangle);
 
 // 2. ASSERT - Sprawdzamy, czy żaden z nich nie jest pusty (0)

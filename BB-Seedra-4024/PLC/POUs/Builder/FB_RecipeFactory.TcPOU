@@ -43,7 +43,7 @@ END_VAR]]></Declaration>
     E_RecipeID.ePTPArona:
         GetBuilder := BuilderArona;
 		
-	E_RecipeID.eNCICircle:
+	E_RecipeID.eNCITest:
         GetBuilder := BuilderCircle;
 		
 	E_RecipeID.ePTPRectangle:                            
@@ -55,22 +55,22 @@ END_VAR]]></Declaration>
 	E_RecipeID.eFeedCircle:                 
         GetBuilder := BuilderFeedCircle;        
 
-	E_RecipeID.eFeedMeina2_2000x1000:
+	E_RecipeID.eNCIMeina2_2000x1000:
 		GetBuilder := BuilderMeina2_2000x1000;   
 		
-	E_RecipeID.eFeedMeina2_500x500:    
+	E_RecipeID.eNCIMeina2_500x500:    
 		GetBuilder := BuilderMeina2_5Squares;
 		
-    E_RecipeID.eFeedMeina2_500x500_Circles:    
+    E_RecipeID.eNCIMeina2_500x500_Circles:    
 		GetBuilder := BuilderMeina2_500x500_Circles;
 		
-    E_RecipeID.eFeedMeina2_750x750:    
+    E_RecipeID.eNCIMeina2_750x750:    
 		GetBuilder := BuilderMeina2_3Squares;
 		
-    E_RecipeID.eFeedMeina2_750x750_Circles:    
+    E_RecipeID.eNCIMeina2_750x750_Circles:    
 		GetBuilder := BuilderMeina2_3Circles;
 		
-    E_RecipeID.eFeedMeina2_1000x1000:    
+    E_RecipeID.eNCIMeina2_1000x1000:    
 		GetBuilder := BuilderMeina2_1000x1000;
 		
     E_RecipeID.eFeedMeina2_1000x1000_Circles:    
@@ -173,9 +173,7 @@ BuilderMeina2_Samples.Config := Config;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.GetBuilder">
-      <LineId Id="1019" Count="44" />
-      <LineId Id="1070" Count="2" />
-      <LineId Id="1064" Count="2" />
+      <LineId Id="1382" Count="50" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.InitializeFactory">
