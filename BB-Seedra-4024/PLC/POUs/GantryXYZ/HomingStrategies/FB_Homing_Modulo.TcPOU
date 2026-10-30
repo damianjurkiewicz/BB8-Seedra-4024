@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_Homing_Modulo" Id="{398b7abf-73ed-4a8a-a3c8-2f04463db183}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Homing_Modulo EXTENDS FB_Homing_Base
+VAR_INPUT
+    ReferencePosition : LREAL := 0.0;
+END_VAR
+VAR
+    fbMcHome          : MC_Home;
+    fbMoveAbs         : MC_MoveAbsolute;
+	fbMoveModulo	  : MC_MoveModulo;
+    DelayTimer        : TON;
+	_HomingVelocity   : LREAL := 50.0;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Abort" Id="{3c597dbe-7762-4228-aa6b-316da941959e}">
+      <Declaration><![CDATA[METHOD Abort
+VAR_INPUT
+END_VAR
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[IF _Axis <> 0 THEN
+    fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+    fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
+END_IF
+
+SUPER^.Abort();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="CyclicLogic" Id="{afe30813-6e1e-4130-8cfc-c80e37369084}">
+      <Declaration><![CDATA[METHOD CyclicLogic
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE nStep OF
+    0: 
+        fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+        fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
+
+    10: 
+        IF _Axis.Axis.Status.Homed THEN
+            nStep := 20;
+        ELSE
+            fbMcHome(
+                Axis        := _Axis.Axis, 
+                Execute     := TRUE, 
+                Position    := ReferencePosition,
+                HomingMode  := MC_Direct
+            );
+            
+            IF fbMcHome.Done THEN
+                fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+                nStep := 20;
+            ELSIF fbMcHome.Error THEN
+                _bBusy    := FALSE;
+                _bError   := TRUE;
+                _bErrorID := fbMcHome.ErrorID;
+                nStep     := 0;
+            END_IF
+        END_IF
+
+	20: 
+        fbMoveModulo(
+            Axis      := _Axis.Axis,
+            Execute   := TRUE,
+            Velocity  := _HomingVelocity,
+            Position  := 0.0,
+            Direction := MC_Shortest_Way 
+        );
+        
+        IF fbMoveModulo.Done THEN
+            fbMoveModulo(Axis := _Axis.Axis, Execute := FALSE);
+            nStep := 40;
+        ELSIF fbMoveModulo.Error THEN
+            _bBusy    := FALSE;
+            _bError   := TRUE;
+            _bErrorID := fbMoveModulo.ErrorID;
+            nStep     := 0;
+        END_IF
+        
+    40: 
+        _bBusy := FALSE;
+        _bDone := TRUE; 
+        nStep  := 0;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="HomingVelocity" Id="{551cdd69-c6cb-47ff-b9b7-6792dba04d4f}">
+      <Declaration><![CDATA[PROPERTY HomingVelocity : LREAL]]></Declaration>
+      <Get Name="Get" Id="{8b56f16c-648b-4463-a280-406b1f5b5952}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[HomingVelocity := _HomingVelocity;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{324ec116-8e07-4c79-9459-8dcef86359a2}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_HomingVelocity := HomingVelocity;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_Homing_Modulo">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Modulo.Abort">
+      <LineId Id="12" Count="4" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Modulo.CyclicLogic">
+      <LineId Id="506" Count="26" />
+      <LineId Id="556" Count="16" />
+      <LineId Id="548" Count="5" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Modulo.HomingVelocity.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Homing_Modulo.HomingVelocity.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

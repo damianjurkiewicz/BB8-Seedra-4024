@@ -36,12 +36,9 @@ VAR
     AxisY               : FB_Component_BasicAxis := (Name := 'AxisY');
     AxisZ               : FB_Component_BasicAxis := (Name := 'AxisZ');
 	AxisQ               : FB_Component_BasicAxis := (Name := 'AxisQ Tangential'); 
-	
-	
+		
 	NciChannel          	: FB_NciChannel := (Name := 'NCI Channel 1');
 	NciChannelTangential	: FB_NciChannelTangential := (Name := 'NCI Channel Tangential');
-	
-	
 	
 	// [Typ osi: 1=X, 2=Y, 3=Z] , [Typ profilu z Enuma]
 	ProfilesX : ARRAY[E_MachineProfile.eProduction..E_MachineProfile.eManual] OF ST_AxisProfile;
@@ -63,7 +60,7 @@ VAR
     fbHomeStratX        : FB_Homing_StandardNC;
     fbHomeStratY        : FB_Homing_StandardNC;
     fbHomeStratZ        : FB_Homing_StandardNC;
-	fbHomeStratQ 		: FB_Homing_Direct;
+	fbHomeStratQ 		: FB_Homing_Modulo;
 
     // =========================================================
     //  ALARMS

@@ -10,262 +10,166 @@
     <Method Name="Build" Id="{fa0b89f6-ef30-4f8b-ba6b-e1f90d3f2882}">
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR
-    TotalX, TotalY, Radius : LREAL;
-    Velo : LREAL;
-    localConfig : ST_GantryXYZ_Config;
-	
-    // Zmienne do otworów
-    HoleDistanceFromEdgeOfRail : LREAL := 100.0;
-    SomeFixedDimension         : LREAL := 12.63;
-    PanelRailOffsetX           : LREAL;
-    PanelRailOffsetY           : LREAL;
-    ExtrusionLengthX           : LREAL;
-    ExtrusionLengthY           : LREAL;
-    
-    NumberOfHolesX             : INT := 3;
-    NumberOfHolesY             : INT := 5;
-    HolesSpacingX              : LREAL;
-    HolesSpacingY              : LREAL;
-    
-    i                          : INT;
-    holeIdx                    : INT;
-	
-	RailSlot  : LREAL := 29.0;
-	BigSlot   : LREAL := 200.0;
-	SmallSlot : LREAL := 100.0;
+      i          : INT;
+END_VAR
 
-// Zmienne pomocnicze do generowania ścieżek
-	sx : LREAL;
-	sy : LREAL;
-	dx : LREAL;
-	dy : LREAL;
-	r_val : LREAL;
-	
+VAR_INST
+    nBuildStep : INT;
+    machineConfig : ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Busy := TRUE;
-_Done := FALSE;
-_Error := FALSE;
-Build := FALSE;
-THIS^.UpdateNestingLimits();
+        <ST><![CDATA[Build := FALSE;
 
-IF NOT _Config.IsValid THEN
-    _Busy := FALSE;
-    _Error := TRUE; 
-    Build := FALSE;
-    RETURN;
-END_IF
+CASE nBuildStep OF
+    0:
+        _Busy := TRUE;
+        _Done := FALSE;
+        _Error := FALSE;
+        _nLinesToWrite := 0;
+        
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Budowanie G-Code', '');
+        
+        THIS^.UpdateNestingLimits();
+        IF NOT _Config.IsValid THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'NCIBuilder: Walidacja nie przeszla! Ustawiam ERROR.', '');
+            _Busy := FALSE;
+            _Error := TRUE;
+            Build := FALSE;
+            RETURN;
+        END_IF
+        
+        // --- BUFOR G-CODE ---
+        _aGCodeBuffer[1]   := '(1001)$N';
+        _aGCodeBuffer[2]   := 'N0 G01 Z22 F600$N';
+        _aGCodeBuffer[3]   := 'N1 G01 X310 Y305 F3000$N';
+        _aGCodeBuffer[4]   := 'N2 G01 Z0 F400$N';
+        _aGCodeBuffer[5]   := 'N3 X510 F1212$N';
+        _aGCodeBuffer[6]   := 'N4 G01 Z22 F600$N';
+        _aGCodeBuffer[7]   := 'N5 G01 Q1=-180. F12000$N';
+        _aGCodeBuffer[8]   := 'N6 G01 Z0 F400$N';
+        _aGCodeBuffer[9]   := 'N7 Y105 F1212$N';
+        _aGCodeBuffer[10]  := 'N8 G01 Z22 F600$N';
+        _aGCodeBuffer[11]  := 'N9 G01 Q1=-270. F12000$N';
+        _aGCodeBuffer[12]  := 'N10 G01 Z0 F400$N';
+        _aGCodeBuffer[13]  := 'N11 X310 F1212$N';
+        _aGCodeBuffer[14]  := 'N12 G01 Z22 F600$N';
+        _aGCodeBuffer[15]  := 'N13 G01 Q1=-360. F12000$N';
+        _aGCodeBuffer[16]  := 'N14 G01 Z0 F400$N';
+        _aGCodeBuffer[17]  := 'N15 Y305 F1212$N';
+        _aGCodeBuffer[18]  := 'N16 Z22 F600$N';
+        _aGCodeBuffer[19]  := 'N17 X910 F3000$N';
+        _aGCodeBuffer[20]  := 'N18 G01 Q1=-180. F12000$N';
+        _aGCodeBuffer[21]  := 'N19 G01 Z0 F400$N';
+        _aGCodeBuffer[22]  := 'N20 Y105 F1212$N';
+        _aGCodeBuffer[23]  := 'N21 G01 Z22 F600$N';
+        _aGCodeBuffer[24]  := 'N22 G01 Q1=-270. F12000$N';
+        _aGCodeBuffer[25]  := 'N23 G01 Z0 F400$N';
+        _aGCodeBuffer[26]  := 'N24 X710 F1212$N';
+        _aGCodeBuffer[27]  := 'N25 G01 Z22 F600$N';
+        _aGCodeBuffer[28]  := 'N26 G01 Q1=-360. F12000$N';
+        _aGCodeBuffer[29]  := 'N27 G01 Z0 F400$N';
+        _aGCodeBuffer[30]  := 'N28 Y305 F1212$N';
+        _aGCodeBuffer[31]  := 'N29 G01 Z22 F600$N';
+        _aGCodeBuffer[32]  := 'N30 G01 Q1=-450. F12000$N';
+        _aGCodeBuffer[33]  := 'N31 G01 Z0 F400$N';
+        _aGCodeBuffer[34]  := 'N32 X910 F1212$N';
+        _aGCodeBuffer[35]  := 'N33 Z22 F600$N';
+        _aGCodeBuffer[36]  := 'N34 X290 Y588.275 F3000$N';
+        _aGCodeBuffer[37]  := 'N35 G01 Q1=-360. F12000$N';
+        _aGCodeBuffer[38]  := 'N36 G01 Z8 F400$N';
+        _aGCodeBuffer[39]  := 'N37 Y606.475 F1385.71$N';
+        _aGCodeBuffer[40]  := 'N38 G03 X286.475 Y610 Q1=-270. I-3.525 F658.25$N';
+        _aGCodeBuffer[41]  := 'N39 G01 X268.275 F1385.71$N';
+        _aGCodeBuffer[42]  := 'N40 Z22 F600$N';
+        _aGCodeBuffer[43]  := 'N41 X1111.73 F3000$N';
+        _aGCodeBuffer[44]  := 'N42 G01 Z8 F400$N';
+        _aGCodeBuffer[45]  := 'N43 X1093.53 F1385.71$N';
+        _aGCodeBuffer[46]  := 'N44 G03 X1090 Y606.475 Q1=-180.041 I-0.003 J-3.528 F658.25$N';
+        _aGCodeBuffer[47]  := 'N45 G01 Y588.275 F1385.71$N';
+        _aGCodeBuffer[48]  := 'N46 Z22 F600$N';
+        _aGCodeBuffer[49]  := 'N47 Y2231.72 F3000$N';
+        _aGCodeBuffer[50]  := 'N48 G01 Z8 F400$N';
+        _aGCodeBuffer[51]  := 'N49 Y2213.52 F1385.71$N';
+        _aGCodeBuffer[52]  := 'N50 Q1=-179.921 F12000$N';
+        _aGCodeBuffer[53]  := 'N51 G03 X1093.53 Y2210 Q1=-89.919 I3.525 J0.005 F658.25$N';
+        _aGCodeBuffer[54]  := 'N52 G01 Q1=-90. F12000$N';
+        _aGCodeBuffer[55]  := 'N53 X1111.73 F1385.71$N';
+        _aGCodeBuffer[56]  := 'N54 Z22 F600$N';
+        _aGCodeBuffer[57]  := 'N55 X268.275 F3000$N';
+        _aGCodeBuffer[58]  := 'N56 G01 Z8 F400$N';
+        _aGCodeBuffer[59]  := 'N57 X286.475 F1385.71$N';
+        _aGCodeBuffer[60]  := 'N58 G03 X290 Y2213.52 Q1=-0.04 I0.003 J3.522 F658.25$N';
+        _aGCodeBuffer[61]  := 'N59 G01 Y2231.72 F1385.71$N';
+        _aGCodeBuffer[62]  := 'N60 Z22 F600$N';
+        _aGCodeBuffer[63]  := 'N61 X190 Y2310 F3000$N';
+        _aGCodeBuffer[64]  := 'N62 G01 Q1=-180. F12000$N';
+        _aGCodeBuffer[65]  := 'N63 G01 Z0 F400$N';
+        _aGCodeBuffer[66]  := 'N64 Y510 F1212$N';
+        _aGCodeBuffer[67]  := 'N65 G03 X290 Y410 Q1=-90. I100 F1002.57$N';
+        _aGCodeBuffer[68]  := 'N66 G01 X1090 F1212$N';
+        _aGCodeBuffer[69]  := 'N67 G03 X1190 Y510 Q1=0. J100 F1002.57$N';
+        _aGCodeBuffer[70]  := 'N68 G01 Y2310 F1212$N';
+        _aGCodeBuffer[71]  := 'N69 G03 X1090 Y2410 Q1=90. I-100 F1002.57$N';
+        _aGCodeBuffer[72]  := 'N70 G01 X290 F1212$N';
+        _aGCodeBuffer[73]  := 'N71 G03 X190 Y2310 Q1=180. J-100 F1002.57$N';
+        _aGCodeBuffer[74]  := 'N72 G01 Z22 F600$N';
+        _aGCodeBuffer[75]  := 'N73 X131 Y2410 F3000$N';
+        _aGCodeBuffer[76]  := 'N74 G01 Q1=270. F12000$N';
+        _aGCodeBuffer[77]  := 'N75 G01 Z0 F400$N';
+        _aGCodeBuffer[78]  := 'N76 X160 F1212$N';
+        _aGCodeBuffer[79]  := 'N77 G01 Z22 F600$N';
+        _aGCodeBuffer[80]  := 'N78 G01 Q1=180. F12000$N';
+        _aGCodeBuffer[81]  := 'N79 G01 Z0 F400$N';
+        _aGCodeBuffer[82]  := 'N80 Y810 F1212$N';
+        _aGCodeBuffer[83]  := 'N81 G01 Z22 F600$N';
+        _aGCodeBuffer[84]  := 'N82 G01 Q1=90. F12000$N';
+        _aGCodeBuffer[85]  := 'N83 G01 Z0 F400$N';
+        _aGCodeBuffer[86]  := 'N84 X131 F1212$N';
+        _aGCodeBuffer[87]  := 'N85 G01 Z22 F600$N';
+        _aGCodeBuffer[88]  := 'N86 G01 Q1=0. F12000$N';
+        _aGCodeBuffer[89]  := 'N87 G01 Z0 F400$N';
+        _aGCodeBuffer[90]  := 'N88 Y2410 F1212$N';
+        _aGCodeBuffer[91]  := 'N89 Z22 F600$N';
+        _aGCodeBuffer[92]  := 'N90 X71 F3000$N';
+        _aGCodeBuffer[93]  := 'N91 G01 Q1=-90. F12000$N';
+        _aGCodeBuffer[94]  := 'N92 G01 Z0 F400$N';
+        _aGCodeBuffer[95]  := 'N93 X100 F1212$N';
+        _aGCodeBuffer[96]  := 'N94 G01 Z22 F600$N';
+        _aGCodeBuffer[97]  := 'N95 G01 Q1=-180. F12000$N';
+        _aGCodeBuffer[98]  := 'N96 G01 Z0 F400$N';
+        _aGCodeBuffer[99]  := 'N97 Y1610 F1212$N';
+        _aGCodeBuffer[100] := 'N98 G01 Z22 F600$N';
+        _aGCodeBuffer[101] := 'N99 G01 Q1=-270. F12000$N';
+        _aGCodeBuffer[102] := 'N100 G01 Z0 F400$N';
+        _aGCodeBuffer[103] := 'N101 X71 F1212$N';
+        _aGCodeBuffer[104] := 'N102 G01 Z22 F600$N';
+        _aGCodeBuffer[105] := 'N103 G01 Q1=-360. F12000$N';
+        _aGCodeBuffer[106] := 'N104 G01 Z0 F400$N';
+        _aGCodeBuffer[107] := 'N105 Y2410 F1212$N';
+        _aGCodeBuffer[108] := 'N106 Z22 F600$N';
+        
+        _nLinesToWrite := 108; 
+        
+        // Czyszczenie reszty bufora
+        FOR i := (_nLinesToWrite + 1) TO 500 DO 
+            _aGCodeBuffer[i] := '';
+        END_FOR
+        
+        nBuildStep := 10;
 
-// Gabaryty i promień
-TotalX := 1000;
-TotalY := 2000;
-Radius := _Config.Radius;
-
-IF Radius > (TotalX / 2.0) THEN Radius := TotalX / 2.0; END_IF
-IF Radius > (TotalY / 2.0) THEN Radius := TotalY / 2.0; END_IF
-
-
-// ===================================================
-// OBLICZENIA DLA SZYN I OTWORÓW
-// ===================================================
-// Po poprawce: offset X uzależniony od X, a Y od Y
-PanelRailOffsetX := 0.1 * TotalX;
-PanelRailOffsetY := 0.1 * TotalY;
-
-ExtrusionLengthX := TotalX - (2.0 * PanelRailOffsetX);
-ExtrusionLengthY := TotalY - (2.0 * PanelRailOffsetY);
-
-// Wyliczenie rozstawu (Zabezpieczenie przed dzieleniem przez zero, jeśli ktoś wpisze NumberOfHoles = 1)
-IF NumberOfHolesX > 1 THEN
-    HolesSpacingX := (ExtrusionLengthX - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesX - 1);
-ELSE
-    HolesSpacingX := 0.0;
-END_IF
-
-IF NumberOfHolesY > 1 THEN
-    HolesSpacingY := (ExtrusionLengthY - (2.0 * HoleDistanceFromEdgeOfRail)) / INT_TO_LREAL(NumberOfHolesY - 1);
-ELSE
-    HolesSpacingY := 0.0;
-END_IF
-
-
-// ===================================================
-// GENEROWANIE OTWORÓW (Zoptymalizowana ścieżka po obwodzie)
-// ===================================================
-holeIdx := 1;
-
-// 1. Otwór na dokładnym środku wycinanego detalu
-_HolesDrill[holeIdx].X := LREAL_TO_REAL(TotalX / 2.0);
-_HolesDrill[holeIdx].Y := LREAL_TO_REAL(TotalY / 2.0);
-
-// 2. Rail Y1 (Lewa) - Ruch z GÓRY na DÓŁ
-FOR i := NumberOfHolesY TO 1 BY -1 DO
-    holeIdx := holeIdx + 1;
-    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX - SomeFixedDimension);
-    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
-END_FOR
-
-// 3. Rail X1 (Dolna) - Ruch z LEWEJ do PRAWEJ
-FOR i := 1 TO NumberOfHolesX DO
-    holeIdx := holeIdx + 1;
-    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
-    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY - SomeFixedDimension);
-END_FOR
-
-// 4. Rail Y2 (Prawa) - Ruch z DOŁU do GÓRY
-FOR i := 1 TO NumberOfHolesY DO
-    holeIdx := holeIdx + 1;
-    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + ExtrusionLengthX + SomeFixedDimension);
-    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingY));
-END_FOR
-
-// 5. Rail X2 (Górna) - Ruch z PRAWEJ do LEWEJ
-FOR i := NumberOfHolesX TO 1 BY -1 DO
-    holeIdx := holeIdx + 1;
-    _HolesDrill[holeIdx].X := LREAL_TO_REAL(PanelRailOffsetX + HoleDistanceFromEdgeOfRail + ((i - 1) * HolesSpacingX));
-    _HolesDrill[holeIdx].Y := LREAL_TO_REAL(PanelRailOffsetY + ExtrusionLengthY + SomeFixedDimension);
-END_FOR
-
-// Przypisanie całkowitej liczby otworów do recepty
-_HolesToDrill := holeIdx;
-
-// ===================================================
-// DEFINICJA ILOŚCI I PUNKTÓW STARTOWYCH (Dla FeedTable)
-// ===================================================
-_ShapesCount := 6; // 1 główny panel + 5 nowych wycięć z tabeli
-
-// 1. Kształt główny
-_ShapeStart[1].X := 0.0;
-_ShapeStart[1].Y := 0.0;
-
-// 2. No. 1
-_ShapeStart[2].X := 1030.0;
-_ShapeStart[2].Y := 0.0;
-
-// 3. No. 2
-_ShapeStart[3].X := 1090.0;
-_ShapeStart[3].Y := 0.0;
-
-// 4. No. 3
-_ShapeStart[4].X := 210.0;
-_ShapeStart[4].Y := 2200.0;
-
-// 5. No. 4
-_ShapeStart[5].X := 410.0;
-_ShapeStart[5].Y := 2150.0;
-
-// 6. No. 5
-_ShapeStart[6].X := 810.0;
-_ShapeStart[6].Y := 2150.0;
-
-IF _ConfigProvider <> 0 THEN
-    localConfig := _ConfigProvider.Config;
-    Velo := localConfig.CuttingSpeedXY;
-ELSE
-    Velo := 50.0;
-END_IF
-
-_GeometryWriter.Clear();
-_GeometryWriter.EnableTangentialFollowing();
-
-// Reset zmiennych pomocniczych przed każdym wywołaniem
-sx := 0.0; sy := 0.0; dx := 0.0; dy := 0.0; r_val := 0.0;
-
-// RYSOWANIE KSZTAŁTU ZGODNIE Z INDEKSEM
-CASE _CurrentShapeIndex OF
-    1:
-        // ==========================================
-        // KSZTAŁT 1 (Główny panel - Twój stary kod)
-        // ==========================================
-        _GeometryWriter.AddStartPoint(_ShapeStart[1].X, _ShapeStart[1].Y);
-
-        _GeometryWriter.AddLine(0.0, TotalY - Radius, Velo);
-        IF Radius > 0 THEN
-            _GeometryWriter.AddArc(Radius, TotalY, Radius, TotalY - Radius, Velo, TRUE);
+    10:
+        IF THIS^.WriteGCodeFile('TangentialCut.nc') THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Zapisano plik TangentialCut.nc', '');
+            nBuildStep := 1000;
         END_IF
 
-        _GeometryWriter.AddLine(TotalX - Radius, TotalY, Velo);
-        IF Radius > 0 THEN
-            _GeometryWriter.AddArc(TotalX, TotalY - Radius, TotalX - Radius, TotalY - Radius, Velo, TRUE);
-        END_IF
-
-        _GeometryWriter.AddLine(TotalX, Radius, Velo);
-        IF Radius > 0 THEN
-            _GeometryWriter.AddArc(TotalX - Radius, 0.0, TotalX - Radius, Radius, Velo, TRUE);
-        END_IF
-
-        _GeometryWriter.AddLine(Radius, 0.0, Velo);
-        IF Radius > 0 THEN
-            _GeometryWriter.AddArc(0.0, Radius, Radius, Radius, Velo, TRUE);
-        END_IF
-
-    2, 3, 4, 5, 6:
-        // ==========================================
-        // KSZTAŁTY OD 2 DO 6 (Z tabeli)
-        // ==========================================
-        // Przypisanie współrzędnych startowych dla aktualnego kształtu
-        sx := _ShapeStart[_CurrentShapeIndex].X;
-        sy := _ShapeStart[_CurrentShapeIndex].Y;
-        r_val := 10.0; // Promień jest równy 10 dla wszystkich slotów
-
-        // Dobór wymiarów na podstawie tego, który numer wycinamy
-        IF _CurrentShapeIndex = 2 THEN
-            dx := RailSlot;
-            dy := ExtrusionLengthY;
-        ELSIF _CurrentShapeIndex = 3 THEN
-            dx := RailSlot;
-            dy := ExtrusionLengthX;
-        ELSIF _CurrentShapeIndex = 4 THEN
-            dx := SmallSlot;
-            dy := SmallSlot;
-        ELSIF _CurrentShapeIndex = 5 THEN
-            dx := BigSlot;
-            dy := BigSlot;
-        ELSIF _CurrentShapeIndex = 6 THEN
-            dx := BigSlot;
-            dy := BigSlot;
-        END_IF
-
-        // Wygenerowanie geometrycznej ścieżki (z absolutnym offsetem sx, sy)
-        // Wkłuwamy się w lewym dolnym rogu (w odpad)
-        _GeometryWriter.AddStartPoint(sx, sy);
-
-        // 1. Lewa krawędź w górę
-        _GeometryWriter.AddLine(sx, sy + dy - r_val, Velo);
-        IF r_val > 0 THEN
-            // Lewy górny łuk
-            _GeometryWriter.AddArc(sx + r_val, sy + dy, sx + r_val, sy + dy - r_val, Velo, TRUE);
-        END_IF
-
-        // 2. Górna krawędź w prawo
-        _GeometryWriter.AddLine(sx + dx - r_val, sy + dy, Velo);
-        IF r_val > 0 THEN
-            // Prawy górny łuk
-            _GeometryWriter.AddArc(sx + dx, sy + dy - r_val, sx + dx - r_val, sy + dy - r_val, Velo, TRUE);
-        END_IF
-
-        // 3. Prawa krawędź w dół
-        _GeometryWriter.AddLine(sx + dx, sy + r_val, Velo);
-        IF r_val > 0 THEN
-            // Prawy dolny łuk
-            _GeometryWriter.AddArc(sx + dx - r_val, sy, sx + dx - r_val, sy + r_val, Velo, TRUE);
-        END_IF
-
-        // 4. Dolna krawędź w lewo i zamknięcie
-        _GeometryWriter.AddLine(sx + r_val, sy, Velo);
-        IF r_val > 0 THEN
-            // Lewy dolny łuk
-            _GeometryWriter.AddArc(sx, sy + r_val, sx + r_val, sy + r_val, Velo, TRUE);
-        END_IF
-
-END_CASE
-
-_GeometryWriter.EndTable();
-
-_Busy := FALSE;
-_Done := TRUE;
-Build := TRUE;
-]]></ST>
+    1000:
+        _Busy := FALSE;
+        _Done := TRUE; 
+        nBuildStep := 0;
+        Build := TRUE;
+        
+END_CASE]]></ST>
       </Implementation>
     </Method>
     <Method Name="CalculateFootprint" Id="{9ee51b75-0294-4fb4-bca1-c4a79e66bf68}">
@@ -331,9 +235,7 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIMeina2_2000x1000.Build">
-      <LineId Id="2840" Count="85" />
-      <LineId Id="3062" Count="134" />
-      <LineId Id="2926" Count="0" />
+      <LineId Id="3230" Count="150" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIMeina2_2000x1000.CalculateFootprint">
