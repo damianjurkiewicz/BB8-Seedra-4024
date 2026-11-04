@@ -129,16 +129,24 @@ CASE nStep OF
             nStep := 60;
         END_IF
 
-    60: // 4. START programu CNC!
+	60: // 4. START programu CNC!
         _NciChannel.Start();
         StepTimer(IN:=FALSE);
-        nStep := 70;
-	
-	70: // 4. Czekamy na koniec programu (M30)
-        IF _NciChannel.ChannelError THEN 
-            nStep := 999;
-        ELSIF _NciChannel.IsReady THEN 
-            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Executor: Program NCI zakonczony (M30). Rozpinam grupe...', '');
+        nStep := 65; // Zmiana z 70 na nowy krok 65
+
+    65: // 4a. Czekamy aż NC przetworzy komendę i faktycznie ruszy
+        IF _NciChannel.ChannelError THEN
+             nStep := 999;
+        ELSIF NOT _NciChannel.IsReady OR _NciChannel.IsMoving THEN
+            // NC opuściło stan bezczynności, maszyna pracuje
+            nStep := 70;
+        END_IF
+
+    70: // 4b. Czekamy na koniec programu (M30 - powrót do IsReady)
+        IF _NciChannel.ChannelError THEN
+             nStep := 999;
+        ELSIF _NciChannel.IsReady THEN
+             ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Executor: Program NCI zakonczony (M30). Rozpinam grupe...', '');
             nStep := 80;
         END_IF
 
@@ -199,7 +207,9 @@ END_VAR
       <LineId Id="3" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Spindle_GCodeXYZ.CyclicLogic">
-      <LineId Id="1984" Count="123" />
+      <LineId Id="1984" Count="83" />
+      <LineId Id="2120" Count="18" />
+      <LineId Id="2079" Count="28" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Spindle_GCodeXYZ.NciChannel.Get">
