@@ -4,6 +4,7 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_UsbGcodeLoader EXTENDS FB_CyclicFB
 VAR_IN_OUT
     HMI              : ST_UsbGcodeLoader_HMI;
+	RecipeConfig : ST_RecipeBuilder_Config; // <--- DODANO
 END_VAR
 VAR
     fbFindFile       : FB_EnumFindFileList;
@@ -42,7 +43,7 @@ END_VAR
     <Method Name="CyclicLogic" Id="{c00c8392-d673-4860-a014-1a09b118b28a}">
       <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
 VAR_INST
-    recipeConfig : ST_RecipeBuilder_Config;
+    RecipeConfig : ST_RecipeBuilder_Config;
 	iLastSelectedFile : INT := -1;
 END_VAR]]></Declaration>
       <Implementation>
@@ -51,14 +52,15 @@ IF (HMI.bBtnLoad OR HMI.iSelectedFile <> iLastSelectedFile) AND nStep = 0 THEN
     HMI.bBtnLoad := FALSE;
     iLastSelectedFile := HMI.iSelectedFile;
     
-    IF HMI.iSelectedFile >= 0 AND HMI.iSelectedFile <= 30 
-        AND LEN(HMI.aFileList[HMI.iSelectedFile]) > 0 
-        AND _RecipeGCodeUSB <> 0 THEN
+    IF HMI.iSelectedFile >= 0 AND HMI.iSelectedFile <= 30 AND _RecipeGCodeUSB <> 0 THEN
         
-        recipeConfig := _RecipeGCodeUSB.Config;
-        recipeConfig.GCodePath := CONCAT('\Hard Disk2\', HMI.aFileList[HMI.iSelectedFile]);
-        recipeConfig.IsValid := TRUE;
-        _RecipeGCodeUSB.Config := recipeConfig;
+        IF LEN(HMI.aFileList[HMI.iSelectedFile]) > 0 THEN
+            RecipeConfig.GCodePath := CONCAT('\Hard Disk2\', HMI.aFileList[HMI.iSelectedFile]);
+        ELSE
+            RecipeConfig.GCodePath := '';
+        END_IF
+        
+        _RecipeGCodeUSB.Config := RecipeConfig;
         _RecipeGCodeUSB.Build();
     END_IF
 END_IF
@@ -211,8 +213,8 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_UsbGCodeLoader.CyclicLogic">
-      <LineId Id="517" Count="0" />
-      <LineId Id="535" Count="13" />
+      <LineId Id="550" Count="0" />
+      <LineId Id="568" Count="14" />
       <LineId Id="416" Count="79" />
       <LineId Id="5" Count="0" />
     </LineIds>

@@ -387,8 +387,8 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_NominalX := _Config.Diameter;
-_NominalY := _Config.Diameter;]]></ST>
+        <ST><![CDATA[_NominalX := 1;
+_NominalY := 1;]]></ST>
       </Implementation>
     </Method>
     <Property Name="ExecutionRoute" Id="{a6a1a916-e2d9-4ecd-aaea-35dbaf655dc7}">
@@ -443,7 +443,7 @@ _Limits.Diameter.MaxVal := 600;]]></ST>
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCITest.CalculateFootprint">
-      <LineId Id="15" Count="0" />
+      <LineId Id="19" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCITest.ExecutionRoute.Get">

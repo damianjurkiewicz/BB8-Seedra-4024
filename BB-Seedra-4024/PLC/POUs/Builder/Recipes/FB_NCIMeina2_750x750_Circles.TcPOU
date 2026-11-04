@@ -238,8 +238,8 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_NominalX := 1200;
-_NominalY := 2400;]]></ST>
+        <ST><![CDATA[_NominalX := 1;
+_NominalY := 1;]]></ST>
       </Implementation>
     </Method>
     <Property Name="ExecutionRoute" Id="{02397026-5ced-429c-aa50-9358e8b3594b}">
@@ -301,7 +301,7 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIMeina2_750x750_Circles.CalculateFootprint">
-      <LineId Id="28" Count="0" />
+      <LineId Id="32" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIMeina2_750x750_Circles.ExecutionRoute.Get">

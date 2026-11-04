@@ -117,10 +117,14 @@ CASE nStep OF
             nStep := 40; 
         END_IF
 
-    40: // 3. Załadowanie pliku G-Code
-        recipeConfig := _RecipeBuilder.Config;
-        _NciChannel.LoadProgram(recipeConfig.GCodePath);
-        nStep := 50;
+	40: // 3. Za adowanie pliku G-Code
+		recipeConfig := _RecipeBuilder.Config;
+		
+		// LOG: Co faktycznie widzi Executor przed wczytaniem?
+		ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'ExecutorNCI [Krok 40]: Sciezka z recepty to: "%s"', recipeConfig.GCodePath);
+		
+		_NciChannel.LoadProgram(recipeConfig.GCodePath);
+		nStep := 50;
 
     50: // Czekamy na załadowanie do bufora
         IF _NciChannel.ChannelError THEN 
@@ -207,7 +211,9 @@ END_VAR
       <LineId Id="3" Count="0" />
     </LineIds>
     <LineIds Name="FB_Exec_Spindle_GCodeXYZ.CyclicLogic">
-      <LineId Id="1984" Count="83" />
+      <LineId Id="1984" Count="71" />
+      <LineId Id="2139" Count="6" />
+      <LineId Id="2059" Count="8" />
       <LineId Id="2120" Count="18" />
       <LineId Id="2079" Count="28" />
       <LineId Id="4" Count="0" />

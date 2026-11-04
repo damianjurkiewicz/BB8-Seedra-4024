@@ -18,20 +18,18 @@ VAR_INST
     machineConfig : ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF LEN(_Config.GCodePath) = 0 THEN
-    _Error := TRUE;
-    _Done := FALSE;
-    Build := FALSE;
-    RETURN;
-END_IF
-
-// Flaga wymagana przez krok 20 w FB_GantryXYZ:
-_Config.IsValid := TRUE; 
-
+        <ST><![CDATA[_Done := FALSE;
 _Error := FALSE;
-_Done := TRUE;
-_Busy := FALSE;
-Build := TRUE;]]></ST>
+
+IF LEN(_Config.GCodePath) > 0 THEN
+    _Config.IsValid := TRUE;
+    _Done           := TRUE;
+    Build           := TRUE;
+ELSE
+    _Config.IsValid := FALSE;
+    _Error          := TRUE;
+    Build           := FALSE;
+END_IF]]></ST>
       </Implementation>
     </Method>
     <Method Name="CalculateFootprint" Id="{a5920beb-a98b-4290-859c-26e1d4bce2fc}">
@@ -92,7 +90,7 @@ _Limits.Diameter.MaxVal := 600;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_GCodeUSB.Build">
-      <LineId Id="7756" Count="12" />
+      <LineId Id="7781" Count="10" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_GCodeUSB.CalculateFootprint">
