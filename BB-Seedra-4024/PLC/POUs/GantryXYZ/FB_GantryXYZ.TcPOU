@@ -283,6 +283,18 @@ IF LogTimer.Q THEN
     IF NciChannel.ChannelError THEN
         ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: NciChannel! ErrorID: %d', UDINT_TO_DINT(NciChannel.ChannelErrorId));
     END_IF
+END_IF
+
+LogTimer(IN := (SequenceState = 15), PT := T#2S);
+IF LogTimer.Q THEN
+    LogTimer(IN := FALSE);
+    
+    IF NciChannel.ChannelError THEN
+        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: NciChannel! ErrorID: %d', UDINT_TO_DINT(NciChannel.ChannelErrorId));
+    END_IF
+    IF NciChannelTangential.ChannelError THEN
+        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: NciChannelTangential! ErrorID: %d', UDINT_TO_DINT(NciChannelTangential.ChannelErrorId));
+    END_IF
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -1244,6 +1256,8 @@ END_CASE]]></ST>
       <LineId Id="220" Count="3" />
       <LineId Id="225" Count="2" />
       <LineId Id="27" Count="0" />
+      <LineId Id="246" Count="10" />
+      <LineId Id="245" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Config.Get">
       <LineId Id="2" Count="0" />

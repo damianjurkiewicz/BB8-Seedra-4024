@@ -2,7 +2,7 @@
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_UsbGCodeLoader" Id="{cad01909-dd71-4c8a-b0fa-1b12de1a4b2f}" SpecialFunc="None">
     <Declaration><![CDATA[FUNCTION_BLOCK FB_UsbGcodeLoader EXTENDS FB_CyclicFB
-VAR_INPUT
+VAR_IN_OUT
     HMI              : ST_UsbGcodeLoader_HMI;
 END_VAR
 VAR
@@ -15,6 +15,7 @@ VAR
     _Done            : BOOL; // Zmienna tylko dla tego bloku (resztę dziedziczy)
          
     _RecipeGCodeUSB  : I_RecipeBuilder;
+	_bResetChannelReq : BOOL;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -48,13 +49,15 @@ END_VAR]]></Declaration>
 IF HMI.bBtnLoad THEN
     HMI.bBtnLoad := FALSE;
          
-    IF HMI.iSelectedFile >= 0 AND HMI.iSelectedFile <= 30 AND _RecipeGCodeUSB <> 0 THEN
-        // Użycie zmiennej pomocniczej do modyfikacji struktury z interfejsu
+    // Zabezpieczenie: indeks w zakresie, nazwa niepusta i builder istnieje
+    IF HMI.iSelectedFile >= 0 AND HMI.iSelectedFile <= 30 
+       AND LEN(HMI.aFileList[HMI.iSelectedFile]) > 0 
+       AND _RecipeGCodeUSB <> 0 THEN
+
         recipeConfig := _RecipeGCodeUSB.Config;
-		recipeConfig.GCodePath := CONCAT('\Hard Disk2\', HMI.aFileList[HMI.iSelectedFile]);
+        recipeConfig.GCodePath := CONCAT('\Hard Disk2\', HMI.aFileList[HMI.iSelectedFile]);
         _RecipeGCodeUSB.Config := recipeConfig;
         
-        // Wymuszenie odświeżenia / Builda recepty, jeśli to konieczne
         _RecipeGCodeUSB.Build();
     END_IF
 END_IF
@@ -207,7 +210,9 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_UsbGCodeLoader.CyclicLogic">
-      <LineId Id="403" Count="92" />
+      <LineId Id="403" Count="0" />
+      <LineId Id="500" Count="13" />
+      <LineId Id="416" Count="79" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_UsbGCodeLoader.Done.Get">
