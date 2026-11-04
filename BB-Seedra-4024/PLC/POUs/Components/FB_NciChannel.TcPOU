@@ -26,7 +26,7 @@ VAR
     _IsProgLoaded   : BOOL;
     _IsReady		:BOOL;
 	
-
+	_bResetChannelReq : BOOL;
 
 END_VAR]]></Declaration>
     <Implementation>
@@ -92,49 +92,58 @@ stPlcToNci.ChnAxesOvr := 1000000;
 fbBuildExtGroup(tTimeOut := T#2S);
 fbUngroup(tTimeOut := T#2S);
 
-
 fbLoadProg(
     sNciToPlc := stNciToPlc, 
-    tTimeOut := T#2S
+    tTimeOut  := T#2S
 );
 
 fbStartStop(
     sNciToPlc := stNciToPlc, 
-    tTimeOut := T#2S
+    tTimeOut  := T#2S
 );
 
-fbReset(
-    sNciToPlc := stNciToPlc, 
-    tTimeOut := T#2S
-);
+// Obsługa wyzwalania resetu NCI z pełnym zboczem
+IF _bResetChannelReq THEN
+    fbReset(
+        bExecute  := TRUE, 
+        sNciToPlc := stNciToPlc, 
+        tTimeOut  := T#2S
+    );
+    IF fbReset.bBusy THEN
+        _bResetChannelReq := FALSE; // Zadanie przyjęte przez ADS w jądrze NC
+    END_IF
+ELSE
+    fbReset(
+        sNciToPlc := stNciToPlc, 
+        tTimeOut  := T#2S
+    );
+END_IF
 
 // --- AKTUALIZACJA STATUSÓW ---
-// Obsługa stanów dla tworzenia grupy
+
+// 1. Obsługa Start/Stop
 IF fbStartStop.bErr THEN
     _Error := TRUE;
     _ErrorId := fbStartStop.nErrId;
     fbStartStop(bStart := FALSE, bStop := FALSE, sNciToPlc := stNciToPlc);
 ELSIF fbStartStop.bBusy THEN
-    // Skoro kanał NCI przyjął komendę i jest zajęty, opuszczamy Start, 
-    // aby przygotować blok na kolejne uruchomienie w przyszłości
     fbStartStop(bStart := FALSE, sNciToPlc := stNciToPlc);
 ELSIF NOT fbStartStop.bBusy AND fbStartStop.bStop THEN
-    // Jak się poprawnie zatrzymał, opuszczamy flagę Stop
     fbStartStop(bStop := FALSE, sNciToPlc := stNciToPlc);
 END_IF
 
-// Obsługa stanów dla rozpinania grupy
+// 2. Obsługa rozpinania grupy (Ungroup)
 IF fbUngroup.bErr THEN
     _Error := TRUE;
     _ErrorId := fbUngroup.nErrId;
     fbUngroup(bExecute := FALSE);
-    _IsGrouped := FALSE; // W razie błędu awaryjnie zdejmujemy flagę, żeby maszyna nie utknęła na zawsze
+    _IsGrouped := FALSE;
 ELSIF fbUngroup.bBusy = FALSE AND fbUngroup.bExecute THEN
-    _IsGrouped := FALSE; // Pomyślnie rozpięto!
+    _IsGrouped := FALSE;
     fbUngroup(bExecute := FALSE);
 END_IF
 
-
+// 3. Obsługa budowania grupy (BuildGroup)
 IF fbBuildExtGroup.bErr THEN
     _Error := TRUE;
     _ErrorId := fbBuildExtGroup.nErrId;
@@ -143,21 +152,23 @@ ELSIF fbBuildExtGroup.bBusy = FALSE AND fbBuildExtGroup.bExecute THEN
     fbBuildExtGroup(bExecute := FALSE);
 END_IF
 
-// Podobnie dla ładowania programu
+// 4. Obsługa ładowania programu (LoadProgram)
 IF fbLoadProg.bErr THEN
     _Error := TRUE;
     _ErrorId := fbLoadProg.nErrId;
 ELSIF fbLoadProg.bBusy = FALSE AND fbLoadProg.bExecute THEN
     _IsProgLoaded := TRUE;
-	fbLoadProg(bExecute := FALSE, sNciToPlc := stNciToPlc);
+    fbLoadProg(bExecute := FALSE, sNciToPlc := stNciToPlc);
 END_IF
 
-// --- OBSŁUGA ZEROWANIA fbReset ---
+// 5. Obsługa zakończenia i błędów resetu kanału
+IF NOT fbReset.bBusy AND fbReset.bExecute THEN
+    fbReset(bExecute := FALSE, sNciToPlc := stNciToPlc);
+END_IF
+
 IF fbReset.bErr THEN
     _Error := TRUE;
     _ErrorId := fbReset.nErrId;
-    fbReset(bExecute := FALSE, sNciToPlc := stNciToPlc);
-ELSIF fbReset.bBusy = FALSE AND fbReset.bExecute THEN
     fbReset(bExecute := FALSE, sNciToPlc := stNciToPlc);
 END_IF]]></ST>
       </Implementation>
@@ -228,15 +239,11 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Najpierw bezwarunkowo ubijamy flagi ruchu
+        <ST><![CDATA[// Zatrzymanie programowe
 fbStartStop(bStart := FALSE, bStop := FALSE, sNciToPlc := stNciToPlc);
 
-// Następnie resetujemy sam kanał NCI
-fbReset(
-    bExecute := TRUE,
-    sNciToPlc := stNciToPlc
-);
-
+// Ustawienie flagi żądania resetu kanału
+_bResetChannelReq := TRUE;
 _Error := FALSE;
 _ErrorId := 0;]]></ST>
       </Implementation>
@@ -294,22 +301,7 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.CyclicLogic">
-      <LineId Id="7" Count="1" />
-      <LineId Id="67" Count="0" />
-      <LineId Id="94" Count="0" />
-      <LineId Id="93" Count="0" />
-      <LineId Id="9" Count="1" />
-      <LineId Id="46" Count="16" />
-      <LineId Id="27" Count="3" />
-      <LineId Id="71" Count="10" />
-      <LineId Id="69" Count="0" />
-      <LineId Id="83" Count="9" />
-      <LineId Id="82" Count="0" />
-      <LineId Id="70" Count="0" />
-      <LineId Id="68" Count="0" />
-      <LineId Id="31" Count="14" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="99" Count="7" />
+      <LineId Id="112" Count="87" />
       <LineId Id="98" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.IsGrouped.Get">
@@ -329,10 +321,8 @@ END_VAR
       <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.ResetChannel">
-      <LineId Id="12" Count="6" />
-      <LineId Id="5" Count="0" />
-      <LineId Id="23" Count="1" />
-      <LineId Id="22" Count="0" />
+      <LineId Id="49" Count="5" />
+      <LineId Id="28" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.Start">
       <LineId Id="6" Count="3" />

@@ -245,21 +245,27 @@ END_VAR]]></Declaration>
         <ST><![CDATA[CASE SequenceState OF
     0:
         NoStateTasksToComplete := FALSE;
-        SequenceState          := SequenceState + 10;
+        SequenceState          := 10;
+
     10:
-		AxisX.Reset();
-		AxisY.Reset();
-		AxisZ.Reset();
-        AxisQ.Reset(); 
-		AxisX.Axis.PlcToNc.ExtSetPos := 2;
-		AxisY.Axis.PlcToNc.ExtSetPos := 2;
-		
+        // Komendy resetu dla napędów i kanałów
+        AxisX.Reset();
+        AxisY.Reset();
+        AxisZ.Reset();
+        AxisQ.Reset();
+        AxisX.Axis.PlcToNc.ExtSetPos := 2;
+        AxisY.Axis.PlcToNc.ExtSetPos := 2;
         
         NciChannel.ResetChannel();
         NciChannelTangential.ResetChannel();
+        SequenceState := 15;
 
-		SequenceState := SequenceState + 10;
-		
+    15:
+        // Czekamy, aż jądro NCI potwierdzi skasowanie błędów w stNciToPlc
+        IF NOT NciChannel.ChannelError AND NOT NciChannelTangential.ChannelError THEN
+            SequenceState := 20;
+        END_IF
+
     20:
         StateTasksComplete := TRUE;
 END_CASE
@@ -284,18 +290,7 @@ IF LogTimer.Q THEN
         ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: NciChannel! ErrorID: %d', UDINT_TO_DINT(NciChannel.ChannelErrorId));
     END_IF
 END_IF
-
-LogTimer(IN := (SequenceState = 15), PT := T#2S);
-IF LogTimer.Q THEN
-    LogTimer(IN := FALSE);
-    
-    IF NciChannel.ChannelError THEN
-        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: NciChannel! ErrorID: %d', UDINT_TO_DINT(NciChannel.ChannelErrorId));
-    END_IF
-    IF NciChannelTangential.ChannelError THEN
-        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: NciChannelTangential! ErrorID: %d', UDINT_TO_DINT(NciChannelTangential.ChannelErrorId));
-    END_IF
-END_IF]]></ST>
+]]></ST>
       </Implementation>
     </Method>
     <Property Name="Config" Id="{ca63134f-ae96-41d5-9585-0ef3c006e9b8}" FolderPath="Properties\">
@@ -1245,19 +1240,9 @@ END_CASE]]></ST>
       <LineId Id="41" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
-      <LineId Id="182" Count="8" />
-      <LineId Id="235" Count="0" />
-      <LineId Id="237" Count="0" />
-      <LineId Id="236" Count="0" />
-      <LineId Id="191" Count="9" />
-      <LineId Id="202" Count="2" />
-      <LineId Id="209" Count="4" />
-      <LineId Id="215" Count="3" />
-      <LineId Id="220" Count="3" />
-      <LineId Id="225" Count="2" />
-      <LineId Id="27" Count="0" />
-      <LineId Id="246" Count="10" />
-      <LineId Id="245" Count="0" />
+      <LineId Id="317" Count="25" />
+      <LineId Id="284" Count="21" />
+      <LineId Id="343" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Config.Get">
       <LineId Id="2" Count="0" />
