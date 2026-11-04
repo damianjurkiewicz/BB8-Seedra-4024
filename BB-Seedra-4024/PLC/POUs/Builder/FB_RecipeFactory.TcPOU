@@ -23,6 +23,8 @@ VAR
     BuilderMeina2_2000x500    			: FB_NCIMeina2_2000x500;
 	
 	BuilderMeina2_Samples				: FB_FeedMeina2_Samples;
+	BuilderGCodeUSB						: FB_GCodeUSB;
+	
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -81,6 +83,9 @@ END_VAR]]></Declaration>
 		
 	E_RecipeID.eFeedMeina2_Samples: 
 		GetBuilder := BuilderMeina2_Samples;	
+		
+	E_RecipeId.eGCodeUSB :
+		GetBuilder := BuilderGCodeUSB;	
         
 ELSE
     GetBuilder := 0; 
@@ -173,7 +178,9 @@ BuilderMeina2_Samples.Config := Config;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.GetBuilder">
-      <LineId Id="1382" Count="50" />
+      <LineId Id="1382" Count="47" />
+      <LineId Id="1436" Count="2" />
+      <LineId Id="1430" Count="2" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.InitializeFactory">

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <DUT Name="ST_UsbGcodeLoader_HMI" Id="{4ae7ee5e-008a-494c-a459-8601df36a254}">
+    <Declaration><![CDATA[TYPE ST_UsbGcodeLoader_HMI :
+STRUCT
+    bBtnScan      : BOOL;
+    bBtnLoad      : BOOL;
+    iSelectedFile : INT;
+    aFileList     : ARRAY[0..30] OF STRING(255);
+END_STRUCT
+END_TYPE]]></Declaration>
+  </DUT>
+</TcPlcObject>

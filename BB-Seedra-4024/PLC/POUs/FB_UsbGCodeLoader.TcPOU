@@ -1,0 +1,232 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_UsbGCodeLoader" Id="{cad01909-dd71-4c8a-b0fa-1b12de1a4b2f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_UsbGcodeLoader EXTENDS FB_CyclicFB
+VAR_INPUT
+    HMI              : ST_UsbGcodeLoader_HMI;
+END_VAR
+VAR
+    fbFindFile       : FB_EnumFindFileList;
+    stFindFile       : ST_FindFileEntry;
+    nStep            : INT;
+    iFileCount       : INT;
+	sUsbPath : STRING(255) := '\Hard Disk2\*.nc'; 
+
+    _Done            : BOOL; // Zmienna tylko dla tego bloku (resztę dziedziczy)
+         
+    _RecipeGCodeUSB  : I_RecipeBuilder;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Property Name="Busy" Id="{2de0bbb7-214f-46df-a714-1666a4e29b84}">
+      <Declaration><![CDATA[PROPERTY Busy : BOOL]]></Declaration>
+      <Get Name="Get" Id="{2223317d-ce82-4697-b86c-f23673daabb7}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Busy := _Busy;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{1def1362-a956-4aa0-beb0-f33c66b1084f}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Busy := Busy;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Method Name="CyclicLogic" Id="{c00c8392-d673-4860-a014-1a09b118b28a}">
+      <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
+VAR_INST
+    recipeConfig : ST_RecipeBuilder_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[// 1. Obsługa przycisku Load (Wstrzyknięcie ścieżki do recepty)
+IF HMI.bBtnLoad THEN
+    HMI.bBtnLoad := FALSE;
+         
+    IF HMI.iSelectedFile >= 0 AND HMI.iSelectedFile <= 30 AND _RecipeGCodeUSB <> 0 THEN
+        // Użycie zmiennej pomocniczej do modyfikacji struktury z interfejsu
+        recipeConfig := _RecipeGCodeUSB.Config;
+		recipeConfig.GCodePath := CONCAT('\Hard Disk2\', HMI.aFileList[HMI.iSelectedFile]);
+        _RecipeGCodeUSB.Config := recipeConfig;
+        
+        // Wymuszenie odświeżenia / Builda recepty, jeśli to konieczne
+        _RecipeGCodeUSB.Build();
+    END_IF
+END_IF
+
+// 2. Obsługa przycisku Scan / Reload USB
+IF HMI.bBtnScan AND nStep = 0 THEN
+    HMI.bBtnScan := FALSE;
+    _Busy := TRUE;
+    _Done := FALSE;
+    _Error := FALSE;
+    nStep := 10;
+END_IF
+
+// 3. Maszyna stanów dla bloku FB_EnumFindFileList
+CASE nStep OF
+    0: // IDLE
+        ;
+    10: // INIT - Czyszczenie tablicy HMI
+        FOR iFileCount := 0 TO 30 DO
+            HMI.aFileList[iFileCount] := '';
+        END_FOR
+        iFileCount := 0;
+        fbFindFile(bExecute := FALSE);
+        nStep := 20;
+
+    20: // POBIERZ PIERWSZY PLIK
+        fbFindFile(
+            bExecute := TRUE,
+            sPathName := sUsbPath,
+            eCmd     := eEnumCmd_First,
+            pFindList:= ADR(stFindFile),
+            cbFindList:= SIZEOF(stFindFile)
+        );
+                 
+        IF NOT fbFindFile.bBusy THEN
+            IF fbFindFile.bError THEN
+                nStep := 999;
+            ELSIF NOT fbFindFile.bEOE THEN // Użycie oryginalnej właściwości Beckhoffa: bEOE (End of Enumeration)
+                HMI.aFileList[iFileCount] := stFindFile.sFileName;
+                iFileCount := iFileCount + 1;
+                fbFindFile(bExecute := FALSE);
+                nStep := 30;
+            ELSE
+                // Brak plików na USB
+                nStep := 1000;
+            END_IF
+        END_IF
+
+    30: // POBIERZ KOLEJNE PLIKI (Pętla)
+        fbFindFile(
+            bExecute := TRUE,
+            eCmd     := eEnumCmd_Next,
+            pFindList:= ADR(stFindFile),
+            cbFindList:= SIZEOF(stFindFile)
+        );
+                 
+        IF NOT fbFindFile.bBusy THEN
+            IF fbFindFile.bError THEN
+                nStep := 999;
+            ELSIF NOT fbFindFile.bEOE THEN // Użycie oryginalnej właściwości Beckhoffa: bEOE (End of Enumeration)
+                IF iFileCount <= 30 THEN
+                    HMI.aFileList[iFileCount] := stFindFile.sFileName;
+                    iFileCount := iFileCount + 1;
+                END_IF
+                fbFindFile(bExecute := FALSE);
+                // Zostajemy w kroku 30 do momentu odczytu EOF
+            ELSE
+                // Koniec plików
+                fbFindFile(bExecute := FALSE);
+                nStep := 1000;
+            END_IF
+        END_IF
+
+    999: // ERROR HANDLING
+        _Busy := FALSE;
+        _Error := TRUE;
+        nStep := 0;
+
+    1000: // ZAKOŃCZONO SUKCESEM
+        _Busy := FALSE;
+        _Done := TRUE;
+        nStep := 0;
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="Done" Id="{bf141489-879e-41e6-8477-86c32c61cf27}">
+      <Declaration><![CDATA[PROPERTY Done : BOOL]]></Declaration>
+      <Get Name="Get" Id="{54d22f7b-1a95-4c0a-8208-5575ba56eaac}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Done := _Done;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{c31598e1-8674-4149-b6ac-f3a6c81e0f7d}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Done := Done;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="Error" Id="{bcdc37fa-bbfd-43a1-a955-67ba9c4df014}">
+      <Declaration><![CDATA[PROPERTY Error : BOOL]]></Declaration>
+      <Get Name="Get" Id="{6128b1e0-e50f-4fd1-9f74-d663003c81cc}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[Error := _Error;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{ce81b19b-d013-43dd-b643-70b84691e663}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_Error := Error;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <Property Name="RecipeGCodeUSB" Id="{2115e97d-83fb-4fb6-bd0d-924e59553470}">
+      <Declaration><![CDATA[PROPERTY RecipeGCodeUSB : I_RecipeBuilder]]></Declaration>
+      <Get Name="Get" Id="{03b4cc64-5d76-415d-9660-b4a3e77d9172}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[RecipeGCodeUSB := _RecipeGCodeUSB;]]></ST>
+        </Implementation>
+      </Get>
+      <Set Name="Set" Id="{4ce47eba-2e99-4c54-a4fc-76be2f6bf277}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[_RecipeGCodeUSB := RecipeGCodeUSB;]]></ST>
+        </Implementation>
+      </Set>
+    </Property>
+    <LineIds Name="FB_UsbGCodeLoader">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UsbGCodeLoader.Busy.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UsbGCodeLoader.Busy.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UsbGCodeLoader.CyclicLogic">
+      <LineId Id="403" Count="92" />
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UsbGCodeLoader.Done.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UsbGCodeLoader.Done.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UsbGCodeLoader.Error.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UsbGCodeLoader.Error.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UsbGCodeLoader.RecipeGCodeUSB.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_UsbGCodeLoader.RecipeGCodeUSB.Set">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
