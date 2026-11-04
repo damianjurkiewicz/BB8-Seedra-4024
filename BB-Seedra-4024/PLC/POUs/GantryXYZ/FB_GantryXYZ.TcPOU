@@ -425,22 +425,23 @@ END_VAR]]></Declaration>
                 
 			20: 
 				IF _RecipeBuilder <> 0 THEN
-					
-					// Zależność dla FeedTable
 					IF _RecipeBuilder.ExecutionRoute = E_ExecutionRoute.eFeedTable THEN
 						_RecipeBuilder.GeometryWriter := ExecTangentialFeed;
 					END_IF
 					
-					// 1. PO PROSTU KAZEMY RECEPCIE PRACOWAĆ (nie sprawdzamy co zwraca funkcja!)
 					_RecipeBuilder.Build();
 					
-					// 2. SPRAWDZAMY FLAGI STANU
 					IF _RecipeBuilder.Done THEN 
-						
-						// ========================================================
-						// SUKCES - ROZWIDLENIE DLA FAZY 1
-						// ========================================================
 						localConfig := _RecipeBuilder.Config;
+						
+						// BLOKADA: Pusta lub niepoprawna recepta nie może uruchomić napędów ani NCI
+						IF NOT localConfig.IsValid THEN
+							ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: Recepta jest pusta lub niepoprawna (IsValid = FALSE)!', '');
+							RaiseAlarmWithStrings(GantryAlarms[1], 'Nie wybrano pliku programu lub wymiary sa niepoprawne!', '');
+							ChangeState(E_PMLCommand.ePMLCommand_Abort);
+							SequenceState := 999;
+							RETURN;
+						END_IF
 						
 						CASE _RecipeBuilder.ExecutionRoute OF
 							E_ExecutionRoute.ePTP:
@@ -457,25 +458,15 @@ END_VAR]]></Declaration>
 						END_CASE
 						
 					ELSIF _RecipeBuilder.Error THEN
-						
-						// ========================================================
-						// PORAŻKA 
-						// ========================================================
 						ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: Krok 20 - Recepta zglosila ERROR!', '');
-						RaiseAlarmWithStrings(GantryAlarms[1], 'Blad budowania recepty! Sprawdz wymiary z HMI.', '');
+						RaiseAlarmWithStrings(GantryAlarms[1], 'Blad budowania recepty!', '');
 						ChangeState(E_PMLCommand.ePMLCommand_Abort);
 						SequenceState := 999;
-			
 					END_IF
-					// Jeśli nie jest ani Done, ani Error, to maszyna po prostu nic nie robi 
-					// i przechodzi do następnego cyklu PLC, dając recepcie czas na pracę (bo flaga _Busy jest aktywna).
-			
-				ELSE
-					// Brak buildera = zły numer programu
-					ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: BLAD KRYTYCZNY! Brak obiektu _RecipeBuilder.', '');
-					ChangeState(E_PMLCommand.ePMLCommand_Abort);
-					SequenceState := 999;
-				END_IF
+					ELSE
+						ChangeState(E_PMLCommand.ePMLCommand_Abort);
+						SequenceState := 999;
+					END_IF
 
             // ========================================================
             // FAZA 1: NARZĘDZIE GŁÓWNE
@@ -1298,7 +1289,7 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
       <LineId Id="750" Count="13" />
-      <LineId Id="1044" Count="51" />
+      <LineId Id="1122" Count="42" />
       <LineId Id="794" Count="40" />
       <LineId Id="1118" Count="0" />
       <LineId Id="1099" Count="0" />

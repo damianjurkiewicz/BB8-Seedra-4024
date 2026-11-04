@@ -156,6 +156,7 @@ END_IF
 IF fbLoadProg.bErr THEN
     _Error := TRUE;
     _ErrorId := fbLoadProg.nErrId;
+	fbLoadProg(bExecute := FALSE, sNciToPlc := stNciToPlc);
 ELSIF fbLoadProg.bBusy = FALSE AND fbLoadProg.bExecute THEN
     _IsProgLoaded := TRUE;
     fbLoadProg(bExecute := FALSE, sNciToPlc := stNciToPlc);
@@ -301,7 +302,9 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.CyclicLogic">
-      <LineId Id="112" Count="87" />
+      <LineId Id="112" Count="73" />
+      <LineId Id="200" Count="0" />
+      <LineId Id="186" Count="13" />
       <LineId Id="98" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.IsGrouped.Get">

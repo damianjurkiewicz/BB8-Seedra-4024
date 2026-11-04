@@ -18,7 +18,18 @@ VAR_INST
     machineConfig : ST_GantryXYZ_Config;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_Config.IsValid := (LEN(_Config.GCodePath) > 0);
+        <ST><![CDATA[IF LEN(_Config.GCodePath) = 0 THEN
+    _Config.IsValid := FALSE;
+    _Busy := FALSE;
+    _Error := TRUE;
+    _Done := FALSE;
+    Build := FALSE;
+    RETURN;
+END_IF
+
+_Config.IsValid := TRUE;
+_Busy := FALSE;
+_Error := FALSE;
 _Done := TRUE; 
 Build := TRUE;]]></ST>
       </Implementation>
@@ -81,7 +92,7 @@ _Limits.Diameter.MaxVal := 600;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_GCodeUSB.Build">
-      <LineId Id="7701" Count="1" />
+      <LineId Id="7712" Count="12" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_GCodeUSB.CalculateFootprint">
