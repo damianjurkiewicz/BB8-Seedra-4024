@@ -17,6 +17,9 @@ VAR
          
     _RecipeGCodeUSB  : I_RecipeBuilder;
 	_bResetChannelReq : BOOL;
+	
+	fbScanTimer      : TON;
+    aTempFileList    : ARRAY [0..30] OF STRING(255);
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -44,15 +47,15 @@ END_VAR
       <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
 VAR_INST
     iLastSelectedFile : INT := -1;
+    sLastSelectedFile : STRING(255) := '';
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// 1. Obsługa przycisku Load (Wstrzyknięcie ścieżki do recepty)
-IF HMI.bBtnLoad AND nStep = 0 THEN
-    HMI.bBtnLoad := FALSE;
-    iLastSelectedFile := HMI.iSelectedFile; 
+        <ST><![CDATA[// 1. Automatyczne ładowanie po zmianie wyboru LUB po aktualizacji listy po włożeniu USB
+IF (HMI.iSelectedFile <> iLastSelectedFile OR HMI.aFileList[HMI.iSelectedFile] <> sLastSelectedFile) AND nStep = 0 THEN
+    iLastSelectedFile := HMI.iSelectedFile;
+    sLastSelectedFile := HMI.aFileList[HMI.iSelectedFile];
     
     IF HMI.iSelectedFile >= 0 AND HMI.iSelectedFile <= 30 AND _RecipeGCodeUSB <> 0 THEN
-        
         IF LEN(HMI.aFileList[HMI.iSelectedFile]) > 0 THEN
             RecipeConfig.GCodePath := CONCAT('\Hard Disk2\', HMI.aFileList[HMI.iSelectedFile]);
         ELSE
@@ -64,22 +67,22 @@ IF HMI.bBtnLoad AND nStep = 0 THEN
     END_IF
 END_IF
 
-// 2. Obsługa przycisku Scan / Reload USB
-IF HMI.bBtnScan AND nStep = 0 THEN
-    HMI.bBtnScan := FALSE;
+// 2. Cykliczne skanowanie USB co 3 sekundy
+fbScanTimer(IN := (nStep = 0), PT := T#3S);
+IF fbScanTimer.Q THEN
     _Busy := TRUE;
     _Done := FALSE;
     _Error := FALSE;
     nStep := 10;
 END_IF
 
-// 3. Maszyna stanów dla bloku FB_EnumFindFileList
+// 3. Maszyna stanów skanująca katalog (do tablicy tymczasowej)
 CASE nStep OF
     0: // IDLE
         ;
-    10: // INIT - Czyszczenie tablicy HMI
+    10: // INIT - Czyszczenie tablicy tymczasowej (Combobox w HMI zostaje nienaruszony)
         FOR iFileCount := 0 TO 30 DO
-            HMI.aFileList[iFileCount] := '';
+            aTempFileList[iFileCount] := '';
         END_FOR
         iFileCount := 0;
         fbFindFile(bExecute := FALSE);
@@ -97,18 +100,17 @@ CASE nStep OF
         IF NOT fbFindFile.bBusy THEN
             IF fbFindFile.bError THEN
                 nStep := 999;
-            ELSIF NOT fbFindFile.bEOE THEN // Użycie oryginalnej właściwości Beckhoffa: bEOE (End of Enumeration)
-                HMI.aFileList[iFileCount] := stFindFile.sFileName;
+            ELSIF NOT fbFindFile.bEOE THEN 
+                aTempFileList[iFileCount] := stFindFile.sFileName;
                 iFileCount := iFileCount + 1;
                 fbFindFile(bExecute := FALSE);
                 nStep := 30;
             ELSE
-                // Brak plików na USB
-                nStep := 1000;
+                nStep := 1000; // Brak plików
             END_IF
         END_IF
 
-    30: // POBIERZ KOLEJNE PLIKI (Pętla)
+    30: // POBIERZ KOLEJNE PLIKI
         fbFindFile(
             bExecute := TRUE,
             eCmd     := eEnumCmd_Next,
@@ -119,15 +121,13 @@ CASE nStep OF
         IF NOT fbFindFile.bBusy THEN
             IF fbFindFile.bError THEN
                 nStep := 999;
-            ELSIF NOT fbFindFile.bEOE THEN // Użycie oryginalnej właściwości Beckhoffa: bEOE (End of Enumeration)
+            ELSIF NOT fbFindFile.bEOE THEN 
                 IF iFileCount <= 30 THEN
-                    HMI.aFileList[iFileCount] := stFindFile.sFileName;
+                    aTempFileList[iFileCount] := stFindFile.sFileName;
                     iFileCount := iFileCount + 1;
                 END_IF
                 fbFindFile(bExecute := FALSE);
-                // Zostajemy w kroku 30 do momentu odczytu EOF
             ELSE
-                // Koniec plików
                 fbFindFile(bExecute := FALSE);
                 nStep := 1000;
             END_IF
@@ -138,7 +138,8 @@ CASE nStep OF
         _Error := TRUE;
         nStep := 0;
 
-    1000: // ZAKOŃCZONO SUKCESEM
+    1000: // ZAKOŃCZONO SUKCESEM - Szybkie przepisanie całej tablicy do HMI
+        HMI.aFileList := aTempFileList;
         _Busy := FALSE;
         _Done := TRUE;
         nStep := 0;
@@ -212,9 +213,7 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_UsbGCodeLoader.CyclicLogic">
-      <LineId Id="617" Count="0" />
-      <LineId Id="593" Count="23" />
-      <LineId Id="425" Count="70" />
+      <LineId Id="625" Count="92" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_UsbGCodeLoader.Done.Get">
