@@ -21,8 +21,12 @@ VAR
 	sLastMessageText : STRING;
 	bReqText : BOOL;
 	
-	aAlarmHistory : ARRAY[1..MAX_ALARMS_HISTORY] OF STRING;
+	aAlarmHistory : ARRAY[1..MAX_ALARMS_HISTORY] OF ST_AlarmHistoryEntry;
     i : INT;
+    
+    // Zmienne tymczasowe, czekające na pobranie tekstu
+    nTempTimestamp : ULINT;
+    eTempSeverity  : TcEventSeverity;
 END_VAR
 VAR CONSTANT
     MAX_ALARMS_HISTORY : INT := 20; // Rozmiar tablicy (np. 20 ostatnich alarmów)
@@ -36,25 +40,30 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[Execute := SUPER^.Execute(); //retrieve events[cite: 2]
+        <ST><![CDATA[Execute := SUPER^.Execute(); //retrieve events
 
-//retrieve the text of a message[cite: 2]
-IF  bReqText AND fbRequestEventText.bError THEN 
-    sLastMessageText := 'Error';
-    bReqText := FALSE; 
-ELSIF bReqText AND NOT  fbRequestEventText.bBusy THEN
-    // Pobranie najnowszego tekstu alarmu[cite: 2]
-    fbRequestEventText.GetString(sLastMessageText, SIZEOF(sLastMessageText));
-    bReqText := FALSE;
+// Zmodyfikowany kod odbioru tekstu
+IF bReqText AND NOT fbRequestEventText.bBusy THEN
     
-    // --- NOWY KOD: Zapis do historii (najnowszy wskakuje na indeks 1) ---
+    // 1. Odbierz tekst lub ustaw błąd
+    IF fbRequestEventText.bError THEN 
+        sLastMessageText := 'Error retrieving text';
+    ELSE
+        fbRequestEventText.GetString(sLastMessageText, SIZEOF(sLastMessageText));
+    END_IF
+    
+    bReqText := FALSE; 
+    
+    // 2. Przesuń starsze alarmy w tablicy (zwolnij indeks 1)
     FOR i := MAX_ALARMS_HISTORY TO 2 BY -1 DO
         aAlarmHistory[i] := aAlarmHistory[i-1];
     END_FOR
     
-    // Zapisz aktualnie odczytany tekst na pierwszym miejscu
-    aAlarmHistory[1] := sLastMessageText;
-    
+    // 3. Wpisz najnowszy alarm na indeks 1
+    aAlarmHistory[1].sMessageText := sLastMessageText;
+    aAlarmHistory[1].nTimestamp   := nTempTimestamp;
+    aAlarmHistory[1].eSeverity    := eTempSeverity;
+
 END_IF]]></ST>
       </Implementation>
     </Method>
@@ -87,14 +96,20 @@ OnAlarmConfirmed := S_OK; // in order to receive more callbacks (Set <> S_OK in 
     <Method Name="OnAlarmRaised" Id="{1df5b803-888d-4d2d-ab12-93687f9c1a1e}">
       <Declaration><![CDATA[METHOD OnAlarmRaised : HRESULT
 VAR_INPUT
-	fbEvent : REFERENCE TO FB_TcEvent;
-END_VAR
-]]></Declaration>
+    fbEvent : REFERENCE TO FB_TcEvent;
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[hr := fbEvent.GetJsonAttribute(sJsonAttribute, SIZEOF(sJsonAttribute));
+        <ST><![CDATA[
+
+// Wewnątrz metody:
+hr := fbEvent.GetJsonAttribute(sJsonAttribute, SIZEOF(sJsonAttribute));
 nCntAlarmsRaised := nCntAlarmsRaised + 1;
 
-OnAlarmRaised := S_OK; // in order to receive more callbacks (Set <> S_OK in order to cancel the callbacks for this program cycle.)
+// --- ZAPISZ DANE DO ZMIENNYCH TYMCZASOWYCH ---
+nTempTimestamp := fbEvent.nTimestamp;
+eTempSeverity  := fbEvent.eSeverity;
+
+OnAlarmRaised := S_OK; 
 fbRequestEventText.Request(eventClass := fbEvent.EventClass, nEventId := fbEvent.nEventId,
                            nLangId := TcLcid.en_US, ipArgs := fbEvent.ipArguments);
 bReqText := TRUE;]]></ST>
@@ -112,6 +127,9 @@ END_VAR]]></Declaration>
         <ST><![CDATA[hr := fbEvent.GetJsonAttribute(sJsonAttribute, SIZEOF(sJsonAttribute));
 nCntMessagesSent := nCntMessagesSent + 1;
 
+nTempTimestamp := fbEvent.nTimestamp;
+eTempSeverity  := fbEvent.eSeverity;
+
 fbRequestEventText.Request(eventClass:=fbEvent.EventClass, nEventId:=fbEvent.nEventId, nLangId:=TcLcid.en_US, ipArgs:=fbEvent.ipArguments );
 bReqText := TRUE;
 
@@ -123,7 +141,7 @@ OnMessageSent := S_OK; // in order to receive more callbacks (Set <> S_OK in ord
       <LineId Id="59" Count="0" />
     </LineIds>
     <LineIds Name="FB_SampleListener.Execute">
-      <LineId Id="20" Count="18" />
+      <LineId Id="42" Count="23" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_SampleListener.OnAlarmCleared">
@@ -139,16 +157,15 @@ OnMessageSent := S_OK; // in order to receive more callbacks (Set <> S_OK in ord
       <LineId Id="13" Count="0" />
     </LineIds>
     <LineIds Name="FB_SampleListener.OnAlarmRaised">
-      <LineId Id="6" Count="0" />
-      <LineId Id="11" Count="0" />
-      <LineId Id="17" Count="0" />
-      <LineId Id="16" Count="0" />
-      <LineId Id="23" Count="1" />
+      <LineId Id="32" Count="12" />
       <LineId Id="18" Count="0" />
     </LineIds>
     <LineIds Name="FB_SampleListener.OnMessageSent">
       <LineId Id="6" Count="0" />
       <LineId Id="10" Count="0" />
+      <LineId Id="47" Count="0" />
+      <LineId Id="49" Count="0" />
+      <LineId Id="48" Count="0" />
       <LineId Id="32" Count="0" />
       <LineId Id="24" Count="0" />
       <LineId Id="14" Count="0" />
