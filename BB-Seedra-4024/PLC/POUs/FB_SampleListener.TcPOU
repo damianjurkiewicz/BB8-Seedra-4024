@@ -20,8 +20,13 @@ VAR
 	{attribute 'TcEncoding':='UTF-8'}
 	sLastMessageText : STRING;
 	bReqText : BOOL;
+	
+	aAlarmHistory : ARRAY[1..MAX_ALARMS_HISTORY] OF STRING;
+    i : INT;
 END_VAR
-]]></Declaration>
+VAR CONSTANT
+    MAX_ALARMS_HISTORY : INT := 20; // Rozmiar tablicy (np. 20 ostatnich alarmów)
+END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
     </Implementation>
@@ -31,18 +36,26 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[Execute := SUPER^.Execute(); //retrieve events
+        <ST><![CDATA[Execute := SUPER^.Execute(); //retrieve events[cite: 2]
 
-//retrieve the text of a message
-IF 	bReqText AND fbRequestEventText.bError THEN 
-	sLastMessageText := 'Error';
-	bReqText := FALSE; 
+//retrieve the text of a message[cite: 2]
+IF  bReqText AND fbRequestEventText.bError THEN 
+    sLastMessageText := 'Error';
+    bReqText := FALSE; 
 ELSIF bReqText AND NOT  fbRequestEventText.bBusy THEN
-	fbRequestEventText.GetString(sLastMessageText, SIZEOF(sLastMessageText));
-	bReqText := FALSE;
-END_IF
-
-]]></ST>
+    // Pobranie najnowszego tekstu alarmu[cite: 2]
+    fbRequestEventText.GetString(sLastMessageText, SIZEOF(sLastMessageText));
+    bReqText := FALSE;
+    
+    // --- NOWY KOD: Zapis do historii (najnowszy wskakuje na indeks 1) ---
+    FOR i := MAX_ALARMS_HISTORY TO 2 BY -1 DO
+        aAlarmHistory[i] := aAlarmHistory[i-1];
+    END_FOR
+    
+    // Zapisz aktualnie odczytany tekst na pierwszym miejscu
+    aAlarmHistory[1] := sLastMessageText;
+    
+END_IF]]></ST>
       </Implementation>
     </Method>
     <Method Name="OnAlarmCleared" Id="{036602cd-44fc-40d2-99e6-e6b033452290}">
@@ -110,7 +123,7 @@ OnMessageSent := S_OK; // in order to receive more callbacks (Set <> S_OK in ord
       <LineId Id="59" Count="0" />
     </LineIds>
     <LineIds Name="FB_SampleListener.Execute">
-      <LineId Id="6" Count="10" />
+      <LineId Id="20" Count="18" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_SampleListener.OnAlarmCleared">
