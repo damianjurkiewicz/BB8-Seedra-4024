@@ -15,6 +15,8 @@ VAR
 	
 	fbListenerFilter : FB_TcEventFilter; 
 	fbMessageListener : FB_SampleListener;
+	
+
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -23,8 +25,9 @@ END_VAR
 
 IF bSubscribe THEN
     bSubscribe := FALSE;
-    fbListenerFilter.Clear().EventClass.EqualTo(TC_EVENTS.Seedra.AlarmMessage.uuidEventClass);
-    hr := fbMessageListener.Subscribe2(fbListenerFilter);
+	fbListenerFilter.Clear().Severity.GreaterThan(0);
+
+hr := fbMessageListener.Subscribe2(fbListenerFilter);
     bSubscribed := fbMessageListener.bSubscribed;
 END_IF
 
@@ -39,8 +42,10 @@ END_IF
     <LineIds Name="FB_ListenerTest">
       <LineId Id="82" Count="1" />
       <LineId Id="127" Count="0" />
-      <LineId Id="190" Count="2" />
-      <LineId Id="199" Count="1" />
+      <LineId Id="232" Count="1" />
+      <LineId Id="247" Count="0" />
+      <LineId Id="244" Count="0" />
+      <LineId Id="235" Count="1" />
       <LineId Id="131" Count="1" />
       <LineId Id="41" Count="4" />
       <LineId Id="133" Count="0" />
