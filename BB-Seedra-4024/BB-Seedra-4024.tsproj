@@ -3436,7 +3436,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{C3C0D838-B99D-A382-0C9D-12BBFB37907D}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{0699BDA7-A302-7819-8B86-47A04092FFC2}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
@@ -3466,11 +3466,11 @@ External Setpoint Generation:
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>IO.ProximitySensorY</Name>
+							<Name>IO.ProximitySensorZ</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>
-							<Name>IO.ProximitySensorZ</Name>
+							<Name>IO.ProximitySensorY</Name>
 							<Type>BOOL</Type>
 						</Var>
 						<Var>

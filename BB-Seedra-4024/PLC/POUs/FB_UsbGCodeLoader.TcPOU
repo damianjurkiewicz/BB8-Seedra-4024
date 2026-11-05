@@ -4,21 +4,24 @@
     <Declaration><![CDATA[FUNCTION_BLOCK FB_UsbGcodeLoader EXTENDS FB_CyclicFB
 VAR_IN_OUT
     HMI              : ST_UsbGcodeLoader_HMI;
-	RecipeConfig : ST_RecipeBuilder_Config; // <--- DODANO
+    RecipeConfig     : ST_RecipeBuilder_Config; 
+END_VAR
+VAR_OUTPUT
+    bUsbPresent      : BOOL; // Zamiast Erroru, po prostu flaga obecności
 END_VAR
 VAR
     fbFindFile       : FB_EnumFindFileList;
     stFindFile       : ST_FindFileEntry;
     nStep            : INT;
     iFileCount       : INT;
-	sUsbPath : STRING(255) := '\Hard Disk2\*.nc'; 
+    sUsbPath         : STRING(255) := '\Hard Disk2\*.nc'; 
 
-    _Done            : BOOL; // Zmienna tylko dla tego bloku (resztę dziedziczy)
+    _Done            : BOOL; 
          
     _RecipeGCodeUSB  : I_RecipeBuilder;
-	_bResetChannelReq : BOOL;
-	
-	fbScanTimer      : TON;
+    _bResetChannelReq: BOOL;
+    
+    fbScanTimer      : TON;
     aTempFileList    : ARRAY [0..30] OF STRING(255);
 END_VAR]]></Declaration>
     <Implementation>
@@ -50,7 +53,7 @@ VAR_INST
     sLastSelectedFile : STRING(255) := '';
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// 1. Automatyczne ładowanie po zmianie wyboru LUB po aktualizacji listy po włożeniu USB
+        <ST><![CDATA[// 1. Automatyczne ładowanie do recepty po zmianie wyboru
 IF (HMI.iSelectedFile <> iLastSelectedFile OR HMI.aFileList[HMI.iSelectedFile] <> sLastSelectedFile) AND nStep = 0 THEN
     iLastSelectedFile := HMI.iSelectedFile;
     sLastSelectedFile := HMI.aFileList[HMI.iSelectedFile];
@@ -67,7 +70,7 @@ IF (HMI.iSelectedFile <> iLastSelectedFile OR HMI.aFileList[HMI.iSelectedFile] <
     END_IF
 END_IF
 
-// 2. Cykliczne skanowanie USB co 3 sekundy
+// 2. Cykliczne skanowanie USB w tle co 3 sekundy
 fbScanTimer(IN := (nStep = 0), PT := T#3S);
 IF fbScanTimer.Q THEN
     _Busy := TRUE;
@@ -76,11 +79,11 @@ IF fbScanTimer.Q THEN
     nStep := 10;
 END_IF
 
-// 3. Maszyna stanów skanująca katalog (do tablicy tymczasowej)
+// 3. Maszyna stanów do skanowania katalogu
 CASE nStep OF
     0: // IDLE
         ;
-    10: // INIT - Czyszczenie tablicy tymczasowej (Combobox w HMI zostaje nienaruszony)
+    10: // INIT - Czyszczenie tylko tablicy tymczasowej
         FOR iFileCount := 0 TO 30 DO
             aTempFileList[iFileCount] := '';
         END_FOR
@@ -90,12 +93,8 @@ CASE nStep OF
 
     20: // POBIERZ PIERWSZY PLIK
         fbFindFile(
-            bExecute := TRUE,
-            sPathName := sUsbPath,
-            eCmd     := eEnumCmd_First,
-            pFindList:= ADR(stFindFile),
-            cbFindList:= SIZEOF(stFindFile)
-        );
+            bExecute := TRUE, sPathName := sUsbPath, eCmd := eEnumCmd_First, 
+            pFindList:= ADR(stFindFile), cbFindList:= SIZEOF(stFindFile));
                  
         IF NOT fbFindFile.bBusy THEN
             IF fbFindFile.bError THEN
@@ -106,17 +105,15 @@ CASE nStep OF
                 fbFindFile(bExecute := FALSE);
                 nStep := 30;
             ELSE
-                nStep := 1000; // Brak plików
+                fbFindFile(bExecute := FALSE);
+                nStep := 1000;
             END_IF
         END_IF
 
     30: // POBIERZ KOLEJNE PLIKI
         fbFindFile(
-            bExecute := TRUE,
-            eCmd     := eEnumCmd_Next,
-            pFindList:= ADR(stFindFile),
-            cbFindList:= SIZEOF(stFindFile)
-        );
+            bExecute := TRUE, eCmd := eEnumCmd_Next, 
+            pFindList:= ADR(stFindFile), cbFindList:= SIZEOF(stFindFile));
                  
         IF NOT fbFindFile.bBusy THEN
             IF fbFindFile.bError THEN
@@ -138,11 +135,24 @@ CASE nStep OF
         _Error := TRUE;
         nStep := 0;
 
-    1000: // ZAKOŃCZONO SUKCESEM - Szybkie przepisanie całej tablicy do HMI
-        HMI.aFileList := aTempFileList;
-        _Busy := FALSE;
-        _Done := TRUE;
-        nStep := 0;
+    1000: // ZAKOŃCZONO SUKCESEM
+        HMI.aFileList := aTempFileList; 
+        
+        IF iFileCount = 0 THEN
+            bUsbPresent := FALSE; 
+            RecipeConfig.GCodePath := ''; // Brak plików - zerowanie ścieżki (brak możliwości odpalenia produkcji)
+            IF _RecipeGCodeUSB <> 0 THEN
+                _RecipeGCodeUSB.Config := RecipeConfig;
+                _RecipeGCodeUSB.Build(); 
+            END_IF
+        ELSE
+            bUsbPresent := TRUE; 
+        END_IF
+        
+        _Error := FALSE;
+        _Done  := TRUE;
+        _Busy  := FALSE;
+        nStep  := 0;
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -213,7 +223,7 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_UsbGCodeLoader.CyclicLogic">
-      <LineId Id="625" Count="92" />
+      <LineId Id="726" Count="99" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_UsbGCodeLoader.Done.Get">

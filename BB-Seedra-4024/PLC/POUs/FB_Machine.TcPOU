@@ -26,7 +26,10 @@ VAR
 	sSelectedRecipeName : STRING(50);
 	aRecipeNames : ARRAY[0..30] OF STRING(50);
 	
-	UsbLoader        : FB_UsbGCodeLoader;
+	UsbLoader       : FB_UsbGCodeLoader;
+	fbFileCopy      : FB_FileCopy;
+    fbFileDelete    : FB_FileDelete;
+    sLocalGCodePath : STRING(255) := '\Hard Disk\ActiveGCode.nc'; // Kopia na dysku PLC
 
 
 END_VAR
@@ -41,34 +44,74 @@ END_VAR
     </Implementation>
     <Folder Name="States" Id="{70644f5e-d79a-440d-8d18-4948c059f975}" />
     <Method Name="Clearing" Id="{309e3014-c1be-40c6-8306-4211d554a87f}" FolderPath="States\">
-      <Declaration><![CDATA[
-METHOD PROTECTED Clearing
+      <Declaration><![CDATA[METHOD PROTECTED Clearing
 VAR
-	i				: UDINT;
-	SubModulesReady : BOOL := TRUE;
-END_VAR
-
-]]></Declaration>
+    i               : UDINT;
+    SubModulesReady : BOOL := TRUE;
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE SequenceState OF
+        <ST><![CDATA[
+//---
+CASE SequenceState OF
     0:
         NoStateTasksToComplete := FALSE;
-        SequenceState          := SequenceState + 10;
+        SequenceState          := 10;
     10:
-		//Leave Aborted thanks to this
-		MachineAlarms[E_Seedra.EmergencyStop].Clear(0, 0);
-        SequenceState := SequenceState + 10;
+        MachineAlarms[E_Seedra.EmergencyStop].Clear(0, 0);
+        
+        // Zawsze profilaktycznie czyść dysk po awarii
+        fbFileDelete(bExecute := FALSE);
+        SequenceState := 20;
     20:
-		IF ResetSafety() THEN
-			SequenceState := SequenceState + 10;		
-		END_IF	
-
-	30:
-		StateTasksComplete := TRUE; 
-			 
+        fbFileDelete(sNetId := '', sPathName := sLocalGCodePath, bExecute := TRUE, tTimeout := T#3S);
+        IF NOT fbFileDelete.bBusy THEN
+            fbFileDelete(bExecute := FALSE);
+            SequenceState := 30;
+        END_IF
+    30:
+        IF ResetSafety() THEN
+            SequenceState := 40;        
+        END_IF  
+    40:
+        StateTasksComplete := TRUE; 
+             
 END_CASE
 
 SUPER^.Clearing();]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="Completing" Id="{cf7cd318-7c54-49ac-87e8-6d8e7e6aa4b7}" FolderPath="States\">
+      <Declaration><![CDATA[METHOD PROTECTED Completing
+VAR
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[
+//---
+CASE _CurrentMode OF
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        CASE SequenceState OF
+            0:
+                NoStateTasksToComplete := FALSE;
+                IF GantryXYZ.ProgramIdRequested = E_RecipeID.eGCodeUSB THEN
+                    fbFileDelete(bExecute := FALSE);
+                    SequenceState := 10;
+                ELSE
+                    StateTasksComplete := TRUE;
+                END_IF
+                
+            10:
+                fbFileDelete(sNetId := '', sPathName := sLocalGCodePath, bExecute := TRUE, tTimeout := T#3S);
+                IF NOT fbFileDelete.bBusy THEN
+                    fbFileDelete(bExecute := FALSE);
+                    StateTasksComplete := TRUE; 
+                END_IF
+        END_CASE
+
+    E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+        StateTasksComplete := TRUE;
+END_CASE
+
+SUPER^.Completing();]]></ST>
       </Implementation>
     </Method>
     <Method Name="CreateEvents" Id="{30d2271a-6055-0dca-0156-9f862888fbc8}">
@@ -483,6 +526,71 @@ END_CASE
 SUPER^.Resetting();]]></ST>
       </Implementation>
     </Method>
+    <Method Name="Starting" Id="{d429143e-af48-42c9-a94c-a9e3899fb208}" FolderPath="States\">
+      <Declaration><![CDATA[// This method contains code which will execute when this PackML module is in the Starting state
+METHOD PROTECTED Starting
+VAR
+	i				: UDINT;
+	SubModulesReady : BOOL := TRUE;
+	TempBuilder : I_RecipeBuilder;
+	RecipeBuilderConfig  : ST_RecipeBuilder_Config;
+END_VAR
+
+// This method is called as required by StateControl()
+]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[CASE _CurrentMode OF
+    E_PMLUnitMode.ePMLUnitMode_Production:
+        CASE SequenceState OF
+            0:
+                NoStateTasksToComplete := FALSE;
+                // Kopiuj plik tylko gdy pracujemy na USB i mamy podaną ścieżkę
+                IF GantryXYZ.ProgramIdRequested = E_RecipeID.eGCodeUSB AND LEN(RecipeConfig_HMI.Config.GCodePath) > 0 THEN
+                    fbFileCopy(bExecute := FALSE);
+                    SequenceState := 10;
+                ELSE
+                    StateTasksComplete := TRUE;
+                END_IF
+                
+            10:
+                // Wykorzystujemy nasz nowo dodany blok FB_FileCopy
+                fbFileCopy(
+                    sSrcNetId := '', 
+                    sSrcPathName := RecipeConfig_HMI.Config.GCodePath, // Z pendrive'a
+                    sDestNetId := '', 
+                    sDestPathName := sLocalGCodePath,                  // Na wbudowany dysk PLC
+                    bExecute := TRUE, 
+                    tTimeOut := T#20S // Zwiększony czas dla dużych plików
+                );
+                
+                IF NOT fbFileCopy.bBusy THEN
+                    fbFileCopy(bExecute := FALSE);
+                    
+                    IF NOT fbFileCopy.bError THEN
+                        // --- POPRAWKA TUTAJ ---
+                        TempBuilder := RecipeFactory.GetBuilder(E_RecipeID.eGCodeUSB);
+                        IF TempBuilder <> 0 THEN
+                            RecipeBuilderConfig := TempBuilder.Config;         // 1. Zrzut do zmiennej pomocniczej
+                            RecipeBuilderConfig.GCodePath := sLocalGCodePath;  // 2. Modyfikacja parametru
+                            TempBuilder.Config := RecipeBuilderConfig;         // 3. Zapis całości z powrotem do recepty
+                        END_IF
+                        // ----------------------
+                        
+                        StateTasksComplete := TRUE;
+                    ELSE
+                        // Kopiowanie się nie udało 
+                        THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                    END_IF
+                END_IF
+        END_CASE
+
+    E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
+        StateTasksComplete := TRUE;
+END_CASE
+
+SUPER^.Starting();]]></ST>
+      </Implementation>
+    </Method>
     <Method Name="SubModuleMonitor" Id="{05824ff8-f244-497a-8a5d-923cd9a5fc87}">
       <Declaration><![CDATA[//! @summary This method monitors <b>submodules</b> within this PackML module and initiates fault responses as required
 METHOD PROTECTED SubModuleMonitor : BOOL
@@ -538,18 +646,12 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Clearing">
-      <LineId Id="28" Count="4" />
-      <LineId Id="34" Count="0" />
-      <LineId Id="72" Count="0" />
-      <LineId Id="35" Count="1" />
-      <LineId Id="80" Count="1" />
-      <LineId Id="57" Count="0" />
-      <LineId Id="64" Count="0" />
-      <LineId Id="62" Count="0" />
-      <LineId Id="60" Count="0" />
-      <LineId Id="59" Count="0" />
-      <LineId Id="48" Count="1" />
+      <LineId Id="118" Count="26" />
       <LineId Id="27" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.Completing">
+      <LineId Id="37" Count="25" />
+      <LineId Id="10" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.CreateEvents">
       <LineId Id="3" Count="4" />
@@ -683,6 +785,10 @@ END_IF]]></ST>
       <LineId Id="27" Count="0" />
       <LineId Id="78" Count="0" />
       <LineId Id="62" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_Machine.Starting">
+      <LineId Id="160" Count="48" />
+      <LineId Id="10" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.SubModuleMonitor">
       <LineId Id="10" Count="37" />
