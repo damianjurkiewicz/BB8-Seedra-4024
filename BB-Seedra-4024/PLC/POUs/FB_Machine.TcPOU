@@ -293,6 +293,8 @@ aRecipeNames[E_RecipeID.eGCodeUSB] 						:= 'GCodeUSB';
 
 sSelectedRecipeName := aRecipeNames[GantryXYZ.ProgramIdRequested];
 
+Machine_HMI.aAlarmHistory := fbListenerTest.fbMessageListener.aAlarmHistory;
+
 SUPER^.HMICommunication();]]></ST>
       </Implementation>
     </Method>
@@ -708,6 +710,7 @@ END_IF]]></ST>
       <LineId Id="108" Count="0" />
       <LineId Id="67" Count="0" />
       <LineId Id="61" Count="0" />
+      <LineId Id="139" Count="1" />
       <LineId Id="10" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>

@@ -6,6 +6,7 @@
         //Config  	: ST_Machine_Config;
 		Status 		: ST_Machine_Status;
 		//Command 	: ST_Machine_Command;
+		aAlarmHistory : ARRAY[1..20] OF ST_AlarmHistoryEntry;
     END_STRUCT
 END_TYPE]]></Declaration>
   </DUT>
