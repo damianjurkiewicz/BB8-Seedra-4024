@@ -288,12 +288,20 @@ aRecipeNames[E_RecipeID.eNCIMeina2_1000x1000]    		:= 'Meina Squares 1000x1000';
 aRecipeNames[E_RecipeID.eFeedMeina2_1000x1000_Circles]  := 'Meina Circles 1000x1000';
 aRecipeNames[E_RecipeID.eFeedMeina2_2000x500] 			:= 'Meina Rectangles 2000x500';
 aRecipeNames[E_RecipeID.eFeedMeina2_Samples] 			:= 'Meina Samples';
-aRecipeNames[E_RecipeID.eGCodeUSB] 						:= 'GCodeUSB';
+aRecipeNames[E_RecipeID.eGCodeUSB] 						:= 'USB Drive';
 
 
 sSelectedRecipeName := aRecipeNames[GantryXYZ.ProgramIdRequested];
 
 Machine_HMI.aAlarmHistory := fbListenerTest.fbMessageListener.aAlarmHistory;
+
+IF GantryXYZ.ProgramIdRequested = E_RecipeID.eGCodeUSB THEN
+    // Warunek dla programu GCode z USB: brak pendrive'a LUB nieprawidłowa recepta
+    Machine_HMI.Status.bDisableStartButton := NOT UsbLoader.bUsbPresent OR NOT RecipeConfig_HMI.Config.IsValid;
+ELSE
+    // Warunek dla każdego innego programu (np. Arona, Borgo Flaps): tylko nieprawidłowa recepta
+    Machine_HMI.Status.bDisableStartButton := NOT RecipeConfig_HMI.Config.IsValid;
+END_IF
 
 SUPER^.HMICommunication();]]></ST>
       </Implementation>
@@ -711,6 +719,8 @@ END_IF]]></ST>
       <LineId Id="67" Count="0" />
       <LineId Id="61" Count="0" />
       <LineId Id="139" Count="1" />
+      <LineId Id="142" Count="6" />
+      <LineId Id="141" Count="0" />
       <LineId Id="10" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>

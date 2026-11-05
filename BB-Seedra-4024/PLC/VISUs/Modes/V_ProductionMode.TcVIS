@@ -5,7 +5,7 @@
       <Data>
         <o xml:space="preserve" t="VisualObject">
           <n n="LastVisuLanguageModelEntry" />
-          <v n="UniqueIdGenerator">"26"</v>
+          <v n="UniqueIdGenerator">"27"</v>
           <o n="VisualElemList" t="VisualElemList">
             <l n="VisualElementList" t="VisualElemCollection" cet="GenericVisualElem">
               <o>
@@ -1613,7 +1613,7 @@
                     </o>
                     <o>
                       <v n="Id">2496894244L</v>
-                      <v n="Value">"NOT MAIN.Seedra.RecipeConfig_HMI.Config.IsValid"</v>
+                      <v n="Value">"MAIN.Seedra.Machine_HMI.Status.bDisableStartButton"</v>
                     </o>
                     <o>
                       <v n="Id">823443203L</v>
@@ -6388,6 +6388,11 @@
                 <v n="Id">25L</v>
                 <n n="Tag" />
                 <v n="Text">"	HMI_Loader : ST_UsbGcodeLoader_HMI;"</v>
+              </o>
+              <o>
+                <v n="Id">27L</v>
+                <n n="Tag" />
+                <v n="Text">"	Machine_HMI : ST_Machine_HMI;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>
