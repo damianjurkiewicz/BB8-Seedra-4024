@@ -36,12 +36,11 @@ END_VAR
 VAR_INPUT
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// Wklej tutaj w pełni działającą implementację z FB_RecipeBase.WriteGCodeFile
-CASE nStep OF
+        <ST><![CDATA[CASE nStep OF
     0: // IDLE
         ;
+        
     10: // Otwarcie pliku (FOPEN_MODEWRITE OR FOPEN_MODETEXT)
-        fbFileOpen(bExecute := FALSE);
         fbFileOpen(
             sNetId := '', 
             sPathName := sLocalGCodePath, 
@@ -51,7 +50,7 @@ CASE nStep OF
         nStep := 20;
         
     20: // Czekamy na otwarcie
-        fbFileOpen(bExecute := FALSE);
+        fbFileOpen(bExecute := TRUE); // PODTRZYMUJEMY SYGNAŁ!
         IF NOT fbFileOpen.bBusy THEN
             IF fbFileOpen.bError THEN
                 nStep := 999;
@@ -60,27 +59,24 @@ CASE nStep OF
                 iCurrentLine := 1;
                 nStep := 30;
             END_IF
+            fbFileOpen(bExecute := FALSE); // Reset bloku po zakończeniu
         END_IF
-        
-	30: // Zapis linijka po linijce
+
+    30: // Zapis linijka po linijce
         IF iCurrentLine <= iLinesCount THEN
-            fbFilePuts(bExecute := FALSE);
             fbFilePuts(
                 sNetId   := '', 
                 hFile    := hFile, 
-                // POLIMORFIZM: Writer nie wie skąd pochodzi kod, 
-                // po prostu prosi interfejs o kolejną linię:
                 sLine    := _RecipeBuilder.GetGCodeLine(iCurrentLine), 
                 bExecute := TRUE
             );
             nStep := 40;
         ELSE
-            // Wszystko zapisane
             nStep := 50;
         END_IF
         
     40: // Czekamy na zapis linii
-        fbFilePuts(bExecute := FALSE);
+        fbFilePuts(bExecute := TRUE); // PODTRZYMUJEMY SYGNAŁ!
         IF NOT fbFilePuts.bBusy THEN
             IF fbFilePuts.bError THEN
                 nStep := 999;
@@ -88,15 +84,15 @@ CASE nStep OF
                 iCurrentLine := iCurrentLine + 1;
                 nStep := 30; // Wracamy do zapisu kolejnej linii
             END_IF
+            fbFilePuts(bExecute := FALSE); // Reset bloku
         END_IF
         
     50: // Zamknięcie pliku
-        fbFileClose(bExecute := FALSE);
         fbFileClose(sNetId := '', hFile := hFile, bExecute := TRUE);
         nStep := 60;
         
     60: // Czekamy na zamknięcie
-        fbFileClose(bExecute := FALSE);
+        fbFileClose(bExecute := TRUE); // PODTRZYMUJEMY SYGNAŁ!
         IF NOT fbFileClose.bBusy THEN
             IF fbFileClose.bError THEN
                 nStep := 999;
@@ -105,12 +101,18 @@ CASE nStep OF
                 _Done := TRUE;
                 nStep := 0;
             END_IF
+            fbFileClose(bExecute := FALSE); // Reset bloku
         END_IF
         
     999: // ERROR
         _Error := TRUE;
         _Busy := FALSE;
         nStep := 0;
+        
+        // Zabezpieczenie: zrzucenie sygnałów startowych z bloków w razie błędu
+        fbFileOpen(bExecute := FALSE);
+        fbFilePuts(bExecute := FALSE);
+        fbFileClose(bExecute := FALSE);
 END_CASE]]></ST>
       </Implementation>
     </Method>
@@ -139,10 +141,16 @@ END_VAR
     <Method Name="Execute" Id="{227ff0bb-1075-40f8-9df9-42912fade186}">
       <Declaration><![CDATA[METHOD Execute : BOOL
 VAR_INPUT
-    Builder : I_RecipeBuilder; // Wstrzykiwanie przez interfejs
+    Builder : I_RecipeBuilder;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[IF _Busy OR Builder = 0 THEN RETURN; END_IF
+        <ST><![CDATA[// Wymagamy tylko poprawnego interfejsu
+IF Builder = 0 THEN RETURN; END_IF
+
+// Reset bloków sprzętowych na wypadek powrotu po wcześniejszym Abort
+fbFileOpen(bExecute := FALSE);
+fbFilePuts(bExecute := FALSE);
+fbFileClose(bExecute := FALSE);
 
 _RecipeBuilder := Builder;
 iLinesCount    := _RecipeBuilder.GetLinesCount();
@@ -161,9 +169,7 @@ Execute := TRUE;]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GCodeWriter.CyclicLogic">
-      <LineId Id="6" Count="25" />
-      <LineId Id="79" Count="14" />
-      <LineId Id="45" Count="33" />
+      <LineId Id="96" Count="76" />
       <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_GCodeWriter.Done.Get">
@@ -173,7 +179,7 @@ Execute := TRUE;]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GCodeWriter.Execute">
-      <LineId Id="28" Count="8" />
+      <LineId Id="45" Count="14" />
       <LineId Id="5" Count="0" />
     </LineIds>
   </POU>

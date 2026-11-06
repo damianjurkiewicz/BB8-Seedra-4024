@@ -423,50 +423,64 @@ END_VAR]]></Declaration>
             10: 
                 SequenceState := 20;
                 
-			20: 
-				IF _RecipeBuilder <> 0 THEN
-					IF _RecipeBuilder.ExecutionRoute = E_ExecutionRoute.eFeedTable THEN
-						_RecipeBuilder.GeometryWriter := ExecTangentialFeed;
-					END_IF
-					
-					_RecipeBuilder.Build();
-					
-					IF _RecipeBuilder.Done THEN 
-						localConfig := _RecipeBuilder.Config;
-						
-						// BLOKADA: Pusta lub niepoprawna recepta nie może uruchomić napędów ani NCI
-						IF NOT localConfig.IsValid THEN
-							ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: Recepta jest pusta lub niepoprawna (IsValid = FALSE)!', '');
-							RaiseAlarmWithStrings(GantryAlarms[1], 'Nie wybrano pliku programu lub wymiary sa niepoprawne!', '');
-							ChangeState(E_PMLCommand.ePMLCommand_Abort);
-							SequenceState := 999;
-							RETURN;
-						END_IF
-						
-						CASE _RecipeBuilder.ExecutionRoute OF
-							E_ExecutionRoute.ePTP:
-								ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb PTP', '');
-								SequenceState := 30; 
-								
-							E_ExecutionRoute.eGCode:
-								ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb G-Code', '');
-								SequenceState := 40;                             
-								
-							E_ExecutionRoute.eFeedTable:
-								ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb FeedTable', '');
-								SequenceState := 60; 
-						END_CASE
-						
-					ELSIF _RecipeBuilder.Error THEN
-						ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: Krok 20 - Recepta zglosila ERROR!', '');
-						RaiseAlarmWithStrings(GantryAlarms[1], 'Blad budowania recepty!', '');
-						ChangeState(E_PMLCommand.ePMLCommand_Abort);
-						SequenceState := 999;
-					END_IF
-					ELSE
-						ChangeState(E_PMLCommand.ePMLCommand_Abort);
-						SequenceState := 999;
-					END_IF
+			20:
+                IF _RecipeBuilder <> 0 THEN
+                    IF _RecipeBuilder.ExecutionRoute = E_ExecutionRoute.eFeedTable THEN
+                        _RecipeBuilder.GeometryWriter := ExecTangentialFeed;
+                    END_IF
+                    
+                    // ZMIANA: Wywołujemy Build() tylko dla przepisów liczonych w locie (PTP / FeedTable).
+                    // G-Code został już wygenerowany asynchronicznie przez GCodeWritera w FB_Machine.Starting,
+                    // więc ponowne wywołanie Build() zresetowałoby ścieżkę do wygenerowanego pliku!
+                    IF _RecipeBuilder.ExecutionRoute <> E_ExecutionRoute.eGCode THEN
+                        _RecipeBuilder.Build();
+                    END_IF
+                    
+                    IF _RecipeBuilder.Done THEN
+                        localConfig := _RecipeBuilder.Config;
+                        
+                        // BLOKADA 1: Pusta lub niepoprawna recepta nie może uruchomić napędów
+                        IF NOT localConfig.IsValid THEN
+                            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: Recepta jest pusta lub niepoprawna (IsValid = FALSE)!', '');
+                            RaiseAlarmWithStrings(GantryAlarms[1], 'Nie wybrano pliku programu lub wymiary sa niepoprawne!', '');
+                            ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                            SequenceState := 999;
+                            RETURN;
+                        END_IF
+                        
+                        // BLOKADA 2: Zabezpieczenie przed pustą ścieżką w trybie G-Code
+                        IF _RecipeBuilder.ExecutionRoute = E_ExecutionRoute.eGCode AND LEN(localConfig.GCodePath) = 0 THEN
+                            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: Brak sciezki G-Code! (Plik nie zostal wygenerowany)', '');
+                            RaiseAlarmWithStrings(GantryAlarms[1], 'Blad sciezki pliku NC!', '');
+                            ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                            SequenceState := 999;
+                            RETURN;
+                        END_IF
+
+                        CASE _RecipeBuilder.ExecutionRoute OF
+                            E_ExecutionRoute.ePTP:
+                                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb PTP', '');
+                                SequenceState := 30;
+                                
+                            E_ExecutionRoute.eGCode:
+                                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb G-Code', '');
+                                SequenceState := 40;
+                                
+                            E_ExecutionRoute.eFeedTable:
+                                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb FeedTable', '');
+                                SequenceState := 60;
+                        END_CASE
+                        
+                    ELSIF _RecipeBuilder.Error THEN
+                        ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: Krok 20 - Recepta zglosila ERROR!', '');
+                        RaiseAlarmWithStrings(GantryAlarms[1], 'Blad budowania recepty!', '');
+                        ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                        SequenceState := 999;
+                    END_IF
+                ELSE
+                    ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                    SequenceState := 999;
+                END_IF
 
             // ========================================================
             // FAZA 1: NARZĘDZIE GŁÓWNE
@@ -1289,7 +1303,7 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
       <LineId Id="750" Count="13" />
-      <LineId Id="1122" Count="42" />
+      <LineId Id="1168" Count="56" />
       <LineId Id="794" Count="40" />
       <LineId Id="1118" Count="0" />
       <LineId Id="1099" Count="0" />

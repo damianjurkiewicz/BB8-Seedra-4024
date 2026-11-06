@@ -8,7 +8,7 @@ VAR
     BuilderArona 			: FB_PTPArona;
 	BuilderRectangle 		: FB_PTPRectangle;
 	
-	BuilderCircle 			: FB_GCodeToCompile;
+	BuilderGCodeToCompile 			: FB_GCodeToCompile;
 	
 	BuilderRoundedRect 		: FB_FeedRoundedRectangle;	
 	BuilderFeedCircle  		: FB_FeedCircle;
@@ -46,7 +46,7 @@ END_VAR]]></Declaration>
         GetBuilder := BuilderArona;
 		
 	E_RecipeID.eNCITest:
-        GetBuilder := BuilderCircle;
+        GetBuilder := BuilderGCodeToCompile;
 		
 	E_RecipeID.ePTPRectangle:                            
         GetBuilder := BuilderRectangle; 
@@ -108,8 +108,8 @@ BuilderFlaps.ConfigProvider 		:= ConfigProvider;
 BuilderArona.Config 				:= Config;
 BuilderArona.ConfigProvider 		:= ConfigProvider;
 
-BuilderCircle.Config 				:= Config;
-BuilderCircle.ConfigProvider 		:= ConfigProvider;
+BuilderGCodeToCompile.Config 				:= Config;
+BuilderGCodeToCompile.ConfigProvider 		:= ConfigProvider;
 
 BuilderRectangle.Config 			:= Config;                    
 BuilderRectangle.ConfigProvider 	:= ConfigProvider; 
@@ -159,7 +159,7 @@ END_VAR]]></Declaration>
 BuilderWings.Config 		:= Config;
 BuilderFlaps.Config 		:= Config;
 BuilderArona.Config 		:= Config;
-BuilderCircle.Config 		:= Config;
+BuilderGCodeToCompile.Config 		:= Config;
 BuilderRectangle.Config 	:= Config;   
 BuilderRoundedRect.Config 	:= Config;      
 BuilderFeedCircle.Config 	:= Config; 
