@@ -175,18 +175,6 @@
     <Compile Include="POUs\Executor\FB_Exec_Spindle_GCodeXYZ.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\FB_FileCopy.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\FB_ListenerTest.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\FB_SampleListener.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\FB_UsbGCodeLoader.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="POUs\GantryXYZ\E_MachineProfile.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -238,10 +226,10 @@
     <Compile Include="POUs\FB_Machine.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\FB_PersistentDataManager.TcPOU">
+    <Compile Include="POUs\GlobalTextList.TcGTLO">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\GlobalTextList.TcGTLO">
+    <Compile Include="POUs\Listener\FB_EventLoggerListener.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\MAIN.TcPOU">
@@ -329,6 +317,15 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TESTS\Mocks\FB_MockConfigProvider.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\WriteRead\FB_FileCopy.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\WriteRead\FB_PersistentDataManager.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\WriteRead\FB_UsbGCodeLoader.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SafetyTask.TcTTO">
@@ -459,6 +456,8 @@
     <Folder Include="POUs\Executor" />
     <Folder Include="POUs\Builder" />
     <Folder Include="POUs\GantryXYZ\HomingStrategies" />
+    <Folder Include="POUs\Listener" />
+    <Folder Include="POUs\WriteRead" />
     <Folder Include="POUs\TESTS" />
     <Folder Include="POUs\TESTS\Mocks" />
     <Folder Include="VISUs" />

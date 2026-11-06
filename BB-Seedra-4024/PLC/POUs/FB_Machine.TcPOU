@@ -22,7 +22,9 @@ VAR
 	
 	HMI_Loader : ST_UsbGcodeLoader_HMI;
 	
-	fbListenerTest : FB_ListenerTest;
+fbMessageListener : FB_EventLoggerListener;
+    fbListenerFilter  : FB_TcEventFilter;
+    hrListener        : HRESULT; 
 	
 	sSelectedRecipeName : STRING(50);
 	aRecipeNames : ARRAY[0..30] OF STRING(50);
@@ -197,8 +199,7 @@ END_IF
 // =========================================================
 // 6. EVENT LOGGER LISTENER & TEXT RETRIEVAL
 // =========================================================
-// Wywołanie bloku Listenera. Cała logika subskrypcji jest schowana w jego wnętrzu.
-fbListenerTest();]]></ST>
+fbMessageListener.Execute();]]></ST>
       </Implementation>
     </Method>
     <Method Name="Execute" Id="{729254ca-03f3-4bb9-98a5-84b797a61e6c}" FolderPath="States\">
@@ -293,7 +294,7 @@ aRecipeNames[E_RecipeID.eGCodeUSB] 						:= 'USB Drive';
 
 sSelectedRecipeName := aRecipeNames[GantryXYZ.ProgramIdRequested];
 
-Machine_HMI.aAlarmHistory := fbListenerTest.fbMessageListener.aAlarmHistory;
+Machine_HMI.aAlarmHistory := fbMessageListener.aAlarmHistory;
 
 IF GantryXYZ.ProgramIdRequested = E_RecipeID.eGCodeUSB THEN
     // Warunek dla programu GCode z USB: brak pendrive'a LUB nieprawidłowa recepta
@@ -400,6 +401,9 @@ CASE DescendantSequenceState OF
 	
 		// Przekazanie konfiguracji z Persistenta do HMI (żeby po restarcie na ekranie były dobre wartości)
 		RecipeConfig_HMI.Config := ConfigManager.Config;
+		
+		fbListenerFilter.Clear().Severity.GreaterThan(0);
+		hrListener := fbMessageListener.Subscribe2(fbListenerFilter);
 		
 		// =================================================================================
 		// DOMYŚLNE LIMITY FIZYCZNE MASZYNY (Zabezpieczenie Numpadów na ekranie powitalnym)
@@ -686,7 +690,7 @@ END_IF]]></ST>
       <LineId Id="411" Count="11" />
       <LineId Id="2" Count="0" />
       <LineId Id="453" Count="0" />
-      <LineId Id="521" Count="3" />
+      <LineId Id="528" Count="2" />
       <LineId Id="452" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Execute">
@@ -777,6 +781,7 @@ END_IF]]></ST>
       <LineId Id="109" Count="0" />
       <LineId Id="119" Count="0" />
       <LineId Id="111" Count="0" />
+      <LineId Id="156" Count="2" />
       <LineId Id="124" Count="0" />
       <LineId Id="126" Count="7" />
       <LineId Id="125" Count="0" />

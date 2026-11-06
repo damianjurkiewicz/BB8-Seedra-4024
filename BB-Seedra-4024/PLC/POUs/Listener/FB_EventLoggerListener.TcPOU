@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_SampleListener" Id="{50ed088d-9a7d-4c16-86a9-e90b487e4982}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_SampleListener EXTENDS FB_ListenerBase2
+  <POU Name="FB_EventLoggerListener" Id="{50ed088d-9a7d-4c16-86a9-e90b487e4982}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_EventLoggerListener EXTENDS FB_ListenerBase2
 VAR_INPUT
 END_VAR
 VAR_OUTPUT
@@ -137,30 +137,30 @@ OnMessageSent := S_OK; // in order to receive more callbacks (Set <> S_OK in ord
 ]]></ST>
       </Implementation>
     </Method>
-    <LineIds Name="FB_SampleListener">
+    <LineIds Name="FB_EventLoggerListener">
       <LineId Id="59" Count="0" />
     </LineIds>
-    <LineIds Name="FB_SampleListener.Execute">
+    <LineIds Name="FB_EventLoggerListener.Execute">
       <LineId Id="42" Count="23" />
       <LineId Id="5" Count="0" />
     </LineIds>
-    <LineIds Name="FB_SampleListener.OnAlarmCleared">
+    <LineIds Name="FB_EventLoggerListener.OnAlarmCleared">
       <LineId Id="6" Count="0" />
       <LineId Id="12" Count="0" />
       <LineId Id="11" Count="0" />
       <LineId Id="13" Count="0" />
     </LineIds>
-    <LineIds Name="FB_SampleListener.OnAlarmConfirmed">
+    <LineIds Name="FB_EventLoggerListener.OnAlarmConfirmed">
       <LineId Id="6" Count="0" />
       <LineId Id="12" Count="0" />
       <LineId Id="11" Count="0" />
       <LineId Id="13" Count="0" />
     </LineIds>
-    <LineIds Name="FB_SampleListener.OnAlarmRaised">
+    <LineIds Name="FB_EventLoggerListener.OnAlarmRaised">
       <LineId Id="32" Count="12" />
       <LineId Id="18" Count="0" />
     </LineIds>
-    <LineIds Name="FB_SampleListener.OnMessageSent">
+    <LineIds Name="FB_EventLoggerListener.OnMessageSent">
       <LineId Id="6" Count="0" />
       <LineId Id="10" Count="0" />
       <LineId Id="47" Count="0" />
