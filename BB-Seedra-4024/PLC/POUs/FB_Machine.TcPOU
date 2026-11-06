@@ -589,9 +589,36 @@ CASE SequenceState OF
             StateTasksComplete := TRUE;
         END_IF
         
-    10:
-        // [TWÓJ ISTNIEJĄCY KOD fbFileCopy DO USB]
-        // Po sukcesie: StateTasksComplete := TRUE;
+            10:
+                // Wykorzystujemy nasz nowo dodany blok FB_FileCopy
+                fbFileCopy(
+                    sSrcNetId := '', 
+                    sSrcPathName := RecipeConfig_HMI.Config.GCodePath, // Z pendrive'a
+                    sDestNetId := '', 
+                    sDestPathName := sLocalGCodePath,                  // Na wbudowany dysk PLC
+                    bExecute := TRUE, 
+                    tTimeOut := T#20S // Zwiększony czas dla dużych plików
+                );
+                
+                IF NOT fbFileCopy.bBusy THEN
+                    fbFileCopy(bExecute := FALSE);
+                    
+                    IF NOT fbFileCopy.bError THEN
+                        // --- POPRAWKA TUTAJ ---
+                        TempBuilder := RecipeFactory.GetBuilder(E_RecipeID.eGCodeUSB);
+                        IF TempBuilder <> 0 THEN
+                            RecipeBuilderConfig := TempBuilder.Config;         // 1. Zrzut do zmiennej pomocniczej
+                            RecipeBuilderConfig.GCodePath := sLocalGCodePath;  // 2. Modyfikacja parametru
+                            TempBuilder.Config := RecipeBuilderConfig;         // 3. Zapis całości z powrotem do recepty
+                        END_IF
+                        // ----------------------
+                        
+                        StateTasksComplete := TRUE;
+                    ELSE
+                        // Kopiowanie się nie udało 
+                        THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
+                    END_IF
+                END_IF
         
     20:
         // Czekanie na zakończenie zapisu dynamicznego G-Code
@@ -827,7 +854,9 @@ END_IF]]></ST>
       <LineId Id="160" Count="1" />
       <LineId Id="219" Count="9" />
       <LineId Id="268" Count="6" />
-      <LineId Id="239" Count="21" />
+      <LineId Id="239" Count="6" />
+      <LineId Id="296" Count="28" />
+      <LineId Id="248" Count="12" />
       <LineId Id="285" Count="0" />
       <LineId Id="261" Count="6" />
       <LineId Id="203" Count="5" />
