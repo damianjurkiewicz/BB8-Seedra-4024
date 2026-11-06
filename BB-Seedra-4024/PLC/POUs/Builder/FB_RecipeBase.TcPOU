@@ -47,6 +47,14 @@ VAR
 	
 	_GeometryWriter : I_GeometryWriter;
 	
+	_GCodeLines : ARRAY[1..MAX_GCODE_LINES] OF STRING(255);
+    _LinesCount : INT;
+    _ExecutionRoute : E_ExecutionRoute; // Or INT, depending on your enum type
+	
+END_VAR
+
+VAR CONSTANT
+    MAX_GCODE_LINES : INT := 1000; // Adjust array limit as required by your memory constraints
 END_VAR
 ]]></Declaration>
     <Implementation>
@@ -317,7 +325,11 @@ VAR_INPUT
     Index : INT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[IF Index >= 1 AND Index <= MAX_GCODE_LINES THEN
+    GetGCodeLine := _GCodeLines[Index];
+ELSE
+    GetGCodeLine := '';
+END_IF]]></ST>
       </Implementation>
     </Method>
     <Method Name="GetLinesCount" Id="{dc1f4d3e-3c93-43cd-9115-ba03f69219a2}">
@@ -325,7 +337,7 @@ END_VAR]]></Declaration>
 VAR_INPUT
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[]]></ST>
+        <ST><![CDATA[GetLinesCount := _LinesCount;]]></ST>
       </Implementation>
     </Method>
     <Property Name="HolesDrill" Id="{33a6c722-63d3-4021-9875-0f4e89b1bc5f}">
@@ -796,6 +808,7 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.GetGCodeLine">
+      <LineId Id="6" Count="3" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.GetLinesCount">
