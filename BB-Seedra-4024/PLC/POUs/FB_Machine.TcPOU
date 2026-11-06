@@ -34,6 +34,9 @@ fbMessageListener : FB_EventLoggerListener;
     fbFileDelete    : FB_FileDelete;
     sLocalGCodePath : STRING(255) := '\Hard Disk\ActiveGCode.nc'; // Kopia na dysku PLC
 
+	fbGCodeWriter : FB_GCodeWriter;
+	localRecipe   : I_RecipeBuilder; // Interfejs do wyciągnięcia tablicy
+	
 
 END_VAR
 
@@ -562,48 +565,53 @@ END_VAR
       <Implementation>
         <ST><![CDATA[CASE _CurrentMode OF
     E_PMLUnitMode.ePMLUnitMode_Production:
-        CASE SequenceState OF
-            0:
-                NoStateTasksToComplete := FALSE;
-                // Kopiuj plik tylko gdy pracujemy na USB i mamy podaną ścieżkę
-                IF GantryXYZ.ProgramIdRequested = E_RecipeID.eGCodeUSB AND LEN(RecipeConfig_HMI.Config.GCodePath) > 0 THEN
-                    fbFileCopy(bExecute := FALSE);
-                    SequenceState := 10;
-                ELSE
-                    StateTasksComplete := TRUE;
-                END_IF
-                
-            10:
-                // Wykorzystujemy nasz nowo dodany blok FB_FileCopy
-                fbFileCopy(
-                    sSrcNetId := '', 
-                    sSrcPathName := RecipeConfig_HMI.Config.GCodePath, // Z pendrive'a
-                    sDestNetId := '', 
-                    sDestPathName := sLocalGCodePath,                  // Na wbudowany dysk PLC
-                    bExecute := TRUE, 
-                    tTimeOut := T#20S // Zwiększony czas dla dużych plików
-                );
-                
-                IF NOT fbFileCopy.bBusy THEN
-                    fbFileCopy(bExecute := FALSE);
-                    
-                    IF NOT fbFileCopy.bError THEN
-                        // --- POPRAWKA TUTAJ ---
-                        TempBuilder := RecipeFactory.GetBuilder(E_RecipeID.eGCodeUSB);
-                        IF TempBuilder <> 0 THEN
-                            RecipeBuilderConfig := TempBuilder.Config;         // 1. Zrzut do zmiennej pomocniczej
-                            RecipeBuilderConfig.GCodePath := sLocalGCodePath;  // 2. Modyfikacja parametru
-                            TempBuilder.Config := RecipeBuilderConfig;         // 3. Zapis całości z powrotem do recepty
-                        END_IF
-                        // ----------------------
-                        
-                        StateTasksComplete := TRUE;
-                    ELSE
-                        // Kopiowanie się nie udało 
-                        THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
-                    END_IF
-                END_IF
-        END_CASE
+CASE SequenceState OF
+    0:
+        NoStateTasksToComplete := FALSE;
+        
+        // 1. Przypadek USB (istniejący)
+        IF GantryXYZ.ProgramIdRequested = E_RecipeID.eGCodeUSB AND LEN(RecipeConfig_HMI.Config.GCodePath) > 0 THEN
+            fbFileCopy(bExecute := FALSE);
+            SequenceState := 10;
+            
+        // 2. Przypadek dynamicznego kompilatora (nowy)
+		ELSIF RecipeFactory.GetBuilder(GantryXYZ.ProgramIdRequested).ExecutionRoute = E_ExecutionRoute.eGCode THEN
+        localRecipe := RecipeFactory.GetBuilder(GantryXYZ.ProgramIdRequested);
+        
+        localRecipe.Build(); // Generuje kod wewnątrz siebie
+        
+        // Wstrzykujemy interfejs do writera i odpalamy asynchroniczny zapis
+        fbGCodeWriter.Execute(Builder := localRecipe);
+        SequenceState := 20;
+            
+        // 3. Przypadek standardowy PTP (bez plików)
+        ELSE
+            StateTasksComplete := TRUE;
+        END_IF
+        
+    10:
+        // [TWÓJ ISTNIEJĄCY KOD fbFileCopy DO USB]
+        // Po sukcesie: StateTasksComplete := TRUE;
+        
+    20:
+        // Czekanie na zakończenie zapisu dynamicznego G-Code
+        fbGCodeWriter.CyclicLogic(); // Wywoływane cyklicznie w stanie Starting
+        
+        IF fbGCodeWriter.Done THEN
+            // Zapis udany - modyfikujemy ścieżkę do nowo wygenerowanego pliku
+            TempBuilder := RecipeFactory.GetBuilder(GantryXYZ.ProgramIdRequested);
+            IF TempBuilder <> 0 THEN
+                RecipeBuilderConfig := TempBuilder.Config;
+                RecipeBuilderConfig.GCodePath := sLocalGCodePath;
+                TempBuilder.Config := RecipeBuilderConfig;
+            END_IF
+            
+            StateTasksComplete := TRUE;
+            
+        ELSIF fbGCodeWriter.Error THEN
+            THIS^.ChangeState(E_PMLCommand.ePMLCommand_Abort);
+        END_IF
+END_CASE
 
     E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
         StateTasksComplete := TRUE;
@@ -815,7 +823,11 @@ END_IF]]></ST>
       <LineId Id="62" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Starting">
-      <LineId Id="160" Count="48" />
+      <LineId Id="160" Count="1" />
+      <LineId Id="219" Count="9" />
+      <LineId Id="268" Count="6" />
+      <LineId Id="239" Count="28" />
+      <LineId Id="203" Count="5" />
       <LineId Id="10" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.SubModuleMonitor">
