@@ -105,6 +105,17 @@
         <Declaration><![CDATA[]]></Declaration>
       </Set>
     </Property>
+    <Method Name="GetGCodeLine" Id="{fe1154d1-0cf4-45d9-b226-d76654c40466}">
+      <Declaration><![CDATA[METHOD GetGCodeLine : STRING(255)
+VAR_INPUT
+    Index : INT;
+END_VAR]]></Declaration>
+    </Method>
+    <Method Name="GetLinesCount" Id="{0ab6c1b4-aabf-43d6-baa0-a74b33152bf5}">
+      <Declaration><![CDATA[METHOD GetLinesCount : INT
+VAR_INPUT
+END_VAR]]></Declaration>
+    </Method>
     <Property Name="HolesDrill" Id="{444fc5fe-9152-4ad9-900c-81717334843f}">
       <Declaration><![CDATA[PROPERTY HolesDrill : REFERENCE TO ARRAY [1..100] OF ST_PointXY;]]></Declaration>
       <Get Name="Get" Id="{f77b18ec-e030-4941-a5d0-463fd5ae46b3}">

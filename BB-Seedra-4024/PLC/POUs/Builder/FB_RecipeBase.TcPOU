@@ -311,6 +311,23 @@ END_VAR
         </Implementation>
       </Set>
     </Property>
+    <Method Name="GetGCodeLine" Id="{e07cbcb9-b7d0-4971-b60a-63c1005246ce}">
+      <Declaration><![CDATA[METHOD GetGCodeLine : STRING(255)
+VAR_INPUT
+    Index : INT;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
+    <Method Name="GetLinesCount" Id="{dc1f4d3e-3c93-43cd-9115-ba03f69219a2}">
+      <Declaration><![CDATA[METHOD GetLinesCount : INT
+VAR_INPUT
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[]]></ST>
+      </Implementation>
+    </Method>
     <Property Name="HolesDrill" Id="{33a6c722-63d3-4021-9875-0f4e89b1bc5f}">
       <Declaration><![CDATA[PROPERTY HolesDrill : REFERENCE TO ARRAY [1..100] OF ST_PointXY]]></Declaration>
       <Get Name="Get" Id="{353ebf4d-ee7a-4628-96f6-0d8b60355f97}">
@@ -777,6 +794,12 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_RecipeBase.GeometryWriter.Set">
       <LineId Id="2" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.GetGCodeLine">
+      <LineId Id="5" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_RecipeBase.GetLinesCount">
+      <LineId Id="4" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.HolesDrill.Get">
       <LineId Id="2" Count="0" />
