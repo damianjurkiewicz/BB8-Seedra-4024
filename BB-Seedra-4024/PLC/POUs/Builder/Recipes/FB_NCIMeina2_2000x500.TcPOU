@@ -306,44 +306,6 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
-    <Method Name="FB_init" Id="{ab0027b3-ed53-49ae-8456-bf761318ee98}">
-      <Declaration><![CDATA[METHOD FB_init : BOOL
-VAR_INPUT
-	bInitRetains : BOOL; // if TRUE, the retain variables are initialized (warm start / cold start)
-	bInCopyCode : BOOL;  // if TRUE, the instance afterwards gets moved into the copy code (online change)
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[_Limits.PanelFrontLength.MinVal := 100.0;
-_Limits.PanelFrontLength.MaxVal := 2400.0;
-
-_Limits.PanelFrontWidth.MinVal  := 100.0;
-_Limits.PanelFrontWidth.MaxVal  := 1200.0;
-
-_Limits.PanelHeight.MinVal      := 0.0;
-_Limits.PanelHeight.MaxVal      := 0.0;
-
-_Limits.RailHeightCorrection.MinVal := 0.0;
-_Limits.RailHeightCorrection.MaxVal := 0.0;
-
-_Limits.CuttingOverpass.MinVal := 0.0;
-_Limits.CuttingOverpass.MaxVal := 50.0;
-
-_Limits.GroovingOverpass.MinVal := 0.0;
-_Limits.GroovingOverpass.MaxVal := 50.0;
-
-_Limits.GrooveDepthZ.MinVal := 0.0;
-_Limits.GrooveDepthZ.MaxVal := 9.0; 
-
-_Limits.CuttingOverpass.MinVal := 0.0;
-_Limits.CuttingOverpass.MaxVal := 50.0;
-_Limits.GroovingOverpass.MinVal := 0.0;
-_Limits.GroovingOverpass.MaxVal := 50.0;
-
-_Limits.Radius.MinVal := 10.0;     
-_Limits.Radius.MaxVal := 600.0;   ]]></ST>
-      </Implementation>
-    </Method>
     <LineIds Name="FB_NCIMeina2_2000x500">
       <LineId Id="9" Count="0" />
     </LineIds>
@@ -357,17 +319,6 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
     </LineIds>
     <LineIds Name="FB_NCIMeina2_2000x500.ExecutionRoute.Get">
       <LineId Id="2" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_NCIMeina2_2000x500.FB_init">
-      <LineId Id="31" Count="15" />
-      <LineId Id="28" Count="0" />
-      <LineId Id="53" Count="1" />
-      <LineId Id="52" Count="0" />
-      <LineId Id="61" Count="0" />
-      <LineId Id="73" Count="2" />
-      <LineId Id="71" Count="0" />
-      <LineId Id="77" Count="1" />
-      <LineId Id="76" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

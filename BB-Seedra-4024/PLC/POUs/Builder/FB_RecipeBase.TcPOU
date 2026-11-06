@@ -469,10 +469,29 @@ VAR
     EffectiveBoardY : REAL;
 END_VAR
 VAR_INST
-    bLogFired       : BOOL; // <-- Zapamięta, czy log już poszedł
+    bLogFired       : BOOL;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// 1. Czysty gabaryt z logiki receptury
+        <ST><![CDATA[// =========================================================
+// 0. BYPASS DLA RECEPT G-CODE (NESTING ZROBIONY W CAM)
+// =========================================================
+IF THIS^.ExecutionRoute = E_ExecutionRoute.eGCode THEN
+    _MaxCopiesX := 1;
+    _MaxCopiesY := 1;
+    
+    // Wymuszamy jedno wykonanie pliku, ignorując ewentualne śmieci z HMI
+    _Config.RequestedCopiesX := 1;
+    _Config.RequestedCopiesY := 1;
+    
+    // Zdejmujemy blokadę HMI - zerowe NominalX/NominalY nie mają znaczenia
+    _Config.IsValid := TRUE; 
+    
+    RETURN; // Przerywamy dalsze, niepotrzebne obliczenia (nie dojdzie do CalculateFootprint)
+END_IF
+
+// =========================================================
+// 1. Czysty gabaryt z logiki receptury
+// =========================================================
 THIS^.CalculateFootprint();
 MaxOverpass := MAX(_Config.CuttingOverpass, _Config.GroovingOverpass);
 _FootprintX := _NominalX + (2.0 * MaxOverpass);
@@ -799,7 +818,8 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeBase.UpdateNestingLimits">
-      <LineId Id="142" Count="5" />
+      <LineId Id="265" Count="20" />
+      <LineId Id="144" Count="3" />
       <LineId Id="171" Count="8" />
       <LineId Id="190" Count="0" />
       <LineId Id="180" Count="3" />
