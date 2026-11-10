@@ -151,9 +151,14 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// BorgoWings wie, że jego wymiar powiększa się o ścianki zagięcia:
-_NominalX := _Config.PanelFrontWidth  + 2.0 * _Config.PanelHeight;
-_NominalY := _Config.PanelFrontLength + 2.0 * _Config.PanelHeight;]]></ST>
+        <ST><![CDATA[////THIS BLOCKs EXECUTION OF THIS PROGRAM
+_NominalX := 9999; 
+_NominalY := 9999;
+//////////////
+
+// Default
+//_NominalX := _Config.PanelFrontWidth  + 2.0 * _Config.PanelHeight;
+//_NominalY := _Config.PanelFrontLength + 2.0 * _Config.PanelHeight;]]></ST>
       </Implementation>
     </Method>
     <Property Name="ExecutionRoute" Id="{f37987ed-0c72-45f4-b183-c93ca21c5023}">
@@ -215,6 +220,7 @@ _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_PTPBorgoWings.CalculateFootprint">
+      <LineId Id="14" Count="4" />
       <LineId Id="9" Count="1" />
       <LineId Id="5" Count="0" />
     </LineIds>

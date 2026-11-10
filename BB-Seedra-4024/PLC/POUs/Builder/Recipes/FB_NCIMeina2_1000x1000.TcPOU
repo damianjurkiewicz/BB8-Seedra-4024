@@ -268,8 +268,14 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_NominalX := 1;
-_NominalY := 1;]]></ST>
+        <ST><![CDATA[////THIS BLOCKs EXECUTION OF THIS PROGRAM
+_NominalX := 9999; 
+_NominalY := 9999;
+//////////////
+
+// Default
+//_NominalX := 1;
+//_NominalY := 1;]]></ST>
       </Implementation>
     </Method>
     <Property Name="ExecutionRoute" Id="{47dc1225-d0d9-4aff-a3e7-3c6fe79884e0}">
@@ -291,6 +297,8 @@ END_VAR
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIMeina2_1000x1000.CalculateFootprint">
+      <LineId Id="33" Count="4" />
+      <LineId Id="32" Count="0" />
       <LineId Id="28" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>

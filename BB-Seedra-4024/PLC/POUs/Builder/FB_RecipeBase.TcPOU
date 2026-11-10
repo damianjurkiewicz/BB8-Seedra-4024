@@ -533,19 +533,19 @@ _Config.IsValid := (_MaxCopiesX > 0) AND (_MaxCopiesY > 0) AND (_NominalX > 0) A
 
 IF NOT _Config.IsValid THEN
     IF NOT bLogFired THEN
-        ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'UpdateNestingLimits: Konfiguracja odrzucona (IsValid = FALSE)! Sprawdzam dlaczego...', '');
+//        ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'UpdateNestingLimits: Some configurations are rejected', '');
         
         IF _MaxCopiesX <= 0 THEN 
-            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _MaxCopiesX <= 0 (Detal wychodzi poza szerokosc stolu)', ''); 
+//            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _MaxCopiesX <= 0 (Detal wychodzi poza szerokosc stolu)', ''); 
         END_IF
         IF _MaxCopiesY <= 0 THEN 
-            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _MaxCopiesY <= 0 (Detal wychodzi poza dlugosc stolu)', ''); 
+//            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _MaxCopiesY <= 0 (Detal wychodzi poza dlugosc stolu)', ''); 
         END_IF
         IF _NominalX <= 0 THEN 
-            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _NominalX <= 0 (Szerokosc Nominalna to zero!)', ''); 
+//            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _NominalX <= 0 (Szerokosc Nominalna to zero!)', ''); 
         END_IF
         IF _NominalY <= 0 THEN 
-            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _NominalY <= 0 (Dlugosc Nominalna to zero!)', ''); 
+//            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'Powod: _NominalY <= 0 (Dlugosc Nominalna to zero!)', ''); 
         END_IF
         
         bLogFired := TRUE; // Zablokuj kolejne wysyłanie
@@ -826,7 +826,9 @@ END_CASE]]></ST>
       <LineId Id="158" Count="12" />
       <LineId Id="100" Count="5" />
       <LineId Id="204" Count="0" />
-      <LineId Id="223" Count="21" />
+      <LineId Id="223" Count="4" />
+      <LineId Id="295" Count="0" />
+      <LineId Id="229" Count="15" />
       <LineId Id="203" Count="0" />
       <LineId Id="106" Count="3" />
       <LineId Id="192" Count="0" />

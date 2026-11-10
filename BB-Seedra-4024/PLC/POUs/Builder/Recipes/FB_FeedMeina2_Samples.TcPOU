@@ -181,8 +181,14 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_NominalX := _Config.PanelFrontWidth;
-_NominalY := _Config.PanelFrontLength;]]></ST>
+        <ST><![CDATA[////THIS BLOCKs EXECUTION OF THIS PROGRAM
+_NominalX := 9999; 
+_NominalY := 9999;
+//////////////
+
+// Default
+//_NominalX := _Config.PanelFrontWidth;
+//_NominalY := _Config.PanelFrontLength;]]></ST>
       </Implementation>
     </Method>
     <Property Name="ExecutionRoute" Id="{3da0d898-d982-4548-8e68-e062b575b330}">
@@ -242,6 +248,8 @@ _Limits.Radius.MaxVal := 600.0;   ]]></ST>
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_FeedMeina2_Samples.CalculateFootprint">
+      <LineId Id="33" Count="4" />
+      <LineId Id="32" Count="0" />
       <LineId Id="28" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>

@@ -82,8 +82,14 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[_NominalX := _Config.PanelFrontWidth;
-_NominalY := _Config.PanelFrontLength;]]></ST>
+        <ST><![CDATA[////THIS BLOCKs EXECUTION OF THIS PROGRAM
+_NominalX := 9999; 
+_NominalY := 9999;
+//////////////
+
+// Default
+//_NominalX := _Config.PanelFrontWidth;
+//_NominalY := _Config.PanelFrontLength;]]></ST>
       </Implementation>
     </Method>
     <Property Name="ExecutionRoute" Id="{5de48596-9966-4044-9349-927935ea8a70}">
@@ -144,6 +150,8 @@ _Limits.GrooveDepthZ.MaxVal := 9.0; //]]></ST>
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_PTPRectangle.CalculateFootprint">
+      <LineId Id="12" Count="4" />
+      <LineId Id="11" Count="0" />
       <LineId Id="7" Count="0" />
       <LineId Id="5" Count="0" />
     </LineIds>
