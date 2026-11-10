@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
   <POU Name="FB_Homing_Modulo" Id="{398b7abf-73ed-4a8a-a3c8-2f04463db183}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_Homing_Modulo EXTENDS FB_Homing_Base
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Homing_Modulo EXTENDS FB_Homing_Base IMPLEMENTS I_MotionSequence
 VAR_INPUT
     ReferencePosition : LREAL := 0.0;
 END_VAR
