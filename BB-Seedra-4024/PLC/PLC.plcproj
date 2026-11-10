@@ -94,7 +94,7 @@
     <Compile Include="POUs\Builder\Recipes\FB_NCIMeina2_2000x1000.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_Samples.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_SampleBox.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_GCodeUSB.TcPOU">
@@ -350,7 +350,7 @@
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
-    <Compile Include="VISUs\Modes\ProductionMode\V_NCIFeedMeina2_Samples.TcVIS">
+    <Compile Include="VISUs\Modes\ProductionMode\V_NCIMeina2_SampleBox.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
