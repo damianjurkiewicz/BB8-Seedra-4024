@@ -225,10 +225,7 @@ VAR_INPUT
 END_VAR
 ]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// LOG: Co weszlo do metody kanalu?
-ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'NciChannel: Start ladowania pliku: "%s"', sProgramPath);
-
-_IsProgLoaded := FALSE;
+        <ST><![CDATA[_IsProgLoaded := FALSE;
 fbLoadProg(
     bExecute := TRUE,
     sPrg := sProgramPath,
@@ -323,7 +320,7 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.LoadProgram">
-      <LineId Id="22" Count="8" />
+      <LineId Id="25" Count="5" />
       <LineId Id="6" Count="0" />
     </LineIds>
     <LineIds Name="FB_NciChannel.ResetChannel">

@@ -46,6 +46,9 @@
     <Compile Include="POUs\Builder\I_GeometryWriter.TcIO">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Builder\Recipes\FB_NCICimasa_SampleBox.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_NCIMeina2_1000x1000_Circles.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -76,7 +79,7 @@
     <Compile Include="POUs\Builder\Recipes\FB_NCIMeina2_2000x1000.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\Builder\Recipes\FB_FeedMeina2_SampleBox.TcPOU">
+    <Compile Include="POUs\Builder\Recipes\FB_NCIMeina2_SampleBox.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_GCodeUSB.TcPOU">
@@ -478,6 +481,12 @@
     <PlaceholderReference Include="SPT Base Types">
       <DefaultResolution>SPT Base Types, * (Beckhoff Automation LLC)</DefaultResolution>
       <Namespace>SPT_BaseTypes</Namespace>
+      <Parameters>
+        <Parameter ListName="PARAMETERS_TRACING" xmlns="">
+          <Key>TRACING_ENABLED</Key>
+          <Value>FALSE</Value>
+        </Parameter>
+      </Parameters>
     </PlaceholderReference>
     <PlaceholderReference Include="SPT Components">
       <DefaultResolution>SPT Components, * (Beckhoff Automation LLC)</DefaultResolution>

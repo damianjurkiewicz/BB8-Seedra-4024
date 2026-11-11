@@ -103,7 +103,6 @@ E_PMLUnitMode.ePMLUnitMode_Production:
             NoStateTasksToComplete := FALSE;
             
             // Logujemy rozpoczęcie procedury Abort
-            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Aborting [0]: Zatrzymywanie kanałów i resetowanie błędów NCI...', '');
             
             NciChannel.Stop();
             NciChannelTangential.Stop();
@@ -117,10 +116,7 @@ E_PMLUnitMode.ePMLUnitMode_Production:
         10:
             AbortStepTimer(IN:=TRUE, PT:=T#300MS); 
             IF AbortStepTimer.Q THEN
-                AbortStepTimer(IN:=FALSE);
-                
-                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Aborting [10]: Nakazano rozpięcie (Ungroup) grup 4 i 5.', '');
-                
+                AbortStepTimer(IN:=FALSE);         
                 NciChannel.Ungroup();
                 NciChannelTangential.Ungroup(); 
                 SequenceState := 20;
@@ -130,7 +126,6 @@ E_PMLUnitMode.ePMLUnitMode_Production:
             // Sprawdzanie warunku z logowaniem co jakiś czas (jeśli utknie)
             IF NOT NciChannel.IsGrouped AND NOT NciChannelTangential.IsGrouped THEN
                 
-                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Aborting [20]: Grupy rozpięte. Wyłączanie napędów i zwalnianie executorów.', '');
 
                 AxisX.Disable();
                 AxisY.Disable();
@@ -159,7 +154,6 @@ E_PMLUnitMode.ePMLUnitMode_Production:
             END_IF
     
         30:
-            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Aborting [30]: Procedura Abort zakończona sukcesem.', '');
             StateTasksComplete := TRUE;
             
     END_CASE
@@ -229,7 +223,7 @@ AxisQ.WriteParameter(MC_AxisParameter.AxisMaxSoftPosLimit, ProfilesQ[RequestedPr
 AxisQ.Acceleration := ProfilesQ[RequestedProfile].Acceleration;
 AxisQ.Deceleration := ProfilesQ[RequestedProfile].Deceleration;
 AxisQ.Jerk         := ProfilesQ[RequestedProfile].Jerk;
-AxisQ.Velocity	   := ProfilesQ[RequestedProfile].Velocity;]]></ST>
+]]></ST>
       </Implementation>
     </Method>
     <Method Name="Clearing" Id="{9be5800b-bdc3-471f-9b7d-42ef121d5c77}" FolderPath="States\">
@@ -238,9 +232,7 @@ VAR
 	i				: UDINT;
 	SubModulesReady : BOOL := TRUE;
 END_VAR
-VAR_INST
-    LogTimer        : TON; // Timer do opóźniania logów, żeby nie zaspamować konsoli
-END_VAR]]></Declaration>
+]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE SequenceState OF
     0:
@@ -273,23 +265,7 @@ END_CASE
 SUPER^.Clearing();
 
 
-LogTimer(IN := (SequenceState = 20), PT := T#2S);
 
-IF LogTimer.Q THEN
-    LogTimer(IN := FALSE); 
-    
-    IF AxisQ.Error THEN
-        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: AxisQ! ErrorID: %d', UDINT_TO_DINT(AxisQ.ErrorID));
-    END_IF
-    
-    IF NciChannelTangential.ChannelError THEN
-        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: NciChannelTangential! ErrorID: %d', UDINT_TO_DINT(NciChannelTangential.ChannelErrorId));
-    END_IF
-    
-    IF NciChannel.ChannelError THEN
-        ADSLOGDINT(ADSLOG_MSGTYPE_ERROR, 'CLEARING BLOCKED BY: NciChannel! ErrorID: %d', UDINT_TO_DINT(NciChannel.ChannelErrorId));
-    END_IF
-END_IF
 ]]></ST>
       </Implementation>
     </Method>
@@ -421,7 +397,6 @@ END_VAR]]></Declaration>
                 // We wait here until the parent module (FB_Machine) finishes its own asynchronous tasks 
                 // (like copying the G-Code file from USB) and assigns a valid recipe interface.
                 IF _RecipeBuilder <> 0 THEN
-                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Gantry Execute: Maszyna glowna potwierdzila gotowosc (Handshake OK)', '');
                     SequenceState := 20;
                 END_IF
                 
@@ -444,7 +419,6 @@ END_VAR]]></Declaration>
 						
 						// BLOKADA: Pusta lub niepoprawna recepta nie może uruchomić napędów ani NCI
 						IF NOT localConfig.IsValid THEN
-							ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: Recepta jest pusta lub niepoprawna (IsValid = FALSE)!', '');
 							RaiseAlarmWithStrings(GantryAlarms[1], 'Nie wybrano pliku programu lub wymiary sa niepoprawne!', '');
 							ChangeState(E_PMLCommand.ePMLCommand_Abort);
 							SequenceState := 999;
@@ -453,20 +427,16 @@ END_VAR]]></Declaration>
 						
 						CASE _RecipeBuilder.ExecutionRoute OF
 							E_ExecutionRoute.ePTP:
-								ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb PTP', '');
 								SequenceState := 30; 
 								
 							E_ExecutionRoute.eGCode:
-								ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb G-Code', '');
 								SequenceState := 40;                             
 								
 							E_ExecutionRoute.eFeedTable:
-								ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Start Fazy 1 - Tryb FeedTable', '');
 								SequenceState := 60; 
 						END_CASE
 						
 					ELSIF _RecipeBuilder.Error THEN
-						ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'MainSeq: Krok 20 - Recepta zglosila ERROR!', '');
 						RaiseAlarmWithStrings(GantryAlarms[1], 'Blad budowania recepty!', '');
 						ChangeState(E_PMLCommand.ePMLCommand_Abort);
 						SequenceState := 999;
@@ -522,7 +492,6 @@ END_VAR]]></Declaration>
 			// ========================================================
 			70:
 				IF ExecutorDrill.Execute() THEN 
-					ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Faza 1.5 - Start operacji wiercenia otworów', '');
 					SequenceState := 75;
 				END_IF
 			75:
@@ -541,7 +510,6 @@ END_VAR]]></Declaration>
             // ========================================================
             100: 
                 IF ExecutorCutY.Execute() THEN 
-                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Faza 2 - Start operacji CutY', '');
                     SequenceState := 110; 
                 END_IF
             110: 
@@ -555,7 +523,6 @@ END_VAR]]></Declaration>
                 
             120: 
                 IF ExecutorCutX.Execute() THEN 
-                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Faza 2 - Start operacji CutX', '');
                     SequenceState := 130; 
                 END_IF
             130: 
@@ -578,7 +545,6 @@ END_VAR]]></Declaration>
             // KONIEC OBRÓBKI 
             // ========================================================
             1000:            
-                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Sekwencja produkcyjna zakonczona sukcesem.', '');
                 StateTasksComplete := TRUE;
                 StateComplete();
 
@@ -1208,11 +1174,15 @@ END_CASE]]></ST>
     <LineIds Name="FB_GantryXYZ.Aborting">
       <LineId Id="149" Count="1" />
       <LineId Id="401" Count="0" />
-      <LineId Id="461" Count="50" />
+      <LineId Id="461" Count="7" />
+      <LineId Id="470" Count="13" />
+      <LineId Id="487" Count="8" />
+      <LineId Id="497" Count="14" />
       <LineId Id="533" Count="0" />
       <LineId Id="512" Count="5" />
       <LineId Id="541" Count="0" />
-      <LineId Id="518" Count="7" />
+      <LineId Id="518" Count="4" />
+      <LineId Id="524" Count="1" />
       <LineId Id="118" Count="0" />
       <LineId Id="181" Count="2" />
       <LineId Id="198" Count="0" />
@@ -1244,7 +1214,8 @@ END_CASE]]></ST>
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Clearing">
       <LineId Id="317" Count="25" />
-      <LineId Id="284" Count="21" />
+      <LineId Id="284" Count="4" />
+      <LineId Id="305" Count="0" />
       <LineId Id="343" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Config.Get">
@@ -1303,21 +1274,31 @@ END_CASE]]></ST>
       <LineId Id="750" Count="7" />
       <LineId Id="1172" Count="1" />
       <LineId Id="1171" Count="0" />
-      <LineId Id="1168" Count="2" />
+      <LineId Id="1168" Count="0" />
+      <LineId Id="1170" Count="0" />
       <LineId Id="758" Count="0" />
       <LineId Id="760" Count="3" />
       <LineId Id="1122" Count="5" />
       <LineId Id="1175" Count="1" />
       <LineId Id="1174" Count="0" />
-      <LineId Id="1128" Count="36" />
+      <LineId Id="1128" Count="6" />
+      <LineId Id="1136" Count="7" />
+      <LineId Id="1145" Count="2" />
+      <LineId Id="1149" Count="2" />
+      <LineId Id="1153" Count="3" />
+      <LineId Id="1158" Count="6" />
       <LineId Id="794" Count="40" />
       <LineId Id="1118" Count="0" />
       <LineId Id="1099" Count="0" />
-      <LineId Id="1103" Count="14" />
+      <LineId Id="1103" Count="4" />
+      <LineId Id="1109" Count="8" />
       <LineId Id="1102" Count="0" />
       <LineId Id="1100" Count="1" />
-      <LineId Id="835" Count="35" />
-      <LineId Id="873" Count="15" />
+      <LineId Id="835" Count="5" />
+      <LineId Id="842" Count="12" />
+      <LineId Id="856" Count="14" />
+      <LineId Id="873" Count="6" />
+      <LineId Id="881" Count="7" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.FB_init">

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
-  <POU Name="FB_FeedMeina2_SampleBox" Id="{a4077330-6da6-413f-a705-3e06a762c716}" SpecialFunc="None">
-    <Declaration><![CDATA[FUNCTION_BLOCK FB_FeedMeina2_SampleBox EXTENDS FB_RecipeBase
+  <POU Name="FB_NCIMeina2_SampleBox" Id="{a4077330-6da6-413f-a705-3e06a762c716}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NCIMeina2_SampleBox EXTENDS FB_RecipeBase
 
 ]]></Declaration>
     <Implementation>
@@ -53,14 +53,14 @@ END_VAR
         </Implementation>
       </Get>
     </Property>
-    <LineIds Name="FB_FeedMeina2_SampleBox">
+    <LineIds Name="FB_NCIMeina2_SampleBox">
       <LineId Id="9" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedMeina2_SampleBox.Build">
+    <LineIds Name="FB_NCIMeina2_SampleBox.Build">
       <LineId Id="2873" Count="19" />
       <LineId Id="11" Count="0" />
     </LineIds>
-    <LineIds Name="FB_FeedMeina2_SampleBox.ExecutionRoute.Get">
+    <LineIds Name="FB_NCIMeina2_SampleBox.ExecutionRoute.Get">
       <LineId Id="2" Count="0" />
     </LineIds>
   </POU>

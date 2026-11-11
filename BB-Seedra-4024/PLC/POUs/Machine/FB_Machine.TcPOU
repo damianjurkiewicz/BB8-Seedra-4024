@@ -293,7 +293,7 @@ aRecipeNames[E_RecipeID.eNCIMeina2_750x750_Circles]   	:= 'Meina Circles 750';
 aRecipeNames[E_RecipeID.eNCIMeina2_1000x1000]    		:= 'Meina Squares 1000x1000';
 aRecipeNames[E_RecipeID.eFeedMeina2_1000x1000_Circles]  := 'Meina Circles 1000x1000';
 aRecipeNames[E_RecipeID.eFeedMeina2_2000x500] 			:= 'Meina Rectangles 2000x500';
-aRecipeNames[E_RecipeID.eFeedMeina2_SampleBox] 			:= 'Meina Sample Box';
+aRecipeNames[E_RecipeID.eNCIMeina2_SampleBox] 			:= 'Meina Sample Box';
 aRecipeNames[E_RecipeID.eGCodeUSB] 						:= 'USB Drive';
 
 
@@ -458,7 +458,6 @@ CASE Step OF
 		
 		0:  // Reset group or waits
 			ResetSafety:= FALSE;
-			//Trace('Timer Initialize');
 			Step := Step + 10;
 			
 		10: //If necessary reset group
@@ -809,7 +808,8 @@ END_IF]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.ResetSafety">
-      <LineId Id="258" Count="62" />
+      <LineId Id="258" Count="6" />
+      <LineId Id="266" Count="54" />
       <LineId Id="111" Count="0" />
     </LineIds>
     <LineIds Name="FB_Machine.Resetting">

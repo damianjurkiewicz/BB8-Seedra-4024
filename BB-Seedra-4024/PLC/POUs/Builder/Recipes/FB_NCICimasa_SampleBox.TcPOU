@@ -1,0 +1,67 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.15">
+  <POU Name="FB_NCICimasa_SampleBox" Id="{e495bbc6-186b-41e3-b55e-5390c6a836f8}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_NCICimasa_SampleBox EXTENDS FB_RecipeBase
+
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[]]></ST>
+    </Implementation>
+    <Method Name="Build" Id="{aa1e595f-ced9-4a60-89fc-140c3e1dd111}">
+      <Declaration><![CDATA[METHOD Build : BOOL
+VAR
+      i          : INT;
+	  sRecipeName : STRING(255) := '\Hard Disk2\Meina2_SampleBox.nc';
+END_VAR
+
+VAR_INST
+    nBuildStep : INT;
+    machineConfig : ST_GantryXYZ_Config;
+END_VAR]]></Declaration>
+      <Implementation>
+        <ST><![CDATA[Build := FALSE;
+
+CASE nBuildStep OF
+    0:
+        _Busy := TRUE;
+        _Done := FALSE;
+        _Error := FALSE;
+        
+        _Config.GCodePath := sRecipeName; 
+        
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, CONCAT('Builder: Skonfigurowano gotowy plik G-Code: ', sRecipeName), '');
+        
+        nBuildStep := 1000;
+
+    1000:
+        _Busy := FALSE;
+        _Done := TRUE; 
+        nBuildStep := 0;
+        Build := TRUE;
+        
+END_CASE]]></ST>
+      </Implementation>
+    </Method>
+    <Property Name="ExecutionRoute" Id="{6a4eba19-6c0e-4358-a0ad-58b76747b17e}">
+      <Declaration><![CDATA[PROPERTY ExecutionRoute : E_ExecutionRoute]]></Declaration>
+      <Get Name="Get" Id="{d7d2ba43-db8b-4ed8-951b-8e6102f5a71e}">
+        <Declaration><![CDATA[VAR
+END_VAR
+]]></Declaration>
+        <Implementation>
+          <ST><![CDATA[ExecutionRoute := E_ExecutionRoute.eGCode;]]></ST>
+        </Implementation>
+      </Get>
+    </Property>
+    <LineIds Name="FB_NCICimasa_SampleBox">
+      <LineId Id="9" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NCICimasa_SampleBox.Build">
+      <LineId Id="2873" Count="19" />
+      <LineId Id="11" Count="0" />
+    </LineIds>
+    <LineIds Name="FB_NCICimasa_SampleBox.ExecutionRoute.Get">
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

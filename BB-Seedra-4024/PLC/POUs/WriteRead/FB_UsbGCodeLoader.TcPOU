@@ -81,7 +81,6 @@ IF bSelectionPending AND nStep = 0 AND NOT bLocked THEN
             RecipeConfig.GCodePath := CONCAT('\Hard Disk2\', sSelectedName);
             _RecipeGCodeUSB.Config := RecipeConfig;
             _RecipeGCodeUSB.Build();
-            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'USB loader: wybrano plik %s', sSelectedName);
         END_IF
         bSelectionPending := FALSE;
     END_IF
@@ -245,7 +244,8 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_UsbGCodeLoader.CyclicLogic">
-      <LineId Id="837" Count="115" />
+      <LineId Id="837" Count="21" />
+      <LineId Id="860" Count="92" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_UsbGCodeLoader.Done.Get">

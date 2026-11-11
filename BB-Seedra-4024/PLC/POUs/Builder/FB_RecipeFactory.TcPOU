@@ -22,7 +22,8 @@ VAR
     BuilderMeina2_1000x1000_Circles    	: FB_NCIMeina2_1000x1000_Circles;
     BuilderMeina2_2000x500    			: FB_NCIMeina2_2000x500;
 	
-	BuilderMeina2_SampleBox				: FB_FeedMeina2_SampleBox;
+	BuilderMeina2_SampleBox				: FB_NCIMeina2_SampleBox;
+	BuilderCimasa_SampleBox				: FB_NCICimasa_SampleBox;
 	BuilderGCodeUSB						: FB_GCodeUSB;
 	
 END_VAR]]></Declaration>
@@ -81,7 +82,7 @@ END_VAR]]></Declaration>
     E_RecipeID.eFeedMeina2_2000x500: 
 		GetBuilder := BuilderMeina2_2000x500;
 		
-	E_RecipeID.eFeedMeina2_SampleBox: 
+	E_RecipeID.eNCIMeina2_SampleBox: 
 		GetBuilder := BuilderMeina2_SampleBox;	
 		
 	E_RecipeId.eGCodeUSB :
@@ -182,7 +183,7 @@ BuilderGCodeUSB.Config := Config;]]></ST>
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.GetBuilder">
-      <LineId Id="1442" Count="53" />
+      <LineId Id="1502" Count="53" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.InitializeFactory">
