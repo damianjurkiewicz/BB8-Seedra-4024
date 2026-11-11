@@ -723,35 +723,6 @@
                           </o>
                           <o>
                             <v n="Flags">2L</v>
-                            <v n="BasicTypeNodeValue">"MAIN.Seedra.GantryXYZ.AxisX.AxisBase_HMI"</v>
-                            <v n="BasicTypeNodeAcceptsExpression">true</v>
-                            <n n="BasicTypeNodeFastAccess" />
-                            <a n="BasicTypeNodeEnumValues" et="String" />
-                            <n n="EnumValueDisplayTextIds" />
-                            <n n="EnumValueVisibilityAttributeValues" />
-                            <n n="EnumValueLibraryId" />
-                            <n n="DynamicEnumMemberVisibilityCheckerTypeGuid" />
-                            <l n="TypeNodeChildren" t="ArrayList" />
-                            <o n="TypeNodeType" t="TypeNodeType">
-                              <v n="TypeClass" t="TypeClass">Reference</v>
-                              <v n="QualifiedName">"ST_AxisBase_HMI"</v>
-                              <v n="Name">"ST_AxisBase_HMI"</v>
-                            </o>
-                            <v n="TypeNodeName">"HMIAxeX"</v>
-                            <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
-                              <v n="AttrFlags">0UL</v>
-                              <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
-                              <v n="ConvDone">true</v>
-                            </o>
-                            <v n="TypeNodeId" t="Int16">256</v>
-                            <v n="TypeNodeIdLong">3763294711L</v>
-                            <n n="LibraryId" />
-                            <n n="DisplayTextId" />
-                            <n n="DescriptionTextID" />
-                            <v n="DescriptionUseParent">false</v>
-                          </o>
-                          <o>
-                            <v n="Flags">2L</v>
                             <v n="BasicTypeNodeValue">"MAIN.Seedra.RecipeConfig_HMI"</v>
                             <v n="BasicTypeNodeAcceptsExpression">true</v>
                             <n n="BasicTypeNodeFastAccess" />
@@ -772,7 +743,7 @@
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
-                            <v n="TypeNodeId" t="Int16">257</v>
+                            <v n="TypeNodeId" t="Int16">256</v>
                             <v n="TypeNodeIdLong">3910413918L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
@@ -795,14 +766,14 @@
                               <v n="QualifiedName">"ST_Machine_HMI"</v>
                               <v n="Name">"ST_Machine_HMI"</v>
                             </o>
-                            <v n="TypeNodeName">"HMI2"</v>
+                            <v n="TypeNodeName">"Machine_HMI"</v>
                             <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
                               <v n="AttrFlags">0UL</v>
                               <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
                               <v n="ConvDone">true</v>
                             </o>
-                            <v n="TypeNodeId" t="Int16">258</v>
-                            <v n="TypeNodeIdLong">2734490756L</v>
+                            <v n="TypeNodeId" t="Int16">257</v>
+                            <v n="TypeNodeIdLong">6236693L</v>
                             <n n="LibraryId" />
                             <n n="DisplayTextId" />
                             <n n="DescriptionTextID" />
@@ -850,22 +821,6 @@
                     <o>
                       <v n="Id">2477733581L</v>
                       <v n="Value">""</v>
-                    </o>
-                    <o>
-                      <v n="Id">2501871159L</v>
-                      <v n="Value">"MAIN.Seedra.PackMLBaseModule_HMI"</v>
-                    </o>
-                    <o>
-                      <v n="Id">3763294711L</v>
-                      <v n="Value">"MAIN.Seedra.GantryXYZ.AxisX.AxisBase_HMI"</v>
-                    </o>
-                    <o>
-                      <v n="Id">3910413918L</v>
-                      <v n="Value">"MAIN.Seedra.RecipeConfig_HMI"</v>
-                    </o>
-                    <o>
-                      <v n="Id">2734490756L</v>
-                      <v n="Value">"MAIN.Seedra.Machine_HMI"</v>
                     </o>
                     <o>
                       <v n="Id">2707294094L</v>
@@ -1099,6 +1054,18 @@
                     </o>
                     <o>
                       <v n="Id">2639317859L</v>
+                      <v n="Value">"MAIN.Seedra.Machine_HMI"</v>
+                    </o>
+                    <o>
+                      <v n="Id">2501871159L</v>
+                      <v n="Value">"MAIN.Seedra.PackMLBaseModule_HMI"</v>
+                    </o>
+                    <o>
+                      <v n="Id">3910413918L</v>
+                      <v n="Value">"MAIN.Seedra.RecipeConfig_HMI"</v>
+                    </o>
+                    <o>
+                      <v n="Id">6236693L</v>
                       <v n="Value">"MAIN.Seedra.Machine_HMI"</v>
                     </o>
                   </l>

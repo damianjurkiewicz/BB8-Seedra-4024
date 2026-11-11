@@ -306,7 +306,7 @@
                     <o>
                       <v n="Id">2477733581L</v>
                       <o n="Value" t="TextListEnumerationInfo">
-                        <v n="TextListEnumerationName">"HMI2.Status.PackMLState"</v>
+                        <v n="TextListEnumerationName">"Machine_HMI.Status.PackMLState"</v>
                         <o n="TextListEnumerationType" t="UserdefType">
                           <o n="TypeDef" t="VariableExpression">
                             <n n="Type" />
@@ -318,7 +318,7 @@
                             <a n="MessagesToSave" et="CompilerMessage" />
                             <v n="Name">"E_PMLStateForHMI"</v>
                           </o>
-                          <v n="SignatureId">17614</v>
+                          <v n="SignatureId">397</v>
                           <v n="ScopeId">-1</v>
                           <v n="Compiled">false</v>
                         </o>
@@ -954,7 +954,7 @@
                     </o>
                     <o>
                       <v n="Id">1649127785L</v>
-                      <v n="Value">-6</v>
+                      <v n="Value" t="Int16">0</v>
                     </o>
                     <o>
                       <v n="Id">357335551L</v>
@@ -2390,11 +2390,6 @@
                 <v n="Text">"	HMI : ST_PackMLBaseModule_HMI;"</v>
               </o>
               <o>
-                <v n="Id">17L</v>
-                <n n="Tag" />
-                <v n="Text">"	HMIAxeX : ST_AxisBase_HMI;"</v>
-              </o>
-              <o>
                 <v n="Id">20L</v>
                 <n n="Tag" />
                 <v n="Text">"	HMI_Recipe : ST_RecipeBuilder_HMI;"</v>
@@ -2402,7 +2397,7 @@
               <o>
                 <v n="Id">21L</v>
                 <n n="Tag" />
-                <v n="Text">"	HMI2 : ST_Machine_HMI;"</v>
+                <v n="Text">"	Machine_HMI : ST_Machine_HMI;"</v>
               </o>
               <o>
                 <v n="Id">1L</v>
