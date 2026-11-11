@@ -23,6 +23,9 @@ VAR
     
     fbScanTimer      : TON;
     aTempFileList    : ARRAY [0..30] OF STRING(255);
+END_VAR
+VAR_INPUT
+    bLocked : BOOL; // TRUE, gdy maszyna nie jest w Idle/Stopped/Aborted
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -50,27 +53,41 @@ END_VAR
       <Declaration><![CDATA[METHOD PUBLIC CyclicLogic
 VAR_INST
     iLastSelectedFile : INT := -1;
-    sLastSelectedFile : STRING(255) := '';
+    bInitDone         : BOOL;
+    bSelectionPending : BOOL;
+    sSelectedName     : STRING(255);
+    nEmptyScans       : INT;
 END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[// 1. Automatyczne ładowanie do recepty po zmianie wyboru
-IF (HMI.iSelectedFile <> iLastSelectedFile OR HMI.aFileList[HMI.iSelectedFile] <> sLastSelectedFile) AND nStep = 0 THEN
+        <ST><![CDATA[// 0. Pierwszy cykl: domyślny indeks z HMI to jeszcze nie jest świadomy wybór użytkownika
+IF NOT bInitDone THEN
     iLastSelectedFile := HMI.iSelectedFile;
-    sLastSelectedFile := HMI.aFileList[HMI.iSelectedFile];
-    
-    IF HMI.iSelectedFile >= 0 AND HMI.iSelectedFile <= 30 AND _RecipeGCodeUSB <> 0 THEN
+    bInitDone := TRUE;
+END_IF
+
+// 1. Użytkownik zmienił wybór (reagujemy tylko na zmianę indeksu, nie na migotanie zawartości)
+IF HMI.iSelectedFile <> iLastSelectedFile THEN
+    iLastSelectedFile := HMI.iSelectedFile;
+    bSelectionPending := TRUE;
+END_IF
+
+// 2. Zastosuj wybór dopiero, gdy skaner USB w tle nie pracuje (nStep = 0) oraz maszyna jest zatrzymana (NOT bLocked)
+IF bSelectionPending AND nStep = 0 AND NOT bLocked THEN
+    IF HMI.iSelectedFile < 0 OR HMI.iSelectedFile > 30 THEN
+        bSelectionPending := FALSE;                     // Zły indeks, ignoruj
+    ELSIF _RecipeGCodeUSB <> 0 THEN                     // Czekaj, jeśli builder nie jest jeszcze wstrzyknięty
         IF LEN(HMI.aFileList[HMI.iSelectedFile]) > 0 THEN
-            RecipeConfig.GCodePath := CONCAT('\Hard Disk2\', HMI.aFileList[HMI.iSelectedFile]);
-        ELSE
-            RecipeConfig.GCodePath := '';
+            sSelectedName := HMI.aFileList[HMI.iSelectedFile];
+            RecipeConfig.GCodePath := CONCAT('\Hard Disk2\', sSelectedName);
+            _RecipeGCodeUSB.Config := RecipeConfig;
+            _RecipeGCodeUSB.Build();
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'USB loader: wybrano plik %s', sSelectedName);
         END_IF
-        
-        _RecipeGCodeUSB.Config := RecipeConfig;
-        _RecipeGCodeUSB.Build();
+        bSelectionPending := FALSE;
     END_IF
 END_IF
 
-// 2. Cykliczne skanowanie USB w tle co 3 sekundy
+// 3. Cykliczne skanowanie USB w tle co 3 sekundy
 fbScanTimer(IN := (nStep = 0), PT := T#3S);
 IF fbScanTimer.Q THEN
     _Busy := TRUE;
@@ -79,10 +96,11 @@ IF fbScanTimer.Q THEN
     nStep := 10;
 END_IF
 
-// 3. Maszyna stanów do skanowania katalogu
+// 4. Maszyna stanów do skanowania katalogu
 CASE nStep OF
     0: // IDLE
         ;
+        
     10: // INIT - Czyszczenie tylko tablicy tymczasowej
         FOR iFileCount := 0 TO 30 DO
             aTempFileList[iFileCount] := '';
@@ -131,24 +149,28 @@ CASE nStep OF
         END_IF
 
     999: // ERROR HANDLING
+        IF nEmptyScans < 100 THEN nEmptyScans := nEmptyScans + 1; END_IF
+        IF nEmptyScans >= 3 THEN bUsbPresent := FALSE; END_IF
+        
         _Busy := FALSE;
         _Error := TRUE;
         nStep := 0;
 
     1000: // ZAKOŃCZONO SUKCESEM
-        HMI.aFileList := aTempFileList; 
-        
         IF iFileCount = 0 THEN
-            bUsbPresent := FALSE; 
-            RecipeConfig.GCodePath := ''; // Brak plików - zerowanie ścieżki (brak możliwości odpalenia produkcji)
-            IF _RecipeGCodeUSB <> 0 THEN
-                _RecipeGCodeUSB.Config := RecipeConfig;
-                _RecipeGCodeUSB.Build(); 
-            END_IF
+            IF nEmptyScans < 100 THEN nEmptyScans := nEmptyScans + 1; END_IF
         ELSE
-            bUsbPresent := TRUE; 
+            nEmptyScans := 0;
+        END_IF
+
+        // Pustą listę (np. chwilowe zniknięcie dysku z winy CE) uznaj dopiero po 3 kolejnych pustych skanach
+        IF iFileCount > 0 OR nEmptyScans >= 3 THEN
+            HMI.aFileList := aTempFileList;
+            bUsbPresent := (iFileCount > 0);
         END_IF
         
+        // Zmienna RecipeConfig.GCodePath NIE jest już czyszczona tutaj!
+
         _Error := FALSE;
         _Done  := TRUE;
         _Busy  := FALSE;
@@ -223,7 +245,7 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_UsbGCodeLoader.CyclicLogic">
-      <LineId Id="726" Count="99" />
+      <LineId Id="837" Count="115" />
       <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_UsbGCodeLoader.Done.Get">

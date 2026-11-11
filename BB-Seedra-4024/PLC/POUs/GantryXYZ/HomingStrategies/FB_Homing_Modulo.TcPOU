@@ -8,9 +8,10 @@ END_VAR
 VAR
     fbMcHome          : MC_Home;
     fbMoveAbs         : MC_MoveAbsolute;
-	fbMoveModulo	  : MC_MoveModulo;
+    fbMoveModulo      : MC_MoveModulo;
+    fbSetPosition     : MC_SetPosition; 
     DelayTimer        : TON;
-	_HomingVelocity   : LREAL := 50.0;
+    _HomingVelocity   : LREAL := 50.0;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -24,6 +25,8 @@ END_VAR
         <ST><![CDATA[IF _Axis <> 0 THEN
     fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
     fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
+    fbMoveModulo(Axis := _Axis.Axis, Execute := FALSE);
+    fbSetPosition(Axis := _Axis.Axis, Execute := FALSE); 
 END_IF
 
 SUPER^.Abort();]]></ST>
@@ -37,6 +40,8 @@ SUPER^.Abort();]]></ST>
     0: 
         fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
         fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
+        fbMoveModulo(Axis := _Axis.Axis, Execute := FALSE);
+        fbSetPosition(Axis := _Axis.Axis, Execute := FALSE); 
 
     10: 
         IF _Axis.Axis.Status.Homed THEN
@@ -60,7 +65,7 @@ SUPER^.Abort();]]></ST>
             END_IF
         END_IF
 
-	20: 
+    20: 
         fbMoveModulo(
             Axis      := _Axis.Axis,
             Execute   := TRUE,
@@ -71,11 +76,28 @@ SUPER^.Abort();]]></ST>
         
         IF fbMoveModulo.Done THEN
             fbMoveModulo(Axis := _Axis.Axis, Execute := FALSE);
-            nStep := 40;
+            nStep := 30; 
         ELSIF fbMoveModulo.Error THEN
             _bBusy    := FALSE;
             _bError   := TRUE;
             _bErrorID := fbMoveModulo.ErrorID;
+            nStep     := 0;
+        END_IF
+
+    30:
+        fbSetPosition(
+            Axis     := _Axis.Axis,
+            Execute  := TRUE,
+            Position := 0.0
+        );
+        
+        IF fbSetPosition.Done THEN
+            fbSetPosition(Axis := _Axis.Axis, Execute := FALSE);
+            nStep := 40;
+        ELSIF fbSetPosition.Error THEN
+            _bBusy    := FALSE;
+            _bError   := TRUE;
+            _bErrorID := fbSetPosition.ErrorID;
             nStep     := 0;
         END_IF
         
@@ -109,13 +131,11 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_Modulo.Abort">
-      <LineId Id="12" Count="4" />
+      <LineId Id="20" Count="6" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_Modulo.CyclicLogic">
-      <LineId Id="506" Count="26" />
-      <LineId Id="556" Count="16" />
-      <LineId Id="548" Count="5" />
+      <LineId Id="574" Count="68" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_Modulo.HomingVelocity.Get">
