@@ -11,7 +11,7 @@
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR
       i          : INT;
-	  sRecipeName : STRING(255) := '\Hard Disk2\Meina2_SampleBox.nc';
+	  sRecipeName : STRING(255) := '\Hard Disk\GCode\Meina2_SampleBox.nc';
 END_VAR
 
 VAR_INST
@@ -57,7 +57,7 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIMeina2_SampleBox.Build">
-      <LineId Id="2873" Count="19" />
+      <LineId Id="2956" Count="19" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIMeina2_SampleBox.ExecutionRoute.Get">
