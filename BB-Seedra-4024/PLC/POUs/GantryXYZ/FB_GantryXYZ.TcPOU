@@ -416,9 +416,14 @@ END_VAR]]></Declaration>
         CASE SequenceState OF
             0:
                 NoStateTasksToComplete := FALSE;
-                // LOG: Start sekwencji
-                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'MainSeq: Rozpoczynam nowa sekwencje produkcyjna', '');
-                SequenceState := 10;
+                
+				// STEP 1: PARENT-CHILD SYNCHRONIZATION (The Handshake)
+                // We wait here until the parent module (FB_Machine) finishes its own asynchronous tasks 
+                // (like copying the G-Code file from USB) and assigns a valid recipe interface.
+                IF _RecipeBuilder <> 0 THEN
+                    ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Gantry Execute: Maszyna glowna potwierdzila gotowosc (Handshake OK)', '');
+                    SequenceState := 20;
+                END_IF
                 
             10: 
                 SequenceState := 20;
@@ -429,6 +434,9 @@ END_VAR]]></Declaration>
 						_RecipeBuilder.GeometryWriter := ExecTangentialFeed;
 					END_IF
 					
+					// STEP 2: OOP DELEGATION
+                    // Now that we have a valid object, we command it to build the recipe 
+                    // and rely entirely on its internal OOP flags (Done/Error) to know when it's ready.
 					_RecipeBuilder.Build();
 					
 					IF _RecipeBuilder.Done THEN 
@@ -563,9 +571,7 @@ END_VAR]]></Declaration>
             // MARTWY KROK DLA BŁĘDÓW
             // ========================================================
             999:
-                // Maszyna po prostu tu czeka.
-                // W tle PackML przetworzy komendę ChangeState i brutalnie przerwie
-                // metodę Execute(), przeskakując do metody Aborting()!
+                //We wait for error propagation, we have time to Abort the machine manually and we can observe the variables easier 
                 ;
     
             // ========================================================
@@ -1050,6 +1056,12 @@ END_VAR
             0:
                 NoStateTasksToComplete := FALSE;
                 StateTasksComplete     := FALSE;
+				
+				// PACKML HANDSHAKE RESET: 
+                // We drop the old recipe reference by setting the pointer to 0 (null). 
+                // This guarantees that Gantry won't accidentally start using data from the previous 
+                // production cycle and forces it to wait for a fresh injection from the parent machine.
+				_RecipeBuilder := 0;
                 SequenceState          := 10;
 				DelayTimer(IN := FALSE);
         
@@ -1288,15 +1300,24 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Execute">
-      <LineId Id="750" Count="13" />
-      <LineId Id="1122" Count="42" />
+      <LineId Id="750" Count="7" />
+      <LineId Id="1172" Count="1" />
+      <LineId Id="1171" Count="0" />
+      <LineId Id="1168" Count="2" />
+      <LineId Id="758" Count="0" />
+      <LineId Id="760" Count="3" />
+      <LineId Id="1122" Count="5" />
+      <LineId Id="1175" Count="1" />
+      <LineId Id="1174" Count="0" />
+      <LineId Id="1128" Count="36" />
       <LineId Id="794" Count="40" />
       <LineId Id="1118" Count="0" />
       <LineId Id="1099" Count="0" />
       <LineId Id="1103" Count="14" />
       <LineId Id="1102" Count="0" />
       <LineId Id="1100" Count="1" />
-      <LineId Id="835" Count="53" />
+      <LineId Id="835" Count="35" />
+      <LineId Id="873" Count="15" />
       <LineId Id="23" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.FB_init">
@@ -1399,7 +1420,12 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
-      <LineId Id="1513" Count="7" />
+      <LineId Id="1513" Count="6" />
+      <LineId Id="1763" Count="0" />
+      <LineId Id="1765" Count="2" />
+      <LineId Id="1764" Count="0" />
+      <LineId Id="1762" Count="0" />
+      <LineId Id="1520" Count="0" />
       <LineId Id="1636" Count="0" />
       <LineId Id="1521" Count="12" />
       <LineId Id="1738" Count="1" />

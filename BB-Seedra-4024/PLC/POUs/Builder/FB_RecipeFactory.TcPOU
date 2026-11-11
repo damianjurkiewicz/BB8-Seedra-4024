@@ -146,6 +146,9 @@ BuilderMeina2_2000x500.ConfigProvider := ConfigProvider;
 
 BuilderMeina2_SampleBox.Config    := Config;
 BuilderMeina2_SampleBox.ConfigProvider := ConfigProvider;    
+
+BuilderGCodeUSB.Config := Config;
+BuilderGCodeUSB.ConfigProvider := ConfigProvider;
 ]]></ST>
       </Implementation>
     </Method>
@@ -171,7 +174,8 @@ BuilderMeina2_3Circles.Config    := Config;
 BuilderMeina2_1000x1000.Config    := Config;
 BuilderMeina2_1000x1000_Circles.Config    := Config;
 BuilderMeina2_2000x500.Config := Config;
-BuilderMeina2_SampleBox.Config := Config;]]></ST>
+BuilderMeina2_SampleBox.Config := Config;
+BuilderGCodeUSB.Config := Config;]]></ST>
       </Implementation>
     </Method>
     <LineIds Name="FB_RecipeFactory">
@@ -205,6 +209,8 @@ BuilderMeina2_SampleBox.Config := Config;]]></ST>
       <LineId Id="63" Count="0" />
       <LineId Id="89" Count="1" />
       <LineId Id="88" Count="0" />
+      <LineId Id="96" Count="1" />
+      <LineId Id="95" Count="0" />
       <LineId Id="44" Count="0" />
     </LineIds>
     <LineIds Name="FB_RecipeFactory.UpdateConfig">
@@ -218,6 +224,7 @@ BuilderMeina2_SampleBox.Config := Config;]]></ST>
       <LineId Id="33" Count="5" />
       <LineId Id="32" Count="0" />
       <LineId Id="42" Count="0" />
+      <LineId Id="46" Count="0" />
     </LineIds>
   </POU>
 </TcPlcObject>

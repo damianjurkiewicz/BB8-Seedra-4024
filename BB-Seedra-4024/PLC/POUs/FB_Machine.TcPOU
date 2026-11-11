@@ -164,6 +164,9 @@ CurrentBuilder := RecipeFactory.GetBuilder(GantryXYZ.ProgramIdRequested);
 IF _CurrentState = E_PMLState.ePMLState_Idle OR 
    _CurrentState = E_PMLState.ePMLState_Stopped OR
    _CurrentState = E_PMLState.ePMLState_Aborted THEN
+   
+   UsbLoader(HMI := HMI_Loader, RecipeConfig := RecipeConfig_HMI.Config);
+    UsbLoader.CyclicLogic();
 
 IF CurrentBuilder <> 0 THEN
     // Wrzucamy dane z HMI -> Wyzwala to limity i UpdateNestingLimits() w Builderze!
@@ -684,7 +687,9 @@ END_IF]]></ST>
       <LineId Id="443" Count="0" />
       <LineId Id="448" Count="0" />
       <LineId Id="441" Count="0" />
-      <LineId Id="379" Count="12" />
+      <LineId Id="379" Count="11" />
+      <LineId Id="534" Count="2" />
+      <LineId Id="391" Count="0" />
       <LineId Id="426" Count="11" />
       <LineId Id="404" Count="4" />
       <LineId Id="411" Count="11" />
