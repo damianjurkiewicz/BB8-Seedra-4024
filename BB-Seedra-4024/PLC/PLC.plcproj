@@ -19,31 +19,10 @@
     <Released>false</Released>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DUTs\ST_AlarmHistoryEntry.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\ST_Machine_Command.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\ST_UsbGcodeLoader_HMI.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="DUTs\ST_Recipe_Limits.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DUTs\ST_LimitInfo.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\E_CutDirection.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\E_PMLStateForHMI.TcTLEO">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\ST_Machine_HMI.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DUTs\ST_Machine_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="GVLs\GVL_HMI.TcGVL">
@@ -178,6 +157,9 @@
     <Compile Include="POUs\Executor\FB_Exec_Spindle_GCodeXYZ.TcPOU">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\GantryXYZ\E_CutDirection.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\GantryXYZ\E_MachineProfile.TcDUT">
       <SubType>Code</SubType>
     </Compile>
@@ -226,13 +208,28 @@
     <Compile Include="POUs\GantryXYZ\ST_GantryXYZ_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\FB_Machine.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="POUs\GlobalTextList.TcGTLO">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\Listener\FB_EventLoggerListener.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Listener\ST_AlarmHistoryEntry.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Machine\E_PMLStateForHMI.TcTLEO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Machine\FB_Machine.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Machine\ST_Machine_Command.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Machine\ST_Machine_HMI.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\Machine\ST_Machine_Status.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\MAIN.TcPOU">
@@ -329,6 +326,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\WriteRead\FB_UsbGCodeLoader.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\WriteRead\ST_UsbGcodeLoader_HMI.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="SafetyTask.TcTTO">
@@ -460,6 +460,7 @@
     <Folder Include="POUs\Builder" />
     <Folder Include="POUs\GantryXYZ\HomingStrategies" />
     <Folder Include="POUs\Listener" />
+    <Folder Include="POUs\Machine" />
     <Folder Include="POUs\WriteRead" />
     <Folder Include="POUs\TESTS" />
     <Folder Include="POUs\TESTS\Mocks" />

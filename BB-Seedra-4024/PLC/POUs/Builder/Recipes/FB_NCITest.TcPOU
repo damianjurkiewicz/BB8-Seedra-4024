@@ -11,7 +11,6 @@
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR
       i          : INT;
-	  sRecipeName : STRING(255) := '\Hard Disk2\Meina2_2000x1000.nc';
 END_VAR
 
 VAR_INST
@@ -26,12 +25,39 @@ CASE nBuildStep OF
         _Busy := TRUE;
         _Done := FALSE;
         _Error := FALSE;
+        _nLinesToWrite := 0;
         
-        _Config.GCodePath := sRecipeName; 
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Budowanie G-Code', '');
         
-        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, CONCAT('Builder: Skonfigurowano gotowy plik G-Code: ', sRecipeName), '');
+        THIS^.UpdateNestingLimits();
+        IF NOT _Config.IsValid THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'NCIBuilder: Walidacja nie przeszla! Ustawiam ERROR.', '');
+            _Busy := FALSE;
+            _Error := TRUE;
+            Build := FALSE;
+            RETURN;
+        END_IF
         
-        nBuildStep := 1000;
+        // --- BUFOR G-CODE ---
+        _aGCodeBuffer[1]   := '(1001)$N';
+        _aGCodeBuffer[2]   := 'N0 G01 Z22 F600$N';
+        _aGCodeBuffer[3]   := 'N1 G01 X310 Y305 F3000$N';
+
+        
+        _nLinesToWrite := 3; 
+        
+        // Czyszczenie reszty bufora
+        FOR i := (_nLinesToWrite + 1) TO 5 DO 
+            _aGCodeBuffer[i] := '';
+        END_FOR
+        
+        nBuildStep := 10;
+
+    10:
+        IF THIS^.WriteGCodeFile('\Hard Disk\NCITest.nc') THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Zapisano plik TangentialCut.nc', '');
+            nBuildStep := 1000;
+        END_IF
 
     1000:
         _Busy := FALSE;
@@ -57,9 +83,8 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCITest.Build">
-      <LineId Id="8092" Count="7" />
-      <LineId Id="8102" Count="3" />
-      <LineId Id="8107" Count="7" />
+      <LineId Id="8124" Count="37" />
+      <LineId Id="8163" Count="8" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCITest.ExecutionRoute.Get">

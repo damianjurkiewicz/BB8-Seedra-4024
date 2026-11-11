@@ -11,6 +11,7 @@
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR
       i          : INT;
+	  sRecipeName : STRING(255) := '\Hard Disk\Meina2_2000x1000.nc';
 END_VAR
 
 VAR_INST
@@ -25,40 +26,12 @@ CASE nBuildStep OF
         _Busy := TRUE;
         _Done := FALSE;
         _Error := FALSE;
-        _nLinesToWrite := 0;
         
-        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Budowanie G-Code', '');
+        _Config.GCodePath := sRecipeName; 
         
-        THIS^.UpdateNestingLimits();
-        IF NOT _Config.IsValid THEN
-            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'NCIBuilder: Walidacja nie przeszla! Ustawiam ERROR.', '');
-            _Busy := FALSE;
-            _Error := TRUE;
-            Build := FALSE;
-            RETURN;
-        END_IF
+        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, CONCAT('Builder: Skonfigurowano gotowy plik G-Code: ', sRecipeName), '');
         
-        // --- BUFOR G-CODE ---
-        _aGCodeBuffer[1]   := '(1001)$N';
-        _aGCodeBuffer[2]   := 'N0 G01 Z22 F600$N';
-        _aGCodeBuffer[3]   := 'N1 G01 X310 Y305 F3000$N';
-
-        
-        _nLinesToWrite := 3; 
-        
-        // Czyszczenie reszty bufora
-        FOR i := (_nLinesToWrite + 1) TO 5 DO 
-            _aGCodeBuffer[i] := '';
-        END_FOR
-        
-        nBuildStep := 10;
-
-    10:
-        IF THIS^.WriteGCodeFile('\Hard Disk2\Meina2_2000x1000.nc') THEN
-            ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Zapisano plik TangentialCut.nc', '');
-			 
-            nBuildStep := 1000;
-        END_IF
+        nBuildStep := 1000;
 
     1000:
         _Busy := FALSE;
@@ -67,16 +40,6 @@ CASE nBuildStep OF
         Build := TRUE;
         
 END_CASE]]></ST>
-      </Implementation>
-    </Method>
-    <Method Name="CalculateFootprint" Id="{9ee51b75-0294-4fb4-bca1-c4a79e66bf68}">
-      <Declaration><![CDATA[METHOD PROTECTED CalculateFootprint
-VAR_INPUT
-END_VAR
-]]></Declaration>
-      <Implementation>
-        <ST><![CDATA[_NominalX := 1;
-_NominalY := 1;]]></ST>
       </Implementation>
     </Method>
     <Property Name="ExecutionRoute" Id="{2522e725-4c9d-4aa7-9745-528a8d6a0bfc}">
@@ -94,15 +57,8 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIMeina2_2000x1000.Build">
-      <LineId Id="3389" Count="23" />
-      <LineId Id="3518" Count="13" />
-      <LineId Id="3656" Count="0" />
-      <LineId Id="3532" Count="8" />
+      <LineId Id="3665" Count="19" />
       <LineId Id="11" Count="0" />
-    </LineIds>
-    <LineIds Name="FB_NCIMeina2_2000x1000.CalculateFootprint">
-      <LineId Id="32" Count="0" />
-      <LineId Id="5" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIMeina2_2000x1000.ExecutionRoute.Get">
       <LineId Id="2" Count="0" />
