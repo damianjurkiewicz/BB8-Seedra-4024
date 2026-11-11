@@ -2598,10 +2598,10 @@ External Setpoint Generation:
 					<AxisPara>
 						<General UnitName="°"/>
 						<Dynamic Acceleration="15000" Deceleration="15000" Jerk="48322.8"/>
-						<Velo RefSearch="1800" RefSync="360" SlowManual="360" FastManual="1800" Fast="10738.39" Maximum="10738.4"/>
+						<Velo RefSearch="1800" RefSync="360" SlowManual="5" FastManual="360" Fast="10738.39" Maximum="10738.4"/>
 						<TargetPosControl Range="0.1"/>
 						<BacklashCompensation Range="0.2"/>
-						<OtherSettings AllowMotionCmdToSlave="true" PulseDistancePos="30" PulseDistanceNeg="30"/>
+						<OtherSettings AllowMotionCmdToSlave="true" PulseDistancePos="1" PulseDistanceNeg="1"/>
 					</AxisPara>
 					<Encoder Name="Enc" EncType="19">
 						<EncPara ScaleFactorNumerator="360" ScaleFactorDenominator="3145728" MaxCount="#xffffffff">
@@ -3436,7 +3436,7 @@ External Setpoint Generation:
 		</Motion>
 		<Plc>
 			<Project GUID="{DFCA86B2-7FCE-4794-85B0-3FA1B21ACFC6}" Name="PLC" PrjFilePath="PLC\PLC.plcproj" TmcFilePath="PLC\PLC.tmc" ReloadTmc="true" AmsPort="851" FileArchiveSettings="#x000e" SymbolicMapping="true">
-				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{269029C9-1A2B-CE80-1C2B-B59578816AD2}">
+				<Instance Id="#x08502000" TcSmClass="TComPlcObjDef" KeepUnrestoredLinks="2" AutoReloadTmc="true" TmcPath="PLC\PLC.tmc" TmcHash="{B2D7E0CF-CACE-921D-23FD-1305C7BC7713}">
 					<Name>PLC Instance</Name>
 					<CLSID ClassFactory="TcPlc30">{08500001-0000-0000-F000-000000000064}</CLSID>
 					<Vars VarGrpType="1">
