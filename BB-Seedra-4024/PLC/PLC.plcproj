@@ -46,6 +46,9 @@
     <Compile Include="POUs\Builder\I_GeometryWriter.TcIO">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="POUs\Builder\Recipes\E_RecipeID.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="POUs\Builder\Recipes\FB_NCICimasa_SampleBox.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -164,9 +167,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\E_MachineProfile.TcDUT">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\GantryXYZ\E_RecipeID.TcDUT">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\GantryXYZ\HomingStrategies\FB_Homing_Base.TcPOU">
@@ -357,6 +357,10 @@
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
     <Compile Include="VISUs\Modes\ProductionMode\V_NCIMeina2_SampleBox.TcVIS">
+      <SubType>Code</SubType>
+      <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
+    </Compile>
+    <Compile Include="VISUs\Modes\ProductionMode\V_NCICimasa_SampleBox.TcVIS">
       <SubType>Code</SubType>
       <DependentUpon>Visualization Manager.TcVMO</DependentUpon>
     </Compile>
