@@ -337,7 +337,37 @@
                                 <v n="VisuNodeReferenceGuid">{00000000-0000-0000-0000-000000000000}</v>
                                 <n n="VisuNodeReference" />
                                 <v n="VisNodeRefs33">"V_InfoMenu"</v>
-                                <l n="TypeNodeChildren" t="ArrayList" />
+                                <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
+                                  <o>
+                                    <v n="Flags">2L</v>
+                                    <n n="BasicTypeNodeValue" />
+                                    <v n="BasicTypeNodeAcceptsExpression">true</v>
+                                    <n n="BasicTypeNodeFastAccess" />
+                                    <a n="BasicTypeNodeEnumValues" et="String" />
+                                    <n n="EnumValueDisplayTextIds" />
+                                    <n n="EnumValueVisibilityAttributeValues" />
+                                    <n n="EnumValueLibraryId" />
+                                    <n n="DynamicEnumMemberVisibilityCheckerTypeGuid" />
+                                    <l n="TypeNodeChildren" t="ArrayList" />
+                                    <o n="TypeNodeType" t="TypeNodeType">
+                                      <v n="TypeClass" t="TypeClass">Reference</v>
+                                      <v n="QualifiedName">"ST_Machine_HMI"</v>
+                                      <v n="Name">"ST_Machine_HMI"</v>
+                                    </o>
+                                    <v n="TypeNodeName">"Machine_HMI"</v>
+                                    <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
+                                      <v n="AttrFlags">0UL</v>
+                                      <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
+                                      <v n="ConvDone">true</v>
+                                    </o>
+                                    <v n="TypeNodeId" t="Int16">255</v>
+                                    <v n="TypeNodeIdLong">2639317859L</v>
+                                    <n n="LibraryId" />
+                                    <n n="DisplayTextId" />
+                                    <n n="DescriptionTextID" />
+                                    <v n="DescriptionUseParent">false</v>
+                                  </o>
+                                </l>
                                 <o n="TypeNodeType" t="TypeNodeType">
                                   <v n="TypeClass" t="TypeClass">Userdef</v>
                                   <v n="QualifiedName">"IVisualisation"</v>
@@ -459,7 +489,7 @@
                                 <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
                                   <o>
                                     <v n="Flags">2L</v>
-                                    <n n="BasicTypeNodeValue" />
+                                    <v n="BasicTypeNodeValue">"MAIN.Seedra.Machine_HMI"</v>
                                     <v n="BasicTypeNodeAcceptsExpression">true</v>
                                     <n n="BasicTypeNodeFastAccess" />
                                     <a n="BasicTypeNodeEnumValues" et="String" />
@@ -818,39 +848,6 @@
                       <v n="Value">true</v>
                     </o>
                     <o>
-                      <v n="Id">2322814029L</v>
-                      <o n="Value" t="VisualizationNode">
-                        <v n="VisuNodeReferenceGuid">{00000000-0000-0000-0000-000000000000}</v>
-                        <n n="VisuNodeReference" />
-                        <v n="VisNodeRefs33">"V_InfoMenu"</v>
-                        <l n="TypeNodeChildren" t="ArrayList" />
-                        <o n="TypeNodeType" t="TypeNodeType">
-                          <v n="TypeClass" t="TypeClass">Userdef</v>
-                          <v n="QualifiedName">"IVisualisation"</v>
-                          <v n="Name">"IVisualisation"</v>
-                        </o>
-                        <v n="TypeNodeName">"[1]"</v>
-                        <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
-                          <v n="AttrFlags">0UL</v>
-                          <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" ckt="String" cvt="String">
-                            <v>conditionalshow</v>
-                            <v>visu_elemdev</v>
-                            <v>ieccodeconversion_useexistinginterface</v>
-                            <v>_3S.CoDeSys.VisuGenerated.IVisualisationIEC</v>
-                            <v>''NORMAL__COMMENT</v>
-                            <v> interface contains additional methods to IVisualElement</v>
-                          </d>
-                          <v n="ConvDone">true</v>
-                        </o>
-                        <v n="TypeNodeId" t="Int16">1</v>
-                        <v n="TypeNodeIdLong">2322814029L</v>
-                        <n n="LibraryId" />
-                        <n n="DisplayTextId" />
-                        <n n="DescriptionTextID" />
-                        <v n="DescriptionUseParent">false</v>
-                      </o>
-                    </o>
-                    <o>
                       <v n="Id">2477733581L</v>
                       <v n="Value">""</v>
                     </o>
@@ -1035,6 +1032,73 @@
                     </o>
                     <o>
                       <v n="Id">2084442062L</v>
+                      <v n="Value">"MAIN.Seedra.Machine_HMI"</v>
+                    </o>
+                    <o>
+                      <v n="Id">2322814029L</v>
+                      <o n="Value" t="VisualizationNode">
+                        <v n="VisuNodeReferenceGuid">{00000000-0000-0000-0000-000000000000}</v>
+                        <n n="VisuNodeReference" />
+                        <v n="VisNodeRefs33">"V_InfoMenu"</v>
+                        <l n="TypeNodeChildren" t="ArrayList" cet="BasicTypeNode">
+                          <o>
+                            <v n="Flags">2L</v>
+                            <v n="BasicTypeNodeValue">"MAIN.Seedra.Machine_HMI"</v>
+                            <v n="BasicTypeNodeAcceptsExpression">true</v>
+                            <n n="BasicTypeNodeFastAccess" />
+                            <a n="BasicTypeNodeEnumValues" et="String" />
+                            <n n="EnumValueDisplayTextIds" />
+                            <n n="EnumValueVisibilityAttributeValues" />
+                            <n n="EnumValueLibraryId" />
+                            <n n="DynamicEnumMemberVisibilityCheckerTypeGuid" />
+                            <l n="TypeNodeChildren" t="ArrayList" />
+                            <o n="TypeNodeType" t="TypeNodeType">
+                              <v n="TypeClass" t="TypeClass">Reference</v>
+                              <v n="QualifiedName">"ST_Machine_HMI"</v>
+                              <v n="Name">"ST_Machine_HMI"</v>
+                            </o>
+                            <v n="TypeNodeName">"Machine_HMI"</v>
+                            <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
+                              <v n="AttrFlags">0UL</v>
+                              <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" />
+                              <v n="ConvDone">true</v>
+                            </o>
+                            <v n="TypeNodeId" t="Int16">255</v>
+                            <v n="TypeNodeIdLong">2639317859L</v>
+                            <n n="LibraryId" />
+                            <n n="DisplayTextId" />
+                            <n n="DescriptionTextID" />
+                            <v n="DescriptionUseParent">false</v>
+                          </o>
+                        </l>
+                        <o n="TypeNodeType" t="TypeNodeType">
+                          <v n="TypeClass" t="TypeClass">Userdef</v>
+                          <v n="QualifiedName">"IVisualisation"</v>
+                          <v n="Name">"IVisualisation"</v>
+                        </o>
+                        <v n="TypeNodeName">"[1]"</v>
+                        <o n="TypeNodeAttributes" t="TypeNodeAttributes2">
+                          <v n="AttrFlags">0UL</v>
+                          <d n="TypeNodeAttributesData" t="CaseInsensitiveHashtable" ckt="String" cvt="String">
+                            <v>conditionalshow</v>
+                            <v>visu_elemdev</v>
+                            <v>ieccodeconversion_useexistinginterface</v>
+                            <v>_3S.CoDeSys.VisuGenerated.IVisualisationIEC</v>
+                            <v>''NORMAL__COMMENT</v>
+                            <v> interface contains additional methods to IVisualElement</v>
+                          </d>
+                          <v n="ConvDone">true</v>
+                        </o>
+                        <v n="TypeNodeId" t="Int16">1</v>
+                        <v n="TypeNodeIdLong">2322814029L</v>
+                        <n n="LibraryId" />
+                        <n n="DisplayTextId" />
+                        <n n="DescriptionTextID" />
+                        <v n="DescriptionUseParent">false</v>
+                      </o>
+                    </o>
+                    <o>
+                      <v n="Id">2639317859L</v>
                       <v n="Value">"MAIN.Seedra.Machine_HMI"</v>
                     </o>
                   </l>

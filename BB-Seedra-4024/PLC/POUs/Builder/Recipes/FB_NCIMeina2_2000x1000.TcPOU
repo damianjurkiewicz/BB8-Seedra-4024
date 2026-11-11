@@ -11,7 +11,6 @@
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR
       i          : INT;
-	  sRecipeName : STRING(255) := '\Hard Disk2\TangentialCut2.nc';
 END_VAR
 
 VAR_INST
@@ -55,11 +54,11 @@ CASE nBuildStep OF
         nBuildStep := 10;
 
     10:
-      //  IF THIS^.WriteGCodeFile('\Hard Disk2\TangentialCut.nc') THEN
+        IF THIS^.WriteGCodeFile('\Hard Disk2\Meina2_2000x1000.nc') THEN
             ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Generator: Zapisano plik TangentialCut.nc', '');
-			 _Config.GCodePath := sRecipeName;
+			 
             nBuildStep := 1000;
-      //  END_IF
+        END_IF
 
     1000:
         _Busy := FALSE;
