@@ -10,13 +10,15 @@
     <Method Name="Build" Id="{aa1e595f-ced9-4a60-89fc-140c3e1dd111}">
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR
-      i          : INT;
-	  sRecipeName : STRING(255) := '\Hard Disk\GCode\CimasaSampleBox.nc';
 END_VAR
-
 VAR_INST
     nBuildStep : INT;
     machineConfig : ST_GantryXYZ_Config;
+    
+    // Zmienne do obsługi kopiowania
+    fbFileCopy : FB_FileCopy;
+    sUsbPath   : STRING(255) := '\Hard Disk2\vrg_flash\Cimasa_SampleBox.nc';
+    sPlcPath   : STRING(255) := '\Hard Disk\GCode\Cimasa_SampleBox.nc';
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[Build := FALSE;
@@ -27,11 +29,33 @@ CASE nBuildStep OF
         _Done := FALSE;
         _Error := FALSE;
         
-        _Config.GCodePath := sRecipeName; 
+        // Rozpoczęcie kopiowania z pendrive'a (Hard Disk2) na dysk PLC
+        fbFileCopy(
+            sSrcPathName  := sUsbPath,
+            sDestPathName := sPlcPath,
+            bExecute      := TRUE
+        );
         
-        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, CONCAT('Builder: Skonfigurowano gotowy plik G-Code: ', sRecipeName), '');
+        nBuildStep := 10;
+
+    10:
+        fbFileCopy(bExecute := FALSE); // Opuszczenie flagi Execute
         
-        nBuildStep := 1000;
+        // Oczekiwanie na zakończenie pracy bloku kopiującego
+        IF NOT fbFileCopy.bBusy THEN
+            IF fbFileCopy.bError THEN
+                // Błąd kopiowania (np. brak USB lub pliku) - logujemy i idziemy dalej
+                ADSLOGSTR(ADSLOG_MSGTYPE_WARN, 'Brak pliku Cimasa na USB. Uzywam wersji z dysku PLC.', '');
+            ELSE
+                // Sukces - plik został nadpisany nową wersją z USB
+                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, 'Plik CimasaSampleBox.nc zostal zaktualizowany z USB.', '');
+            END_IF
+            
+            // Niezależnie od wyniku (błąd czy sukces), recepta wskazuje na plik lokalny
+            _Config.GCodePath := sPlcPath; 
+            
+            nBuildStep := 1000;
+        END_IF
 
     1000:
         _Busy := FALSE;
@@ -57,7 +81,7 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCICimasa_SampleBox.Build">
-      <LineId Id="2873" Count="19" />
+      <LineId Id="2913" Count="41" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCICimasa_SampleBox.ExecutionRoute.Get">

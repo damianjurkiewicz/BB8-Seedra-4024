@@ -10,13 +10,14 @@
     <Method Name="Build" Id="{35e58042-1596-4d98-b2a8-ce51c28b018b}">
       <Declaration><![CDATA[METHOD Build : BOOL
 VAR
-      i          : INT;
-	  sRecipeName : STRING(255) := '\Hard Disk\GCode\Meina2_SampleBox.nc';
 END_VAR
-
 VAR_INST
     nBuildStep : INT;
     machineConfig : ST_GantryXYZ_Config;
+    
+    fbFileCopy : FB_FileCopy;
+    sUsbPath   : STRING(255) := '\Hard Disk2\vrg_flash\Meina2_SampleBox.nc';
+    sPlcPath   : STRING(255) := '\Hard Disk\GCode\Meina2_SampleBox.nc';
 END_VAR]]></Declaration>
       <Implementation>
         <ST><![CDATA[Build := FALSE;
@@ -27,11 +28,29 @@ CASE nBuildStep OF
         _Done := FALSE;
         _Error := FALSE;
         
-        _Config.GCodePath := sRecipeName; 
+        fbFileCopy(
+            sSrcPathName  := sUsbPath,
+            sDestPathName := sPlcPath,
+            bExecute      := TRUE
+        );
         
-        ADSLOGSTR(ADSLOG_MSGTYPE_HINT, CONCAT('Builder: Skonfigurowano gotowy plik G-Code: ', sRecipeName), '');
+        nBuildStep := 10;
+
+    10:
+        fbFileCopy(bExecute := FALSE); 
         
-        nBuildStep := 1000;
+
+        IF NOT fbFileCopy.bBusy THEN
+            IF fbFileCopy.bError THEN
+                ADSLOGSTR(ADSLOG_MSGTYPE_WARN, 'No FLash.', '');
+            ELSE
+                ADSLOGSTR(ADSLOG_MSGTYPE_HINT, '.nc Flash.', '');
+            END_IF
+            
+            _Config.GCodePath := sPlcPath; 
+            
+            nBuildStep := 1000;
+        END_IF
 
     1000:
         _Busy := FALSE;
@@ -57,7 +76,11 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIMeina2_SampleBox.Build">
-      <LineId Id="2956" Count="19" />
+      <LineId Id="2996" Count="7" />
+      <LineId Id="3005" Count="13" />
+      <LineId Id="3020" Count="1" />
+      <LineId Id="3023" Count="2" />
+      <LineId Id="3027" Count="10" />
       <LineId Id="11" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCIMeina2_SampleBox.ExecutionRoute.Get">
