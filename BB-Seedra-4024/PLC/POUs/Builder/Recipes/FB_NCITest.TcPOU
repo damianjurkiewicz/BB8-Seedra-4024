@@ -41,7 +41,8 @@ CASE nBuildStep OF
         // --- BUFOR G-CODE ---
         _aGCodeBuffer[1]   := '(1001)$N';
         _aGCodeBuffer[2]   := 'N0 G01 Z22 F600$N';
-        _aGCodeBuffer[3]   := 'N1 G01 X310 Y305 F3000$N';
+        _aGCodeBuffer[3]   := 'N1 G01 Q1=7110. F72000';
+		
 
         
         _nLinesToWrite := 3; 
@@ -83,7 +84,9 @@ END_VAR
       <LineId Id="9" Count="0" />
     </LineIds>
     <LineIds Name="FB_NCITest.Build">
-      <LineId Id="8124" Count="37" />
+      <LineId Id="8124" Count="23" />
+      <LineId Id="8180" Count="0" />
+      <LineId Id="8148" Count="13" />
       <LineId Id="8163" Count="8" />
       <LineId Id="11" Count="0" />
     </LineIds>

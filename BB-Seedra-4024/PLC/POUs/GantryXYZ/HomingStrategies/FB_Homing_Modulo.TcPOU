@@ -8,10 +8,9 @@ END_VAR
 VAR
     fbMcHome          : MC_Home;
     fbMoveAbs         : MC_MoveAbsolute;
-    fbMoveModulo      : MC_MoveModulo;
     fbSetPosition     : MC_SetPosition; 
-    DelayTimer        : TON;
     _HomingVelocity   : LREAL := 50.0;
+    _TargetPos        : LREAL := 0.0;
 END_VAR]]></Declaration>
     <Implementation>
       <ST><![CDATA[]]></ST>
@@ -25,7 +24,6 @@ END_VAR
         <ST><![CDATA[IF _Axis <> 0 THEN
     fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
     fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
-    fbMoveModulo(Axis := _Axis.Axis, Execute := FALSE);
     fbSetPosition(Axis := _Axis.Axis, Execute := FALSE); 
 END_IF
 
@@ -34,70 +32,100 @@ SUPER^.Abort();]]></ST>
     </Method>
     <Method Name="CyclicLogic" Id="{afe30813-6e1e-4130-8cfc-c80e37369084}">
       <Declaration><![CDATA[METHOD CyclicLogic
-]]></Declaration>
+VAR
+    lrCurrentPos : LREAL;
+    lrRemainder  : LREAL;
+END_VAR]]></Declaration>
       <Implementation>
-        <ST><![CDATA[CASE nStep OF
+        <ST><![CDATA[
+
+CASE nStep OF
     0: 
         fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
         fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
-        fbMoveModulo(Axis := _Axis.Axis, Execute := FALSE);
         fbSetPosition(Axis := _Axis.Axis, Execute := FALSE); 
 
-    10: 
-        IF _Axis.Axis.Status.Homed THEN
-            nStep := 20;
-        ELSE
-            fbMcHome(
-                Axis        := _Axis.Axis, 
-                Execute     := TRUE, 
-                Position    := ReferencePosition,
-                HomingMode  := MC_Direct
-            );
-            
-            IF fbMcHome.Done THEN
-                fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
-                nStep := 20;
-            ELSIF fbMcHome.Error THEN
-                _bBusy    := FALSE;
-                _bError   := TRUE;
-                _bErrorID := fbMcHome.ErrorID;
-                nStep     := 0;
-            END_IF
+		10: 
+			IF _Axis.Axis.Status.Homed THEN
+				ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '6. HomingModulo [Step 10] -> AxisQ juz Homed=TRUE, ide do 15', '');
+				nStep := 15;
+			ELSE
+				IF NOT fbMcHome.Busy THEN
+					ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '6. HomingModulo [Step 10] -> start MC_Home(MC_Direct)', '');
+				END_IF
+				fbMcHome(
+					Axis        := _Axis.Axis, 
+					Execute     := TRUE, 
+					Position    := ReferencePosition,
+					HomingMode  := MC_Direct
+				);
+				
+				IF fbMcHome.Done THEN
+					ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '6a. HomingModulo [Step 10] -> MC_Home DONE', '');
+					fbMcHome(Axis := _Axis.Axis, Execute := FALSE);
+					nStep := 15;
+				ELSIF fbMcHome.Error THEN
+					ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'BLAD HomingModulo [Step 10] -> MC_Home ErrorID: %s', UDINT_TO_STRING(fbMcHome.ErrorID));
+					_bBusy    := FALSE;
+					_bError   := TRUE;
+					_bErrorID := fbMcHome.ErrorID;
+					nStep     := 0;
+				END_IF
+			END_IF
+		
+15:
+        lrCurrentPos := _Axis.Axis.NcToPlc.ActPos;
+        lrRemainder  := lrCurrentPos - DINT_TO_LREAL(LREAL_TO_DINT(lrCurrentPos / 360.0)) * 360.0;
+        _TargetPos   := lrRemainder; // Zapis do zmiennej instancyjnej FB (nie ginie w kolejnym cyklu!)
+        ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '7. HomingModulo [Step 15] -> ActPos=%s', LREAL_TO_STRING(lrCurrentPos));
+        ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '7a. HomingModulo [Step 15] -> zapisano _TargetPos=%s', LREAL_TO_STRING(_TargetPos));
+        nStep        := 20;
+
+    20:
+        IF NOT fbSetPosition.Busy THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '8. HomingModulo [Step 20] -> start MC_SetPosition na: %s', LREAL_TO_STRING(_TargetPos));
         END_IF
 
-    20: 
-        fbMoveModulo(
-            Axis      := _Axis.Axis,
-            Execute   := TRUE,
-            Velocity  := _HomingVelocity,
-            Position  := 0.0,
-            Direction := MC_Shortest_Way 
-        );
-        
-        IF fbMoveModulo.Done THEN
-            fbMoveModulo(Axis := _Axis.Axis, Execute := FALSE);
-            nStep := 30; 
-        ELSIF fbMoveModulo.Error THEN
-            _bBusy    := FALSE;
-            _bError   := TRUE;
-            _bErrorID := fbMoveModulo.ErrorID;
-            nStep     := 0;
-        END_IF
-
-    30:
         fbSetPosition(
             Axis     := _Axis.Axis,
             Execute  := TRUE,
-            Position := 0.0
+            Position := _TargetPos, // Tu jest +90.0°, więc NC wie, że nóż jest 90° od oryginalnego 0°
+            Mode     := FALSE
         );
         
         IF fbSetPosition.Done THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '9. HomingModulo [Step 20] -> MC_SetPosition DONE', '');
             fbSetPosition(Axis := _Axis.Axis, Execute := FALSE);
-            nStep := 40;
+            nStep := 30;
         ELSIF fbSetPosition.Error THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'BLAD HomingModulo [Step 20] -> MC_SetPosition ErrorID: %s', UDINT_TO_STRING(fbSetPosition.ErrorID));
             _bBusy    := FALSE;
             _bError   := TRUE;
             _bErrorID := fbSetPosition.ErrorID;
+            nStep     := 0;
+        END_IF
+
+    30: 
+        IF NOT fbMoveAbs.Busy THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '10. HomingModulo [Step 30] -> start MC_MoveAbsolute do 0.0', '');
+        END_IF
+
+        fbMoveAbs(
+            Axis      := _Axis.Axis,
+            Execute   := TRUE,
+            Position  := 0.0, // Fizyczny obrót z +90.0° na oryginalne 0.0° (ruch o -90°)
+            Velocity  := _HomingVelocity
+        );
+        
+        IF fbMoveAbs.Done THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '11. HomingModulo [Step 30] -> MC_MoveAbsolute DONE (os na 0.0)', '');
+            fbMoveAbs(Axis := _Axis.Axis, Execute := FALSE);
+            nStep := 40; 
+        ELSIF fbMoveAbs.Error THEN
+            ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'BLAD HomingModulo [Step 30] -> MC_MoveAbsolute ErrorID: %s', UDINT_TO_STRING(fbMoveAbs.ErrorID));
+            _bBusy    := FALSE;
+            _bError   := TRUE;
+            _bErrorID := fbMoveAbs.ErrorID;
             nStep     := 0;
         END_IF
         
@@ -131,11 +159,16 @@ END_VAR
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_Modulo.Abort">
-      <LineId Id="20" Count="6" />
+      <LineId Id="20" Count="2" />
+      <LineId Id="24" Count="2" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_Modulo.CyclicLogic">
-      <LineId Id="574" Count="68" />
+      <LineId Id="648" Count="7" />
+      <LineId Id="729" Count="27" />
+      <LineId Id="873" Count="53" />
+      <LineId Id="864" Count="4" />
+      <LineId Id="724" Count="0" />
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_Homing_Modulo.HomingVelocity.Get">

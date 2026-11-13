@@ -1016,107 +1016,110 @@ END_VAR
 ]]></Declaration>
       <Implementation>
         <ST><![CDATA[CASE _CurrentMode OF
-
     E_PMLUnitMode.ePMLUnitMode_Production:
         CASE SequenceState OF
-            0:
-                NoStateTasksToComplete := FALSE;
-                StateTasksComplete     := FALSE;
-				
-				// PACKML HANDSHAKE RESET: 
-                // We drop the old recipe reference by setting the pointer to 0 (null). 
-                // This guarantees that Gantry won't accidentally start using data from the previous 
-                // production cycle and forces it to wait for a fresh injection from the parent machine.
-				_RecipeBuilder := 0;
-                SequenceState          := 10;
+			0:
+				ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '2. Gantry.Resetting [Step 0] -> start', '');
+				NoStateTasksToComplete := FALSE;
+				StateTasksComplete     := FALSE;
+				_RecipeBuilder         := 0;
+				SequenceState          := 10;
 				DelayTimer(IN := FALSE);
-        
-            10:
-                AxisX.Enable();
-                AxisY.Enable();
-                AxisZ.Enable();
-                AxisQ.Enable();
-                SequenceState := 20;
-        
-            20:
-                IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled AND AxisQ.Enabled THEN
-                    SequenceState := 25;
-                END_IF
-        
+			
+			10:
+				ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '3. Gantry.Resetting [Step 10] -> AxisX/Y/Z/Q.Enable()', '');
+				AxisX.Enable();
+				AxisY.Enable();
+				AxisZ.Enable();
+				AxisQ.Enable();
+				SequenceState := 20;
+			
+			20:
+				IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled AND AxisQ.Enabled THEN
+					ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '4. Gantry.Resetting [Step 20] -> wszystkie osie Enabled', '');
+					SequenceState := 25;
+				END_IF
+			
 			25:
 				IF NOT AxisZ.Busy THEN
-					IF AxisZ.Axis.Status.Homed THEN
-						IF NOT IsZAboveMaterial() THEN
-							MoveZToSafePosition();
-							DelayTimer(IN := FALSE);
-							SequenceState := 27;
-						ELSE
-							SequenceState := 30;
-						END_IF
+					IF AxisZ.Axis.Status.Homed AND NOT IsZAboveMaterial() THEN
+						ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '4a. Gantry.Resetting [Step 25] -> MoveZToSafePosition()', '');
+						MoveZToSafePosition();
+						DelayTimer(IN := FALSE);
+						SequenceState := 27;
 					ELSE
 						SequenceState := 30;
 					END_IF
 				END_IF
-            27:
-                IF AxisZ.InPosition THEN
-                    SequenceState := 30;
-                ELSIF AxisZ.Error THEN
-                    SequenceState := 99;
-                END_IF
-                
-            30:   
-                fbHomeStratQ.Execute();
-                DelayTimer(IN := TRUE, PT := T#700MS);
-                IF DelayTimer.Q THEN
-                    DelayTimer(IN := FALSE); 
-                    SequenceState := 31;
-                END_IF
-				
-			31:	
-				IF fbHomeStratQ.Done THEN
-                    SequenceState := 32;
-				END_IF	
 			
-			32: 
-		    	fbHomeStratZ.Execute();
+			27:
+				IF NOT AxisZ.Busy AND AxisZ.InPosition THEN
+					SequenceState := 30;
+				ELSIF AxisZ.Error THEN
+					ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'BLAD Gantry.Resetting [Step 27] -> AxisZ.Error', '');
+					SequenceState := 99;
+				END_IF
+			
+			30: // Start Q (1 cykl PLC)
+				ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '5. Gantry.Resetting [Step 30] -> fbHomeStratQ.Execute()', '');
+				fbHomeStratQ.Execute();
+				DelayTimer(IN := FALSE);
+				SequenceState := 31;
+
+            31: // Odstęp 700 ms przed Z
                 DelayTimer(IN := TRUE, PT := T#700MS);
                 IF DelayTimer.Q THEN
-                    DelayTimer(IN := FALSE); 
+                    DelayTimer(IN := FALSE);
+                    SequenceState := 32;
+                END_IF
+
+            32: // Start Z (1 cykl PLC)
+                fbHomeStratZ.Execute();
+                DelayTimer(IN := FALSE);
+                SequenceState := 33;
+
+            33: // Odstęp 700 ms przed Y
+                DelayTimer(IN := TRUE, PT := T#700MS);
+                IF DelayTimer.Q THEN
+                    DelayTimer(IN := FALSE);
                     SequenceState := 34;
                 END_IF
 
-            34:     
-				fbHomeStratY.Execute();    
+            34: // Start Y (1 cykl PLC)
+                fbHomeStratY.Execute();
+                DelayTimer(IN := FALSE);
+                SequenceState := 35;
+
+            35: // Odstęp 700 ms przed X
                 DelayTimer(IN := TRUE, PT := T#700MS);
                 IF DelayTimer.Q THEN
-                    DelayTimer(IN := FALSE); 
+                    DelayTimer(IN := FALSE);
                     SequenceState := 38;
                 END_IF
 
+            38: // Start X (1 cykl PLC)
+                fbHomeStratX.Execute();
+                SequenceState := 44;
 
-            38: 
-				fbHomeStratX.Execute();    
-                DelayTimer(IN := TRUE, PT := T#700MS);
-                IF DelayTimer.Q THEN
-                    DelayTimer(IN := FALSE); 
-                    SequenceState := 44;
-                END_IF
-				
-        
-			44: 	
-				IF fbHomeStratX.Done AND fbHomeStratY.Done THEN
-                    SequenceState := 50;
-                ELSIF fbHomeStratX.Error OR fbHomeStratY.Error OR fbHomeStratQ.Error THEN
-                    SequenceState := 99;
-                END_IF
-				
+			44: // Czekamy na zakończenie wszystkich 4 osi
+				IF fbHomeStratX.Done AND fbHomeStratY.Done AND fbHomeStratZ.Done AND fbHomeStratQ.Done THEN
+					ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, '12. Gantry.Resetting [Step 44] -> wszystkie strategie Homing DONE', '');
+					SequenceState := 50;
+				ELSIF fbHomeStratX.Error OR fbHomeStratY.Error OR fbHomeStratZ.Error OR fbHomeStratQ.Error THEN
+					ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'BLAD Gantry.Resetting [Step 44] -> Q_ErrID: %s', UDINT_TO_STRING(fbHomeStratQ.ErrorID));
+					ADSLOGSTR(ADSLOG_MSGTYPE_ERROR, 'BLAD Gantry.Resetting [Step 44] -> X/Y/Z ErrID: %s',
+						CONCAT(UDINT_TO_STRING(fbHomeStratX.ErrorID),
+						CONCAT(' / ', CONCAT(UDINT_TO_STRING(fbHomeStratY.ErrorID),
+						CONCAT(' / ', UDINT_TO_STRING(fbHomeStratZ.ErrorID))))));
+					SequenceState := 99;
+				END_IF
+
             50:
                 StateTasksComplete := TRUE;
-                SequenceState      := 0; 
-        
+                SequenceState      := 0;
+
             99:
                 ChangeState(E_PMLCommand.ePMLCommand_Abort);
-                
         END_CASE
 
     E_PMLUnitMode.ePMLUnitMode_Maintenance, E_PMLUnitMode.ePMLUnitMode_Manual:
@@ -1124,21 +1127,17 @@ END_VAR
             0:
                 NoStateTasksToComplete := FALSE;
                 SequenceState := 10;
-
             10:
                 AxisX.Enable();
                 AxisY.Enable();
                 AxisZ.Enable();
                 AxisQ.Enable();
-
                 IF AxisX.Enabled AND AxisY.Enabled AND AxisZ.Enabled AND AxisQ.Enabled THEN
                     SequenceState := 20;
                 END_IF
-
             20:
                 StateTasksComplete := TRUE;
         END_CASE
-
 END_CASE
 
 SUPER^.Resetting();]]></ST>
@@ -1401,42 +1400,11 @@ END_CASE]]></ST>
       <LineId Id="2" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.Resetting">
-      <LineId Id="1513" Count="6" />
-      <LineId Id="1763" Count="0" />
-      <LineId Id="1765" Count="2" />
-      <LineId Id="1764" Count="0" />
-      <LineId Id="1762" Count="0" />
-      <LineId Id="1520" Count="0" />
-      <LineId Id="1636" Count="0" />
-      <LineId Id="1521" Count="12" />
-      <LineId Id="1738" Count="1" />
-      <LineId Id="1741" Count="8" />
-      <LineId Id="1752" Count="1" />
-      <LineId Id="1544" Count="0" />
-      <LineId Id="1551" Count="7" />
-      <LineId Id="1689" Count="0" />
-      <LineId Id="1726" Count="3" />
-      <LineId Id="1697" Count="0" />
-      <LineId Id="1695" Count="1" />
-      <LineId Id="1692" Count="2" />
-      <LineId Id="1641" Count="0" />
-      <LineId Id="1681" Count="0" />
-      <LineId Id="1684" Count="0" />
-      <LineId Id="1722" Count="3" />
-      <LineId Id="1688" Count="0" />
-      <LineId Id="1656" Count="1" />
-      <LineId Id="1713" Count="4" />
-      <LineId Id="1662" Count="3" />
-      <LineId Id="1671" Count="0" />
-      <LineId Id="1666" Count="3" />
-      <LineId Id="1623" Count="0" />
-      <LineId Id="1672" Count="0" />
-      <LineId Id="1571" Count="0" />
-      <LineId Id="1698" Count="0" />
-      <LineId Id="1701" Count="3" />
-      <LineId Id="1700" Count="0" />
-      <LineId Id="1699" Count="0" />
-      <LineId Id="1572" Count="30" />
+      <LineId Id="1776" Count="2" />
+      <LineId Id="1899" Count="45" />
+      <LineId Id="1819" Count="36" />
+      <LineId Id="1945" Count="10" />
+      <LineId Id="1861" Count="27" />
       <LineId Id="27" Count="0" />
     </LineIds>
     <LineIds Name="FB_GantryXYZ.StateChanged">
