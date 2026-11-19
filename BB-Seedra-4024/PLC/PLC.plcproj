@@ -17,6 +17,7 @@
     <Implicit_Jitter_Distribution>{06faaaad-929c-4cdc-b8d5-b3a4bb2b7341}</Implicit_Jitter_Distribution>
     <LibraryReferences>{e7cbf271-3fc6-4bd7-81ed-46cc1d9ca872}</LibraryReferences>
     <Released>false</Released>
+    <CombineIds>true</CombineIds>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="DUTs\ST_Recipe_Limits.TcDUT">
@@ -268,15 +269,6 @@
     <Compile Include="POUs\TESTS\FB_Cylinder_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\TESTS\FB_ExecutorNCITable_Test.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TESTS\FB_ExecutorGCode_Test.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TESTS\FB_FeedBuilderRoundedRect_Test.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="POUs\TESTS\FB_NciChannelTangential_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
@@ -286,37 +278,7 @@
     <Compile Include="POUs\TESTS\FB_GantryXYZ_Test.TcPOU">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="POUs\TESTS\FB_ExecutorCut_Test.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TESTS\FB_ExecutorGrooveXY_Test.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TESTS\FB_RecipeBuilder_Test.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="POUs\TESTS\FB_RecipeFactory_Test.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TESTS\FB_Exec_Drill_PTP_Test.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TESTS\Mocks\FB_MockAxis.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TESTS\Mocks\FB_MockRecipe_Drill.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TESTS\Mocks\FB_MockGeometryWriter.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TESTS\Mocks\FB_MockNciChannelFeedTable.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TESTS\Mocks\FB_MockNciChannel.TcPOU">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="POUs\TESTS\Mocks\FB_MockCylinder.TcPOU">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="POUs\TESTS\Mocks\FB_MockConfigProvider.TcPOU">
